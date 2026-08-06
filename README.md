@@ -1,8 +1,8 @@
 # كينزا هب - Kenza Hub (Flutter)
 
-**Marketplace for buying/selling used clothes in Egypt**
+**Marketplace for buying/selling Stock and used clothes in Egypt**
 
-نسخة Dart/Flutter الكاملة لتطبيق كينزا هب - سوق إلكتروني لبيع وشراء الملابس المستعملة في مصر.
+نسخة Dart/Flutter الكاملة لتطبيق كينزا هب - سوق إلكتروني لبيع وشراء الملابس الاستوك و المستعملة في مصر.
 
 ## 📱 المميزات الأساسية
 
