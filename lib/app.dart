@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'welcome_screen.dart';
+import 'screens/welcome/welcome_screen.dart'; 
 
 class KenzaHubApp extends StatelessWidget {
   const KenzaHubApp({super.key});
