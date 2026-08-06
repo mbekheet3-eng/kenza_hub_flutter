@@ -8,7 +8,13 @@ on:
 jobs:
   build-apk:
     name: Build debug APK
-    runs-on: ubuntu-latest
+    # Add concurrency to avoid duplicate/competing runs and reduce queue pressure
+    concurrency:
+      group: build-apk-${{ github.ref }}
+      cancel-in-progress: false
+    # Use an explicit Ubuntu image version to avoid transient hosted-runner allocation issues
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
 
     steps:
       - name: Checkout repository
