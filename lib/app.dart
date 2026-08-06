@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'screens/welcome/welcome_screen.dart'; 
+import 'screens/welcome/welcome_screen.dart';
 
 class KenzaHubApp extends StatelessWidget {
   const KenzaHubApp({super.key});
@@ -8,39 +8,20 @@ class KenzaHubApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Kenza Hub',
       debugShowCheckedModeBanner: false,
 
-      // اللغة الافتراضية ستصبح لغة الجهاز،
-      // وسنضيف تغيير اللغة لاحقًا.
-      locale: WidgetsBinding.instance.platformDispatcher.locale,
-
-      supportedLocales: const [
-        Locale('ar'),
-        Locale('en'),
-        Locale('fr'),
-      ],
+      title: 'Kenza Hub',
 
       theme: ThemeData(
-        useMaterial3: true,
-
+        scaffoldBackgroundColor: Colors.white,
         fontFamily: 'Cairo',
-
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFFC62828),
         ),
-
-        scaffoldBackgroundColor: Colors.white,
-
-        appBarTheme: const AppBarTheme(
-          elevation: 0,
-          backgroundColor: Colors.white,
-          foregroundColor: Color(0xFF0F172A),
-          centerTitle: true,
-        ),
+        useMaterial3: true,
       ),
 
       home: const WelcomeScreen(),
     );
   }
-}
+} 
