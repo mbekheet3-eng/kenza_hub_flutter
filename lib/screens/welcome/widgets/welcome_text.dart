@@ -6,7 +6,9 @@ class WelcomeText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24),
+      padding: EdgeInsets.symmetric(
+        horizontal: 24,
+      ),
       child: Column(
         children: [
           Text(
@@ -19,7 +21,9 @@ class WelcomeText extends StatelessWidget {
               height: 1.3,
             ),
           ),
+
           SizedBox(height: 12),
+
           Text(
             'بيع واشتري بسهولة من غير عمولة',
             textAlign: TextAlign.center,
