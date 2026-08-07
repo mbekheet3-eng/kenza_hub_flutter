@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kenza_hub_flutter/config/app_colors.dart';
 import 'package:kenza_hub_flutter/config/app_spacing.dart';
 import 'package:kenza_hub_flutter/config/app_radius.dart';
 
@@ -11,7 +10,7 @@ class WelcomeScreen extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).colorScheme.background,
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
