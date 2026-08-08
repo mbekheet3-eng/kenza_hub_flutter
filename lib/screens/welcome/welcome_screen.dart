@@ -13,44 +13,45 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-
       child: Scaffold(
         backgroundColor: Colors.white,
-
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(
               horizontal: 24,
               vertical: 20,
             ),
-
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
+                HeaderSection(
+                  currentLanguage: 'العربية',
+                  onLanguageChanged: (language) {},
+                ),
 
-                // Logo + Brand
-                HeaderSection(),
+                const SizedBox(height: 25),
 
-                SizedBox(height: 25),
+                const ImageSlider(),
 
-                // صور العرض
-                ImageSlider(),
+                const SizedBox(height: 25),
 
-                SizedBox(height: 25),
+                const WelcomeText(),
 
-                // النص الترحيبي
-                WelcomeText(),
+                const SizedBox(height: 30),
 
-                SizedBox(height: 30),
+                ActionButtons(
+                  onSignUp: () {},
+                  onLogin: () {},
+                  onGuest: () {},
+                ),
 
-                // أزرار الدخول والتسجيل
-                ActionButtons(),
+                const SizedBox(height: 25),
 
-                SizedBox(height: 25),
-
-                // الروابط السفلية
-                FooterLinks(),
-
+                FooterLinks(
+                  onAbout: () {},
+                  onTerms: () {},
+                  onPrivacy: () {},
+                ),
               ],
             ),
           ),
