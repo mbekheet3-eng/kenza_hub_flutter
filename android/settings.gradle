@@ -24,14 +24,4 @@ plugins {
 
 include ":app"
 
-def localPropertiesFile = new File(rootDir, "local.properties")
-def properties = new Properties()
 
-if (localPropertiesFile.exists()) {
-    properties.load(new FileInputStream(localPropertiesFile))
-}
-
-def flutterRoot = properties.getProperty('flutter.sdk')
-if (flutterRoot != null) {
-    apply from: "${flutterRoot}/packages/flutter_tools/gradle/app_plugin_loader.gradle"
-}
