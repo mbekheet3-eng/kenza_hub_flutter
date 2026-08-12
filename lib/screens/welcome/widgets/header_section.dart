@@ -13,34 +13,40 @@ class HeaderSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 16,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Language Button
           OutlinedButton(
-            onPressed: () {
-              _showLanguageSheet(context);
-            },
+            onPressed: () => _showLanguageSheet(context),
             style: OutlinedButton.styleFrom(
               foregroundColor: const Color(0xFFC62828),
               side: const BorderSide(
                 color: Color(0xFFC62828),
+                width: 1.2,
+              ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 9,
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(24),
               ),
             ),
-            child: Text(currentLanguage.toUpperCase()),
+            child: Text(
+              currentLanguage,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
 
-          // Logo
           Image.asset(
             'assets/images/logo.png',
-            height: 42,
+            height: 46,
+            fit: BoxFit.contain,
           ),
         ],
       ),
@@ -50,32 +56,64 @@ class HeaderSection extends StatelessWidget {
   void _showLanguageSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(24),
+        ),
+      ),
       builder: (_) {
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              const SizedBox(height: 8),
+
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE5E7EB),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
               ListTile(
-                title: const Text('العربية'),
+                title: const Text(
+                  'العربية',
+                  textAlign: TextAlign.right,
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   onLanguageChanged('ar');
                 },
               ),
+
               ListTile(
-                title: const Text('English'),
+                title: const Text(
+                  'English',
+                  textAlign: TextAlign.right,
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   onLanguageChanged('en');
                 },
               ),
+
               ListTile(
-                title: const Text('Français'),
+                title: const Text(
+                  'Français',
+                  textAlign: TextAlign.right,
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   onLanguageChanged('fr');
                 },
               ),
+
+              const SizedBox(height: 8),
             ],
           ),
         );
