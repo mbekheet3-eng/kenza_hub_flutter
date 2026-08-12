@@ -11,6 +11,11 @@ class _ImageSliderState extends State<ImageSlider>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
+  static const double _imageWidth = 105;
+  static const double _imageHeight = 130;
+  static const double _imageSpacing = 5;
+  static const double _rowGap = 12;
+
   final List<String> _row1 = const [
     'assets/images/welcome/welcome_row1_01.png',
     'assets/images/welcome/welcome_row1_02.png',
@@ -37,6 +42,10 @@ class _ImageSliderState extends State<ImageSlider>
     'assets/images/welcome/welcome_row2_10.png',
   ];
 
+  double get _singleSetWidth {
+    return _row1.length * (_imageWidth + (_imageSpacing * 2));
+  }
+
   @override
   void initState() {
     super.initState();
@@ -55,12 +64,14 @@ class _ImageSliderState extends State<ImageSlider>
 
   Widget _image(String path) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5),
+      padding: const EdgeInsets.symmetric(
+        horizontal: _imageSpacing,
+      ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: SizedBox(
-          width: 105,
-          height: 130,
+          width: _imageWidth,
+          height: _imageHeight,
           child: Image.asset(
             path,
             fit: BoxFit.cover,
@@ -72,20 +83,22 @@ class _ImageSliderState extends State<ImageSlider>
 
   Widget _animatedRow(
     List<String> images, {
-    required bool reverse,
+    required bool moveRight,
   }) {
-    final repeatedImages = [...images, ...images, ...images];
+    final repeatedImages = [
+      ...images,
+      ...images,
+      ...images,
+    ];
 
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        const double travelDistance = 440;
+        final progress = _controller.value;
 
-        final double progress = _controller.value;
-
-        final double offset = reverse
-            ? progress * travelDistance
-            : -progress * travelDistance;
+        final offset = moveRight
+            ? (progress * _singleSetWidth) - _singleSetWidth
+            : -(progress * _singleSetWidth);
 
         return Transform.translate(
           offset: Offset(offset, 0),
@@ -101,26 +114,26 @@ class _ImageSliderState extends State<ImageSlider>
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 275,
+      height: (_imageHeight * 2) + _rowGap,
       child: ClipRect(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              height: 130,
+              height: _imageHeight,
               child: _animatedRow(
                 _row1,
-                reverse: false,
+                moveRight: true,
               ),
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: _rowGap),
 
             SizedBox(
-              height: 130,
+              height: _imageHeight,
               child: _animatedRow(
                 _row2,
-                reverse: true,
+                moveRight: false,
               ),
             ),
           ],
