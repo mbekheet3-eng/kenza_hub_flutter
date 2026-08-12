@@ -6,10 +6,9 @@ class WelcomeText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: 24,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 8),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             'لو مش محتاجها... غيرك محتاجها',
@@ -18,11 +17,11 @@ class WelcomeText extends StatelessWidget {
               fontSize: 30,
               fontWeight: FontWeight.bold,
               color: Color(0xFF0F172A),
-              height: 1.3,
+              height: 1.25,
             ),
           ),
 
-          SizedBox(height: 12),
+          SizedBox(height: 10),
 
           Text(
             'بيع واشتري بسهولة من غير عمولة',
@@ -31,7 +30,7 @@ class WelcomeText extends StatelessWidget {
               fontSize: 18,
               fontWeight: FontWeight.w500,
               color: Color(0xFF6B7280),
-              height: 1.5,
+              height: 1.4,
             ),
           ),
         ],
