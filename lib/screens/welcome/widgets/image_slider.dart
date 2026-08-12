@@ -42,9 +42,9 @@ class _ImageSliderState extends State<ImageSlider>
     'assets/images/welcome/welcome_row2_10.png',
   ];
 
-  double get _singleSetWidth {
-    return _row1.length * (_imageWidth + (_imageSpacing * 2));
-  }
+  double get _itemWidth => _imageWidth + (_imageSpacing * 2);
+
+  double get _setWidth => _row1.length * _itemWidth;
 
   @override
   void initState() {
@@ -81,10 +81,12 @@ class _ImageSliderState extends State<ImageSlider>
     );
   }
 
-  Widget _animatedRow(
+  Widget _buildRow(
     List<String> images, {
     required bool moveRight,
   }) {
+    // تكرار المجموعة يسمح بوجود صور جديدة دائمًا
+    // داخل الـ viewport أثناء الحركة.
     final repeatedImages = [
       ...images,
       ...images,
@@ -96,9 +98,13 @@ class _ImageSliderState extends State<ImageSlider>
       builder: (context, child) {
         final progress = _controller.value;
 
-        final offset = moveRight
-            ? (progress * _singleSetWidth) - _singleSetWidth
-            : -(progress * _singleSetWidth);
+        final double offset;
+
+        if (moveRight) {
+          offset = -_setWidth + (progress * _setWidth);
+        } else {
+          offset = -(progress * _setWidth);
+        }
 
         return Transform.translate(
           offset: Offset(offset, 0),
@@ -115,13 +121,15 @@ class _ImageSliderState extends State<ImageSlider>
   Widget build(BuildContext context) {
     return SizedBox(
       height: (_imageHeight * 2) + _rowGap,
+      width: double.infinity,
       child: ClipRect(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
+              width: double.infinity,
               height: _imageHeight,
-              child: _animatedRow(
+              child: _buildRow(
                 _row1,
                 moveRight: true,
               ),
@@ -130,8 +138,9 @@ class _ImageSliderState extends State<ImageSlider>
             const SizedBox(height: _rowGap),
 
             SizedBox(
+              width: double.infinity,
               height: _imageHeight,
-              child: _animatedRow(
+              child: _buildRow(
                 _row2,
                 moveRight: false,
               ),
