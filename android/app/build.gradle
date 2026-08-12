@@ -1,4 +1,4 @@
-plugins {
+ plugins {
     id "com.android.application"
     id "org.jetbrains.kotlin.android"
     id "dev.flutter.flutter-gradle-plugin"
@@ -7,6 +7,7 @@ plugins {
 android {
     namespace "com.example.kenza_hub_flutter"
     compileSdk 36
+    ndkVersion "28.2.13676358"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -15,10 +16,6 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
-    }
-
-    sourceSets {
-        main.java.srcDirs += "src/main/kotlin"
     }
 
     defaultConfig {
