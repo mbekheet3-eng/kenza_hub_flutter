@@ -16,44 +16,56 @@ class WelcomeScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 20,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                HeaderSection(
-                  currentLanguage: 'العربية',
-                  onLanguageChanged: (language) {},
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        HeaderSection(
+                          currentLanguage: 'العربية',
+                          onLanguageChanged: (language) {},
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        const ImageSlider(),
+
+                        const SizedBox(height: 22),
+
+                        const WelcomeText(),
+
+                        const SizedBox(height: 24),
+
+                        ActionButtons(
+                          onSignUp: () {},
+                          onLogin: () {},
+                          onGuest: () {},
+                        ),
+
+                        const SizedBox(height: 18),
+
+                        FooterLinks(
+                          onAbout: () {},
+                          onTerms: () {},
+                          onPrivacy: () {},
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-
-                const SizedBox(height: 25),
-
-                const ImageSlider(),
-
-                const SizedBox(height: 25),
-
-                const WelcomeText(),
-
-                const SizedBox(height: 30),
-
-                ActionButtons(
-                  onSignUp: () {},
-                  onLogin: () {},
-                  onGuest: () {},
-                ),
-
-                const SizedBox(height: 25),
-
-                FooterLinks(
-                  onAbout: () {},
-                  onTerms: () {},
-                  onPrivacy: () {},
-                ),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),
