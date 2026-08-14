@@ -1,46 +1,50 @@
- plugins {
+plugins {
     id "com.android.application"
-    id "org.jetbrains.kotlin.android"
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
 android {
-    namespace "com.example.kenza_hub_flutter"
-    compileSdk 36
-    ndkVersion "28.2.13676358"
+    namespace = "com.kenza.hub"  // غير ده لو اسم الباكج بتاعك مختلف (افحص AndroidManifest.xml)
+    compileSdk = 34
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     defaultConfig {
-        applicationId "com.example.kenza_hub_flutter"
-        minSdkVersion 21
-        targetSdkVersion 35
-        versionCode flutter.versionCode.toInteger()
-        versionName flutter.versionName
+        applicationId = "com.kenza.hub" // غير ده لو مختلف
+        minSdk = 21
+        targetSdk = 34
+        versionCode = flutterVersionCode.toInteger()
+        versionName = flutterVersionName
     }
 
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
-        }
-
-        debug {
-            debuggable true
+            signingConfig = signingConfigs.debug // للبيتا، لو عايز توقيع رسمي هتغيره بعدين
         }
     }
 }
 
 flutter {
     source = "../.."
-}
-
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
 }
