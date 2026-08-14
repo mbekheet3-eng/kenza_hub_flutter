@@ -1,6 +1,7 @@
 plugins {
     id "com.android.application"
     id "dev.flutter.flutter-gradle-plugin"
+    id "org.jetbrains.kotlin.android"  // <-- تأكد من وجود هذا السطر
 }
 
 def localProperties = new Properties()
@@ -22,7 +23,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace = "com.kenza.hub"  // غير ده لو اسم الباكج بتاعك مختلف (افحص AndroidManifest.xml)
+    namespace = "com.kenza.hub"
     compileSdk = 34
 
     compileOptions {
@@ -30,8 +31,12 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    kotlinOptions {   // <-- أضف هذا البلوك لضمان توافق Kotlin مع Java 17
+        jvmTarget = "17"
+    }
+
     defaultConfig {
-        applicationId = "com.kenza.hub" // غير ده لو مختلف
+        applicationId = "com.kenza.hub"
         minSdk = 21
         targetSdk = 34
         versionCode = flutterVersionCode.toInteger()
@@ -40,7 +45,7 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.debug // للبيتا، لو عايز توقيع رسمي هتغيره بعدين
+            signingConfig = signingConfigs.debug
         }
     }
 }
