@@ -8,48 +8,42 @@ class LanguageSelector extends StatefulWidget {
 }
 
 class _LanguageSelectorState extends State<LanguageSelector> {
-  String _currentLanguage = 'ar';
+  String _selectedLanguage = 'AR';
+
+  final Map<String, String> _languages = {
+    'AR': 'العربية',
+    'EN': 'English',
+    'FR': 'Français',
+  };
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _buildLanguageButton('AR'),
-        const SizedBox(width: 4),
-        _buildLanguageButton('EN'),
-        const SizedBox(width: 4),
-        _buildLanguageButton('FR'),
-      ],
-    );
-  }
-
-  Widget _buildLanguageButton(String code) {
-    final isSelected = _currentLanguage == code.toLowerCase();
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _currentLanguage = code.toLowerCase();
-        });
-        // هنا سيتم إضافة Localization الفعلي لاحقاً
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFC62828) : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected ? const Color(0xFFC62828) : const Color(0xFFCBD5E1),
-            width: 1.2,
-          ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFFCBD5E1)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: DropdownButton<String>(
+        value: _selectedLanguage,
+        icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF0F172A)),
+        underline: const SizedBox(),
+        style: const TextStyle(
+          color: Color(0xFF0F172A),
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
         ),
-        child: Text(
-          code,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: isSelected ? Colors.white : const Color(0xFF64748B),
-          ),
-        ),
+        onChanged: (String? newValue) {
+          setState(() {
+            _selectedLanguage = newValue!;
+          });
+        },
+        items: _languages.keys.map((String key) {
+          return DropdownMenuItem<String>(
+            value: key,
+            child: Text(_languages[key]!),
+          );
+        }).toList(),
       ),
     );
   }
