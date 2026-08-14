@@ -1,72 +1,70 @@
 import 'package:flutter/material.dart';
-
-import 'widgets/header_section.dart';
-import 'widgets/image_slider.dart';
-import 'widgets/welcome_text.dart';
-import 'widgets/action_buttons.dart';
-import 'widgets/footer_links.dart';
+import 'welcome_image_rows.dart';
+import 'welcome_logo.dart';
+import 'welcome_actions.dart';
+import 'language_selector.dart';
+import 'welcome_footer.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        HeaderSection(
-                          currentLanguage: 'العربية',
-                          onLanguageChanged: (language) {},
-                        ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header: Logo + Language Selector
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const WelcomeLogo(),
+                  const LanguageSelector(),
+                ],
+              ),
+            ),
 
-                        const SizedBox(height: 12),
+            // الصفان المتحركان
+            const Expanded(
+              child: WelcomeImageRows(),
+            ),
 
-                        const ImageSlider(),
-
-                        const SizedBox(height: 22),
-
-                        const WelcomeText(),
-
-                        const SizedBox(height: 24),
-
-                        ActionButtons(
-                          onSignUp: () {},
-                          onLogin: () {},
-                          onGuest: () {},
-                        ),
-
-                        const SizedBox(height: 18),
-
-                        FooterLinks(
-                          onAbout: () {},
-                          onTerms: () {},
-                          onPrivacy: () {},
-                        ),
-                      ],
+            // النصوص والأزرار
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
+              child: Column(
+                children: [
+                  const Text(
+                    'لو مش محتاجها...\nغيرك محتاجها',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF0F172A),
+                      height: 1.4,
                     ),
                   ),
-                ),
-              );
-            },
-          ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'بيع واشتري بسهولة من غير عمولة',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  const WelcomeActions(),
+                  const SizedBox(height: 16),
+                  const WelcomeFooter(),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
