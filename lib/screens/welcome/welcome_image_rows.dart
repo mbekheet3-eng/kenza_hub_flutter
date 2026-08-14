@@ -64,32 +64,22 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // الصف الأول (يتحرك →)
         AnimatedBuilder(
           animation: _controllerRow1,
           builder: (context, child) {
             return Transform.translate(
               offset: Offset(_controllerRow1.value * 200, 0),
-              child: WelcomeImageRow(
-                images: _row1Images,
-                speed: 30,
-                reverse: false,
-              ),
+              child: WelcomeImageRow(images: _row1Images),
             );
           },
         ),
         const SizedBox(height: 10),
-        // الصف الثاني (يتحرك ←)
         AnimatedBuilder(
           animation: _controllerRow2,
           builder: (context, child) {
             return Transform.translate(
               offset: Offset(_controllerRow2.value * 200, 0),
-              child: WelcomeImageRow(
-                images: _row2Images,
-                speed: 35,
-                reverse: true,
-              ),
+              child: WelcomeImageRow(images: _row2Images),
             );
           },
         ),

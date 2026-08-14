@@ -2,15 +2,8 @@ import 'package:flutter/material.dart';
 
 class WelcomeImageRow extends StatelessWidget {
   final List<String> images;
-  final double speed; // سرعة الحركة (بالثواني)
-  final bool reverse; // true = حركة عكسية
 
-  const WelcomeImageRow({
-    super.key,
-    required this.images,
-    required this.speed,
-    this.reverse = false,
-  });
+  const WelcomeImageRow({super.key, required this.images});
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +24,14 @@ class WelcomeImageRow extends StatelessWidget {
                 width: 120,
                 height: 120,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: 120,
+                    height: 120,
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.broken_image, color: Colors.grey),
+                  );
+                },
               ),
             ),
           );

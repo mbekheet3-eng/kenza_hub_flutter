@@ -15,7 +15,6 @@ class WelcomeScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Header: Logo + Language Selector
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               child: Row(
@@ -26,13 +25,7 @@ class WelcomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-
-            // الصفان المتحركان
-            const Expanded(
-              child: WelcomeImageRows(),
-            ),
-
-            // النصوص والأزرار
+            const Expanded(child: WelcomeImageRows()),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
               child: Column(
