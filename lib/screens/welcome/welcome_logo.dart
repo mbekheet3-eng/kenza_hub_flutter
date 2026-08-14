@@ -6,8 +6,8 @@ class WelcomeLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Image.asset(
-      'assets/logos/logo.png', // المسار الصحيح لللوجو
-      height: 50,
+      'assets/images/logo.png', // المسار الصحيح لللوجو
+      height: 45,
       fit: BoxFit.contain,
       errorBuilder: (context, error, stackTrace) {
         return const Text(
