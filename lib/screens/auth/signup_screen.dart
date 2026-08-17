@@ -72,7 +72,7 @@ class _SignupScreenState extends State<SignupScreen> {
             // Full Name
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: AppLocalizations.of(context).fullName,
                 prefixIcon: Icon(Icons.person),
               ),
@@ -82,7 +82,7 @@ class _SignupScreenState extends State<SignupScreen> {
             // Email
             TextField(
               controller: _emailController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: AppLocalizations.of(context).email,
                 hintText: 'example@email.com',
                 prefixIcon: Icon(Icons.email),
@@ -113,7 +113,7 @@ class _SignupScreenState extends State<SignupScreen> {
             // Confirm Password
             TextField(
               controller: _confirmPasswordController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: AppLocalizations.of(context).confirmPassword,
                 prefixIcon: Icon(Icons.lock),
               ),

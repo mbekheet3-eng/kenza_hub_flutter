@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/localization/app_localizations.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../models/product.dart';
 import '../../services/supabase_service.dart';
 import '../../config/theme.dart';
@@ -140,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildCategoriesGrid(bool isMobile) {
     final categories = [
       ('clothes', AppLocalizations.of(context).clothes, Icons.checkroom),
-      ('shoes', AppLocalizations.of(context).shoes, Icons.shoes),
+      ('shoes', AppLocalizations.of(context).shoes, Icons.shopping_bag_outlined),
       ('kids', AppLocalizations.of(context).kids, Icons.child_care),
       ('home', AppLocalizations.of(context).home, Icons.home),
     ];
@@ -220,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
           ),
           const SizedBox(height: 12),
-          const Text(
+          Text(
             AppLocalizations.of(context).sellAndEarn,
             style: TextStyle(color: Colors.white70),
           ),

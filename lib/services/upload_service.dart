@@ -74,7 +74,7 @@ class UploadService {
   Future<File> _copyToCacheDirectory(File sourceFile) async {
     try {
       final cacheDir = await getTemporaryDirectory();
-      final cachePath = '${cacheDir.path}/$cacheFolder';
+      final cachePath = '${cacheDir.path}/kenza_hub';
       final cacheFolder = Directory(cachePath);
 
       // Create folder if not exists
@@ -99,7 +99,7 @@ class UploadService {
   Future<void> cleanupCache() async {
     try {
       final cacheDir = await getTemporaryDirectory();
-      final cachePath = '${cacheDir.path}/$cacheFolder';
+      final cachePath = '${cacheDir.path}/kenza_hub';
       final cacheFolder = Directory(cachePath);
 
       if (await cacheFolder.exists()) {
@@ -205,7 +205,6 @@ class UploadService {
   Future<String> uploadImage(File imageFile, {String? customPath}) async {
     try {
       // 1. Get file metadata
-      final fileName = imageFile.path.split('/').last;
       final mimeType = _getMimeType(imageFile.path);
       final fileBytes = await imageFile.readAsBytes();
       final fileSize = fileBytes.length;
@@ -221,7 +220,6 @@ class UploadService {
       // 3. Generate remote path
       final remoteFileName =
           customPath ?? '${const Uuid().v4()}_${DateTime.now().millisecondsSinceEpoch}';
-      final filePath = '$bucketName/$remoteFileName';
 
       // 4. Upload to Supabase
       await _client.storage.from(bucketName).uploadBinary(

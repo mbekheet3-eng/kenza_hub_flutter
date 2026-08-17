@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '../../../services/upload_service.dart';
+import 'package:image_picker/image_picker.dart';
+import "../../../services/upload_service.dart";
 import '../../../config/theme.dart';
 
 class StepImages extends StatefulWidget {

@@ -129,7 +129,7 @@ class _StepDetailsState extends State<StepDetails> {
             _notifyChanges();
           },
           backgroundColor: AppTheme.surfaceColor,
-          selectedColor: AppTheme.primaryColor.withOpacity(0.1),
+          selectedColor: AppTheme.primaryColor.withValues(alpha: 0.1),
           side: BorderSide(
             color: isSelected ? AppTheme.primaryColor : AppTheme.borderLight,
             width: isSelected ? 2 : 1,
@@ -155,7 +155,7 @@ class _StepDetailsState extends State<StepDetails> {
             _notifyChanges();
           },
           backgroundColor: AppTheme.surfaceColor,
-          selectedColor: AppTheme.primaryColor.withOpacity(0.1),
+          selectedColor: AppTheme.primaryColor.withValues(alpha: 0.1),
           side: BorderSide(
             color: isSelected ? AppTheme.primaryColor : AppTheme.borderLight,
             width: isSelected ? 2 : 1,
@@ -206,7 +206,7 @@ class _StepDetailsState extends State<StepDetails> {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: isSelected ? categoryColor.withOpacity(0.1) : AppTheme.surfaceColor,
+              color: isSelected ? categoryColor.withValues(alpha: 0.1) : AppTheme.surfaceColor,
               border: Border.all(
                 color: isSelected ? categoryColor : AppTheme.borderLight,
                 width: isSelected ? 2 : 1,

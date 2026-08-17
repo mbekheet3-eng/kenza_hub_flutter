@@ -163,7 +163,7 @@ class _SearchScreenState extends State<SearchScreen> {
         });
       },
       backgroundColor: AppTheme.surfaceColor,
-      selectedColor: AppTheme.primaryColor.withOpacity(0.1),
+      selectedColor: AppTheme.primaryColor.withValues(alpha: 0.1),
       side: BorderSide(
         color: isSelected ? AppTheme.primaryColor : AppTheme.borderLight,
         width: isSelected ? 2 : 1,

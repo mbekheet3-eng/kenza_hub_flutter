@@ -25,7 +25,7 @@ class WelcomeActions extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text(
+            child: Text(
               AppLocalizations.of(context).signUp,
               style: TextStyle(
                 fontSize: 18,
@@ -50,7 +50,7 @@ class WelcomeActions extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text(
+            child: Text(
               AppLocalizations.of(context).login,
               style: TextStyle(
                 fontSize: 18,
@@ -64,7 +64,7 @@ class WelcomeActions extends StatelessWidget {
           onPressed: () {
             Navigator.pushNamed(context, '/guest_home');
           },
-          child: const Text(
+          child: Text(
             AppLocalizations.of(context).continueAsGuest,
             style: TextStyle(
               fontSize: 14,
@@ -96,7 +96,7 @@ class WelcomeActions extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 AppLocalizations.of(context).login,
                 style: TextStyle(
                   fontSize: 22,
@@ -105,14 +105,14 @@ class WelcomeActions extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              const TextField(
+              TextField(
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context).email,
                   border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 12),
-              const TextField(
+              TextField(
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context).password,

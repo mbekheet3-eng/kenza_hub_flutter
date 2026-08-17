@@ -11,7 +11,6 @@ import 'steps/step_category.dart';
 import 'steps/step_brand.dart';
 import 'steps/step_details.dart';
 import 'steps/step_price.dart';
-import 'steps/step_review.dart';
 
 class SellWizardScreen extends StatefulWidget {
   const SellWizardScreen({Key? key}) : super(key: key);
@@ -162,7 +161,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         return _category != null;
       case 2:
         return _condition != null && (_category == null || 
-            (!categorySkipFields[_category] ?? false) || 
+            (categorySkipFields[_category] != true) || 
             (_color != null && _size != null));
       case 3:
         return _category != null && 
@@ -260,7 +259,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
           _buildReviewSection('الصور', _buildImagePreview()),
           _buildReviewSection('الفئة', Text(_category ?? '-')),
           _buildReviewSection('الحالة', Text(_condition ?? '-')),
-          if (!categorySkipFields[_category] ?? false) ...[
+          if (categorySkipFields[_category] != true) ...[
             _buildReviewSection('اللون', Text(_color ?? '-')),
             _buildReviewSection('المقاس', Text(_size ?? '-')),
             _buildReviewSection('العلامة التجارية', Text(_brand ?? '-')),

@@ -143,9 +143,9 @@ class _StepPriceState extends State<StepPrice> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppTheme.infoColor.withOpacity(0.1),
+              color: AppTheme.infoColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppTheme.infoColor.withOpacity(0.3)),
+              border: Border.all(color: AppTheme.infoColor.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
@@ -171,10 +171,10 @@ class _StepPriceState extends State<StepPrice> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppTheme.primaryColor.withOpacity(0.05),
+                color: AppTheme.primaryColor.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: AppTheme.primaryColor.withOpacity(0.2),
+                  color: AppTheme.primaryColor.withValues(alpha: 0.2),
                 ),
               ),
               child: Column(
@@ -209,7 +209,7 @@ class _StepPriceState extends State<StepPrice> {
         _updatePrice(price);
       },
       style: OutlinedButton.styleFrom(
-        backgroundColor: isSelected ? AppTheme.primaryColor.withOpacity(0.1) : null,
+        backgroundColor: isSelected ? AppTheme.primaryColor.withValues(alpha: 0.1) : null,
         side: BorderSide(
           color: isSelected ? AppTheme.primaryColor : AppTheme.borderMedium,
           width: isSelected ? 2 : 1,

@@ -32,7 +32,8 @@ class AppLocalizations {
       _AppLocalizationsDelegate();
 
   static AppLocalizations of(BuildContext context) {
-    final localizations = Localizations.of<AppLocalizations>(
+    final localizations =
+        Localizations.of<AppLocalizations>(
       context,
       AppLocalizations,
     );
@@ -325,142 +326,187 @@ class AppLocalizations {
         return 'لديك حساب بالفعل؟ ';
     }
   }
-}
 
   String get categories {
     switch (locale.languageCode) {
-      case 'en': return 'Categories';
-      case 'fr': return 'Catégories';
+      case 'en':
+        return 'Categories';
+      case 'fr':
+        return 'Catégories';
       case 'ar':
-      default: return 'الفئات';
+      default:
+        return 'الفئات';
     }
   }
 
   String get trendingProducts {
     switch (locale.languageCode) {
-      case 'en': return 'Trending Products';
-      case 'fr': return 'Produits tendance';
+      case 'en':
+        return 'Trending Products';
+      case 'fr':
+        return 'Produits tendance';
       case 'ar':
-      default: return 'المنتجات الرائجة';
+      default:
+        return 'المنتجات الرائجة';
     }
   }
 
   String get viewAll {
     switch (locale.languageCode) {
-      case 'en': return 'View All';
-      case 'fr': return 'Voir tout';
+      case 'en':
+        return 'View All';
+      case 'fr':
+        return 'Voir tout';
       case 'ar':
-      default: return 'عرض الكل';
+      default:
+        return 'عرض الكل';
     }
   }
 
   String get sellNow {
     switch (locale.languageCode) {
-      case 'en': return 'Sell Now';
-      case 'fr': return 'Vendre maintenant';
+      case 'en':
+        return 'Sell Now';
+      case 'fr':
+        return 'Vendre maintenant';
       case 'ar':
-      default: return 'بيع الآن';
+      default:
+        return 'بيع الآن';
     }
   }
 
   String get searchProduct {
     switch (locale.languageCode) {
-      case 'en': return 'Search for a product...';
-      case 'fr': return 'Rechercher un produit...';
+      case 'en':
+        return 'Search for a product...';
+      case 'fr':
+        return 'Rechercher un produit...';
       case 'ar':
-      default: return 'ابحث عن منتج...';
+      default:
+        return 'ابحث عن منتج...';
     }
   }
 
   String get clothes {
     switch (locale.languageCode) {
-      case 'en': return 'Clothes';
-      case 'fr': return 'Vêtements';
+      case 'en':
+        return 'Clothes';
+      case 'fr':
+        return 'Vêtements';
       case 'ar':
-      default: return 'ملابس';
+      default:
+        return 'ملابس';
     }
   }
 
   String get shoes {
     switch (locale.languageCode) {
-      case 'en': return 'Shoes';
-      case 'fr': return 'Chaussures';
+      case 'en':
+        return 'Shoes';
+      case 'fr':
+        return 'Chaussures';
       case 'ar':
-      default: return 'أحذية';
+      default:
+        return 'أحذية';
     }
   }
 
   String get kids {
     switch (locale.languageCode) {
-      case 'en': return 'Kids Clothes';
-      case 'fr': return 'Vêtements enfants';
+      case 'en':
+        return 'Kids Clothes';
+      case 'fr':
+        return 'Vêtements enfants';
       case 'ar':
-      default: return 'ملابس أطفال';
+      default:
+        return 'ملابس أطفال';
     }
   }
 
   String get home {
     switch (locale.languageCode) {
-      case 'en': return 'Home';
-      case 'fr': return 'Maison';
+      case 'en':
+        return 'Home';
+      case 'fr':
+        return 'Maison';
       case 'ar':
-      default: return 'منزل';
+      default:
+        return 'منزل';
     }
   }
 
   String get error {
     switch (locale.languageCode) {
-      case 'en': return 'Error';
-      case 'fr': return 'Erreur';
+      case 'en':
+        return 'Error';
+      case 'fr':
+        return 'Erreur';
       case 'ar':
-      default: return 'خطأ';
+      default:
+        return 'خطأ';
     }
   }
 
   String get noProducts {
     switch (locale.languageCode) {
-      case 'en': return 'No products available';
-      case 'fr': return 'Aucun produit disponible';
+      case 'en':
+        return 'No products available';
+      case 'fr':
+        return 'Aucun produit disponible';
       case 'ar':
-      default: return 'لا توجد منتجات';
+      default:
+        return 'لا توجد منتجات';
     }
   }
 
   String get oldClothes {
     switch (locale.languageCode) {
-      case 'en': return 'Have old clothes?';
-      case 'fr': return 'Vous avez des vêtements anciens ?';
+      case 'en':
+        return 'Have old clothes?';
+      case 'fr':
+        return 'Vous avez des vêtements anciens ?';
       case 'ar':
-      default: return 'هل لديك ملابس قديمة؟';
+      default:
+        return 'هل لديك ملابس قديمة؟';
     }
   }
 
   String get sellAndEarn {
     switch (locale.languageCode) {
-      case 'en': return 'Sell your clothes easily and earn money';
-      case 'fr': return 'Vendez vos vêtements facilement et gagnez de l’argent';
+      case 'en':
+        return 'Sell your clothes easily and earn money';
+      case 'fr':
+        return 'Vendez vos vêtements facilement et gagnez de l’argent';
       case 'ar':
-      default: return 'بيع ملابسك بسهولة واربح أموالاً';
+      default:
+        return 'بيع ملابسك بسهولة واربح أموالاً';
     }
   }
 
   String get startSelling {
     switch (locale.languageCode) {
-      case 'en': return 'Start Selling Now';
-      case 'fr': return 'Commencer à vendre';
+      case 'en':
+        return 'Start Selling Now';
+      case 'fr':
+        return 'Commencer à vendre';
       case 'ar':
-      default: return 'ابدأ البيع الآن';
+      default:
+        return 'ابدأ البيع الآن';
     }
   }
 
   String get currency {
     switch (locale.languageCode) {
-      case 'en': return 'EGP';
-      case 'fr': return 'EGP';
+      case 'en':
+        return 'EGP';
+      case 'fr':
+        return 'EGP';
       case 'ar':
-      default: return 'ج.م';
+      default:
+        return 'ج.م';
     }
   }
+}
 
 class _AppLocalizationsDelegate
     extends LocalizationsDelegate<AppLocalizations> {

@@ -6,7 +6,7 @@ abstract class Result<T> extends Equatable {
 
   /// تحويل النتيجة بناءً على الحالة
   R fold<R>(
-    R Function(Failure) onFailure,
+    R Function(AppFailure) onFailure,
     R Function(T) onSuccess,
   );
 
@@ -14,7 +14,7 @@ abstract class Result<T> extends Equatable {
   T? getOrNull();
 
   /// الحصول على الخطأ أو null
-  Failure? getErrorOrNull();
+  AppFailure? getErrorOrNull();
 
   /// التحقق من النجاح
   bool get isSuccess;
@@ -31,7 +31,7 @@ class Success<T> extends Result<T> {
 
   @override
   R fold<R>(
-    R Function(Failure) onFailure,
+    R Function(AppFailure) onFailure,
     R Function(T) onSuccess,
   ) =>
       onSuccess(data);
@@ -40,7 +40,7 @@ class Success<T> extends Result<T> {
   T? getOrNull() => data;
 
   @override
-  Failure? getErrorOrNull() => null;
+  AppFailure? getErrorOrNull() => null;
 
   @override
   bool get isSuccess => true;

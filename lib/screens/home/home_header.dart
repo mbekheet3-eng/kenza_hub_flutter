@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../config/app_colors.dart';
 import '../../config/app_radius.dart';
 import '../../config/app_spacing.dart';
 import '../../config/app_text_styles.dart';
 
-class HomeHeader extends StatelessWidget {
+class HomeHeader extends StatelessWidget implements PreferredSizeWidget {
   const HomeHeader({super.key});
+
+  @override
+  Size get preferredSize => const Size.fromHeight(64);
 
   @override
   Widget build(BuildContext context) {

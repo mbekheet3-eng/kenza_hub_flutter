@@ -24,13 +24,10 @@ final class AppTheme {
       onPrimary: AppColors.onPrimary,
       secondary: AppColors.secondary,
       onSecondary: AppColors.onSecondary,
-      background: AppColors.background,
-      onBackground: AppColors.onBackground,
-      surface: AppColors.surface,
+      surface: AppColors.background,
       onSurface: AppColors.onSurface,
-      error: AppColors.error,
       outline: AppColors.outline,
-      surfaceVariant: AppColors.surfaceVariant,
+      surfaceContainerHighest: AppColors.surfaceVariant,
     );
 
     final TextTheme textTheme = TextTheme(
@@ -40,15 +37,15 @@ final class AppTheme {
       bodyMedium: AppTextStyles.bodyMedium,
       labelLarge: AppTextStyles.labelLarge,
     ).apply(
-      bodyColor: colorScheme.onBackground,
-      displayColor: colorScheme.onBackground,
+      bodyColor: colorScheme.onSurface,
+      displayColor: colorScheme.onSurface,
     );
 
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: colorScheme.background,
+      scaffoldBackgroundColor: colorScheme.surface,
       textTheme: textTheme,
 
       appBarTheme: AppBarTheme(
@@ -181,12 +178,12 @@ final class AppTheme {
 
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: colorScheme.surface,
-        indicatorColor: colorScheme.primary.withOpacity(0.08),
+        indicatorColor: colorScheme.primary.withValues(alpha: 0.08),
         height: 64,
-        iconTheme: MaterialStatePropertyAll(
+        iconTheme: WidgetStatePropertyAll(
           IconThemeData(color: colorScheme.onSurface),
         ),
-        labelTextStyle: MaterialStatePropertyAll(
+        labelTextStyle: WidgetStatePropertyAll(
           textTheme.labelLarge?.copyWith(
             color: colorScheme.onSurface,
           ),

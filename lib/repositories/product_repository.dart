@@ -1,10 +1,9 @@
-import 'package:kenza_hub/core/index.dart';
-import 'package:kenza_hub/models/product.dart';
-import 'package:kenza_hub/services/supabase_service.dart';
+import 'package:kenza_hub_flutter/core/index.dart';
+import 'package:kenza_hub_flutter/models/product.dart';
+import 'package:kenza_hub_flutter/services/supabase_service.dart';
 
-/// Abstract Product Repository Interface
+/// Repository for product-related operations.
 abstract class IProductRepository {
-  /// البحث عن المنتجات
   Future<Result<List<Product>>> searchProducts({
     required String query,
     String? category,
@@ -14,65 +13,56 @@ abstract class IProductRepository {
     int offset,
   });
 
-  /// الحصول على منتجات الفئة
   Future<Result<List<Product>>> getProductsByCategory(
     String category, {
     int limit,
     int offset,
   });
 
-  /// الحصول على المنتجات الرائجة
-  Future<Result<List<Product>>> getTrendingProducts({int limit});
+  Future<Result<List<Product>>> getTrendingProducts({
+    int limit,
+  });
 
-  /// الحصول على منتج بـ ID
   Future<Result<Product>> getProductById(String productId);
 
-  /// الحصول على منتجات المستخدم
   Future<Result<List<Product>>> getUserProducts(
     String userId, {
     int limit,
   });
 
-  /// إضافة منتج جديد
   Future<Result<String>> addProduct(Product product);
 
-  /// تحديث منتج
   Future<Result<void>> updateProduct(Product product);
 
-  /// حذف منتج
   Future<Result<void>> deleteProduct(String productId);
 
-  /// إضافة صور للمنتج
   Future<Result<void>> addProductImages(
     String productId,
     List<String> imageUrls,
   );
 
-  /// زيادة عدد المشاهدات
   Future<Result<void>> incrementProductViews(String productId);
 
-  /// إضافة المنتج للمفضلة
   Future<Result<void>> addToFavorites(
     String userId,
     String productId,
   );
 
-  /// إزالة من المفضلة
   Future<Result<void>> removeFromFavorites(
     String userId,
     String productId,
   );
 
-  /// الحصول على المفضلات
   Future<Result<List<String>>> getUserFavorites(String userId);
 }
 
-/// Product Repository Implementation
+/// Product repository implementation.
 class ProductRepository implements IProductRepository {
   final SupabaseService _supabaseService;
 
-  ProductRepository({SupabaseService? supabaseService})
-      : _supabaseService = supabaseService ?? SupabaseService();
+  ProductRepository({
+    SupabaseService? supabaseService,
+  }) : _supabaseService = supabaseService ?? SupabaseService();
 
   @override
   Future<Result<List<Product>>> searchProducts({
@@ -92,18 +82,13 @@ class ProductRepository implements IProductRepository {
         limit: limit,
         offset: offset,
       );
-      return Success(products);
-    } on ServerException catch (e) {
-      return Failure(
-        ServerAppFailure(message: e.message, code: e.code),
-      );
-    } on NetworkException catch (e) {
-      return Failure(
-        NetworkAppFailure(message: e.message, code: e.code),
-      );
+
+      return Success<List<Product>>(products);
     } catch (e) {
-      return Failure(
-        UnknownAppFailure(message: 'Failed to search products: $e'),
+      return Failure<List<Product>>(
+        ServerAppFailure(
+          message: 'Failed to search products: $e',
+        ),
       );
     }
   }
@@ -120,38 +105,32 @@ class ProductRepository implements IProductRepository {
         limit: limit,
         offset: offset,
       );
-      return Success(products);
-    } on ServerException catch (e) {
-      return Failure(
-        ServerAppFailure(message: e.message, code: e.code),
-      );
-    } on NetworkException catch (e) {
-      return Failure(
-        NetworkAppFailure(message: e.message, code: e.code),
-      );
+
+      return Success<List<Product>>(products);
     } catch (e) {
-      return Failure(
-        UnknownAppFailure(message: 'Failed to get products by category: $e'),
+      return Failure<List<Product>>(
+        ServerAppFailure(
+          message: 'Failed to get products by category: $e',
+        ),
       );
     }
   }
 
   @override
-  Future<Result<List<Product>>> getTrendingProducts({int limit = 10}) async {
+  Future<Result<List<Product>>> getTrendingProducts({
+    int limit = 10,
+  }) async {
     try {
-      final products = await _supabaseService.getTrendingProducts(limit: limit);
-      return Success(products);
-    } on ServerException catch (e) {
-      return Failure(
-        ServerAppFailure(message: e.message, code: e.code),
+      final products = await _supabaseService.getTrendingProducts(
+        limit: limit,
       );
-    } on NetworkException catch (e) {
-      return Failure(
-        NetworkAppFailure(message: e.message, code: e.code),
-      );
+
+      return Success<List<Product>>(products);
     } catch (e) {
-      return Failure(
-        UnknownAppFailure(message: 'Failed to get trending products: $e'),
+      return Failure<List<Product>>(
+        ServerAppFailure(
+          message: 'Failed to get trending products: $e',
+        ),
       );
     }
   }
@@ -160,18 +139,13 @@ class ProductRepository implements IProductRepository {
   Future<Result<Product>> getProductById(String productId) async {
     try {
       final product = await _supabaseService.getProduct(productId);
-      return Success(product);
-    } on NotFoundException catch (e) {
-      return Failure(
-        NotFoundAppFailure(message: e.message, code: e.code),
-      );
-    } on ServerException catch (e) {
-      return Failure(
-        ServerAppFailure(message: e.message, code: e.code),
-      );
+
+      return Success<Product>(product);
     } catch (e) {
-      return Failure(
-        UnknownAppFailure(message: 'Failed to get product: $e'),
+      return Failure<Product>(
+        ServerAppFailure(
+          message: 'Failed to get product: $e',
+        ),
       );
     }
   }
@@ -186,14 +160,13 @@ class ProductRepository implements IProductRepository {
         userId,
         limit: limit,
       );
-      return Success(products);
-    } on ServerException catch (e) {
-      return Failure(
-        ServerAppFailure(message: e.message, code: e.code),
-      );
+
+      return Success<List<Product>>(products);
     } catch (e) {
-      return Failure(
-        UnknownAppFailure(message: 'Failed to get user products: $e'),
+      return Failure<List<Product>>(
+        ServerAppFailure(
+          message: 'Failed to get user products: $e',
+        ),
       );
     }
   }
@@ -202,18 +175,13 @@ class ProductRepository implements IProductRepository {
   Future<Result<String>> addProduct(Product product) async {
     try {
       final productId = await _supabaseService.addProduct(product);
-      return Success(productId);
-    } on ValidationException catch (e) {
-      return Failure(
-        ValidationAppFailure(message: e.message, code: e.code),
-      );
-    } on ServerException catch (e) {
-      return Failure(
-        ServerAppFailure(message: e.message, code: e.code),
-      );
+
+      return Success<String>(productId);
     } catch (e) {
-      return Failure(
-        UnknownAppFailure(message: 'Failed to add product: $e'),
+      return Failure<String>(
+        ServerAppFailure(
+          message: 'Failed to add product: $e',
+        ),
       );
     }
   }
@@ -222,18 +190,13 @@ class ProductRepository implements IProductRepository {
   Future<Result<void>> updateProduct(Product product) async {
     try {
       await _supabaseService.updateProduct(product);
-      return Success(null);
-    } on ValidationException catch (e) {
-      return Failure(
-        ValidationAppFailure(message: e.message, code: e.code),
-      );
-    } on ServerException catch (e) {
-      return Failure(
-        ServerAppFailure(message: e.message, code: e.code),
-      );
+
+      return const Success<void>(null);
     } catch (e) {
-      return Failure(
-        UnknownAppFailure(message: 'Failed to update product: $e'),
+      return Failure<void>(
+        ServerAppFailure(
+          message: 'Failed to update product: $e',
+        ),
       );
     }
   }
@@ -242,14 +205,13 @@ class ProductRepository implements IProductRepository {
   Future<Result<void>> deleteProduct(String productId) async {
     try {
       await _supabaseService.deleteProduct(productId);
-      return Success(null);
-    } on ServerException catch (e) {
-      return Failure(
-        ServerAppFailure(message: e.message, code: e.code),
-      );
+
+      return const Success<void>(null);
     } catch (e) {
-      return Failure(
-        UnknownAppFailure(message: 'Failed to delete product: $e'),
+      return Failure<void>(
+        ServerAppFailure(
+          message: 'Failed to delete product: $e',
+        ),
       );
     }
   }
@@ -260,27 +222,35 @@ class ProductRepository implements IProductRepository {
     List<String> imageUrls,
   ) async {
     try {
-      await _supabaseService.addProductImages(productId, imageUrls);
-      return Success(null);
-    } on ServerException catch (e) {
-      return Failure(
-        ServerAppFailure(message: e.message, code: e.code),
+      await _supabaseService.addProductImages(
+        productId,
+        imageUrls,
       );
+
+      return const Success<void>(null);
     } catch (e) {
-      return Failure(
-        UnknownAppFailure(message: 'Failed to add product images: $e'),
+      return Failure<void>(
+        ServerAppFailure(
+          message: 'Failed to add product images: $e',
+        ),
       );
     }
   }
 
   @override
-  Future<Result<void>> incrementProductViews(String productId) async {
+  Future<Result<void>> incrementProductViews(
+    String productId,
+  ) async {
     try {
       await _supabaseService.incrementProductViews(productId);
-      return Success(null);
+
+      return const Success<void>(null);
     } catch (e) {
-      // Silent failure - not critical
-      return Success(null);
+      return Failure<void>(
+        ServerAppFailure(
+          message: 'Failed to increment product views: $e',
+        ),
+      );
     }
   }
 
@@ -290,15 +260,17 @@ class ProductRepository implements IProductRepository {
     String productId,
   ) async {
     try {
-      await _supabaseService.addToFavorites(userId, productId);
-      return Success(null);
-    } on ServerException catch (e) {
-      return Failure(
-        ServerAppFailure(message: e.message, code: e.code),
+      await _supabaseService.addToFavorites(
+        userId,
+        productId,
       );
+
+      return const Success<void>(null);
     } catch (e) {
-      return Failure(
-        UnknownAppFailure(message: 'Failed to add to favorites: $e'),
+      return Failure<void>(
+        ServerAppFailure(
+          message: 'Failed to add product to favorites: $e',
+        ),
       );
     }
   }
@@ -309,31 +281,36 @@ class ProductRepository implements IProductRepository {
     String productId,
   ) async {
     try {
-      await _supabaseService.removeFromFavorites(userId, productId);
-      return Success(null);
-    } on ServerException catch (e) {
-      return Failure(
-        ServerAppFailure(message: e.message, code: e.code),
+      await _supabaseService.removeFromFavorites(
+        userId,
+        productId,
       );
+
+      return const Success<void>(null);
     } catch (e) {
-      return Failure(
-        UnknownAppFailure(message: 'Failed to remove from favorites: $e'),
+      return Failure<void>(
+        ServerAppFailure(
+          message: 'Failed to remove product from favorites: $e',
+        ),
       );
     }
   }
 
   @override
-  Future<Result<List<String>>> getUserFavorites(String userId) async {
+  Future<Result<List<String>>> getUserFavorites(
+    String userId,
+  ) async {
     try {
-      final favorites = await _supabaseService.getUserFavorites(userId);
-      return Success(favorites);
-    } on ServerException catch (e) {
-      return Failure(
-        ServerAppFailure(message: e.message, code: e.code),
+      final favorites = await _supabaseService.getUserFavorites(
+        userId,
       );
+
+      return Success<List<String>>(favorites);
     } catch (e) {
-      return Failure(
-        UnknownAppFailure(message: 'Failed to get favorites: $e'),
+      return Failure<List<String>>(
+        ServerAppFailure(
+          message: 'Failed to get user favorites: $e',
+        ),
       );
     }
   }

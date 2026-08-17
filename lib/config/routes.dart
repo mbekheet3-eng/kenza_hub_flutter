@@ -37,7 +37,7 @@ class AppRouter {
         path: '/search',
         name: 'search',
         builder: (context, state) {
-          final query = state.queryParameters['q'] ?? '';
+          final query = state.uri.queryParameters['q'] ?? '';
           return SearchScreen(query: query);
         },
       ),

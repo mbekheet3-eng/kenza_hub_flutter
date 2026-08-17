@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenza_hub_flutter/config/app_theme.dart';
-import 'package:kenza_hub_flutter/screens/welcome_screen.dart';
+import 'package:kenza_hub_flutter/screens/welcome/welcome_screen.dart';
 
 class KenzaHubApp extends StatelessWidget {
   const KenzaHubApp({super.key});

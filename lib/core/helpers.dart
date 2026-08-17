@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 /// Helper functions والـ utilities الأساسية
 
 /// String Helpers
@@ -79,7 +80,7 @@ class NumberHelpers {
 
   /// تقريب الرقم لعدد معين من المنازل العشرية
   static double round(double number, int places) {
-    final factor = pow(10.0, places).toInt();
+    final factor = math.pow(10, places).toDouble();
     return (number * factor).round() / factor;
   }
 }
