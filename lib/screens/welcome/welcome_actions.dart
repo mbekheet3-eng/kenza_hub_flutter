@@ -34,7 +34,9 @@ class WelcomeActions extends StatelessWidget {
             ),
           ),
         ),
+
         const SizedBox(height: 12),
+<<<<<<< ours
         SizedBox(
           width: double.infinity,
           height: 54,
@@ -56,10 +58,57 @@ class WelcomeActions extends StatelessWidget {
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
+||||||| base
+
+        // Secondary CTA - تسجيل الدخول (يظهر Bottom Sheet)
+        TextButton(
+          onPressed: () {
+            _showLoginBottomSheet(context);
+          },
+          child: const Text(
+            'تسجيل الدخول',
+            style: TextStyle(
+              fontSize: 16,
+              color: Color(0xFF0F172A),
+              fontWeight: FontWeight.w600,
+=======
+
+        SizedBox(
+          width: double.infinity,
+          height: 54,
+          child: ElevatedButton(
+            onPressed: () {
+              _showLoginBottomSheet(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryRed,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text(
+              'تسجيل الدخول',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+>>>>>>> theirs
             ),
           ),
         ),
+<<<<<<< ours
         const SizedBox(height: 8),
+||||||| base
+        const SizedBox(height: 4),
+
+        // Guest - تصفح كزائر
+=======
+
+        const SizedBox(height: 8),
+
+>>>>>>> theirs
         TextButton(
           onPressed: () {
             Navigator.pushNamed(context, '/guest_home');

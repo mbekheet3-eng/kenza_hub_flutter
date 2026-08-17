@@ -2,41 +2,51 @@ import 'package:flutter/material.dart';
 
 class WelcomeImageRow extends StatelessWidget {
   final List<String> images;
+  final double imageWidth;
+  final double imageHeight;
+  final double spacing;
 
-  const WelcomeImageRow({super.key, required this.images});
+  const WelcomeImageRow({
+    super.key,
+    required this.images,
+    required this.imageWidth,
+    required this.imageHeight,
+    this.spacing = 8,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 120,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: images.length * 3,
-        itemBuilder: (context, index) {
-          final imageIndex = index % images.length;
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6.0),
+    final repeatedImages = [...images, ...images];
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (final image in repeatedImages)
+          Padding(
+            padding: EdgeInsets.only(right: spacing),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.asset(
-                images[imageIndex],
-                width: 120,
-                height: 120,
+                image,
+                width: imageWidth,
+                height: imageHeight,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
-                    width: 120,
-                    height: 120,
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.broken_image, color: Colors.grey),
+                    width: imageWidth,
+                    height: imageHeight,
+                    color: const Color(0xFFE2E8F0),
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.broken_image_outlined,
+                      color: Color(0xFF94A3B8),
+                    ),
                   );
                 },
               ),
             ),
-          );
-        },
-      ),
+          ),
+      ],
     );
   }
 }
