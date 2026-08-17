@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
 
@@ -49,7 +50,7 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('إنشاء حساب'),
+        title: Text(AppLocalizations.of(context).signupTitle),
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -58,12 +59,12 @@ class _SignupScreenState extends State<SignupScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'انضم إلينا الآن',
+              AppLocalizations.of(context).joinUs,
               style: Theme.of(context).textTheme.displaySmall,
             ),
             const SizedBox(height: 8),
             Text(
-              'أنشئ حسابك للبدء في البيع والشراء',
+              AppLocalizations.of(context).signupSubtitle,
               style: TextStyle(color: AppTheme.textSecondary),
             ),
             const SizedBox(height: 32),
@@ -72,7 +73,7 @@ class _SignupScreenState extends State<SignupScreen> {
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(
-                labelText: 'الاسم الكامل',
+                labelText: AppLocalizations.of(context).fullName,
                 prefixIcon: Icon(Icons.person),
               ),
             ),
@@ -82,7 +83,7 @@ class _SignupScreenState extends State<SignupScreen> {
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(
-                labelText: 'البريد الإلكتروني',
+                labelText: AppLocalizations.of(context).email,
                 hintText: 'example@email.com',
                 prefixIcon: Icon(Icons.email),
               ),
@@ -94,7 +95,7 @@ class _SignupScreenState extends State<SignupScreen> {
             TextField(
               controller: _passwordController,
               decoration: InputDecoration(
-                labelText: 'كلمة المرور',
+                labelText: AppLocalizations.of(context).password,
                 prefixIcon: const Icon(Icons.lock),
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -113,7 +114,7 @@ class _SignupScreenState extends State<SignupScreen> {
             TextField(
               controller: _confirmPasswordController,
               decoration: const InputDecoration(
-                labelText: 'تأكيد كلمة المرور',
+                labelText: AppLocalizations.of(context).confirmPassword,
                 prefixIcon: Icon(Icons.lock),
               ),
               obscureText: _obscurePassword,
@@ -134,8 +135,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     onTap: () {
                       setState(() => _agreeToTerms = !_agreeToTerms);
                     },
-                    child: const Text(
-                      'أوافق على شروط الخدمة والسياسة',
+                    child: Text(
+                      AppLocalizations.of(context).agreeToTerms,
                       style: TextStyle(fontSize: 13),
                     ),
                   ),
@@ -154,7 +155,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         context.pushReplacement('/');
                       }
                     : null,
-                child: const Text('إنشاء حساب'),
+                child: Text(AppLocalizations.of(context).signupTitle),
               ),
             ),
             const SizedBox(height: 16),
@@ -163,10 +164,10 @@ class _SignupScreenState extends State<SignupScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('لديك حساب بالفعل؟ '),
+                Text(AppLocalizations.of(context).haveAccount),
                 TextButton(
                   onPressed: () => context.pop(),
-                  child: const Text('تسجيل الدخول'),
+                  child: Text(AppLocalizations.of(context).login),
                 ),
               ],
             ),

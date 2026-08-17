@@ -42,13 +42,15 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
   @override
   void initState() {
     super.initState();
+    // الصف الأول يتحرك بسرعة ثابتة للأمام (→)
     _controllerRow1 = AnimationController(
-      duration: const Duration(seconds: 30),
+      duration: const Duration(seconds: 25),
       vsync: this,
     )..repeat();
 
+    // الصف الثاني يتحرك بسرعة ثابتة للخلف (←)
     _controllerRow2 = AnimationController(
-      duration: const Duration(seconds: 35),
+      duration: const Duration(seconds: 30),
       vsync: this,
     )..repeat(reverse: true);
   }
@@ -63,22 +65,27 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
+        // الصف الأول (→ اتجاه)
         AnimatedBuilder(
           animation: _controllerRow1,
           builder: (context, child) {
+            final double offset = _controllerRow1.value * 200;
             return Transform.translate(
-              offset: Offset(_controllerRow1.value * 200, 0),
+              offset: Offset(offset, 0),
               child: WelcomeImageRow(images: _row1Images),
             );
           },
         ),
         const SizedBox(height: 10),
+        // الصف الثاني (← اتجاه معاكس)
         AnimatedBuilder(
           animation: _controllerRow2,
           builder: (context, child) {
+            final double offset = -(_controllerRow2.value * 200);
             return Transform.translate(
-              offset: Offset(_controllerRow2.value * 200, 0),
+              offset: Offset(offset, 0),
               child: WelcomeImageRow(images: _row2Images),
             );
           },

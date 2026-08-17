@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 
 class LanguageSelector extends StatefulWidget {
   const LanguageSelector({super.key});
@@ -17,6 +18,19 @@ class _LanguageSelectorState extends State<LanguageSelector> {
   };
 
   @override
+  void initState() {
+    super.initState();
+
+    final languageCode = AppLocalizations.currentLocale.languageCode;
+
+    _selectedLanguage = switch (languageCode) {
+      'en' => 'EN',
+      'fr' => 'FR',
+      _ => 'AR',
+    };
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -26,7 +40,10 @@ class _LanguageSelectorState extends State<LanguageSelector> {
       ),
       child: DropdownButton<String>(
         value: _selectedLanguage,
-        icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF0F172A)),
+        icon: const Icon(
+          Icons.arrow_drop_down,
+          color: Color(0xFF0F172A),
+        ),
         underline: const SizedBox(),
         style: const TextStyle(
           color: Color(0xFF0F172A),
@@ -34,9 +51,19 @@ class _LanguageSelectorState extends State<LanguageSelector> {
           fontWeight: FontWeight.w600,
         ),
         onChanged: (String? newValue) {
+          if (newValue == null) return;
+
           setState(() {
-            _selectedLanguage = newValue!;
+            _selectedLanguage = newValue;
           });
+
+          AppLocalizations.setLocale(
+            switch (newValue) {
+              'EN' => 'en',
+              'FR' => 'fr',
+              _ => 'ar',
+            },
+          );
         },
         items: _languages.keys.map((String key) {
           return DropdownMenuItem<String>(

@@ -5,20 +5,22 @@ class WelcomeLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
-      'assets/images/logo.png', // المسار الصحيح لللوجو
-      height: 45,
-      fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) {
-        return const Text(
-          'Kenza Hub',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF0F172A),
-          ),
-        );
-      },
+    return SizedBox(
+      height: 58,
+      child: Image.asset(
+        'assets/images/logo.png',
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          return const Text(
+            'Kenza Hub',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF0F172A),
+            ),
+          );
+        },
+      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
 
@@ -25,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('تسجيل الدخول'),
+        title: Text(AppLocalizations.of(context).loginTitle),
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -34,12 +35,12 @@ class _LoginScreenState extends State<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'مرحباً بعودتك',
+              AppLocalizations.of(context).welcomeBack,
               style: Theme.of(context).textTheme.displaySmall,
             ),
             const SizedBox(height: 8),
             Text(
-              'سجل دخول لحسابك للاستمرار',
+              AppLocalizations.of(context).loginSubtitle,
               style: TextStyle(color: AppTheme.textSecondary),
             ),
             const SizedBox(height: 32),
@@ -48,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(
-                labelText: 'البريد الإلكتروني',
+                labelText: AppLocalizations.of(context).email,
                 hintText: 'example@email.com',
                 prefixIcon: Icon(Icons.email),
               ),
@@ -60,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
             TextField(
               controller: _passwordController,
               decoration: InputDecoration(
-                labelText: 'كلمة المرور',
+                labelText: AppLocalizations.of(context).password,
                 prefixIcon: const Icon(Icons.lock),
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -83,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   // TODO: Implement login
                   context.pushReplacement('/');
                 },
-                child: const Text('تسجيل الدخول'),
+                child: Text(AppLocalizations.of(context).loginTitle),
               ),
             ),
             const SizedBox(height: 16),
@@ -92,10 +93,10 @@ class _LoginScreenState extends State<LoginScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('ليس لديك حساب؟ '),
+                Text(AppLocalizations.of(context).noAccount),
                 TextButton(
                   onPressed: () => context.push('/signup'),
-                  child: const Text('إنشاء حساب'),
+                  child: Text(AppLocalizations.of(context).signUp),
                 ),
               ],
             ),

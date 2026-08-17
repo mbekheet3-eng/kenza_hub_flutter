@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../core/localization/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../models/product.dart';
 import '../../services/supabase_service.dart';
 import '../../config/theme.dart';
+import 'home_header.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -34,10 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('كينزا هب'),
-        elevation: 0,
-      ),
+      appBar: const HomeHeader(),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'الفئات',
+                    AppLocalizations.of(context).categories,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 12),
@@ -71,13 +70,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'المنتجات الرائجة',
+                        AppLocalizations.of(context).trendingProducts,
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       GestureDetector(
                         onTap: () => context.push('/search?q='),
                         child: Text(
-                          'عرض الكل',
+                          AppLocalizations.of(context).viewAll,
                           style: TextStyle(
                             color: AppTheme.primaryColor,
                             fontWeight: FontWeight.w500,
@@ -99,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/sell'),
-        label: const Text('بيع الآن'),
+        label: Text(AppLocalizations.of(context).sellNow),
         icon: const Icon(Icons.add),
       ),
     );
@@ -111,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: 'ابحث عن منتج...',
+          hintText: AppLocalizations.of(context).searchProduct,
           prefixIcon: const Icon(Icons.search),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
@@ -140,10 +139,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCategoriesGrid(bool isMobile) {
     final categories = [
-      ('clothes', 'ملابس', Icons.checkroom),
-      ('shoes', 'أحذية', Icons.shoes),
-      ('kids', 'ملابس أطفال', Icons.child_care),
-      ('home', 'منزل', Icons.home),
+      ('clothes', AppLocalizations.of(context).clothes, Icons.checkroom),
+      ('shoes', AppLocalizations.of(context).shoes, Icons.shoes),
+      ('kids', AppLocalizations.of(context).kids, Icons.child_care),
+      ('home', AppLocalizations.of(context).home, Icons.home),
     ];
 
     return GridView.builder(
@@ -175,12 +174,12 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         if (snapshot.hasError) {
-          return Center(child: Text('خطأ: ${snapshot.error}'));
+          return Center(child: Text('${AppLocalizations.of(context).error}: ${snapshot.error}'));
         }
 
         final products = snapshot.data ?? [];
         if (products.isEmpty) {
-          return const Center(child: Text('لا توجد منتجات'));
+          return Center(child: Text(AppLocalizations.of(context).noProducts));
         }
 
         return GridView.builder(
@@ -215,14 +214,14 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           Text(
-            'هل لديك ملابس قديمة؟',
+            AppLocalizations.of(context).oldClothes,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   color: Colors.white,
                 ),
           ),
           const SizedBox(height: 12),
           const Text(
-            'بيع ملابسك بسهولة واربح أموالاً',
+            AppLocalizations.of(context).sellAndEarn,
             style: TextStyle(color: Colors.white70),
           ),
           const SizedBox(height: 16),
@@ -234,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 backgroundColor: Colors.white,
                 foregroundColor: AppTheme.primaryColor,
               ),
-              child: const Text('ابدأ البيع الآن'),
+              child: Text(AppLocalizations.of(context).startSelling),
             ),
           ),
         ],
@@ -344,7 +343,7 @@ class _ProductCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${product.price} ج.م',
+                     '${product.price} ${AppLocalizations.of(context).currency}',
                     style: TextStyle(
                       color: AppTheme.primaryColor,
                       fontWeight: FontWeight.bold,
