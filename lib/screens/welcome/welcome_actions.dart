@@ -27,16 +27,14 @@ class WelcomeActions extends StatelessWidget {
             ),
             child: Text(
               AppLocalizations.of(context).signUp,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
         ),
-
         const SizedBox(height: 12),
-<<<<<<< ours
         SizedBox(
           width: double.infinity,
           height: 54,
@@ -54,68 +52,21 @@ class WelcomeActions extends StatelessWidget {
             ),
             child: Text(
               AppLocalizations.of(context).login,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
-||||||| base
-
-        // Secondary CTA - تسجيل الدخول (يظهر Bottom Sheet)
-        TextButton(
-          onPressed: () {
-            _showLoginBottomSheet(context);
-          },
-          child: const Text(
-            'تسجيل الدخول',
-            style: TextStyle(
-              fontSize: 16,
-              color: Color(0xFF0F172A),
-              fontWeight: FontWeight.w600,
-=======
-
-        SizedBox(
-          width: double.infinity,
-          height: 54,
-          child: ElevatedButton(
-            onPressed: () {
-              _showLoginBottomSheet(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryRed,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text(
-              'تسجيل الدخول',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
->>>>>>> theirs
             ),
           ),
         ),
-<<<<<<< ours
         const SizedBox(height: 8),
-||||||| base
-        const SizedBox(height: 4),
-
-        // Guest - تصفح كزائر
-=======
-
-        const SizedBox(height: 8),
-
->>>>>>> theirs
         TextButton(
           onPressed: () {
             Navigator.pushNamed(context, '/guest_home');
           },
           child: Text(
             AppLocalizations.of(context).continueAsGuest,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               color: Color(0xFF94A3B8),
             ),
@@ -147,7 +98,7 @@ class WelcomeActions extends StatelessWidget {
             children: [
               Text(
                 AppLocalizations.of(context).login,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF0F172A),
@@ -157,7 +108,7 @@ class WelcomeActions extends StatelessWidget {
               TextField(
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context).email,
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 12),
@@ -165,7 +116,7 @@ class WelcomeActions extends StatelessWidget {
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context).password,
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 20),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 
 class LanguageSelector extends StatefulWidget {
   const LanguageSelector({super.key});
@@ -8,7 +9,8 @@ class LanguageSelector extends StatefulWidget {
 }
 
 class _LanguageSelectorState extends State<LanguageSelector> {
-  String _selectedLanguage = 'AR';
+  String _selectedLanguage =
+      AppLocalizations.currentLocale.languageCode.toUpperCase();
 
   final Map<String, String> _languages = {
     'AR': 'العربية',
@@ -34,9 +36,8 @@ class _LanguageSelectorState extends State<LanguageSelector> {
           fontWeight: FontWeight.w600,
         ),
         onChanged: (String? newValue) {
-          setState(() {
-            _selectedLanguage = newValue!;
-          });
+          setState(() => _selectedLanguage = newValue!);
+          AppLocalizations.setLocale(newValue!.toLowerCase());
         },
         items: _languages.keys.map((String key) {
           return DropdownMenuItem<String>(

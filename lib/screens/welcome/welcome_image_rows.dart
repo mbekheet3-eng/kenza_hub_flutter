@@ -62,6 +62,11 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isSmallScreen = screenHeight(context) < 700;
+    final imageWidth = screenWidth * (isSmallScreen ? 0.26 : 0.28);
+    final imageHeight = imageWidth * 1.3;
+
     return Column(
       children: [
         AnimatedBuilder(
@@ -69,7 +74,11 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
           builder: (context, child) {
             return Transform.translate(
               offset: Offset(_controllerRow1.value * 200, 0),
-              child: WelcomeImageRow(images: _row1Images),
+              child: WelcomeImageRow(
+                images: _row1Images,
+                imageWidth: imageWidth,
+                imageHeight: imageHeight,
+              ),
             );
           },
         ),
@@ -79,11 +88,18 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
           builder: (context, child) {
             return Transform.translate(
               offset: Offset(_controllerRow2.value * 200, 0),
-              child: WelcomeImageRow(images: _row2Images),
+              child: WelcomeImageRow(
+                images: _row2Images,
+                imageWidth: imageWidth * 0.9,
+                imageHeight: imageHeight * 0.9,
+              ),
             );
           },
         ),
       ],
     );
   }
+
+  double screenHeight(BuildContext context) =>
+      MediaQuery.sizeOf(context).height;
 }

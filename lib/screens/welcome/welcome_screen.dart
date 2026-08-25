@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/localization/app_localizations.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'welcome_actions.dart';
 import 'welcome_footer.dart';
 import 'welcome_image_rows.dart';
@@ -33,17 +33,17 @@ class WelcomeScreen extends StatelessWidget {
                         horizontal: 20,
                         vertical: isSmallScreen ? 8 : 12,
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
+                        children: [
                           WelcomeLogo(),
                           LanguageSelector(),
                         ],
                       ),
                     ),
                     SizedBox(
-                      height: isSmallScreen ? 225 : 275,
+                      height: isSmallScreen ? 235 : 275,
                       child: const Center(
                         child: WelcomeImageRows(),
                       ),
@@ -66,7 +66,7 @@ class WelcomeScreen extends StatelessWidget {
                               color: const Color(0xFF0F172A),
                               height: 1.35,
                             ),
-                         ),
+                          ),
                           const SizedBox(height: 8),
                           Text(
                             strings.welcomeSubtitle,
