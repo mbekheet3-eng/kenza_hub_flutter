@@ -1,9 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:kenza_hub_flutter/config/env_config.dart';
 import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:kenza_hub_flutter/screens/welcome/welcome_screen.dart';
 
-void main() {
+void main() async {
+  // Load environment variables
+  await dotenv.load(fileName: '.env');
+  
+  // Print config in debug mode
+  EnvConfig.debugPrint();
+  
+  // Validate configuration
+  if (!EnvConfig.isConfigured()) {
+    print('⚠️ WARNING: Supabase configuration is missing!');
+    print('Please fill in your .env file with valid credentials.');
+  }
+  
   runApp(const MyApp());
 }
 
