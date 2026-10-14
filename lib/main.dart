@@ -4,6 +4,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:kenza_hub_flutter/config/env_config.dart';
 import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:kenza_hub_flutter/screens/welcome/welcome_screen.dart';
+import 'package:kenza_hub_flutter/screens/home/home_screen.dart';
+import 'package:kenza_hub_flutter/screens/product/product_details_screen.dart';
+import 'package:kenza_hub_flutter/services/supabase_service.dart';
 
 void main() async {
   // Load environment variables
@@ -16,6 +19,13 @@ void main() async {
   if (!EnvConfig.isConfigured()) {
     print('⚠️ WARNING: Supabase configuration is missing!');
     print('Please fill in your .env file with valid credentials.');
+  } else {
+    // Initialize Supabase if configured
+    try {
+      await SupabaseService.initialize();
+    } catch (e) {
+      print('⚠️ WARNING: Supabase initialization failed: $e');
+    }
   }
   
   runApp(const MyApp());
@@ -57,6 +67,16 @@ class MyApp extends StatelessWidget {
           initialRoute: '/',
           routes: {
             '/': (context) => const WelcomeScreen(),
+            '/home': (context) => const HomeScreen(),
+            '/product-details': (context) {
+              final productId = ModalRoute.of(context)?.settings.arguments as String?;
+              if (productId == null) {
+                return const Scaffold(
+                  body: Center(child: Text('خطأ: معرف المنتج مفقود')),
+                );
+              }
+              return ProductDetailsScreen(productId: productId);
+            },
             '/signup': (context) => const Scaffold(
                   body: Center(
                     child: Text('إنشاء حساب - قيد التطوير'),
@@ -67,11 +87,22 @@ class MyApp extends StatelessWidget {
                     child: Text('تسجيل الدخول - قيد التطوير'),
                   ),
                 ),
-            '/guest_home': (context) => const Scaffold(
+            '/cart': (context) => const Scaffold(
                   body: Center(
-                    child: Text('التصفح كزائر - قيد التطوير'),
+                    child: Text('السلة - قيد التطوير'),
                   ),
                 ),
+            '/checkout': (context) => const Scaffold(
+                  body: Center(
+                    child: Text('الدفع - قيد التطوير'),
+                  ),
+                ),
+            '/profile': (context) => const Scaffold(
+                  body: Center(
+                    child: Text('الملف الشخصي - قيد التطوير'),
+                  ),
+                ),
+            '/guest_home': (context) => const HomeScreen(),
           },
         );
       },

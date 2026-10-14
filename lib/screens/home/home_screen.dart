@@ -1,281 +1,245 @@
 import 'package:flutter/material.dart';
-import '../../core/localization/app_localizations.dart';
-import 'package:go_router/go_router.dart';
-import '../../models/product.dart';
-import '../../services/supabase_service.dart';
-import '../../config/theme.dart';
-import 'home_header.dart';
+import 'package:kenza_hub_flutter/config/app_colors.dart';
+import 'package:kenza_hub_flutter/config/app_radius.dart';
+import 'package:kenza_hub_flutter/config/app_spacing.dart';
+import 'package:kenza_hub_flutter/models/product_model.dart';
+import 'package:kenza_hub_flutter/services/supabase_service.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _supabaseService = SupabaseService();
-  late Future<List<Product>> _trendingProducts;
-  final _searchController = TextEditingController();
+  final SupabaseService _supabaseService = SupabaseService();
+  
+  List<Product> _products = [];
+  List<Product> _filteredProducts = [];
+  bool _isLoading = true;
+  String _selectedCategory = 'الكل';
+  String _searchQuery = '';
+  
+  final List<String> _categories = [
+    'الكل',
+    'رجال',
+    'نساء',
+    'أطفال',
+    'أحذية',
+    'ملحقات',
+  ];
 
   @override
   void initState() {
     super.initState();
-    _trendingProducts = _supabaseService.getTrendingProducts(limit: 8);
+    _loadProducts();
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  Future<void> _loadProducts() async {
+    try {
+      setState(() => _isLoading = true);
+      
+      final productsData = await _supabaseService.fetchProducts();
+      final products = productsData
+          .map((p) => Product.fromJson(p))
+          .toList();
+      
+      setState(() {
+        _products = products;
+        _applyFilters();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ في تحميل المنتجات: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _applyFilters() {
+    _filteredProducts = _products.where((product) {
+      final matchesCategory = _selectedCategory == 'الكل' ||
+          product.category.toLowerCase() == _selectedCategory.toLowerCase();
+      
+      final matchesSearch = _searchQuery.isEmpty ||
+          product.title.toLowerCase().contains(_searchQuery.toLowerCase());
+      
+      return matchesCategory && matchesSearch;
+    }).toList();
+  }
+
+  void _onCategoryChanged(String category) {
+    setState(() {
+      _selectedCategory = category;
+      _applyFilters();
+    });
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query;
+      _applyFilters();
+    });
+  }
+
+  void _onRefresh() {
+    _loadProducts();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 600;
-
     return Scaffold(
-      appBar: const HomeHeader(),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: const Text(
+          'كنزة هب',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.shopping_cart, color: Colors.black),
+            onPressed: () => Navigator.pushNamed(context, '/cart'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.person, color: Colors.black),
+            onPressed: () => Navigator.pushNamed(context, '/profile'),
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: (_) async => _onRefresh(),
+        child: CustomScrollView(
+          slivers: [
             // Search Bar
-            _buildSearchBar(context),
-
-            // Categories Section
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppLocalizations.of(context).categories,
-                    style: Theme.of(context).textTheme.headlineSmall,
+            SliverAppBar(
+              pinned: true,
+              elevation: 0,
+              backgroundColor: Colors.white,
+              flexibleSpace: FlexibleSpaceBar(
+                background: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: TextField(
+                    onChanged: _onSearchChanged,
+                    decoration: InputDecoration(
+                      hintText: 'ابحث عن منتجات...',
+                      prefixIcon: const Icon(Icons.search),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 12),
-                  _buildCategoriesGrid(isMobile),
-                ],
+                ),
               ),
             ),
-
-            // Trending Products Section
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context).trendingProducts,
-                        style: Theme.of(context).textTheme.headlineSmall,
+            
+            // Category Filter
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 50,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                  itemCount: _categories.length,
+                  itemBuilder: (context, index) {
+                    final category = _categories[index];
+                    final isSelected = _selectedCategory == category;
+                    
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: FilterChip(
+                        label: Text(category),
+                        selected: isSelected,
+                        onSelected: (_) => _onCategoryChanged(category),
+                        backgroundColor: Colors.grey[200],
+                        selectedColor: AppColors.primary,
+                        labelStyle: TextStyle(
+                          color: isSelected ? Colors.white : Colors.black,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                      GestureDetector(
-                        onTap: () => context.push('/search?q='),
-                        child: Text(
-                          AppLocalizations.of(context).viewAll,
-                          style: TextStyle(
-                            color: AppTheme.primaryColor,
-                            fontWeight: FontWeight.w500,
-                          ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            
+            const SliverSizedBox(height: AppSpacing.md),
+            
+            // Products Grid
+            if (_isLoading)
+              SliverFillRemaining(
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            else if (_filteredProducts.isEmpty)
+              SliverFillRemaining(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.shopping_bag_outlined,
+                        size: 64,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        'لا توجد منتجات',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 18,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  _buildTrendingProducts(isMobile),
-                ],
-              ),
-            ),
-
-            // Call to Action
-            _buildCallToAction(context),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/sell'),
-        label: Text(AppLocalizations.of(context).sellNow),
-        icon: const Icon(Icons.add),
-      ),
-    );
-  }
-
-  Widget _buildSearchBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: TextField(
-        controller: _searchController,
-        decoration: InputDecoration(
-          hintText: AppLocalizations.of(context).searchProduct,
-          prefixIcon: const Icon(Icons.search),
-          suffixIcon: _searchController.text.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    _searchController.clear();
-                    setState(() {});
-                  },
-                )
-              : null,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        onChanged: (value) {
-          setState(() {});
-        },
-        onSubmitted: (value) {
-          if (value.isNotEmpty) {
-            context.push('/search?q=$value');
-          }
-        },
-      ),
-    );
-  }
-
-  Widget _buildCategoriesGrid(bool isMobile) {
-    final categories = [
-      ('clothes', AppLocalizations.of(context).clothes, Icons.checkroom),
-      ('shoes', AppLocalizations.of(context).shoes, Icons.shopping_bag_outlined),
-      ('kids', AppLocalizations.of(context).kids, Icons.child_care),
-      ('home', AppLocalizations.of(context).home, Icons.home),
-    ];
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: isMobile ? 2 : 4,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-      ),
-      itemCount: categories.length,
-      itemBuilder: (context, index) {
-        final (key, label, icon) = categories[index];
-        return _CategoryCard(
-          label: label,
-          icon: icon,
-          onTap: () => context.push('/search?category=$key'),
-        );
-      },
-    );
-  }
-
-  Widget _buildTrendingProducts(bool isMobile) {
-    return FutureBuilder<List<Product>>(
-      future: _trendingProducts,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError) {
-          return Center(child: Text('${AppLocalizations.of(context).error}: ${snapshot.error}'));
-        }
-
-        final products = snapshot.data ?? [];
-        if (products.isEmpty) {
-          return Center(child: Text(AppLocalizations.of(context).noProducts));
-        }
-
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: isMobile ? 2 : 4,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 0.75,
-          ),
-          itemCount: products.length,
-          itemBuilder: (context, index) {
-            return _ProductCard(
-              product: products[index],
-              onTap: () => context.push('/product/${products[index].id}'),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildCallToAction(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.primaryColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Text(
-            AppLocalizations.of(context).oldClothes,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Colors.white,
                 ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            AppLocalizations.of(context).sellAndEarn,
-            style: TextStyle(color: Colors.white70),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => context.push('/sell'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: AppTheme.primaryColor,
+              )
+            else
+              SliverPadding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                sliver: SliverGrid(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.75,
+                    crossAxisSpacing: AppSpacing.md,
+                    mainAxisSpacing: AppSpacing.md,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final product = _filteredProducts[index];
+                      
+                      return ProductCard(
+                        product: product,
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/product-details',
+                            arguments: product.id,
+                          );
+                        },
+                      );
+                    },
+                    childCount: _filteredProducts.length,
+                  ),
+                ),
               ),
-              child: Text(AppLocalizations.of(context).startSelling),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CategoryCard extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _CategoryCard({
-    required this.label,
-    required this.icon,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppTheme.surfaceColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppTheme.borderLight),
-          boxShadow: const [AppTheme.shadowSmall],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 32, color: AppTheme.primaryColor),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
-              ),
-            ),
           ],
         ),
       ),
@@ -283,11 +247,12 @@ class _CategoryCard extends StatelessWidget {
   }
 }
 
-class _ProductCard extends StatelessWidget {
+class ProductCard extends StatelessWidget {
   final Product product;
   final VoidCallback onTap;
 
-  const _ProductCard({
+  const ProductCard({
+    super.key,
     required this.product,
     required this.onTap,
   });
@@ -296,60 +261,112 @@ class _ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppTheme.surfaceColor,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [AppTheme.shadowSmall],
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image
             Expanded(
+              flex: 3,
               child: Container(
-                width: double.infinity,
                 decoration: BoxDecoration(
-                  color: AppTheme.backgroundColor,
                   borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
+                    topLeft: Radius.circular(AppRadius.lg),
+                    topRight: Radius.circular(AppRadius.lg),
                   ),
+                  color: Colors.grey[200],
                 ),
-                child: product.primaryImage.isNotEmpty
+                child: product.imageUrl != null && product.imageUrl!.isNotEmpty
                     ? Image.network(
-                        product.primaryImage,
+                        product.imageUrl!,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(Icons.image_not_supported),
+                        errorBuilder: (_, __, ___) => Center(
+                          child: Icon(
+                            Icons.image_not_supported_outlined,
+                            color: Colors.grey[400],
+                            size: 40,
+                          ),
+                        ),
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
                       )
-                    : const Icon(Icons.image_not_supported),
+                    : Center(
+                        child: Icon(
+                          Icons.image_outlined,
+                          color: Colors.grey[400],
+                          size: 40,
+                        ),
+                      ),
               ),
             ),
-            // Content
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 13,
+            
+            // Product Info
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Title
+                    Text(
+                      product.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                     '${product.price} ${AppLocalizations.of(context).currency}',
-                    style: TextStyle(
-                      color: AppTheme.primaryColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                    
+                    // Rating & Price
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Price
+                        Text(
+                          '${product.price.toStringAsFixed(0)} ريال',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        
+                        // Rating
+                        if (product.rating != null)
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.star_rounded,
+                                color: Colors.amber,
+                                size: 14,
+                              ),
+                              const SizedBox(width: 2),
+                              Text(
+                                product.rating!.toStringAsFixed(1),
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            ],
+                          ),
+                      ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
