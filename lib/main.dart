@@ -6,6 +6,8 @@ import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:kenza_hub_flutter/screens/welcome/welcome_screen.dart';
 import 'package:kenza_hub_flutter/screens/home/home_screen.dart';
 import 'package:kenza_hub_flutter/screens/product/product_details_screen.dart';
+import 'package:kenza_hub_flutter/screens/auth/signup_screen.dart';
+import 'package:kenza_hub_flutter/screens/auth/login_screen.dart';
 import 'package:kenza_hub_flutter/services/supabase_service.dart';
 
 void main() async {
@@ -77,16 +79,8 @@ class MyApp extends StatelessWidget {
               }
               return ProductDetailsScreen(productId: productId);
             },
-            '/signup': (context) => const Scaffold(
-                  body: Center(
-                    child: Text('إنشاء حساب - قيد التطوير'),
-                  ),
-                ),
-            '/login': (context) => const Scaffold(
-                  body: Center(
-                    child: Text('تسجيل الدخول - قيد التطوير'),
-                  ),
-                ),
+            '/signup': (context) => const SignUpScreen(),
+            '/login': (context) => const LoginScreen(),
             '/cart': (context) => const Scaffold(
                   body: Center(
                     child: Text('السلة - قيد التطوير'),
