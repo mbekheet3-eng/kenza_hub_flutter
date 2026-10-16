@@ -1,7 +1,3 @@
-import 'package:json_annotation/json_annotation.dart';
-
-part 'order.g.dart';
-
 enum OrderStatus {
   pending,
   accepted,
@@ -12,7 +8,6 @@ enum OrderStatus {
   disputed,
 }
 
-@JsonSerializable()
 class Order {
   final String id;
   final String productId;
@@ -56,8 +51,82 @@ class Order {
     this.sellerName,
   });
 
-  factory Order.fromJson(Map<String, dynamic> json) => _$OrderFromJson(json);
-  Map<String, dynamic> toJson() => _$OrderToJson(this);
+  factory Order.fromJson(Map<String, dynamic> json) {
+    return Order(
+      id: json['id'] as String,
+      productId: json['productId'] as String,
+      buyerId: json['buyerId'] as String,
+      sellerId: json['sellerId'] as String,
+      amount: (json['amount'] as num).toDouble(),
+      status: _statusFromString(json['status'] as String),
+      shippingAddress: json['shippingAddress'] as String?,
+      trackingNumber: json['trackingNumber'] as String?,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      shippedAt: json['shippedAt'] == null
+          ? null
+          : DateTime.parse(json['shippedAt'] as String),
+      deliveredAt: json['deliveredAt'] == null
+          ? null
+          : DateTime.parse(json['deliveredAt'] as String),
+      notes: json['notes'] as String?,
+      rating: (json['rating'] as num?)?.toDouble(),
+      review: json['review'] as String?,
+      productTitle: json['productTitle'] as String?,
+      productImage: json['productImage'] as String?,
+      buyerName: json['buyerName'] as String?,
+      sellerName: json['sellerName'] as String?,
+    );
+  }
+
+  static OrderStatus _statusFromString(String status) {
+    switch (status) {
+      case 'pending':
+        return OrderStatus.pending;
+      case 'accepted':
+        return OrderStatus.accepted;
+      case 'shipped':
+        return OrderStatus.shipped;
+      case 'delivered':
+        return OrderStatus.delivered;
+      case 'completed':
+        return OrderStatus.completed;
+      case 'cancelled':
+        return OrderStatus.cancelled;
+      case 'disputed':
+        return OrderStatus.disputed;
+      default:
+        return OrderStatus.pending;
+    }
+  }
+
+  static String _statusToString(OrderStatus status) {
+    return status.toString().split('.')[1];
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'productId': productId,
+      'buyerId': buyerId,
+      'sellerId': sellerId,
+      'amount': amount,
+      'status': _statusToString(status),
+      'shippingAddress': shippingAddress,
+      'trackingNumber': trackingNumber,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'shippedAt': shippedAt?.toIso8601String(),
+      'deliveredAt': deliveredAt?.toIso8601String(),
+      'notes': notes,
+      'rating': rating,
+      'review': review,
+      'productTitle': productTitle,
+      'productImage': productImage,
+      'buyerName': buyerName,
+      'sellerName': sellerName,
+    };
+  }
 
   String get statusArabic {
     switch (status) {
@@ -123,7 +192,6 @@ class Order {
   }
 }
 
-@JsonSerializable()
 class OrderItem {
   final String orderId;
   final String productId;
@@ -141,11 +209,29 @@ class OrderItem {
     required this.quantity,
   });
 
-  factory OrderItem.fromJson(Map<String, dynamic> json) => _$OrderItemFromJson(json);
-  Map<String, dynamic> toJson() => _$OrderItemToJson(this);
+  factory OrderItem.fromJson(Map<String, dynamic> json) {
+    return OrderItem(
+      orderId: json['orderId'] as String,
+      productId: json['productId'] as String,
+      title: json['title'] as String,
+      price: (json['price'] as num).toDouble(),
+      imageUrl: json['imageUrl'] as String,
+      quantity: json['quantity'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'orderId': orderId,
+      'productId': productId,
+      'title': title,
+      'price': price,
+      'imageUrl': imageUrl,
+      'quantity': quantity,
+    };
+  }
 }
 
-@JsonSerializable()
 class OrderTimeline {
   final String orderId;
   final OrderStatus status;
@@ -161,6 +247,23 @@ class OrderTimeline {
     this.metadata,
   });
 
-  factory OrderTimeline.fromJson(Map<String, dynamic> json) => _$OrderTimelineFromJson(json);
-  Map<String, dynamic> toJson() => _$OrderTimelineToJson(this);
+  factory OrderTimeline.fromJson(Map<String, dynamic> json) {
+    return OrderTimeline(
+      orderId: json['orderId'] as String,
+      status: Order._statusFromString(json['status'] as String),
+      message: json['message'] as String,
+      timestamp: DateTime.parse(json['timestamp'] as String),
+      metadata: json['metadata'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'orderId': orderId,
+      'status': Order._statusToString(status),
+      'message': message,
+      'timestamp': timestamp.toIso8601String(),
+      'metadata': metadata,
+    };
+  }
 }

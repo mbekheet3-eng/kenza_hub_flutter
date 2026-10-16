@@ -1,8 +1,3 @@
-import 'package:json_annotation/json_annotation.dart';
-
-part 'user.g.dart';
-
-@JsonSerializable()
 class User {
   final String id;
   final String email;
@@ -50,8 +45,61 @@ class User {
     this.favorites,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
-  Map<String, dynamic> toJson() => _$UserToJson(this);
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'] as String,
+      email: json['email'] as String,
+      displayName: json['displayName'] as String?,
+      phone: json['phone'] as String?,
+      avatarUrl: json['avatarUrl'] as String?,
+      bio: json['bio'] as String?,
+      location: json['location'] as String?,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
+      rating: (json['rating'] as num?)?.toDouble() ?? 0,
+      totalReviews: json['totalReviews'] as int? ?? 0,
+      productsCount: json['productsCount'] as int? ?? 0,
+      followersCount: json['followersCount'] as int? ?? 0,
+      isVerified: json['isVerified'] as bool? ?? false,
+      isPhoneVerified: json['isPhoneVerified'] as bool? ?? false,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      lastSeenAt: json['lastSeenAt'] == null
+          ? null
+          : DateTime.parse(json['lastSeenAt'] as String),
+      preferredLanguage: json['preferredLanguage'] as String? ?? 'ar',
+      notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
+      favorites: (json['favorites'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'email': email,
+      'displayName': displayName,
+      'phone': phone,
+      'avatarUrl': avatarUrl,
+      'bio': bio,
+      'location': location,
+      'latitude': latitude,
+      'longitude': longitude,
+      'rating': rating,
+      'totalReviews': totalReviews,
+      'productsCount': productsCount,
+      'followersCount': followersCount,
+      'isVerified': isVerified,
+      'isPhoneVerified': isPhoneVerified,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'lastSeenAt': lastSeenAt?.toIso8601String(),
+      'preferredLanguage': preferredLanguage,
+      'notificationsEnabled': notificationsEnabled,
+      'favorites': favorites,
+    };
+  }
 
   User copyWith({
     String? id,
@@ -102,7 +150,6 @@ class User {
   }
 }
 
-@JsonSerializable()
 class UserProfile {
   final String userId;
   final String displayName;
@@ -126,6 +173,31 @@ class UserProfile {
     required this.updatedAt,
   });
 
-  factory UserProfile.fromJson(Map<String, dynamic> json) => _$UserProfileFromJson(json);
-  Map<String, dynamic> toJson() => _$UserProfileToJson(this);
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      userId: json['userId'] as String,
+      displayName: json['displayName'] as String,
+      phone: json['phone'] as String?,
+      avatarUrl: json['avatarUrl'] as String?,
+      bio: json['bio'] as String?,
+      location: json['location'] as String?,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'displayName': displayName,
+      'phone': phone,
+      'avatarUrl': avatarUrl,
+      'bio': bio,
+      'location': location,
+      'latitude': latitude,
+      'longitude': longitude,
+      'updatedAt': updatedAt.toIso8601String(),
+    };
+  }
 }
