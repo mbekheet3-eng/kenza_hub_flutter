@@ -62,6 +62,18 @@ class Product {
   // Get primary image path (for caching)
   String? get primaryImagePath => imagePaths.isNotEmpty ? imagePaths[0] : null;
 
+  // Price display with currency
+  String get priceDisplay => '${price.toStringAsFixed(2)} ج.م';
+
+  // Check if product is available (not sold and is active)
+  bool get isAvailable => !isSold && isActive;
+
+  // Rating display
+  String get ratingDisplay => rating != null ? rating!.toStringAsFixed(1) : 'بدون تقييم';
+
+  // Review count display
+  int get reviewCount => rating != null ? (rating! * 20).toInt() : 0; // Estimate
+
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'] as String,
