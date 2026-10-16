@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:kenza_hub_flutter/config/app_colors.dart';
 import 'package:kenza_hub_flutter/config/app_radius.dart';
 import 'package:kenza_hub_flutter/config/app_spacing.dart';
-import 'package:kenza_hub_flutter/models/product_model.dart';
-import 'package:kenza_hub_flutter/services/supabase_service.dart';
+import 'package:kenza_hub_flutter/providers/product_details_provider.dart';
+import 'package:kenza_hub_flutter/providers/cart_provider.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final String productId;
@@ -18,385 +19,497 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
-  final SupabaseService _supabaseService = SupabaseService();
-  
-  late Product _product;
-  bool _isLoading = true;
-  String? _selectedSize;
-  String? _selectedColor;
-  int _quantity = 1;
-
   @override
   void initState() {
     super.initState();
-    _loadProduct();
+    Future.microtask(() {
+      context.read<ProductDetailsProvider>().loadProduct(widget.productId);
+    });
   }
 
-  Future<void> _loadProduct() async {
-    try {
-      setState(() => _isLoading = true);
-      
-      final productData = await _supabaseService.fetchProductById(widget.productId);
-      
-      setState(() {
-        _product = Product.fromJson(productData);
-        _isLoading = false;
-        
-        // Set default selections
-        if (_product.sizes != null && _product.sizes!.isNotEmpty) {
-          _selectedSize = _product.sizes!.first;
-        }
-        if (_product.colors != null && _product.colors!.isNotEmpty) {
-          _selectedColor = _product.colors!.first;
-        }
-      });
-    } catch (e) {
-      setState(() => _isLoading = false);
-      
-      if (mounted) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('خطأ في تحميل المنتج: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
+  void _handleAddToCart(BuildContext context) {
+    final provider = context.read<ProductDetailsProvider>();
+    final product = provider.product;
 
-  void _addToCart() {
-    // TODO: Implement cart functionality
+    if (product == null) return;
+
+    // Add to cart
+    context.read<CartProvider>().addItem(
+      productId: product.id,
+      title: product.title,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      quantity: provider.quantity,
+      size: provider.selectedSize,
+      color: provider.selectedColor,
+    );
+
+    provider.markAsAddedToCart();
+
+    // Show snackbar
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('تمت إضافة المنتج إلى السلة'),
-        duration: Duration(seconds: 2),
+        backgroundColor: Colors.green,
       ),
     );
   }
 
-  void _buyNow() {
-    // TODO: Implement direct purchase
-    Navigator.pushNamed(context, '/checkout');
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
+        title: const Text('تفاصيل المنتج'),
+        centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
-        title: const Text('تفاصيل المنتج'),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Product Image
-            Container(
-              height: 300,
-              width: double.infinity,
-              color: Colors.grey[200],
-              child: _product.imageUrl != null && _product.imageUrl!.isNotEmpty
-                  ? Image.network(
-                      _product.imageUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Center(
-                        child: Icon(
-                          Icons.image_not_supported_outlined,
-                          color: Colors.grey[400],
-                          size: 64,
-                        ),
-                      ),
-                    )
-                  : Center(
-                      child: Icon(
-                        Icons.image_outlined,
-                        color: Colors.grey[400],
-                        size: 64,
-                      ),
-                    ),
-            ),
+      body: Consumer<ProductDetailsProvider>(
+        builder: (context, provider, _) {
+          if (provider.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title & Price
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          if (provider.error != null) {
+            return ErrorStateWidget(
+              error: provider.error!,
+              onRetry: () => provider.retry(widget.productId),
+            );
+          }
+
+          final product = provider.product;
+          if (product == null) {
+            return const Center(child: Text('المنتج غير موجود'));
+          }
+
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Product Image
+                Container(
+                  width: double.infinity,
+                  height: 300,
+                  color: Colors.grey[200],
+                  child: product.imageUrl != null
+                      ? Image.network(
+                          product.imageUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Center(
+                            child: Icon(
+                              Icons.image_not_supported,
+                              size: 80,
+                              color: Colors.grey[400],
+                            ),
+                          ),
+                        )
+                      : Center(
+                          child: Icon(
+                            Icons.image,
+                            size: 80,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                ),
+
+                // Product Info
+                Padding(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _product.title,
-                              style: const TextStyle(
-                                fontSize: 22,
+                      // Title
+                      Text(
+                        product.title,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(height: AppSpacing.sm),
+
+                      // Rating
+                      Row(
+                        children: [
+                          if (product.rating != null)
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.star_rounded,
+                                  color: Colors.amber,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${product.rating} (${product.reviewCount ?? 0} تقييم)',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+
+                      const SizedBox(height: AppSpacing.lg),
+
+                      // Price
+                      Row(
+                        children: [
+                          Text(
+                            product.priceDisplay,
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: product.isAvailable
+                                  ? Colors.green[100]
+                                  : Colors.red[100],
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              product.isAvailable ? 'متوفر' : 'نفد',
+                              style: TextStyle(
+                                color: product.isAvailable
+                                    ? Colors.green[700]
+                                    : Colors.red[700],
                                 fontWeight: FontWeight.bold,
+                                fontSize: 12,
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            if (_product.rating != null)
-                              Row(
-                                children: [
-                                  Icon(Icons.star_rounded, color: Colors.amber),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '${_product.rating} (${_product.reviewCount ?? 0} تقييم)',
-                                    style: const TextStyle(fontSize: 14),
-                                  ),
-                                ],
-                              ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
+
+                      const SizedBox(height: AppSpacing.lg),
+
+                      // Description
                       Text(
-                        '${_product.price.toStringAsFixed(0)} ريال',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // Description
-                  if (_product.description.isNotEmpty)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'الوصف',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _product.description,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[700],
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // Size Selection
-                  if (_product.sizes != null && _product.sizes!.isNotEmpty)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'الحجم',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 8,
-                          children: _product.sizes!.map((size) {
-                            final isSelected = _selectedSize == size;
-                            return ChoiceChip(
-                              label: Text(size),
-                              selected: isSelected,
-                              onSelected: (_) {
-                                setState(() => _selectedSize = size);
-                              },
-                              backgroundColor: Colors.grey[200],
-                              selectedColor: AppColors.primary,
-                              labelStyle: TextStyle(
-                                color: isSelected ? Colors.white : Colors.black,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    ),
-
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // Color Selection
-                  if (_product.colors != null && _product.colors!.isNotEmpty)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'اللون',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 8,
-                          children: _product.colors!.map((color) {
-                            final isSelected = _selectedColor == color;
-                            return ChoiceChip(
-                              label: Text(color),
-                              selected: isSelected,
-                              onSelected: (_) {
-                                setState(() => _selectedColor = color);
-                              },
-                              backgroundColor: Colors.grey[200],
-                              selectedColor: AppColors.primary,
-                              labelStyle: TextStyle(
-                                color: isSelected ? Colors.white : Colors.black,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    ),
-
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // Quantity
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'الكمية',
-                        style: TextStyle(
+                        'الوصف',
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          IconButton(
-                            onPressed: _quantity > 1
-                                ? () => setState(() => _quantity--)
-                                : null,
-                            icon: const Icon(Icons.remove),
-                            constraints: const BoxConstraints(
-                              minWidth: 48,
-                              minHeight: 48,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              _quantity.toString(),
-                              style: const TextStyle(
-                                fontSize: 18,
+
+                      const SizedBox(height: AppSpacing.sm),
+
+                      Text(
+                        product.description,
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          height: 1.5,
+                        ),
+                      ),
+
+                      const SizedBox(height: AppSpacing.lg),
+
+                      // Sizes
+                      if (provider.availableSizes.isNotEmpty)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'المقاس',
+                              style: TextStyle(
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
-                          IconButton(
-                            onPressed: _quantity < _product.stock
-                                ? () => setState(() => _quantity++)
-                                : null,
-                            icon: const Icon(Icons.add),
-                            constraints: const BoxConstraints(
-                              minWidth: 48,
-                              minHeight: 48,
+                            const SizedBox(height: AppSpacing.sm),
+                            Wrap(
+                              spacing: AppSpacing.sm,
+                              children: provider.availableSizes
+                                  .map((size) => SizeChip(
+                                    size: size,
+                                    isSelected:
+                                        provider.selectedSize == size,
+                                    onTap: () =>
+                                        provider.selectSize(size),
+                                  ))
+                                  .toList(),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                            const SizedBox(height: AppSpacing.lg),
+                          ],
+                        ),
 
-                  const SizedBox(height: AppSpacing.xl),
+                      // Colors
+                      if (provider.availableColors.isNotEmpty)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'اللون',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            Wrap(
+                              spacing: AppSpacing.sm,
+                              children: provider.availableColors
+                                  .map((color) => ColorChip(
+                                    color: color,
+                                    isSelected:
+                                        provider.selectedColor == color,
+                                    onTap: () =>
+                                        provider.selectColor(color),
+                                  ))
+                                  .toList(),
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                          ],
+                        ),
 
-                  // Stock Status
-                  if (_product.stock == 0)
-                    Container(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      decoration: BoxDecoration(
-                        color: Colors.red[100],
-                        borderRadius: BorderRadius.circular(AppRadius.md),
-                      ),
-                      child: Row(
+                      // Quantity
+                      Row(
                         children: [
-                          Icon(Icons.error_outline, color: Colors.red[700]),
-                          const SizedBox(width: 12),
-                          Text(
-                            'المنتج غير متوفر حالياً',
+                          const Text(
+                            'الكمية',
                             style: TextStyle(
-                              color: Colors.red[700],
-                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                             ),
+                          ),
+                          const Spacer(),
+                          QuantitySelector(
+                            quantity: provider.quantity,
+                            onMinus: provider.decrementQuantity,
+                            onPlus: provider.incrementQuantity,
                           ),
                         ],
                       ),
-                    ),
 
-                  const SizedBox(height: AppSpacing.lg),
+                      const SizedBox(height: AppSpacing.xl),
 
-                  // Action Buttons
-                  Row(
-                    gap: AppSpacing.md,
-                    children: [
-                      // Add to Cart
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: _product.stock > 0 ? _addToCart : null,
-                          icon: const Icon(Icons.shopping_cart_outlined),
-                          label: const Text('أضف للسلة'),
+                      // Add to Cart Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: product.isAvailable
+                              ? () => _handleAddToCart(context)
+                              : null,
                           style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 16,
-                            ),
-                            backgroundColor: Colors.grey[200],
-                            foregroundColor: Colors.black,
-                          ),
-                        ),
-                      ),
-                      // Buy Now
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: _product.stock > 0 ? _buyNow : null,
-                          icon: const Icon(Icons.payment),
-                          label: const Text('اشتري الآن'),
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 16,
-                            ),
                             backgroundColor: AppColors.primary,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.md),
+                            ),
+                          ),
+                          child: Text(
+                            provider.isAddedToCart
+                                ? 'تمت الإضافة إلى السلة ✓'
+                                : 'إضافة إلى السلة',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
+
+                      const SizedBox(height: AppSpacing.lg),
                     ],
                   ),
-                ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// Size Chip Widget
+class SizeChip extends StatelessWidget {
+  final String size;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const SizeChip({
+    super.key,
+    required this.size,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FilterChip(
+      label: Text(size),
+      selected: isSelected,
+      onSelected: (_) => onTap(),
+      backgroundColor: Colors.grey[200],
+      selectedColor: AppColors.primary,
+      labelStyle: TextStyle(
+        color: isSelected ? Colors.white : Colors.black,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+  }
+}
+
+// Color Chip Widget
+class ColorChip extends StatelessWidget {
+  final String color;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const ColorChip({
+    super.key,
+    required this.color,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isSelected ? AppColors.primary : Colors.grey[300]!,
+            width: isSelected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.circular(AppRadius.md),
+        ),
+        child: Text(
+          color,
+          style: TextStyle(
+            color: isSelected ? AppColors.primary : Colors.black,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Quantity Selector Widget
+class QuantitySelector extends StatelessWidget {
+  final int quantity;
+  final VoidCallback onMinus;
+  final VoidCallback onPlus;
+
+  const QuantitySelector({
+    super.key,
+    required this.quantity,
+    required this.onMinus,
+    required this.onPlus,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.remove),
+            onPressed: onMinus,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+          ),
+          Container(
+            width: 50,
+            alignment: Alignment.center,
+            child: Text(
+              quantity.toString(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: onPlus,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Error State Widget
+class ErrorStateWidget extends StatelessWidget {
+  final String error;
+  final VoidCallback onRetry;
+
+  const ErrorStateWidget({
+    super.key,
+    required this.error,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 80,
+            color: Colors.red[300],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Text(
+            'حدث خطأ',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            child: Text(
+              error,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey[500],
+                fontSize: 14,
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          ElevatedButton(
+            onPressed: onRetry,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 12,
+              ),
+            ),
+            child: const Text(
+              'حاول مجدداً',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
       ),
     );
   }
