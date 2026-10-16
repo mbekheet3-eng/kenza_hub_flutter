@@ -59,6 +59,9 @@ class Product {
   // Get primary image
   String get primaryImage => imageUrls.isNotEmpty ? imageUrls[0] : '';
 
+  // Get primary image (alias for compatibility)
+  String get imageUrl => imageUrls.isNotEmpty ? imageUrls[0] : '';
+
   // Get primary image path (for caching)
   String? get primaryImagePath => imagePaths.isNotEmpty ? imagePaths[0] : null;
 
