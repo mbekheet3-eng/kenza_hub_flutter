@@ -68,7 +68,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey[300]!),
-                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      borderRadius: BorderRadius.circular(AppSpacing.md),
                       color: Colors.grey[50],
                     ),
                     child: Column(
@@ -102,7 +102,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      borderRadius: BorderRadius.circular(AppSpacing.md),
                     ),
                     child: Column(
                       children: [
@@ -123,7 +123,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.blue[50],
                       border: Border.all(color: Colors.blue[300]!),
-                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      borderRadius: BorderRadius.circular(AppSpacing.md),
                     ),
                     child: Row(
                       children: [
@@ -161,7 +161,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                           vertical: 16,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppRadius.md),
+                          borderRadius: BorderRadius.circular(AppSpacing.md),
                         ),
                       ),
                       child: const Text(
@@ -192,7 +192,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                           vertical: 16,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppRadius.md),
+                          borderRadius: BorderRadius.circular(AppSpacing.md),
                         ),
                         side: BorderSide(color: Colors.grey[400]!),
                       ),

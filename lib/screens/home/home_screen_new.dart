@@ -82,11 +82,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           )
                         : null,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      borderRadius: BorderRadius.circular(AppSpacing.md),
                       borderSide: const BorderSide(color: Colors.grey, width: 0.5),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      borderRadius: BorderRadius.circular(AppSpacing.md),
                       borderSide: const BorderSide(color: Colors.grey, width: 0.5),
                     ),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12),

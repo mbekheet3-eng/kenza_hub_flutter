@@ -128,7 +128,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             vertical: 16,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            borderRadius: BorderRadius.circular(AppSpacing.md),
                           ),
                         ),
                         child: checkoutProvider.isProcessing
@@ -160,7 +160,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             vertical: 16,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            borderRadius: BorderRadius.circular(AppSpacing.md),
                           ),
                           side: BorderSide(color: Colors.grey[400]!),
                         ),
@@ -233,7 +233,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
               color: AppColors.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(AppRadius.md),
+              borderRadius: BorderRadius.circular(AppSpacing.md),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -295,7 +295,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             isSelected ? AppColors.primary : Colors.grey[300]!,
                         width: isSelected ? 2 : 1,
                       ),
-                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      borderRadius: BorderRadius.circular(AppSpacing.md),
                       color: isSelected
                           ? AppColors.primary.withOpacity(0.05)
                           : null,

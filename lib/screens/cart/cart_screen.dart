@@ -114,7 +114,7 @@ class CartScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        borderRadius: BorderRadius.circular(AppSpacing.md),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -151,7 +151,7 @@ class CartScreen extends StatelessWidget {
                           vertical: 16,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppRadius.md),
+                          borderRadius: BorderRadius.circular(AppSpacing.md),
                         ),
                       ),
                       child: const Text(
@@ -176,7 +176,7 @@ class CartScreen extends StatelessWidget {
                           vertical: 16,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppRadius.md),
+                          borderRadius: BorderRadius.circular(AppSpacing.md),
                         ),
                         side: BorderSide(color: Colors.grey[400]!),
                       ),
@@ -269,7 +269,7 @@ class CartItemCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderRadius: BorderRadius.circular(AppSpacing.md),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -281,7 +281,7 @@ class CartItemCard extends StatelessWidget {
               children: [
                 // Image
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                  borderRadius: BorderRadius.circular(AppSpacing.sm),
                   child: Container(
                     width: 80,
                     height: 80,
@@ -371,7 +371,7 @@ class CartItemCard extends StatelessWidget {
                 Container(
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey[300]!),
-                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                    borderRadius: BorderRadius.circular(AppSpacing.sm),
                   ),
                   child: Row(
                     children: [

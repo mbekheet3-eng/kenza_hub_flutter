@@ -309,7 +309,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius:
-                                  BorderRadius.circular(AppRadius.md),
+                                  BorderRadius.circular(AppSpacing.md),
                             ),
                           ),
                           child: Text(
@@ -391,7 +391,7 @@ class ColorChip extends StatelessWidget {
             color: isSelected ? AppColors.primary : Colors.grey[300]!,
             width: isSelected ? 2 : 1,
           ),
-          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderRadius: BorderRadius.circular(AppSpacing.md),
         ),
         child: Text(
           color,
@@ -423,7 +423,7 @@ class QuantitySelector extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey[300]!),
-        borderRadius: BorderRadius.circular(AppRadius.sm),
+        borderRadius: BorderRadius.circular(AppSpacing.sm),
       ),
       child: Row(
         children: [

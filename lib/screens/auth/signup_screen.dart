@@ -145,7 +145,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       hintText: 'أحمد محمد',
                       prefixIcon: const Icon(Icons.person_outlined),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        borderRadius: BorderRadius.circular(AppSpacing.md),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
@@ -174,7 +174,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       hintText: 'example@email.com',
                       prefixIcon: const Icon(Icons.email_outlined),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        borderRadius: BorderRadius.circular(AppSpacing.md),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
@@ -214,7 +214,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         },
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        borderRadius: BorderRadius.circular(AppSpacing.md),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
@@ -255,7 +255,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         },
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        borderRadius: BorderRadius.circular(AppSpacing.md),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
@@ -315,7 +315,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         vertical: 16,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        borderRadius: BorderRadius.circular(AppSpacing.md),
                       ),
                     ),
                     child: authProvider.isLoading

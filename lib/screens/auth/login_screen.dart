@@ -120,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       hintText: 'example@email.com',
                       prefixIcon: const Icon(Icons.email_outlined),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        borderRadius: BorderRadius.circular(AppSpacing.md),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
@@ -160,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        borderRadius: BorderRadius.circular(AppSpacing.md),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
@@ -204,7 +204,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         vertical: 16,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        borderRadius: BorderRadius.circular(AppSpacing.md),
                       ),
                     ),
                     child: authProvider.isLoading
@@ -279,7 +279,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         vertical: 16,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        borderRadius: BorderRadius.circular(AppSpacing.md),
                       ),
                       side: BorderSide(color: Colors.grey[400]!),
                     ),
