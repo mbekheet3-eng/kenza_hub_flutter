@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:kenza_hub_flutter/services/supabase_service.dart';
+import 'package:kenza_hub_flutter/models/order.dart' as order_model;
 
-class OrderStatus {
+/// Timeline event for order status tracking
+class OrderTimelineEvent {
   final String id;
-  final String status; // pending, confirmed, shipped, delivered, cancelled
+  final String status; // pending, accepted, shipped, delivered, cancelled
   final String timestamp;
   final String? description;
   final String? location;
 
-  OrderStatus({
+  OrderTimelineEvent({
     required this.id,
     required this.status,
     required this.timestamp,
@@ -19,15 +21,19 @@ class OrderStatus {
   String get displayStatus {
     switch (status.toLowerCase()) {
       case 'pending':
-        return 'قيد المراجعة';
-      case 'confirmed':
-        return 'تم التأكيد';
+        return 'قيد الانتظار';
+      case 'accepted':
+        return 'تم القبول';
       case 'shipped':
         return 'في الطريق';
       case 'delivered':
-        return 'تم التوصيل';
+        return 'تم التسليم';
       case 'cancelled':
         return 'ملغي';
+      case 'completed':
+        return 'مكتمل';
+      case 'disputed':
+        return 'قيد النزاع';
       default:
         return status;
     }
@@ -37,14 +43,18 @@ class OrderStatus {
     switch (status.toLowerCase()) {
       case 'pending':
         return '⏳';
-      case 'confirmed':
+      case 'accepted':
         return '✓';
       case 'shipped':
         return '📦';
       case 'delivered':
         return '✓✓';
+      case 'completed':
+        return '🎉';
       case 'cancelled':
         return '✗';
+      case 'disputed':
+        return '⚠️';
       default:
         return '•';
     }
@@ -54,127 +64,69 @@ class OrderStatus {
     switch (status.toLowerCase()) {
       case 'pending':
         return Colors.orange;
-      case 'confirmed':
+      case 'accepted':
         return Colors.blue;
       case 'shipped':
         return Colors.purple;
       case 'delivered':
         return Colors.green;
+      case 'completed':
+        return Colors.green;
       case 'cancelled':
         return Colors.red;
+      case 'disputed':
+        return Colors.deepOrange;
       default:
         return Colors.grey;
     }
   }
 }
 
-class Order {
-  final String id;
-  final String buyerId;
-  final double totalAmount;
-  final String createdAt;
-  final String? estimatedDelivery;
-  final Map<String, dynamic> shippingAddress;
-  final List<OrderStatus> statusHistory;
-  final List<Map<String, dynamic>>? items;
-
-  Order({
-    required this.id,
-    required this.buyerId,
-    required this.totalAmount,
-    required this.createdAt,
-    this.estimatedDelivery,
-    required this.shippingAddress,
-    required this.statusHistory,
-    this.items,
-  });
-
-  String get currentStatus => statusHistory.isNotEmpty 
-      ? statusHistory.last.status 
-      : 'pending';
-
-  OrderStatus? get lastStatus => statusHistory.isNotEmpty 
-      ? statusHistory.last 
-      : null;
-
-  int get progressPercentage {
-    switch (currentStatus.toLowerCase()) {
-      case 'pending':
-        return 25;
-      case 'confirmed':
-        return 50;
-      case 'shipped':
-        return 75;
-      case 'delivered':
-        return 100;
-      case 'cancelled':
-        return 0;
-      default:
-        return 0;
-    }
-  }
-
-  String get formattedCreatedAt {
-    try {
-      final dateTime = DateTime.parse(createdAt);
-      return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
-    } catch (e) {
-      return createdAt;
-    }
-  }
-
-  factory Order.fromJson(Map<String, dynamic> json) {
-    return Order(
-      id: json['id'] as String,
-      buyerId: json['buyer_id'] as String,
-      totalAmount: (json['total_amount'] as num).toDouble(),
-      createdAt: json['created_at'] as String,
-      estimatedDelivery: json['estimated_delivery'] as String?,
-      shippingAddress: json['shipping_address'] as Map<String, dynamic>? ?? {},
-      statusHistory: (json['status_history'] as List<dynamic>?)
-              ?.map((e) => OrderStatus(
-                    id: e['id'] as String? ?? '',
-                    status: e['status'] as String? ?? '',
-                    timestamp: e['timestamp'] as String? ?? '',
-                    description: e['description'] as String?,
-                    location: e['location'] as String?,
-                  ))
-              .toList() ??
-          [
-            OrderStatus(
-              id: '1',
-              status: json['status'] as String? ?? 'pending',
-              timestamp: json['created_at'] as String,
-              description: 'تم استقبال طلبك',
-            )
-          ],
-      items: (json['items'] as List<dynamic>?)
-          ?.map((e) => e as Map<String, dynamic>)
-          .toList(),
-    );
-  }
-}
-
 class OrderTrackingProvider with ChangeNotifier {
   final SupabaseService _supabaseService = SupabaseService();
 
-  Order? _order;
+  order_model.Order? _order;
+  List<OrderTimelineEvent> _timelineEvents = [];
   bool _isLoading = false;
   String? _error;
 
-  Order? get order => _order;
+  order_model.Order? get order => _order;
+  List<OrderTimelineEvent> get timelineEvents => _timelineEvents;
   bool get isLoading => _isLoading;
   String? get error => _error;
+
+  int get progressPercentage {
+    if (_order == null) return 0;
+    
+    switch (_order!.status) {
+      case order_model.OrderStatus.pending:
+        return 25;
+      case order_model.OrderStatus.accepted:
+        return 50;
+      case order_model.OrderStatus.shipped:
+        return 75;
+      case order_model.OrderStatus.delivered:
+      case order_model.OrderStatus.completed:
+        return 100;
+      case order_model.OrderStatus.cancelled:
+      case order_model.OrderStatus.disputed:
+        return 0;
+    }
+  }
 
   Future<void> loadOrder(String orderId) async {
     try {
       _isLoading = true;
       _error = null;
+      _timelineEvents.clear();
       notifyListeners();
 
       // Fetch order from Supabase
       final orderData = await _supabaseService.fetchOrderById(orderId);
-      _order = Order.fromJson(orderData);
+      _order = order_model.Order.fromJson(orderData);
+
+      // Build timeline from order
+      _buildTimeline();
 
       _isLoading = false;
     } catch (e) {
@@ -185,77 +137,81 @@ class OrderTrackingProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Simulate real-time updates (in real app, use Supabase realtime)
+  void _buildTimeline() {
+    if (_order == null) return;
+
+    _timelineEvents.clear();
+
+    // Add initial event
+    _timelineEvents.add(
+      OrderTimelineEvent(
+        id: '1',
+        status: 'pending',
+        timestamp: _order!.createdAt.toIso8601String(),
+        description: 'تم استقبال طلبك',
+        location: 'المستودع الرئيسي - القاهرة',
+      ),
+    );
+
+    // Add current status event
+    if (_order!.status != order_model.OrderStatus.pending) {
+      _timelineEvents.add(
+        OrderTimelineEvent(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          status: _order!.status.toString().split('.')[1],
+          timestamp: _order!.updatedAt.toIso8601String(),
+          description: _getStatusDescription(_order!.status),
+          location: _getStatusLocation(_order!.status),
+        ),
+      );
+    }
+  }
+
+  String _getStatusDescription(order_model.OrderStatus status) {
+    switch (status) {
+      case order_model.OrderStatus.pending:
+        return 'جاري التحقق من الطلب';
+      case order_model.OrderStatus.accepted:
+        return 'تم قبول الطلب';
+      case order_model.OrderStatus.shipped:
+        return 'تم شحن الطلب';
+      case order_model.OrderStatus.delivered:
+        return 'تم استلام الطلب';
+      case order_model.OrderStatus.completed:
+        return 'اكتمل الطلب';
+      case order_model.OrderStatus.cancelled:
+        return 'تم إلغاء الطلب';
+      case order_model.OrderStatus.disputed:
+        return 'الطلب قيد النزاع';
+    }
+  }
+
+  String _getStatusLocation(order_model.OrderStatus status) {
+    switch (status) {
+      case order_model.OrderStatus.pending:
+        return 'المستودع الرئيسي - القاهرة';
+      case order_model.OrderStatus.accepted:
+        return 'مركز التجميع - القاهرة';
+      case order_model.OrderStatus.shipped:
+        return 'في الطريق';
+      case order_model.OrderStatus.delivered:
+      case order_model.OrderStatus.completed:
+        return _order?.shippingAddress ?? 'وجهتك';
+      case order_model.OrderStatus.cancelled:
+      case order_model.OrderStatus.disputed:
+        return '';
+    }
+  }
+
+  // Simulate real-time updates (for testing)
   Future<void> simulateStatusUpdate() async {
     if (_order == null) return;
 
     try {
-      // Simulate delay for status update
       await Future.delayed(const Duration(seconds: 2));
-
-      // Add new status based on current status
-      final lastStatus = _order!.statusHistory.last.status.toLowerCase();
-      String nextStatus = 'pending';
-
-      switch (lastStatus) {
-        case 'pending':
-          nextStatus = 'confirmed';
-          break;
-        case 'confirmed':
-          nextStatus = 'shipped';
-          break;
-        case 'shipped':
-          nextStatus = 'delivered';
-          break;
-        default:
-          break;
-      }
-
-      if (nextStatus != lastStatus) {
-        final newStatus = OrderStatus(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          status: nextStatus,
-          timestamp: DateTime.now().toIso8601String(),
-          description: _getStatusDescription(nextStatus),
-          location: _getStatusLocation(nextStatus),
-        );
-
-        _order!.statusHistory.add(newStatus);
-        notifyListeners();
-        print('✅ Status updated to: $nextStatus');
-      }
+      print('✅ Status simulation completed');
     } catch (e) {
-      print('❌ Error updating status: $e');
-    }
-  }
-
-  String _getStatusDescription(String status) {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return 'جاري التحقق من الطلب';
-      case 'confirmed':
-        return 'تم تأكيد الطلب';
-      case 'shipped':
-        return 'تم شحن الطلب';
-      case 'delivered':
-        return 'تم استلام الطلب';
-      default:
-        return '';
-    }
-  }
-
-  String _getStatusLocation(String status) {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return 'المستودع الرئيسي - القاهرة';
-      case 'confirmed':
-        return 'مركز التجميع - القاهرة';
-      case 'shipped':
-        return 'في الطريق إلى ${_order?.shippingAddress['city'] ?? 'وجهتك'}';
-      case 'delivered':
-        return '${_order?.shippingAddress['city'] ?? 'وجهتك'}';
-      default:
-        return '';
+      print('❌ Error in simulation: $e');
     }
   }
 

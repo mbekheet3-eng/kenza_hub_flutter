@@ -4,6 +4,7 @@ import 'package:kenza_hub_flutter/config/app_colors.dart';
 import 'package:kenza_hub_flutter/config/app_radius.dart';
 import 'package:kenza_hub_flutter/config/app_spacing.dart';
 import 'package:kenza_hub_flutter/providers/order_tracking_provider.dart';
+import 'package:kenza_hub_flutter/models/order.dart' as order_model;
 
 class OrderTrackingScreen extends StatefulWidget {
   final String orderId;
@@ -56,17 +57,17 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Order ID and Date
-                _buildOrderHeader(order),
+                _buildOrderHeader(provider, order),
 
                 const Divider(height: 1),
 
                 // Progress Bar
-                _buildProgressBar(order),
+                _buildProgressBar(provider, order),
 
                 const Divider(height: 1),
 
                 // Timeline
-                _buildStatusTimeline(order),
+                _buildStatusTimeline(provider),
 
                 const Divider(height: 1),
 
@@ -86,9 +87,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     children: [
                       ElevatedButton(
                         onPressed: () {
-                          context
-                              .read<OrderTrackingProvider>()
-                              .simulateStatusUpdate();
+                          provider.simulateStatusUpdate();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
@@ -111,9 +110,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       const SizedBox(height: AppSpacing.sm),
                       OutlinedButton(
                         onPressed: () {
-                          context
-                              .read<OrderTrackingProvider>()
-                              .retry(widget.orderId);
+                          provider.retry(widget.orderId);
                         },
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
@@ -144,7 +141,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     );
   }
 
-  Widget _buildOrderHeader(Order order) {
+  Widget _buildOrderHeader(OrderTrackingProvider provider, order_model.Order order) {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
@@ -171,7 +168,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'تاريخ الطلب: ${order.formattedCreatedAt}',
+                'تاريخ الطلب: ${order.createdAt.day}/${order.createdAt.month}/${order.createdAt.year}',
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey[600],
@@ -183,15 +180,15 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: order.lastStatus?.statusColor.withOpacity(0.2),
+                  color: Colors.blue.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  order.lastStatus?.displayStatus ?? 'قيد المراجعة',
-                  style: TextStyle(
+                  order.statusArabic,
+                  style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
-                    color: order.lastStatus?.statusColor,
+                    color: Colors.blue,
                   ),
                 ),
               ),
@@ -202,7 +199,9 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     );
   }
 
-  Widget _buildProgressBar(Order order) {
+  Widget _buildProgressBar(OrderTrackingProvider provider, order_model.Order order) {
+    final progressPercent = provider.progressPercentage;
+    
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
@@ -219,17 +218,17 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(AppRadius.sm),
             child: LinearProgressIndicator(
-              value: order.progressPercentage / 100,
+              value: progressPercent / 100,
               minHeight: 8,
               backgroundColor: Colors.grey[300],
-              valueColor: AlwaysStoppedAnimation<Color>(
-                order.lastStatus?.statusColor ?? AppColors.primary,
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.primary,
               ),
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            '${order.progressPercentage}% مكتمل',
+            '$progressPercent% مكتمل',
             style: TextStyle(
               fontSize: 12,
               color: Colors.grey[600],
@@ -240,7 +239,9 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     );
   }
 
-  Widget _buildStatusTimeline(Order order) {
+  Widget _buildStatusTimeline(OrderTrackingProvider provider) {
+    final events = provider.timelineEvents;
+    
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
@@ -254,28 +255,39 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: order.statusHistory.length,
-            itemBuilder: (context, index) {
-              final status = order.statusHistory[index];
-              final isLast = index == order.statusHistory.length - 1;
+          events.isEmpty
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                  child: Text(
+                    'لا توجد تحديثات حتى الآن',
+                    style: TextStyle(
+                      color: Colors.grey[500],
+                      fontSize: 13,
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: events.length,
+                  itemBuilder: (context, index) {
+                    final event = events[index];
+                    final isLast = index == events.length - 1;
 
-              return _buildTimelineItem(
-                status: status,
-                isLast: isLast,
-                isFirst: index == 0,
-              );
-            },
-          ),
+                    return _buildTimelineItem(
+                      event: event,
+                      isLast: isLast,
+                      isFirst: index == 0,
+                    );
+                  },
+                ),
         ],
       ),
     );
   }
 
   Widget _buildTimelineItem({
-    required OrderStatus status,
+    required OrderTimelineEvent event,
     required bool isLast,
     required bool isFirst,
   }) {
@@ -288,12 +300,12 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: status.statusColor.withOpacity(0.2),
+                color: event.statusColor.withOpacity(0.2),
                 shape: BoxShape.circle,
               ),
               child: Center(
                 child: Text(
-                  status.statusIcon,
+                  event.statusIcon,
                   style: const TextStyle(fontSize: 20),
                 ),
               ),
@@ -314,24 +326,24 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  status.displayStatus,
+                  event.displayStatus,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
                 ),
-                if (status.description != null)
+                if (event.description != null && event.description!.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
-                      status.description!,
+                      event.description!,
                       style: TextStyle(
                         color: Colors.grey[600],
                         fontSize: 12,
                       ),
                     ),
                   ),
-                if (status.location != null)
+                if (event.location != null && event.location!.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Row(
@@ -344,7 +356,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            status.location!,
+                            event.location!,
                             style: TextStyle(
                               color: Colors.grey[500],
                               fontSize: 11,
@@ -357,7 +369,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: Text(
-                    _formatTime(status.timestamp),
+                    _formatTime(event.timestamp),
                     style: TextStyle(
                       color: Colors.grey[400],
                       fontSize: 11,
@@ -381,7 +393,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     }
   }
 
-  Widget _buildShippingInfo(Order order) {
+  Widget _buildShippingInfo(order_model.Order order) {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
@@ -405,41 +417,38 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  order.shippingAddress['full_name'] ?? 'بدون اسم',
+                  order.buyerName ?? 'بدون اسم',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  '${order.shippingAddress['street'] ?? ''}, ${order.shippingAddress['city'] ?? ''}',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 13,
-                  ),
-                ),
-                if (order.shippingAddress['governorate'] != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      order.shippingAddress['governorate'],
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12,
+                if (order.shippingAddress != null && order.shippingAddress!.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 8),
+                      Text(
+                        order.shippingAddress!,
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 13,
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Icon(Icons.phone, size: 14, color: Colors.grey[500]),
+                    Icon(Icons.location_on, size: 14, color: Colors.grey[500]),
                     const SizedBox(width: 4),
-                    Text(
-                      order.shippingAddress['phone'] ?? '',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12,
+                    Expanded(
+                      child: Text(
+                        order.shippingAddress ?? 'عنوان غير محدد',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                   ],
@@ -452,7 +461,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     );
   }
 
-  Widget _buildOrderSummary(Order order) {
+  Widget _buildOrderSummary(order_model.Order order) {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
@@ -471,7 +480,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
             children: [
               const Text('المجموع'),
               Text(
-                '${order.totalAmount.toStringAsFixed(2)} ريال',
+                '${order.amount.toStringAsFixed(2)} ج.م',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: AppColors.primary,
@@ -479,16 +488,39 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               ),
             ],
           ),
-          if (order.estimatedDelivery != null)
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.md),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('تاريخ التحديث'),
+                Text(
+                  '${order.updatedAt.day}/${order.updatedAt.month}/${order.updatedAt.year}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+          if (order.notes != null && order.notes!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: AppSpacing.md),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('التوصيل المتوقع'),
+                  const Text(
+                    'ملاحظات',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
                   Text(
-                    order.estimatedDelivery!,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    order.notes!,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                    ),
                   ),
                 ],
               ),
