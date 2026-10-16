@@ -397,4 +397,49 @@ class SupabaseService {
       throw Exception('Failed to get trending products: $e');
     }
   }
+
+  // ==================== ORDERS ====================
+
+  /// Fetch order by ID
+  Future<Map<String, dynamic>> fetchOrderById(String orderId) async {
+    try {
+      final result = await _client
+          .from('orders')
+          .select('*')
+          .eq('id', orderId)
+          .single();
+      return result as Map<String, dynamic>;
+    } catch (e) {
+      print('❌ Error fetching order: $e');
+      rethrow;
+    }
+  }
+
+  /// Get user orders
+  Future<List<Map<String, dynamic>>> getUserOrders(String userId) async {
+    try {
+      final result = await _client
+          .from('orders')
+          .select('*')
+          .eq('buyer_id', userId)
+          .order('created_at', ascending: false);
+      return List<Map<String, dynamic>>.from(result);
+    } catch (e) {
+      print('❌ Error fetching user orders: $e');
+      rethrow;
+    }
+  }
+
+  /// Update order status
+  Future<void> updateOrderStatus(String orderId, String newStatus) async {
+    try {
+      await _client
+          .from('orders')
+          .update({'status': newStatus})
+          .eq('id', orderId);
+    } catch (e) {
+      print('❌ Error updating order status: $e');
+      rethrow;
+    }
+  }
 }

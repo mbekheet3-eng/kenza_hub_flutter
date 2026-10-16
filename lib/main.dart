@@ -11,6 +11,7 @@ import 'package:kenza_hub_flutter/providers/auth_provider.dart';
 import 'package:kenza_hub_flutter/providers/product_details_provider.dart';
 import 'package:kenza_hub_flutter/providers/cart_provider.dart';
 import 'package:kenza_hub_flutter/providers/checkout_provider.dart';
+import 'package:kenza_hub_flutter/providers/order_tracking_provider.dart';
 import 'package:kenza_hub_flutter/services/supabase_service.dart';
 
 void main() async {
@@ -48,6 +49,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProductDetailsProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
+        ChangeNotifierProvider(create: (_) => OrderTrackingProvider()),
       ],
       child: ValueListenableBuilder<Locale>(
         valueListenable: AppLocalizations.localeNotifier,
