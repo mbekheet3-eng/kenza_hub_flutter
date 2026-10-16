@@ -95,7 +95,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                             vertical: 12,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            borderRadius: BorderRadius.circular(AppSpacing.md),
                           ),
                         ),
                         child: const Text(
@@ -117,7 +117,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                             vertical: 12,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            borderRadius: BorderRadius.circular(AppSpacing.md),
                           ),
                           side: BorderSide(color: Colors.grey[400]!),
                         ),
@@ -216,7 +216,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           ),
           const SizedBox(height: AppSpacing.md),
           ClipRRect(
-            borderRadius: BorderRadius.circular(AppRadius.sm),
+            borderRadius: BorderRadius.circular(AppSpacing.sm),
             child: LinearProgressIndicator(
               value: progressPercent / 100,
               minHeight: 8,
@@ -411,7 +411,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey[300]!),
-              borderRadius: BorderRadius.circular(AppRadius.md),
+              borderRadius: BorderRadius.circular(AppSpacing.md),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

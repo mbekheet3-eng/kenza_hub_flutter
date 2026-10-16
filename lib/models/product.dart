@@ -1,8 +1,3 @@
-import 'package:json_annotation/json_annotation.dart';
-
-part 'product.g.dart';
-
-@JsonSerializable()
 class Product {
   final String id;
   final String userId;
@@ -67,8 +62,65 @@ class Product {
   // Get primary image path (for caching)
   String? get primaryImagePath => imagePaths.isNotEmpty ? imagePaths[0] : null;
 
-  factory Product.fromJson(Map<String, dynamic> json) => _$ProductFromJson(json);
-  Map<String, dynamic> toJson() => _$ProductToJson(this);
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      id: json['id'] as String,
+      userId: json['userId'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      price: (json['price'] as num).toDouble(),
+      category: json['category'] as String,
+      subcategory: json['subcategory'] as String?,
+      condition: json['condition'] as String,
+      color: json['color'] as String?,
+      size: json['size'] as String?,
+      brand: json['brand'] as String?,
+      imageUrls: List<String>.from(json['imageUrls'] as List<dynamic>? ?? []),
+      imagePaths: List<String>.from(json['imagePaths'] as List<dynamic>? ?? []),
+      views: json['views'] as int? ?? 0,
+      likes: json['likes'] as int? ?? 0,
+      rating: (json['rating'] as num?)?.toDouble(),
+      isActive: json['isActive'] as bool? ?? true,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
+      location: json['location'] as String?,
+      isSold: json['isSold'] as bool? ?? false,
+      sellerName: json['sellerName'] as String?,
+      sellerAvatar: json['sellerAvatar'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'title': title,
+      'description': description,
+      'price': price,
+      'category': category,
+      'subcategory': subcategory,
+      'condition': condition,
+      'color': color,
+      'size': size,
+      'brand': brand,
+      'imageUrls': imageUrls,
+      'imagePaths': imagePaths,
+      'views': views,
+      'likes': likes,
+      'rating': rating,
+      'isActive': isActive,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'latitude': latitude,
+      'longitude': longitude,
+      'location': location,
+      'isSold': isSold,
+      'sellerName': sellerName,
+      'sellerAvatar': sellerAvatar,
+    };
+  }
 
   // Copy with method
   Product copyWith({
@@ -128,7 +180,6 @@ class Product {
   }
 }
 
-@JsonSerializable()
 class ProductImage {
   final String id;
   final String productId;
@@ -146,8 +197,27 @@ class ProductImage {
     required this.createdAt,
   });
 
-  factory ProductImage.fromJson(Map<String, dynamic> json) => _$ProductImageFromJson(json);
-  Map<String, dynamic> toJson() => _$ProductImageToJson(this);
+  factory ProductImage.fromJson(Map<String, dynamic> json) {
+    return ProductImage(
+      id: json['id'] as String,
+      productId: json['productId'] as String,
+      imageUrl: json['imageUrl'] as String,
+      localPath: json['localPath'] as String,
+      order: json['order'] as int,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'productId': productId,
+      'imageUrl': imageUrl,
+      'localPath': localPath,
+      'order': order,
+      'createdAt': createdAt.toIso8601String(),
+    };
+  }
 }
 
 // Size translations for Arabic market
