@@ -80,6 +80,9 @@ class CheckoutProvider with ChangeNotifier {
   bool get canProceed =>
       _selectedAddress != null && _agreedToTerms && !_isProcessing;
 
+  String get productId => _cartItems.isNotEmpty ? _cartItems.first.productId : '';
+  List<CartItem> get cartItems => _cartItems;
+
   // Load addresses
   Future<void> loadAddresses() async {
     try {

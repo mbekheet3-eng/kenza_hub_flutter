@@ -216,8 +216,8 @@ class ProductCard extends StatelessWidget {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(AppRadius.lg),
-                    topRight: Radius.circular(AppRadius.lg),
+                    topLeft: Radius.circular(AppSpacing.lg),
+                    topRight: Radius.circular(AppSpacing.lg),
                   ),
                   color: Colors.grey[200],
                 ),

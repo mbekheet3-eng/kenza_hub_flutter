@@ -399,7 +399,7 @@ class SupabaseService {
   }
 
   /// Fetch a single product by ID
-  Future<Product> fetchProductById(String productId) async {
+  Future<Map<String, dynamic>> fetchProductById(String productId) async {
     try {
       final response = await _client
           .from('products')
@@ -407,7 +407,7 @@ class SupabaseService {
           .eq('id', productId)
           .single();
 
-      return Product.fromJson(response as Map<String, dynamic>);
+      return response as Map<String, dynamic>;
     } catch (e) {
       print('❌ Error fetching product: $e');
       rethrow;
@@ -426,6 +426,26 @@ class SupabaseService {
     } catch (e) {
       print('❌ Error fetching product variants: $e');
       rethrow;
+    }
+  }
+
+  // ==================== AUTHENTICATION ====================
+
+  /// Reset password
+  Future<void> resetPassword(String email) async {
+    try {
+      await _client.auth.resetPasswordForEmail(email);
+    } catch (e) {
+      throw Exception('Failed to reset password: $e');
+    }
+  }
+
+  /// Sign out
+  Future<void> signOut() async {
+    try {
+      await _client.auth.signOut();
+    } catch (e) {
+      throw Exception('Failed to sign out: $e');
     }
   }
 
