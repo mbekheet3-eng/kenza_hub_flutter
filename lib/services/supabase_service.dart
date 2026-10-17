@@ -431,6 +431,38 @@ class SupabaseService {
 
   // ==================== AUTHENTICATION ====================
 
+  /// Sign in with email and password
+  Future<Map<String, dynamic>> signIn(String email, String password) async {
+    try {
+      final response = await _client.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      return {
+        'user': response.user,
+        'session': response.session,
+      };
+    } catch (e) {
+      throw Exception('Failed to sign in: $e');
+    }
+  }
+
+  /// Sign up with email and password
+  Future<Map<String, dynamic>> signUp(String email, String password) async {
+    try {
+      final response = await _client.auth.signUp(
+        email: email,
+        password: password,
+      );
+      return {
+        'user': response.user,
+        'session': response.session,
+      };
+    } catch (e) {
+      throw Exception('Failed to sign up: $e');
+    }
+  }
+
   /// Reset password
   Future<void> resetPassword(String email) async {
     try {
