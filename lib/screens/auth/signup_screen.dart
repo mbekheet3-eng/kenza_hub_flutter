@@ -102,7 +102,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       height: 100,
                       decoration: BoxDecoration(
                         color: AppColors.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                        borderRadius: BorderRadius.circular(AppSpacing.lg),
                       ),
                       child: Icon(
                         Icons.person_add,

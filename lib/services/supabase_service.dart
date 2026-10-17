@@ -398,6 +398,37 @@ class SupabaseService {
     }
   }
 
+  /// Fetch a single product by ID
+  Future<Product> fetchProductById(String productId) async {
+    try {
+      final response = await _client
+          .from('products')
+          .select()
+          .eq('id', productId)
+          .single();
+
+      return Product.fromJson(response as Map<String, dynamic>);
+    } catch (e) {
+      print('❌ Error fetching product: $e');
+      rethrow;
+    }
+  }
+
+  /// Fetch product variants (sizes, colors, etc.)
+  Future<List<Map<String, dynamic>>> fetchProductVariants(String productId) async {
+    try {
+      final response = await _client
+          .from('product_variants')
+          .select()
+          .eq('product_id', productId);
+
+      return List<Map<String, dynamic>>.from(response as List);
+    } catch (e) {
+      print('❌ Error fetching product variants: $e');
+      rethrow;
+    }
+  }
+
   // ==================== ORDERS ====================
 
   /// Fetch order by ID

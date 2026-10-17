@@ -206,7 +206,7 @@ class ProductCard extends StatelessWidget {
       child: Card(
         elevation: 2,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderRadius: BorderRadius.circular(AppSpacing.lg),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

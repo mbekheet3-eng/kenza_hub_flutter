@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 100,
                       decoration: BoxDecoration(
                         color: AppColors.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                        borderRadius: BorderRadius.circular(AppSpacing.lg),
                       ),
                       child: Icon(
                         Icons.shopping_bag,
