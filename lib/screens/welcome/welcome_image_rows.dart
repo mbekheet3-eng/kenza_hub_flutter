@@ -9,7 +9,7 @@ class WelcomeImageRows extends StatefulWidget {
 }
 
 class _WelcomeImageRowsState extends State<WelcomeImageRows>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _controllerRow1;
   late AnimationController _controllerRow2;
 
@@ -42,15 +42,18 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
   @override
   void initState() {
     super.initState();
+    
+    // Row 1: Smooth infinite scroll to the left
     _controllerRow1 = AnimationController(
-      duration: const Duration(seconds: 30),
+      duration: const Duration(seconds: 50),
       vsync: this,
     )..repeat();
 
+    // Row 2: Smooth infinite scroll to the right
     _controllerRow2 = AnimationController(
-      duration: const Duration(seconds: 35),
+      duration: const Duration(seconds: 60),
       vsync: this,
-    )..repeat(reverse: true);
+    )..repeat();
   }
 
   @override
@@ -69,11 +72,14 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
 
     return Column(
       children: [
+        // Row 1: Scrolls to the left
         AnimatedBuilder(
           animation: _controllerRow1,
           builder: (context, child) {
+            // Infinite scroll effect: -1x means continuous movement
+            final offset = -_controllerRow1.value * screenWidth * 2.5;
             return Transform.translate(
-              offset: Offset(_controllerRow1.value * 200, 0),
+              offset: Offset(offset, 0),
               child: WelcomeImageRow(
                 images: _row1Images,
                 imageWidth: imageWidth,
@@ -83,11 +89,15 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
           },
         ),
         const SizedBox(height: 10),
+        
+        // Row 2: Scrolls to the right
         AnimatedBuilder(
           animation: _controllerRow2,
           builder: (context, child) {
+            // Infinite scroll effect: opposite direction
+            final offset = _controllerRow2.value * screenWidth * 2.0;
             return Transform.translate(
-              offset: Offset(_controllerRow2.value * 200, 0),
+              offset: Offset(offset, 0),
               child: WelcomeImageRow(
                 images: _row2Images,
                 imageWidth: imageWidth * 0.9,
