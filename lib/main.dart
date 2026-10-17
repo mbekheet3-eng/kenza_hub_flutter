@@ -15,8 +15,13 @@ import 'package:kenza_hub_flutter/providers/order_tracking_provider.dart';
 import 'package:kenza_hub_flutter/services/supabase_service.dart';
 
 void main() async {
-  // Load environment variables
-  await dotenv.load(fileName: '.env');
+  // Load environment variables (optional - may not exist in CI/CD)
+  try {
+    await dotenv.load(fileName: '.env');
+    print('✅ .env file loaded successfully');
+  } catch (e) {
+    print('⚠️ .env file not found (this is OK in CI/CD environments)');
+  }
   
   // Print config in debug mode
   EnvConfig.debugPrint();
@@ -24,7 +29,7 @@ void main() async {
   // Validate configuration
   if (!EnvConfig.isConfigured()) {
     print('⚠️ WARNING: Supabase configuration is missing!');
-    print('Please fill in your .env file with valid credentials.');
+    print('Please ensure SUPABASE_URL and SUPABASE_ANON_KEY are set.');
   }
   
   runApp(const MyApp());
