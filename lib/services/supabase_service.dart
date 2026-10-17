@@ -451,7 +451,10 @@ class SupabaseService {
   // ==================== AUTHENTICATION ====================
 
   /// Sign in with email and password
-  Future<Map<String, dynamic>> signIn(String email, String password) async {
+  Future<Map<String, dynamic>> signIn({
+    required String email,
+    required String password,
+  }) async {
     try {
       final response = await _client.auth.signInWithPassword(
         email: email,
@@ -467,9 +470,9 @@ class SupabaseService {
   }
 
   /// Sign up with email and password
-  Future<Map<String, dynamic>> signUp(
-    String email,
-    String password, {
+  Future<Map<String, dynamic>> signUp({
+    required String email,
+    required String password,
     String? fullName,
   }) async {
     try {
