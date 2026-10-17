@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:kenza_hub_flutter/services/supabase_service.dart';
 import 'package:kenza_hub_flutter/models/order.dart';
 
@@ -166,7 +167,7 @@ class CheckoutProvider with ChangeNotifier {
         sellerId: '', // Will be set by seller
         amount: totalAmount,
         status: OrderStatus.pending,
-        shippingAddress: _selectedAddress?.toJson() ?? '',
+        shippingAddress: _selectedAddress != null ? jsonEncode(_selectedAddress!.toJson()) : null,
         trackingNumber: null,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),

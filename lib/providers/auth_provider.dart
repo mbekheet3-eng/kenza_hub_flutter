@@ -48,7 +48,7 @@ class AuthProvider with ChangeNotifier {
         fullName: fullName,
       );
 
-      _currentUser = response.user;
+      _currentUser = response['user'];
       _isSignedIn = _currentUser != null;
       _isLoading = false;
 
@@ -77,7 +77,7 @@ class AuthProvider with ChangeNotifier {
         password: password,
       );
 
-      _currentUser = response.user;
+      _currentUser = response['user'];
       _isSignedIn = _currentUser != null;
       _isLoading = false;
 

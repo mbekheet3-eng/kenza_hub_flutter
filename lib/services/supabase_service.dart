@@ -15,6 +15,9 @@ class SupabaseService {
     _client = Supabase.instance.client;
   }
 
+  // Static getter for client
+  static SupabaseClient get client => _instance._client;
+
   // ==================== PRODUCTS ====================
 
   /// Add a new product
@@ -414,6 +417,22 @@ class SupabaseService {
     }
   }
 
+  /// Fetch all products
+  Future<List<Map<String, dynamic>>> fetchProducts() async {
+    try {
+      final response = await _client
+          .from('products')
+          .select()
+          .eq('is_active', true)
+          .order('created_at', ascending: false);
+
+      return List<Map<String, dynamic>>.from(response as List);
+    } catch (e) {
+      print('❌ Error fetching products: $e');
+      rethrow;
+    }
+  }
+
   /// Fetch product variants (sizes, colors, etc.)
   Future<List<Map<String, dynamic>>> fetchProductVariants(String productId) async {
     try {
@@ -448,11 +467,16 @@ class SupabaseService {
   }
 
   /// Sign up with email and password
-  Future<Map<String, dynamic>> signUp(String email, String password) async {
+  Future<Map<String, dynamic>> signUp(
+    String email,
+    String password, {
+    String? fullName,
+  }) async {
     try {
       final response = await _client.auth.signUp(
         email: email,
         password: password,
+        data: fullName != null ? {'full_name': fullName} : null,
       );
       return {
         'user': response.user,
@@ -513,16 +537,4 @@ class SupabaseService {
     }
   }
 
-  /// Update order status
-  Future<void> updateOrderStatus(String orderId, String newStatus) async {
-    try {
-      await _client
-          .from('orders')
-          .update({'status': newStatus})
-          .eq('id', orderId);
-    } catch (e) {
-      print('❌ Error updating order status: $e');
-      rethrow;
-    }
-  }
 }

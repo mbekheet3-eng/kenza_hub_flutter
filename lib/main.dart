@@ -25,13 +25,6 @@ void main() async {
   if (!EnvConfig.isConfigured()) {
     print('⚠️ WARNING: Supabase configuration is missing!');
     print('Please fill in your .env file with valid credentials.');
-  } else {
-    // Initialize Supabase if configured
-    try {
-      await SupabaseService.initialize();
-    } catch (e) {
-      print('⚠️ WARNING: Supabase initialization failed: $e');
-    }
   }
   
   runApp(const MyApp());
