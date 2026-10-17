@@ -521,20 +521,4 @@ class SupabaseService {
       rethrow;
     }
   }
-
-  /// Get user orders
-  Future<List<Map<String, dynamic>>> getUserOrders(String userId) async {
-    try {
-      final result = await _client
-          .from('orders')
-          .select('*')
-          .eq('buyer_id', userId)
-          .order('created_at', ascending: false);
-      return List<Map<String, dynamic>>.from(result);
-    } catch (e) {
-      print('❌ Error fetching user orders: $e');
-      rethrow;
-    }
-  }
-
 }
