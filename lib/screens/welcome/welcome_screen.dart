@@ -11,9 +11,16 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final strings = AppLocalizations.of(context);
     final screenHeight = MediaQuery.sizeOf(context).height;
     final isSmallScreen = screenHeight < 700;
+    
+    // Get strings safely - fallback to Arabic if context not available
+    late final AppLocalizations strings;
+    try {
+      strings = AppLocalizations.of(context);
+    } catch (_) {
+      strings = AppLocalizations(AppLocalizations.currentLocale);
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,

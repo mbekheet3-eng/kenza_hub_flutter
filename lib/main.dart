@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:kenza_hub_flutter/config/env_config.dart';
 import 'package:kenza_hub_flutter/config/app_routes.dart';
 import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:kenza_hub_flutter/screens/welcome/welcome_screen.dart';
@@ -12,36 +10,8 @@ import 'package:kenza_hub_flutter/providers/product_details_provider.dart';
 import 'package:kenza_hub_flutter/providers/cart_provider.dart';
 import 'package:kenza_hub_flutter/providers/checkout_provider.dart';
 import 'package:kenza_hub_flutter/providers/order_tracking_provider.dart';
-import 'package:kenza_hub_flutter/services/supabase_service.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  print('🚀 Kenza Hub - Starting application...');
-  
-  // Load environment variables (optional - may not exist in CI/CD)
-  try {
-    await dotenv.load(fileName: '.env');
-    print('✅ .env file loaded successfully');
-  } catch (e) {
-    print('⚠️ .env file not found - using environment variables only');
-    print('   This is OK in deployed/CI/CD environments');
-  }
-  
-  // Print config in debug mode
-  print('📋 Configuration Status:');
-  EnvConfig.debugPrint();
-  
-  // Validate configuration
-  if (!EnvConfig.isConfigured()) {
-    print('⚠️ WARNING: Supabase configuration is incomplete!');
-    print('   Please ensure SUPABASE_URL and SUPABASE_ANON_KEY are set.');
-    print('   App will run but Supabase features will not work.');
-  } else {
-    print('✅ Supabase configuration loaded successfully');
-  }
-  
-  print('🎨 Building UI...');
+void main() {
   runApp(const MyApp());
 }
 

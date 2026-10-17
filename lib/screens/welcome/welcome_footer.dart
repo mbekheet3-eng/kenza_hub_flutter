@@ -6,7 +6,7 @@ class WelcomeFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final strings = AppLocalizations.of(context);
+    final strings = AppLocalizations.safeOf(context);
 
     return Column(
       children: [

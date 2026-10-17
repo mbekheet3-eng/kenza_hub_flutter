@@ -47,6 +47,15 @@ class AppLocalizations {
     return localizations;
   }
 
+  /// Safe version of of() that returns a default instance if not found
+  static AppLocalizations safeOf(BuildContext context) {
+    try {
+      return of(context);
+    } catch (_) {
+      return AppLocalizations(currentLocale);
+    }
+  }
+
   bool get isArabic => locale.languageCode == 'ar';
 
   String get languageName {
