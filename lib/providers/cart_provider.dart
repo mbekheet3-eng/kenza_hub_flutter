@@ -72,7 +72,7 @@ class CartProvider with ChangeNotifier {
 
   String get cartSummary {
     if (_items.isEmpty) return 'السلة فارغة';
-    return 'عدد المنتجات: $itemCount • السعر: ${total.toStringAsFixed(2)} ريال';
+    return 'عدد المنتجات: $itemCount • السعر: ${total.toStringAsFixed(2)} ج.م';
   }
 
   // Add item to cart

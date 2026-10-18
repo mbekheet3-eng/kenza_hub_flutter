@@ -80,7 +80,7 @@ class Product {
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'] as String,
-      userId: json['userId'] as String,
+      userId: json['user_id'] as String, // ✅ FIXED: snake_case
       title: json['title'] as String,
       description: json['description'] as String,
       price: (json['price'] as num).toDouble(),
@@ -90,27 +90,27 @@ class Product {
       color: json['color'] as String?,
       size: json['size'] as String?,
       brand: json['brand'] as String?,
-      imageUrls: List<String>.from(json['imageUrls'] as List<dynamic>? ?? []),
-      imagePaths: List<String>.from(json['imagePaths'] as List<dynamic>? ?? []),
+      imageUrls: List<String>.from(json['image_urls'] as List<dynamic>? ?? []), // ✅ FIXED: snake_case
+      imagePaths: List<String>.from(json['image_paths'] as List<dynamic>? ?? []), // ✅ FIXED: snake_case
       views: json['views'] as int? ?? 0,
       likes: json['likes'] as int? ?? 0,
       rating: (json['rating'] as num?)?.toDouble(),
-      isActive: json['isActive'] as bool? ?? true,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      isActive: json['is_active'] as bool? ?? true, // ✅ FIXED: snake_case
+      createdAt: DateTime.parse(json['created_at'] as String), // ✅ FIXED: snake_case
+      updatedAt: DateTime.parse(json['updated_at'] as String), // ✅ FIXED: snake_case
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
       location: json['location'] as String?,
-      isSold: json['isSold'] as bool? ?? false,
-      sellerName: json['sellerName'] as String?,
-      sellerAvatar: json['sellerAvatar'] as String?,
+      isSold: json['is_sold'] as bool? ?? false, // ✅ FIXED: snake_case
+      sellerName: json['seller_name'] as String?, // ✅ FIXED: snake_case
+      sellerAvatar: json['seller_avatar'] as String?, // ✅ FIXED: snake_case
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'userId': userId,
+      'user_id': userId, // ✅ FIXED: snake_case
       'title': title,
       'description': description,
       'price': price,
@@ -120,20 +120,20 @@ class Product {
       'color': color,
       'size': size,
       'brand': brand,
-      'imageUrls': imageUrls,
-      'imagePaths': imagePaths,
+      'image_urls': imageUrls, // ✅ FIXED: snake_case
+      'image_paths': imagePaths, // ✅ FIXED: snake_case
       'views': views,
       'likes': likes,
       'rating': rating,
-      'isActive': isActive,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'is_active': isActive, // ✅ FIXED: snake_case
+      'created_at': createdAt.toIso8601String(), // ✅ FIXED: snake_case
+      'updated_at': updatedAt.toIso8601String(), // ✅ FIXED: snake_case
       'latitude': latitude,
       'longitude': longitude,
       'location': location,
-      'isSold': isSold,
-      'sellerName': sellerName,
-      'sellerAvatar': sellerAvatar,
+      'is_sold': isSold, // ✅ FIXED: snake_case
+      'seller_name': sellerName, // ✅ FIXED: snake_case
+      'seller_avatar': sellerAvatar, // ✅ FIXED: snake_case
     };
   }
 
@@ -215,22 +215,22 @@ class ProductImage {
   factory ProductImage.fromJson(Map<String, dynamic> json) {
     return ProductImage(
       id: json['id'] as String,
-      productId: json['productId'] as String,
-      imageUrl: json['imageUrl'] as String,
-      localPath: json['localPath'] as String,
-      order: json['order'] as int,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      productId: json['product_id'] as String, // ✅ FIXED: snake_case
+      imageUrl: json['image_url'] as String, // ✅ FIXED: snake_case
+      localPath: json['local_path'] as String, // ✅ FIXED: snake_case
+      order: json['order_index'] as int, // ✅ FIXED: match DB column name
+      createdAt: DateTime.parse(json['created_at'] as String), // ✅ FIXED: snake_case
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'productId': productId,
-      'imageUrl': imageUrl,
-      'localPath': localPath,
-      'order': order,
-      'createdAt': createdAt.toIso8601String(),
+      'product_id': productId, // ✅ FIXED: snake_case
+      'image_url': imageUrl, // ✅ FIXED: snake_case
+      'local_path': localPath, // ✅ FIXED: snake_case
+      'order_index': order, // ✅ FIXED: match DB column name
+      'created_at': createdAt.toIso8601String(), // ✅ FIXED: snake_case
     };
   }
 }

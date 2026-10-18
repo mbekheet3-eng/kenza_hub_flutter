@@ -54,28 +54,28 @@ class Order {
   factory Order.fromJson(Map<String, dynamic> json) {
     return Order(
       id: json['id'] as String,
-      productId: json['productId'] as String,
-      buyerId: json['buyerId'] as String,
-      sellerId: json['sellerId'] as String,
+      productId: json['product_id'] as String, // ✅ FIXED: snake_case
+      buyerId: json['buyer_id'] as String, // ✅ FIXED: snake_case
+      sellerId: json['seller_id'] as String, // ✅ FIXED: snake_case
       amount: (json['amount'] as num).toDouble(),
       status: _statusFromString(json['status'] as String),
-      shippingAddress: json['shippingAddress'] as String?,
-      trackingNumber: json['trackingNumber'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      shippedAt: json['shippedAt'] == null
+      shippingAddress: json['shipping_address'] as String?, // ✅ FIXED: snake_case
+      trackingNumber: json['tracking_number'] as String?, // ✅ FIXED: snake_case
+      createdAt: DateTime.parse(json['created_at'] as String), // ✅ FIXED: snake_case
+      updatedAt: DateTime.parse(json['updated_at'] as String), // ✅ FIXED: snake_case
+      shippedAt: json['shipped_at'] == null
           ? null
-          : DateTime.parse(json['shippedAt'] as String),
-      deliveredAt: json['deliveredAt'] == null
+          : DateTime.parse(json['shipped_at'] as String), // ✅ FIXED: snake_case
+      deliveredAt: json['delivered_at'] == null
           ? null
-          : DateTime.parse(json['deliveredAt'] as String),
+          : DateTime.parse(json['delivered_at'] as String), // ✅ FIXED: snake_case
       notes: json['notes'] as String?,
       rating: (json['rating'] as num?)?.toDouble(),
       review: json['review'] as String?,
-      productTitle: json['productTitle'] as String?,
-      productImage: json['productImage'] as String?,
-      buyerName: json['buyerName'] as String?,
-      sellerName: json['sellerName'] as String?,
+      productTitle: json['product_title'] as String?, // ✅ FIXED: snake_case
+      productImage: json['product_image'] as String?, // ✅ FIXED: snake_case
+      buyerName: json['buyer_name'] as String?, // ✅ FIXED: snake_case
+      sellerName: json['seller_name'] as String?, // ✅ FIXED: snake_case
     );
   }
 
@@ -107,24 +107,24 @@ class Order {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'productId': productId,
-      'buyerId': buyerId,
-      'sellerId': sellerId,
+      'product_id': productId, // ✅ FIXED: snake_case
+      'buyer_id': buyerId, // ✅ FIXED: snake_case
+      'seller_id': sellerId, // ✅ FIXED: snake_case
       'amount': amount,
       'status': _statusToString(status),
-      'shippingAddress': shippingAddress,
-      'trackingNumber': trackingNumber,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
-      'shippedAt': shippedAt?.toIso8601String(),
-      'deliveredAt': deliveredAt?.toIso8601String(),
+      'shipping_address': shippingAddress, // ✅ FIXED: snake_case
+      'tracking_number': trackingNumber, // ✅ FIXED: snake_case
+      'created_at': createdAt.toIso8601String(), // ✅ FIXED: snake_case
+      'updated_at': updatedAt.toIso8601String(), // ✅ FIXED: snake_case
+      'shipped_at': shippedAt?.toIso8601String(), // ✅ FIXED: snake_case
+      'delivered_at': deliveredAt?.toIso8601String(), // ✅ FIXED: snake_case
       'notes': notes,
       'rating': rating,
       'review': review,
-      'productTitle': productTitle,
-      'productImage': productImage,
-      'buyerName': buyerName,
-      'sellerName': sellerName,
+      'product_title': productTitle, // ✅ FIXED: snake_case
+      'product_image': productImage, // ✅ FIXED: snake_case
+      'buyer_name': buyerName, // ✅ FIXED: snake_case
+      'seller_name': sellerName, // ✅ FIXED: snake_case
     };
   }
 
@@ -211,22 +211,22 @@ class OrderItem {
 
   factory OrderItem.fromJson(Map<String, dynamic> json) {
     return OrderItem(
-      orderId: json['orderId'] as String,
-      productId: json['productId'] as String,
+      orderId: json['order_id'] as String, // ✅ FIXED: snake_case
+      productId: json['product_id'] as String, // ✅ FIXED: snake_case
       title: json['title'] as String,
       price: (json['price'] as num).toDouble(),
-      imageUrl: json['imageUrl'] as String,
+      imageUrl: json['image_url'] as String, // ✅ FIXED: snake_case
       quantity: json['quantity'] as int,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'orderId': orderId,
-      'productId': productId,
+      'order_id': orderId, // ✅ FIXED: snake_case
+      'product_id': productId, // ✅ FIXED: snake_case
       'title': title,
       'price': price,
-      'imageUrl': imageUrl,
+      'image_url': imageUrl, // ✅ FIXED: snake_case
       'quantity': quantity,
     };
   }
@@ -249,20 +249,20 @@ class OrderTimeline {
 
   factory OrderTimeline.fromJson(Map<String, dynamic> json) {
     return OrderTimeline(
-      orderId: json['orderId'] as String,
+      orderId: json['order_id'] as String, // ✅ FIXED: snake_case
       status: Order._statusFromString(json['status'] as String),
       message: json['message'] as String,
-      timestamp: DateTime.parse(json['timestamp'] as String),
+      timestamp: DateTime.parse(json['created_at'] as String), // ✅ FIXED: use created_at
       metadata: json['metadata'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'orderId': orderId,
+      'order_id': orderId, // ✅ FIXED: snake_case
       'status': Order._statusToString(status),
       'message': message,
-      'timestamp': timestamp.toIso8601String(),
+      'created_at': timestamp.toIso8601String(), // ✅ FIXED: use created_at
       'metadata': metadata,
     };
   }

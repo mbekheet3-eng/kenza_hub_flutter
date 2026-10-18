@@ -8,6 +8,7 @@ import 'package:kenza_hub_flutter/screens/cart/cart_screen.dart';
 import 'package:kenza_hub_flutter/screens/checkout/checkout_screen.dart';
 import 'package:kenza_hub_flutter/screens/checkout/order_confirmation_screen.dart';
 import 'package:kenza_hub_flutter/screens/orders/order_tracking_screen.dart';
+import 'package:kenza_hub_flutter/screens/orders/order_history_screen.dart';
 
 class AppRoutes {
   static const String welcome = '/welcome';
@@ -59,6 +60,11 @@ class AppRoutes {
           builder: (_) => OrderTrackingScreen(orderId: orderId),
         );
 
+      case orderHistory:
+        return MaterialPageRoute(
+          builder: (_) => const OrderHistoryScreen(), // ✅ FIXED D12
+        );
+
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
@@ -69,23 +75,5 @@ class AppRoutes {
           ),
         );
     }
-  }
-}
-
-// Placeholder for OrderHistory (سيتم إنشاؤه لاحقاً)
-class OrderHistoryPlaceholder extends StatelessWidget {
-  const OrderHistoryPlaceholder({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('سجل الطلبات'),
-        centerTitle: true,
-      ),
-      body: const Center(
-        child: Text('سيتم بناء هذه الشاشة قريباً'),
-      ),
-    );
   }
 }

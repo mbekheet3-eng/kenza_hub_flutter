@@ -13,15 +13,25 @@ class HomeProvider with ChangeNotifier {
   String _selectedCategory = 'الكل';
   String _searchQuery = '';
 
-  // Categories
+  // ✅ FIXED D5: Use categories that match DATABASE SCHEMA
+  // Database supports: clothes, shoes, kids, home
+  // UI shows: All, Clothes, Shoes, Kids, Home (5 total)
   final List<String> categories = [
-    'الكل',
-    'رجال',
-    'نساء',
-    'أطفال',
-    'أحذية',
-    'ملحقات',
+    'الكل',      // 0. All (special - shows all items)
+    'ملابس',    // 1. clothes
+    'أحذية',    // 2. shoes
+    'ملابس أطفال',  // 3. kids
+    'منزل وأثاث',  // 4. home
   ];
+
+  // Mapping between UI labels and database category values
+  final Map<String, String> categoryMapping = {
+    'الكل': '',           // Empty = show all
+    'ملابس': 'clothes',
+    'أحذية': 'shoes',
+    'ملابس أطفال': 'kids',
+    'منزل وأثاث': 'home',
+  };
 
   // Getters
   List<Product> get filteredProducts => _filteredProducts;
@@ -81,9 +91,10 @@ class HomeProvider with ChangeNotifier {
   // Apply filters and search
   void _applyFilters() {
     _filteredProducts = _allProducts.where((product) {
-      // Category filter
-      final categoryMatch = _selectedCategory == 'الكل' ||
-          product.category.toLowerCase() == _selectedCategory.toLowerCase();
+      // Category filter - use database value from mapping
+      final dbCategory = categoryMapping[_selectedCategory] ?? '';
+      final categoryMatch = dbCategory.isEmpty ||
+          product.category.toLowerCase() == dbCategory.toLowerCase();
 
       // Search filter
       final searchMatch = _searchQuery.isEmpty ||

@@ -401,36 +401,14 @@ class SupabaseService {
     }
   }
 
-  /// Fetch a single product by ID
+  /// Fetch a single product by ID WITH IMAGES ✅ FIXED D10
   Future<Map<String, dynamic>> fetchProductById(String productId) async {
-    try {
-      final response = await _client
-          .from('products')
-          .select()
-          .eq('id', productId)
-          .single();
-
-      return response as Map<String, dynamic>;
-    } catch (e) {
-      print('❌ Error fetching product: $e');
-      rethrow;
-    }
+    return fetchProductByIdWithImages(productId);
   }
 
-  /// Fetch all products
+  /// Fetch all products WITH IMAGES assembled ✅ FIXED D10
   Future<List<Map<String, dynamic>>> fetchProducts() async {
-    try {
-      final response = await _client
-          .from('products')
-          .select()
-          .eq('is_active', true)
-          .order('created_at', ascending: false);
-
-      return List<Map<String, dynamic>>.from(response as List);
-    } catch (e) {
-      print('❌ Error fetching products: $e');
-      rethrow;
-    }
+    return fetchProductsWithImages();
   }
 
   /// Fetch product variants (sizes, colors, etc.)
@@ -444,6 +422,94 @@ class SupabaseService {
       return List<Map<String, dynamic>>.from(response as List);
     } catch (e) {
       print('❌ Error fetching product variants: $e');
+      rethrow;
+    }
+  }
+
+  // ==================== PRODUCT IMAGES ====================
+
+  /// ✅ FIXED D10: Fetch product images from separate product_images table
+  Future<List<Map<String, dynamic>>> fetchProductImages(String productId) async {
+    try {
+      final response = await _client
+          .from('product_images')
+          .select()
+          .eq('product_id', productId)
+          .order('order_index', ascending: true);
+
+      return List<Map<String, dynamic>>.from(response as List);
+    } catch (e) {
+      print('❌ Error fetching product images for $productId: $e');
+      return []; // Return empty list if images not found
+    }
+  }
+
+  /// ✅ FIXED D10: Fetch products with images assembled from product_images table
+  Future<List<Map<String, dynamic>>> fetchProductsWithImages() async {
+    try {
+      // Fetch all products
+      final productsResponse = await _client
+          .from('products')
+          .select()
+          .eq('is_active', true)
+          .order('created_at', ascending: false);
+
+      final products = List<Map<String, dynamic>>.from(productsResponse as List);
+
+      // For each product, fetch its images
+      final enrichedProducts = <Map<String, dynamic>>[];
+      
+      for (final product in products) {
+        final productId = product['id'] as String;
+        
+        // Fetch images for this product
+        final images = await fetchProductImages(productId);
+        
+        // Extract image URLs and sort by order_index
+        final imageUrls = (images as List)
+            .map((img) => img['image_url'] as String)
+            .toList();
+
+        // Add assembled image data to product
+        product['image_urls'] = imageUrls;  // ✅ Add as snake_case
+        product['image_paths'] = [];  // Empty local paths initially
+        
+        enrichedProducts.add(product);
+      }
+
+      return enrichedProducts;
+    } catch (e) {
+      print('❌ Error fetching products with images: $e');
+      rethrow;
+    }
+  }
+
+  /// ✅ FIXED D10: Fetch single product WITH images
+  Future<Map<String, dynamic>> fetchProductByIdWithImages(String productId) async {
+    try {
+      final product = await _client
+          .from('products')
+          .select()
+          .eq('id', productId)
+          .single();
+
+      final productData = product as Map<String, dynamic>;
+
+      // Fetch images for this product
+      final images = await fetchProductImages(productId);
+      
+      // Extract image URLs
+      final imageUrls = (images as List)
+          .map((img) => img['image_url'] as String)
+          .toList();
+
+      // Add assembled image data
+      productData['image_urls'] = imageUrls;
+      productData['image_paths'] = [];
+
+      return productData;
+    } catch (e) {
+      print('❌ Error fetching product with images: $e');
       rethrow;
     }
   }
