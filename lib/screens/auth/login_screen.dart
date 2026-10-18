@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:kenza_hub_flutter/config/app_colors.dart';
 import 'package:kenza_hub_flutter/config/app_radius.dart';
 import 'package:kenza_hub_flutter/config/app_spacing.dart';
+import 'package:kenza_hub_flutter/config/app_routes.dart';
 import 'package:kenza_hub_flutter/providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -34,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (success && mounted) {
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
     } else if (!mounted) return;
 
     if (authProvider.error != null) {
@@ -254,7 +255,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Text('ليس لديك حساب؟ '),
                       TextButton(
                         onPressed: () {
-                          Navigator.pushNamed(context, '/sign-up');
+                          Navigator.pushNamed(context, AppRoutes.signup);
                         },
                         child: const Text(
                           'أنشئ حساباً',
@@ -272,7 +273,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Guest Login
                   OutlinedButton(
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/home');
+                      Navigator.pushReplacementNamed(context, AppRoutes.home);
                     },
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(

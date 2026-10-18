@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kenza_hub_flutter/config/app_colors.dart';
 import 'package:kenza_hub_flutter/config/app_radius.dart';
 import 'package:kenza_hub_flutter/config/app_spacing.dart';
+import 'package:kenza_hub_flutter/config/app_routes.dart';
 import 'package:kenza_hub_flutter/models/product_model.dart';
 import 'package:kenza_hub_flutter/services/supabase_service.dart';
 
@@ -111,11 +112,11 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.shopping_cart, color: Colors.black),
-            onPressed: () => Navigator.pushNamed(context, '/cart'),
+            onPressed: () => Navigator.pushNamed(context, AppRoutes.cart),
           ),
           IconButton(
             icon: const Icon(Icons.person, color: Colors.black),
-            onPressed: () => Navigator.pushNamed(context, '/profile'),
+            onPressed: () => // TODO: Navigate to profile screen (not yet implemented),
           ),
         ],
       ),

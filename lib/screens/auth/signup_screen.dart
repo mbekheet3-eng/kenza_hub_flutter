@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:kenza_hub_flutter/config/app_colors.dart';
 import 'package:kenza_hub_flutter/config/app_radius.dart';
 import 'package:kenza_hub_flutter/config/app_spacing.dart';
+import 'package:kenza_hub_flutter/config/app_routes.dart';
 import 'package:kenza_hub_flutter/providers/auth_provider.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -61,7 +62,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
 
     if (success && mounted) {
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
     } else if (!mounted) return;
 
     if (authProvider.error != null) {
@@ -347,7 +348,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       const Text('هل لديك حساب بالفعل؟ '),
                       TextButton(
                         onPressed: () {
-                          Navigator.pushNamed(context, '/login');
+                          Navigator.pushNamed(context, AppRoutes.login);
                         },
                         child: const Text(
                           'سجّل دخول',

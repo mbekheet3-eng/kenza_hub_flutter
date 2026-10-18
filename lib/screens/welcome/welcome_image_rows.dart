@@ -10,8 +10,8 @@ class WelcomeImageRows extends StatefulWidget {
 
 class _WelcomeImageRowsState extends State<WelcomeImageRows>
     with TickerProviderStateMixin {
-  late AnimationController _controllerRow1;
-  late AnimationController _controllerRow2;
+  late ScrollController _scrollControllerRow1;
+  late ScrollController _scrollControllerRow2;
 
   final List<String> _row1Images = [
     'assets/images/welcome/welcome_row1_01.png',
@@ -42,24 +42,58 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
   @override
   void initState() {
     super.initState();
-    
-    // Row 1: Smooth infinite scroll to the left
-    _controllerRow1 = AnimationController(
-      duration: const Duration(seconds: 50),
-      vsync: this,
-    )..repeat();
+    _scrollControllerRow1 = ScrollController();
+    _scrollControllerRow2 = ScrollController();
 
-    // Row 2: Smooth infinite scroll to the right
-    _controllerRow2 = AnimationController(
-      duration: const Duration(seconds: 60),
-      vsync: this,
-    )..repeat();
+    // Auto scroll Row 1 to the left
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _autoScrollRow1();
+    });
+
+    // Auto scroll Row 2 to the right
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 100), _autoScrollRow2);
+    });
+  }
+
+  void _autoScrollRow1() async {
+    while (mounted) {
+      await Future.delayed(const Duration(milliseconds: 50));
+      if (_scrollControllerRow1.hasClients) {
+        _scrollControllerRow1.animateTo(
+          _scrollControllerRow1.offset + 3,
+          duration: const Duration(milliseconds: 50),
+          curve: Curves.linear,
+        );
+        // Reset to start for infinite loop
+        if (_scrollControllerRow1.offset >= _scrollControllerRow1.position.maxScrollExtent / 2) {
+          _scrollControllerRow1.jumpTo(0);
+        }
+      }
+    }
+  }
+
+  void _autoScrollRow2() async {
+    while (mounted) {
+      await Future.delayed(const Duration(milliseconds: 60));
+      if (_scrollControllerRow2.hasClients) {
+        _scrollControllerRow2.animateTo(
+          _scrollControllerRow2.offset - 2.5,
+          duration: const Duration(milliseconds: 60),
+          curve: Curves.linear,
+        );
+        // Reset to start for infinite loop
+        if (_scrollControllerRow2.offset <= 0) {
+          _scrollControllerRow2.jumpTo(_scrollControllerRow2.position.maxScrollExtent / 2);
+        }
+      }
+    }
   }
 
   @override
   void dispose() {
-    _controllerRow1.dispose();
-    _controllerRow2.dispose();
+    _scrollControllerRow1.dispose();
+    _scrollControllerRow2.dispose();
     super.dispose();
   }
 
@@ -73,38 +107,49 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
     return Column(
       children: [
         // Row 1: Scrolls to the left
-        AnimatedBuilder(
-          animation: _controllerRow1,
-          builder: (context, child) {
-            // Infinite scroll effect: -1x means continuous movement
-            final offset = -_controllerRow1.value * screenWidth * 2.5;
-            return Transform.translate(
-              offset: Offset(offset, 0),
-              child: WelcomeImageRow(
+        SizedBox(
+          height: imageHeight,
+          child: ListView(
+            controller: _scrollControllerRow1,
+            scrollDirection: Axis.horizontal,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              WelcomeImageRow(
                 images: _row1Images,
                 imageWidth: imageWidth,
                 imageHeight: imageHeight,
               ),
-            );
-          },
+              WelcomeImageRow(
+                images: _row1Images,
+                imageWidth: imageWidth,
+                imageHeight: imageHeight,
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 10),
         
         // Row 2: Scrolls to the right
-        AnimatedBuilder(
-          animation: _controllerRow2,
-          builder: (context, child) {
-            // Infinite scroll effect: opposite direction
-            final offset = _controllerRow2.value * screenWidth * 2.0;
-            return Transform.translate(
-              offset: Offset(offset, 0),
-              child: WelcomeImageRow(
+        SizedBox(
+          height: imageHeight * 0.9,
+          child: ListView(
+            controller: _scrollControllerRow2,
+            scrollDirection: Axis.horizontal,
+            reverse: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              WelcomeImageRow(
                 images: _row2Images,
                 imageWidth: imageWidth * 0.9,
                 imageHeight: imageHeight * 0.9,
               ),
-            );
-          },
+              WelcomeImageRow(
+                images: _row2Images,
+                imageWidth: imageWidth * 0.9,
+                imageHeight: imageHeight * 0.9,
+              ),
+            ],
+          ),
         ),
       ],
     );
