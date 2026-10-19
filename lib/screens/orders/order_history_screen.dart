@@ -147,7 +147,10 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 ),
               ],
             ),
-            const Divider(margin: EdgeInsets.symmetric(vertical: 12)),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Divider(height: 1),
+            ),
 
             // Product title
             if (order.productTitle != null)
