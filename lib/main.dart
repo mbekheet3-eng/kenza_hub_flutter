@@ -17,18 +17,14 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Initialize Supabase
-  // Note: Make sure environment variables are properly set
-  // SUPABASE_URL and SUPABASE_ANON_KEY should be configured
   try {
     await Supabase.initialize(
       url: 'https://qvqfzujvcnmquohieevl.supabase.co',
-      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2cWZ6dWp2Y25tcXVvaGllZXZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc3NTAwMzAsImV4cCI6MjA0MzMyNjAzMH0.PLACEHOLDER_KEY', // Replace with actual key
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2cWZ6dWp2Y25tcXVvaGllZXZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3Nzk5NzUsImV4cCI6MjA5NzM1NTk3NX0.MWKerHrby4y9Ok6TRixR05dB7OtQlZYq0BurZmMCDFg',
     );
     print('✅ Supabase initialized successfully');
   } catch (e) {
     print('❌ Supabase initialization failed: $e');
-    // App will continue but may crash on first auth call
-    // See console for details
   }
 
   runApp(const MyApp());
