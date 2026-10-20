@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../models/user.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/product_provider.dart';
+import '../../services/supabase_service.dart';
 import '../../config/theme.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -14,6 +15,10 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  User? _userProfile;
+  bool _isLoadingProfile = true;
+  String? _error;
+
   @override
   void initState() {
     super.initState();
@@ -21,17 +26,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadUserData() async {
-    if (mounted) {
-      context.read<AuthProvider>().loadCurrentUser();
+    try {
+      setState(() => _isLoadingProfile = true);
+
+      final authProvider = context.read<AuthProvider>();
+      final userId = authProvider.userId;
+
+      if (userId == null) {
+        setState(() {
+          _error = 'User not authenticated';
+          _isLoadingProfile = false;
+        });
+        return;
+      }
+
+      // Load custom User model from database
+      final user = await SupabaseService().getUser(userId);
+
+      if (mounted) {
+        setState(() {
+          _userProfile = user;
+          _isLoadingProfile = false;
+          _error = null;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = 'فشل تحميل الملف الشخصي: $e';
+          _isLoadingProfile = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleLogout() async {
+    try {
+      final authProvider = context.read<AuthProvider>();
+      await authProvider.signOut();
+
+      if (mounted) {
+        context.go('/welcome');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطأ في تسجيل الخروج: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
-    final user = authProvider.currentUser;
 
-    if (user == null) {
+    // Check if user is logged in
+    if (authProvider.userId == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('الملف الشخصي')),
         body: Center(
@@ -54,6 +108,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       );
     }
+
+    // Loading state
+    if (_isLoadingProfile) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('الملف الشخصي')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    // Error state
+    if (_error != null || _userProfile == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('الملف الشخصي')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Colors.red.shade300,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                _error ?? 'فشل تحميل البيانات',
+                style: Theme.of(context).textTheme.titleMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _loadUserData,
+                child: const Text('إعادة المحاولة'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final user = _userProfile!;
 
     return Scaffold(
       appBar: AppBar(
@@ -98,14 +192,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: SizedBox(
                   width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: () => _handleLogout(context),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.red),
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _handleLogout,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.shade600,
                     ),
                     child: const Text(
                       'تسجيل الخروج',
-                      style: TextStyle(color: Colors.red),
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
                 ),
@@ -119,50 +214,75 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildProfileHeader(BuildContext context, User user) {
-    return Container(
-      color: AppTheme.primaryColor.withOpacity(0.05),
-      padding: const EdgeInsets.all(16),
-      child: Column(
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Row(
         children: [
           // Avatar
-          CircleAvatar(
-            radius: 50,
-            backgroundImage: user.avatarUrl != null
-                ? NetworkImage(user.avatarUrl!)
-                : null,
-            child: user.avatarUrl == null
-                ? Icon(Icons.person, size: 50, color: AppTheme.primaryColor)
-                : null,
-          ),
-          const SizedBox(height: 16),
-
-          // Display Name
-          Text(
-            user.displayName ?? 'مستخدم',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 4),
-
-          // Email
-          Text(
-            user.email,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppTheme.textSecondary,
+          GestureDetector(
+            onTap: () => context.push('/edit-profile'),
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: const Color(0xFFC85A32),
+                  width: 2,
+                ),
+                image: user.avatarUrl != null
+                    ? DecorationImage(
+                        image: NetworkImage(user.avatarUrl!),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+                color: Colors.grey[300],
+              ),
+              child: user.avatarUrl == null
+                  ? const Icon(Icons.person, size: 40)
+                  : null,
             ),
           ),
-          const SizedBox(height: 4),
-
-          // Verification Badge
-          if (user.isVerified == true)
-            Chip(
-              label: const Text('موثق'),
-              icon: const Icon(Icons.verified, size: 16),
-              backgroundColor: Colors.green.withOpacity(0.2),
-              labelStyle: const TextStyle(color: Colors.green),
+          const SizedBox(width: 20),
+          // User Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  user.displayName ?? 'مستخدم',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  user.email,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppTheme.textSecondary,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                // Rating
+                if (user.rating > 0)
+                  Row(
+                    children: [
+                      const Icon(Icons.star, size: 16, color: Colors.amber),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${user.rating.toStringAsFixed(1)} (${user.totalReviews})',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+              ],
             ),
+          ),
+          // Edit Button
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () => context.push('/edit-profile'),
+          ),
         ],
       ),
     );
@@ -170,55 +290,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildUserStats(BuildContext context, User user) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildStatCard(
-            context,
-            title: 'المنتجات',
-            value: '${user.productsCount ?? 0}',
-            icon: Icons.shopping_bag,
-          ),
-          _buildStatCard(
-            context,
-            title: 'المتابعون',
-            value: '${user.followersCount ?? 0}',
-            icon: Icons.people,
-          ),
-          _buildStatCard(
-            context,
-            title: 'التقييم',
-            value: '${user.rating?.toStringAsFixed(1) ?? '0.0'}',
-            icon: Icons.star,
-          ),
+          _buildStatItem(context, user.productsCount.toString(), 'منتجاتي'),
+          _buildStatItem(context, user.followersCount.toString(), 'المتابعين'),
+          _buildStatItem(context, user.totalReviews.toString(), 'التقييمات'),
         ],
       ),
     );
   }
 
-  Widget _buildStatCard(
-    BuildContext context, {
-    required String title,
-    required String value,
-    required IconData icon,
-  }) {
+  Widget _buildStatItem(BuildContext context, String value, String label) {
     return Column(
       children: [
-        Icon(icon, color: AppTheme.primaryColor, size: 24),
-        const SizedBox(height: 8),
         Text(
           value,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFFC85A32),
+              ),
         ),
         const SizedBox(height: 4),
         Text(
-          title,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppTheme.textSecondary,
-          ),
+          label,
+          style: Theme.of(context).textTheme.bodySmall,
         ),
       ],
     );
@@ -226,90 +323,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildQuickActions(BuildContext context, User user) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
         children: [
-          Text(
-            'الإجراءات السريعة',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: () => context.push('/my-products'),
+              icon: const Icon(Icons.shopping_bag),
+              label: const Text('منتجاتي'),
             ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildActionButton(
-                icon: Icons.add_circle,
-                label: 'إضافة منتج',
-                onTap: () => context.push('/sell-wizard'),
-              ),
-              _buildActionButton(
-                icon: Icons.edit,
-                label: 'تعديل الملف',
-                onTap: () => context.push('/edit-profile'),
-              ),
-              _buildActionButton(
-                icon: Icons.shopping_cart,
-                label: 'المشتريات',
-                onTap: () => context.push('/orders'),
-              ),
-            ],
+          const SizedBox(width: 12),
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: () => context.push('/edit-profile'),
+              icon: const Icon(Icons.edit),
+              label: const Text('تحرير'),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildActionButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: AppTheme.primaryColor, size: 24),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildAboutSection(BuildContext context, User user) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'عني',
+            'نبذة عني',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+                  fontWeight: FontWeight.bold,
+                ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            user.bio ?? '',
-            style: Theme.of(context).textTheme.bodyMedium,
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              user.bio ?? '',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ),
         ],
       ),
@@ -317,13 +376,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildMyProductsSection(BuildContext context) {
-    final productProvider = context.watch<ProductProvider>();
-    final userProducts = productProvider.products
-        .where((p) => p.userId == context.read<AuthProvider>().currentUser?.id)
-        .toList();
-
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -333,137 +387,93 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Text(
                 'منتجاتي',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
-              if (userProducts.length > 3)
-                TextButton(
-                  onPressed: () => context.push('/my-products'),
-                  child: const Text('عرض الكل'),
-                ),
+              TextButton(
+                onPressed: () => context.push('/my-products'),
+                child: const Text('عرض الكل'),
+              ),
             ],
           ),
           const SizedBox(height: 12),
-          if (userProducts.isEmpty)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  children: [
-                    Icon(Icons.shopping_bag_outline, size: 48, color: AppTheme.textTertiary),
-                    const SizedBox(height: 12),
-                    Text(
-                      'لا توجد منتجات',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.textSecondary,
+          Consumer<ProductProvider>(
+            builder: (context, productProvider, _) {
+              final products = productProvider.products.take(3).toList();
+
+              if (products.isEmpty) {
+                return Center(
+                  child: Text(
+                    'لا توجد منتجات',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                );
+              }
+
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.75,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  return GestureDetector(
+                    onTap: () => context.push('/product/${product.id}'),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.grey[200],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(8),
+                                ),
+                                color: Colors.grey[300],
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  product.title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${product.price} ج.م',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: const Color(0xFFC85A32),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () => context.push('/sell-wizard'),
-                      child: const Text('إضافة منتج أول'),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          else
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 0.75,
-              ),
-              itemCount: userProducts.take(3).length,
-              itemBuilder: (context, index) {
-                final product = userProducts[index];
-                return _buildProductCard(context, product);
-              },
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProductCard(BuildContext context, dynamic product) {
-    return GestureDetector(
-      onTap: () => context.push('/product/${product.id}'),
-      child: Card(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Product Image
-            Container(
-              width: double.infinity,
-              height: 120,
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceColor,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(8),
-                ),
-              ),
-              child: product.imageUrls?.isNotEmpty == true
-                  ? Image.network(
-                      product.imageUrls![0],
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          Icon(Icons.image, color: AppTheme.textTertiary),
-                    )
-                  : Icon(Icons.image, color: AppTheme.textTertiary),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.title ?? '',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${product.price} ج.م',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppTheme.primaryColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _handleLogout(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('تسجيل الخروج'),
-        content: const Text('هل أنت متأكد من رغبتك في تسجيل الخروج؟'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await context.read<AuthProvider>().logout();
-              if (mounted) {
-                context.go('/login');
-              }
+                  );
+                },
+              );
             },
-            child: const Text('تسجيل الخروج', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
