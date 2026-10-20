@@ -590,4 +590,80 @@ class SupabaseService {
       rethrow;
     }
   }
+
+  // ==================== PRODUCT PROVIDER ALIASES ====================
+
+  /// Get all active products (alias for getTrendingProducts)
+  Future<List<Product>> getAllProducts({int limit = 100}) async {
+    try {
+      final response = await _client
+          .from('products')
+          .select()
+          .eq('is_active', true)
+          .neq('is_sold', true)
+          .order('created_at', ascending: false)
+          .limit(limit);
+
+      return (response as List)
+          .map((json) => Product.fromJson(json))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to get all products: $e');
+    }
+  }
+
+  /// Create a new product (alias for addProduct)
+  Future<String> createProduct(Product product) async {
+    return addProduct(product);
+  }
+
+  /// Toggle favorite (combine add/remove logic)
+  Future<void> toggleFavorite(String productId, String userId) async {
+    try {
+      // Check if already favorited
+      final existing = await _client
+          .from('favorites')
+          .select()
+          .eq('user_id', userId)
+          .eq('product_id', productId);
+
+      if ((existing as List).isNotEmpty) {
+        // Remove if exists
+        await removeFromFavorites(userId, productId);
+      } else {
+        // Add if doesn't exist
+        await addToFavorites(userId, productId);
+      }
+    } catch (e) {
+      throw Exception('Failed to toggle favorite: $e');
+    }
+  }
+
+  /// Update user profile
+  Future<void> updateProfile(User user) async {
+    try {
+      await _client
+          .from('users')
+          .update(user.toJson())
+          .eq('id', user.id);
+    } catch (e) {
+      throw Exception('Failed to update profile: $e');
+    }
+  }
+
+  /// Load current user by ID
+  Future<User?> getCurrentUser(String userId) async {
+    try {
+      final response = await _client
+          .from('users')
+          .select()
+          .eq('id', userId)
+          .single();
+
+      return User.fromJson(response);
+    } catch (e) {
+      print('Error loading current user: $e');
+      return null;
+    }
+  }
 }

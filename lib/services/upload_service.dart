@@ -333,6 +333,30 @@ class UploadService {
     }
   }
 
+  // ==================== PROFILE UPLOADS ====================
+
+  /// Upload profile image for user
+  Future<String> uploadProfileImage(File imageFile, String userId) async {
+    try {
+      const bucket = 'avatars';
+      final fileName = '$userId.jpg';
+
+      // Upload to storage
+      final path = await _client.storage.from(bucket).upload(
+        fileName,
+        imageFile,
+        fileOptions: const FileOptions(upsert: true),
+      );
+
+      // Get public URL
+      final publicUrl = _client.storage.from(bucket).getPublicUrl(path);
+
+      return publicUrl;
+    } catch (e) {
+      throw Exception('Failed to upload profile image: $e');
+    }
+  }
+
   // ==================== VERIFICATION ====================
 
   /// Verify file is accessible
