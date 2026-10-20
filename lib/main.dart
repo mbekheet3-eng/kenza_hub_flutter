@@ -4,10 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:kenza_hub_flutter/config/app_routes.dart';
 import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
-import 'package:kenza_hub_flutter/screens/welcome/welcome_screen.dart';
 import 'package:kenza_hub_flutter/providers/home_provider.dart';
 import 'package:kenza_hub_flutter/providers/auth_provider.dart';
 import 'package:kenza_hub_flutter/providers/product_details_provider.dart';
+import 'package:kenza_hub_flutter/providers/product_provider.dart';
 import 'package:kenza_hub_flutter/providers/cart_provider.dart';
 import 'package:kenza_hub_flutter/providers/checkout_provider.dart';
 import 'package:kenza_hub_flutter/providers/order_tracking_provider.dart';
@@ -40,6 +40,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => HomeProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProductDetailsProvider()),
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
         ChangeNotifierProvider(create: (_) => OrderTrackingProvider()),
@@ -47,7 +48,7 @@ class MyApp extends StatelessWidget {
       child: ValueListenableBuilder<Locale>(
         valueListenable: AppLocalizations.localeNotifier,
         builder: (context, locale, child) {
-          return MaterialApp(
+          return MaterialApp.router(
             locale: locale,
             localeResolutionCallback: (deviceLocale, supportedLocales) {
               return supportedLocales.firstWhere(
@@ -72,8 +73,7 @@ class MyApp extends StatelessWidget {
                 secondary: Color(0xFFC85A32),
               ),
             ),
-            initialRoute: AppRoutes.welcome,
-            onGenerateRoute: AppRoutes.generateRoute,
+            routerConfig: goRouter,
           );
         },
       ),
