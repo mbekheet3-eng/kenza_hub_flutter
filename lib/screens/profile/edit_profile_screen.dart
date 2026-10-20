@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../models/user.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/supabase_service.dart';
 import '../../services/upload_service.dart';
 import '../../config/theme.dart';
 
@@ -23,20 +24,46 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   File? _selectedImage;
   bool _isLoading = false;
+  bool _isLoadingProfile = true;
   String? _errorMessage;
+  User? _currentUserProfile;
 
   @override
   void initState() {
     super.initState();
-    _initializeControllers();
+    _nameController = TextEditingController();
+    _bioController = TextEditingController();
+    _locationController = TextEditingController();
+    _phoneController = TextEditingController();
+    _loadUserProfile();
   }
 
-  void _initializeControllers() {
-    final user = context.read<AuthProvider>().currentUser;
-    _nameController = TextEditingController(text: user?.displayName ?? '');
-    _bioController = TextEditingController(text: user?.bio ?? '');
-    _locationController = TextEditingController(text: user?.location ?? '');
-    _phoneController = TextEditingController(text: user?.phone ?? '');
+  Future<void> _loadUserProfile() async {
+    try {
+      final authProvider = context.read<AuthProvider>();
+      final userId = authProvider.userId;
+
+      if (userId == null) {
+        throw Exception('User ID not found');
+      }
+
+      // Load the actual user profile from database
+      final user = await SupabaseService().getUser(userId);
+
+      setState(() {
+        _currentUserProfile = user;
+        _nameController.text = user.displayName ?? '';
+        _bioController.text = user.bio ?? '';
+        _locationController.text = user.location ?? '';
+        _phoneController.text = user.phone ?? '';
+        _isLoadingProfile = false;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'فشل تحميل الملف الشخصي: $e';
+        _isLoadingProfile = false;
+      });
+    }
   }
 
   @override
@@ -62,41 +89,39 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _saveProfile() async {
+    if (_currentUserProfile == null) {
+      _showError('بيانات المستخدم غير متاحة');
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      final authProvider = context.read<AuthProvider>();
-      final currentUser = authProvider.currentUser;
-
-      if (currentUser == null) {
-        throw Exception('لم يتم العثور على المستخدم');
-      }
-
-      String? newAvatarUrl = currentUser.avatarUrl;
+      String? newAvatarUrl = _currentUserProfile!.avatarUrl;
 
       // Upload new avatar if selected
       if (_selectedImage != null) {
         final uploadService = UploadService();
         newAvatarUrl = await uploadService.uploadProfileImage(
           _selectedImage!,
-          currentUser.id,
+          _currentUserProfile!.id,
         );
       }
 
-      // Update user in database
-      final updatedUser = currentUser.copyWith(
+      // Create updated user object with new values
+      final updatedUser = _currentUserProfile!.copyWith(
         displayName: _nameController.text,
         bio: _bioController.text,
         location: _locationController.text,
         phone: _phoneController.text,
         avatarUrl: newAvatarUrl,
-        updatedAt: DateTime.now(),
       );
 
-      await authProvider.updateProfile(updatedUser);
+      // Update using SupabaseService
+      await SupabaseService().updateProfile(updatedUser);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -123,208 +148,196 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<AuthProvider>().currentUser;
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
 
-    if (user == null) {
+    if (_isLoadingProfile) {
       return Scaffold(
-        appBar: AppBar(title: const Text('تعديل الملف الشخصي')),
+        appBar: AppBar(
+          title: const Text('تحرير الملف الشخصي'),
+          centerTitle: true,
+        ),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('تعديل الملف الشخصي'),
+        title: const Text('تحرير الملف الشخصي'),
+        centerTitle: true,
         elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF0F172A),
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              // Avatar Section
-              _buildAvatarSection(user),
-              const SizedBox(height: 32),
-
-              // Form Fields
-              _buildNameField(),
-              const SizedBox(height: 16),
-
-              _buildBioField(),
-              const SizedBox(height: 16),
-
-              _buildLocationField(),
-              const SizedBox(height: 16),
-
-              _buildPhoneField(),
-              const SizedBox(height: 32),
-
-              // Save Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _saveProfile,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: AppTheme.primaryColor,
-                  ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : const Text(
-                          'حفظ التغييرات',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Avatar Section
+            Center(
+              child: Column(
+                children: [
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: const Color(0xFFC85A32),
+                          width: 3,
                         ),
-                ),
+                        image: _selectedImage != null
+                            ? DecorationImage(
+                                image: FileImage(_selectedImage!),
+                                fit: BoxFit.cover,
+                              )
+                            : (_currentUserProfile?.avatarUrl != null
+                                ? DecorationImage(
+                                    image: NetworkImage(
+                                        _currentUserProfile!.avatarUrl!),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null),
+                        color: Colors.grey[300],
+                      ),
+                      child: _selectedImage == null &&
+                              _currentUserProfile?.avatarUrl == null
+                          ? const Icon(Icons.person, size: 60)
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextButton.icon(
+                    onPressed: _pickImage,
+                    icon: const Icon(Icons.camera_alt),
+                    label: const Text('غيّر الصورة'),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
+            ),
+            const SizedBox(height: 32),
 
-              // Cancel Button
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: _isLoading ? null : () => context.pop(),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    side: BorderSide(color: AppTheme.primaryColor),
-                  ),
-                  child: const Text(
-                    'إلغاء',
-                    style: TextStyle(fontSize: 16),
-                  ),
+            // Form Section
+            _buildFormField(
+              label: 'الاسم',
+              controller: _nameController,
+              icon: Icons.person_outline,
+            ),
+            const SizedBox(height: 16),
+            _buildFormField(
+              label: 'السيرة الذاتية',
+              controller: _bioController,
+              icon: Icons.description_outlined,
+              maxLines: 3,
+            ),
+            const SizedBox(height: 16),
+            _buildFormField(
+              label: 'الموقع',
+              controller: _locationController,
+              icon: Icons.location_on_outlined,
+            ),
+            const SizedBox(height: 16),
+            _buildFormField(
+              label: 'رقم الهاتف',
+              controller: _phoneController,
+              icon: Icons.phone_outlined,
+            ),
+            const SizedBox(height: 32),
+
+            // Error Message
+            if (_errorMessage != null)
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red),
+                ),
+                child: Text(
+                  _errorMessage!,
+                  style: const TextStyle(color: Colors.red),
                 ),
               ),
-            ],
-          ),
+            const SizedBox(height: 24),
+
+            // Save Button
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _saveProfile,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFC85A32),
+                  foregroundColor: Colors.white,
+                  disabledBackgroundColor: Colors.grey[400],
+                ),
+                child: _isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        'حفظ التغييرات',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildAvatarSection(User user) {
+  Widget _buildFormField({
+    required String label,
+    required TextEditingController controller,
+    required IconData icon,
+    int maxLines = 1,
+  }) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        GestureDetector(
-          onTap: _isLoading ? null : _pickImage,
-          child: Stack(
-            children: [
-              CircleAvatar(
-                radius: 60,
-                backgroundImage: _selectedImage != null
-                    ? FileImage(_selectedImage!)
-                    : user.avatarUrl != null
-                        ? NetworkImage(user.avatarUrl!)
-                        : null,
-                child: _selectedImage == null && user.avatarUrl == null
-                    ? Icon(Icons.person, size: 60, color: AppTheme.primaryColor)
-                    : null,
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryColor,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.camera_alt,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                ),
-              ),
-            ],
+        Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF0F172A),
           ),
         ),
-        const SizedBox(height: 12),
-        Text(
-          'اضغط لتغيير الصورة',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppTheme.textSecondary,
+        const SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          maxLines: maxLines,
+          decoration: InputDecoration(
+            prefixIcon: Icon(icon),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(
+                color: Color(0xFFC85A32),
+                width: 2,
+              ),
+            ),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildNameField() {
-    return TextField(
-      controller: _nameController,
-      decoration: InputDecoration(
-        labelText: 'الاسم الكامل',
-        hintText: 'أدخل اسمك الكامل',
-        prefixIcon: const Icon(Icons.person),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 16),
-      ),
-      enabled: !_isLoading,
-    );
-  }
-
-  Widget _buildBioField() {
-    return TextField(
-      controller: _bioController,
-      maxLines: 3,
-      decoration: InputDecoration(
-        labelText: 'نبذة عني',
-        hintText: 'اكتب نبذة قصيرة عن نفسك',
-        prefixIcon: const Icon(Icons.info),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 16,
-          horizontal: 16,
-        ),
-      ),
-      enabled: !_isLoading,
-    );
-  }
-
-  Widget _buildLocationField() {
-    return TextField(
-      controller: _locationController,
-      decoration: InputDecoration(
-        labelText: 'المدينة / المنطقة',
-        hintText: 'أين تقع؟',
-        prefixIcon: const Icon(Icons.location_on),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 16),
-      ),
-      enabled: !_isLoading,
-    );
-  }
-
-  Widget _buildPhoneField() {
-    return TextField(
-      controller: _phoneController,
-      decoration: InputDecoration(
-        labelText: 'رقم الهاتف',
-        hintText: '+20xxxxxxxxx',
-        prefixIcon: const Icon(Icons.phone),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 16),
-      ),
-      keyboardType: TextInputType.phone,
-      enabled: !_isLoading,
     );
   }
 }

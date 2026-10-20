@@ -100,7 +100,8 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final isSmallScreen = screenHeight(context) < 700;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final isSmallScreen = screenHeight < 700;
     final imageWidth = screenWidth * (isSmallScreen ? 0.26 : 0.28);
     final imageHeight = imageWidth * 1.3;
 
@@ -154,7 +155,4 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
       ],
     );
   }
-
-  double screenHeight(BuildContext context) =>
-      MediaQuery.sizeOf(context).height;
 }
