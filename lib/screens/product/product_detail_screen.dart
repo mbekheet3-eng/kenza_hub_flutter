@@ -403,8 +403,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   void _addToCart(BuildContext context, Product product) {
     context.read<CartProvider>().addItem(
-      product,
-      _quantity,
+      productId: product.id,
+      title: product.title,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      quantity: _quantity,
     );
     
     ScaffoldMessenger.of(context).showSnackBar(
@@ -417,7 +420,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   void _buyNow(BuildContext context, Product product) {
-    context.read<CartProvider>().addItem(product, _quantity);
+    context.read<CartProvider>().addItem(
+      productId: product.id,
+      title: product.title,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      quantity: _quantity,
+    );
     context.push('/cart');
   }
 

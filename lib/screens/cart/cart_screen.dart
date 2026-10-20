@@ -16,7 +16,7 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     final cartProvider = context.watch<CartProvider>();
     final cartItems = cartProvider.items;
-    final totalPrice = cartProvider.totalPrice;
+    final totalPrice = cartProvider.total;
 
     return Scaffold(
       appBar: AppBar(
@@ -141,7 +141,7 @@ class _CartScreenState extends State<CartScreen> {
                               onTap: item.quantity > 1
                                   ? () => context
                                       .read<CartProvider>()
-                                      .updateQuantity(index, item.quantity - 1)
+                                      .updateQuantity(item.id, item.quantity - 1)
                                   : null,
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -164,7 +164,7 @@ class _CartScreenState extends State<CartScreen> {
                             InkWell(
                               onTap: () => context
                                   .read<CartProvider>()
-                                  .updateQuantity(index, item.quantity + 1),
+                                  .updateQuantity(item.id, item.quantity + 1),
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 6,
@@ -184,7 +184,7 @@ class _CartScreenState extends State<CartScreen> {
                       IconButton(
                         icon: const Icon(Icons.close, size: 18),
                         onPressed: () =>
-                            context.read<CartProvider>().removeItem(index),
+                            context.read<CartProvider>().removeItem(item.id),
                       ),
                     ],
                   ),
