@@ -14,13 +14,25 @@ client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 def get_changed_files():
     """Get list of changed Dart files"""
     try:
+        # First, ensure we have the base branch
+        base_branch = os.getenv('GITHUB_BASE_REF', 'main')
+        
+        # Fetch the base branch to ensure it exists
+        subprocess.run(
+            ['git', 'fetch', 'origin', f'{base_branch}'],
+            capture_output=True,
+            text=True,
+            check=False  # Don't fail if fetch has issues
+        )
+        
+        # Get changed files
         result = subprocess.run(
-            ['git', 'diff', '--name-only', 'origin/main...HEAD'],
+            ['git', 'diff', '--name-only', f'origin/{base_branch}...HEAD'],
             capture_output=True,
             text=True,
             check=True
         )
-        files = [f for f in result.stdout.strip().split('\n') if f.endswith('.dart')]
+        files = [f for f in result.stdout.strip().split('\n') if f.endswith('.dart') and f]
         return files
     except subprocess.CalledProcessError:
         return []

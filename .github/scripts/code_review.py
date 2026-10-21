@@ -19,8 +19,20 @@ pr_number = os.getenv('PR_NUMBER')
 def get_pr_changes():
     """Get the diff of the PR"""
     try:
+        # First, ensure we have the base branch
+        base_branch = os.getenv('GITHUB_BASE_REF', 'main')
+        
+        # Fetch the base branch to ensure it exists
+        subprocess.run(
+            ['git', 'fetch', 'origin', f'{base_branch}'],
+            capture_output=True,
+            text=True,
+            check=False  # Don't fail if fetch has issues
+        )
+        
+        # Get diff
         result = subprocess.run(
-            ['git', 'diff', f'origin/main...HEAD'],
+            ['git', 'diff', f'origin/{base_branch}...HEAD'],
             capture_output=True,
             text=True,
             check=True
