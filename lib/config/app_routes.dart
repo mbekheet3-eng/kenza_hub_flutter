@@ -98,7 +98,7 @@ final goRouter = GoRouter(
   errorBuilder: (context, state) => Scaffold(
     appBar: AppBar(title: const Text('خطأ')),
     body: Center(
-      child: Text('الصفحة "${state.location}" غير موجودة'),
+      child: Text('الصفحة "${state.uri.path}" غير موجودة'),
     ),
   ),
 );

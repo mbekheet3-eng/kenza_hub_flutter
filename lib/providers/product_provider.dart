@@ -62,7 +62,7 @@ class ProductProvider extends ChangeNotifier {
   Future<void> searchProducts(String query) async {
     _setLoading(true);
     try {
-      _products = await _supabaseService.searchProducts(query);
+      _products = await _supabaseService.searchProducts(query: query);
       _error = null;
     } catch (e) {
       _error = 'فشلت عملية البحث: $e';
