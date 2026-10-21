@@ -139,7 +139,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.shopping_bag_outline,
+            Icons.shopping_bag,
             size: 64,
             color: AppTheme.textTertiary,
           ),

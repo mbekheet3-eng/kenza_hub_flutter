@@ -89,7 +89,7 @@ class _StepPriceState extends State<StepPrice> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.lightbulb_outline, color: AppTheme.warningColor),
+                  const Icon(Icons.lightbulb, color: AppTheme.warningColor),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
