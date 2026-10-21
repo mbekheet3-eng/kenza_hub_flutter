@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kenza_hub_flutter/config/app_colors.dart';
 import 'package:kenza_hub_flutter/config/app_radius.dart';
 import 'package:kenza_hub_flutter/config/app_spacing.dart';
@@ -112,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.shopping_cart, color: Colors.black),
-            onPressed: () => Navigator.pushNamed(context, AppRoutes.cart),
+            onPressed: () => context.push(AppRoutes.cart),
           ),
           IconButton(
             icon: const Icon(Icons.person, color: Colors.black),

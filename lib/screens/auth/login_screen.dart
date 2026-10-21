@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:kenza_hub_flutter/config/app_colors.dart';
 import 'package:kenza_hub_flutter/config/app_radius.dart';
 import 'package:kenza_hub_flutter/config/app_spacing.dart';
-import 'package:kenza_hub_flutter/config/app_routes.dart';
 import 'package:kenza_hub_flutter/providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (success && mounted) {
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      context.go('/home');
     } else if (!mounted) return;
 
     if (authProvider.error != null) {
@@ -186,7 +186,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, '/forgot-password');
+                        // TODO: Implement forgot password screen
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('سيتم تفعيل استرجاع كلمة المرور قريباً')),
+                        );
                       },
                       child: const Text('هل نسيت كلمة المرور؟'),
                     ),
@@ -255,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Text('ليس لديك حساب؟ '),
                       TextButton(
                         onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.signup);
+                          context.push('/sign-up');
                         },
                         child: const Text(
                           'أنشئ حساباً',
@@ -273,7 +276,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Guest Login
                   OutlinedButton(
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, AppRoutes.home);
+                      context.go('/home');
                     },
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
-import 'package:kenza_hub_flutter/config/app_routes.dart';
 
 class WelcomeActions extends StatelessWidget {
   const WelcomeActions({super.key});
@@ -20,7 +20,7 @@ class WelcomeActions extends StatelessWidget {
           height: 54,
           child: ElevatedButton(
             onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.signup);
+              context.push('/sign-up');
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryRed,
@@ -47,7 +47,7 @@ class WelcomeActions extends StatelessWidget {
           height: 54,
           child: ElevatedButton(
             onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.login);
+              context.push('/login');
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryRed,
@@ -71,7 +71,7 @@ class WelcomeActions extends StatelessWidget {
         // Continue as Guest Button
         TextButton(
           onPressed: () {
-            Navigator.pushNamed(context, AppRoutes.home);
+            context.push('/home');
           },
           child: Text(
             strings.continueAsGuest,
