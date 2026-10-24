@@ -181,7 +181,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             
-            const SliverSizedBox(height: AppSpacing.md),
+            SliverToBoxAdapter(
+              child: SizedBox(height: AppSpacing.md),
+            ),
             
             // Products Grid
             if (_isLoading)
