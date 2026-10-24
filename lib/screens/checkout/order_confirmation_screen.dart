@@ -150,11 +150,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          '/home',
-                          (route) => false,
-                        );
+                        context.go('/home');
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
@@ -182,11 +178,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                     width: double.infinity,
                     child: OutlinedButton(
                       onPressed: () {
-                        Navigator.pushNamed(
-                          context,
-                          '/order-tracking',
-                          arguments: orderId,
-                        );
+                        context.push('/order-tracking/$orderId');
                       },
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(

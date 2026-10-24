@@ -1,4 +1,4 @@
-import 'package:kenza_hub_flutter/models/user_model.dart';
+import 'package:kenza_hub_flutter/models/user.dart';
 import 'package:kenza_hub_flutter/services/supabase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

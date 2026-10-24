@@ -24,9 +24,9 @@ class AppRouter {
         builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
-        path: '/signup',
+        path: '/sign-up',
         name: 'signup',
-        builder: (context, state) => const SignupScreen(),
+        builder: (context, state) => const SignUpScreen(),
       ),
       GoRoute(
         path: '/sell',

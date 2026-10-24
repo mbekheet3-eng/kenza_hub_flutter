@@ -196,11 +196,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               child: ElevatedButton(
                 onPressed: () {
                   // Navigate to order tracking
-                  Navigator.pushNamed(
-                    context,
-                    AppRoutes.orderTracking,
-                    arguments: order.id,
-                  );
+                  context.push('/order-tracking/${order.id}');
                 },
                 child: const Text('تفاصيل الطلب'),
               ),

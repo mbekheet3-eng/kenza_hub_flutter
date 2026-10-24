@@ -4,7 +4,7 @@ import 'package:kenza_hub_flutter/config/app_colors.dart';
 import 'package:kenza_hub_flutter/config/app_radius.dart';
 import 'package:kenza_hub_flutter/config/app_spacing.dart';
 import 'package:kenza_hub_flutter/config/app_routes.dart';
-import 'package:kenza_hub_flutter/models/product_model.dart';
+import 'package:kenza_hub_flutter/models/product.dart';
 import 'package:kenza_hub_flutter/services/supabase_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -230,11 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       return ProductCard(
                         product: product,
                         onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/product-details',
-                            arguments: product.id,
-                          );
+                          context.push('/product/${product.id}');
                         },
                       );
                     },
@@ -277,8 +273,8 @@ class ProductCard extends StatelessWidget {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(AppRadius.lg),
-                    topRight: Radius.circular(AppRadius.lg),
+                    topLeft: Radius.circular(16.0),
+                    topRight: Radius.circular(16.0),
                   ),
                   color: Colors.grey[200],
                 ),

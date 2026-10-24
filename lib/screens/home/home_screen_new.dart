@@ -177,11 +177,7 @@ class ProductsGrid extends StatelessWidget {
           product: products[index],
           onTap: () {
             // Navigate to product details
-            Navigator.pushNamed(
-              context,
-              '/product-details',
-              arguments: products[index].id,
-            );
+            context.push('/product/${products[index].id}');
           },
         );
       },

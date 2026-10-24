@@ -62,7 +62,7 @@ class _StepCategoryState extends State<StepCategory> {
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isSelected ? AppTheme.primaryColor.withValues(alpha: 0.1) : AppTheme.surfaceColor,
+                    color: isSelected ? AppTheme.primaryColor.withOpacity(0.1) : AppTheme.surfaceColor,
                     border: Border.all(
                       color: isSelected ? AppTheme.primaryColor : AppTheme.borderLight,
                       width: isSelected ? 2 : 1,

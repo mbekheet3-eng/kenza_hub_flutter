@@ -60,11 +60,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       cartProvider.clear();
 
       // Navigate to order confirmation
-      Navigator.pushReplacementNamed(
-        context,
-        '/order-confirmation',
-        arguments: checkoutProvider.orderId,
-      );
+      context.go('/order-confirmation/${checkoutProvider.orderId}');
     } else if (checkoutProvider.error != null && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

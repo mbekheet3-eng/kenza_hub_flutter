@@ -178,7 +178,7 @@ final class AppTheme {
 
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: colorScheme.surface,
-        indicatorColor: colorScheme.primary.withValues(alpha: 0.08),
+        indicatorColor: colorScheme.primary.withOpacity(0.08),
         height: 64,
         iconTheme: WidgetStatePropertyAll(
           IconThemeData(color: colorScheme.onSurface),
