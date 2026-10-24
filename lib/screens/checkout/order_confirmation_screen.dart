@@ -14,8 +14,8 @@ class OrderConfirmationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false, // Prevent back navigation
+    return PopScope(
+      canPop: false, // Prevent back navigation
       child: Scaffold(
         body: Center(
           child: SingleChildScrollView(
