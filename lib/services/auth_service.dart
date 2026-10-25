@@ -54,7 +54,7 @@ class AuthService {
   }
 
   /// Sign in with email and password
-  Future<UserModel> signIn({
+  Future<User> signIn({
     required String email,
     required String password,
   }) async {
@@ -64,13 +64,13 @@ class AuthService {
         password: password,
       );
 
-      final user = _supabaseService.currentUser;
-      if (user == null) {
+      final authUser = _supabaseService.currentUser;
+      if (authUser == null) {
         throw Exception('Sign in failed: User is null');
       }
 
       // Fetch user profile
-      return await getUserProfile(user.id);
+      return await getUserProfile(authUser.id);
     } catch (e) {
       print('❌ Sign in error: $e');
       rethrow;
@@ -88,16 +88,16 @@ class AuthService {
   }
 
   /// Get user profile
-  Future<UserModel> getUserProfile(String userId) async {
+  Future<User> getUserProfile(String userId) async {
     try {
       final client = SupabaseService.client;
       final response = await client
-          .from('profiles')
+          .from('users')
           .select('*')
           .eq('id', userId)
           .single();
 
-      return UserModel.fromJson(response as Map<String, dynamic>);
+      return User.fromJson(response as Map<String, dynamic>);
     } catch (e) {
       print('❌ Error fetching user profile: $e');
       rethrow;

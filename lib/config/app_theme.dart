@@ -139,7 +139,7 @@ final class AppTheme {
         ),
       ),
 
-      cardTheme: CardThemeData(
+      cardTheme: CardTheme(
         color: colorScheme.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -156,10 +156,6 @@ final class AppTheme {
 
       iconTheme: IconThemeData(
         color: colorScheme.onSurface,
-      ),
-
-      primaryIconTheme: IconThemeData(
-        color: colorScheme.onPrimary,
       ),
 
       floatingActionButtonTheme: FloatingActionButtonThemeData(

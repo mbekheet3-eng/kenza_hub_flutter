@@ -1,11 +1,11 @@
-import 'package:supabase_flutter/supabase_flutter.dart' hide User;
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import '../models/product.dart';
-import '../models/user.dart';
+import '../models/user.dart'; // Custom User model for profile data
 import '../models/order.dart';
 
 class SupabaseService {
   static final SupabaseService _instance = SupabaseService._internal();
-  late final SupabaseClient _client;
+  late final supabase.SupabaseClient _client;
 
   factory SupabaseService() {
     return _instance;
@@ -16,7 +16,18 @@ class SupabaseService {
   }
 
   // Static getter for client
-  static SupabaseClient get client => _instance._client;
+  static supabase.SupabaseClient get client => _instance._client;
+
+  // ==================== AUTH PROPERTIES ====================
+
+  /// Check if user is authenticated
+  bool get isAuthenticated => _client.auth.currentUser != null;
+
+  /// Get current authenticated user (Gotrue User - auth only, not profile data)
+  supabase.User? get currentUser => _client.auth.currentUser;
+
+  /// Get current user ID
+  String? get userId => _client.auth.currentUser?.id;
 
   // ==================== PRODUCTS ====================
 
