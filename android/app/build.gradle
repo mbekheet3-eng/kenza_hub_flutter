@@ -32,7 +32,7 @@ android {
 
     defaultConfig {
         applicationId = "com.kenza.hub"
-        minSdkVersion = flutter.minSdkVersion
+        minSdk = 21  // API 21 = Android 5.0
         targetSdk = 34
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
