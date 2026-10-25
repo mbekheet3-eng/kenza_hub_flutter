@@ -15,8 +15,8 @@ class AuthService {
   /// Check if user is authenticated
   bool get isAuthenticated => _supabaseService.isAuthenticated;
 
-  /// Get current authenticated user (Gotrue - auth only, not profile)
-  supabase.User? get currentAuthUser => _supabaseService.currentUser;
+  /// Get current authenticated user (Gotrue - auth only, not profile data)
+  supabase.User? get currentUser => _supabaseService.currentUser;
 
   /// Get current user ID
   String? get userId => _supabaseService.userId;
