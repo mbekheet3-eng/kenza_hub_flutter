@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _onRefresh() {
+  Future<void> _onRefresh() async {
     _loadProducts();
   }
 
@@ -117,12 +117,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.person, color: Colors.black),
-            onPressed: () => // TODO: Navigate to profile screen (not yet implemented),
+            onPressed: () => context.push(AppRoutes.profile),
           ),
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: (_) async => _onRefresh(),
+        onRefresh: _onRefresh,
         child: CustomScrollView(
           slivers: [
             // Search Bar

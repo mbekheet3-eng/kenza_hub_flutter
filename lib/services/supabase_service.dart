@@ -12,7 +12,7 @@ class SupabaseService {
   }
 
   SupabaseService._internal() {
-    _client = Supabase.instance.client;
+    _client = supabase.Supabase.instance.client;
   }
 
   // Static getter for client

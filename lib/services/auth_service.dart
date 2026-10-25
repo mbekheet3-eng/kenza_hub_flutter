@@ -1,6 +1,6 @@
-import 'package:kenza_hub_flutter/models/user.dart';
+import 'package:kenza_hub_flutter/models/user.dart' as custom_user;
 import 'package:kenza_hub_flutter/services/supabase_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -15,8 +15,8 @@ class AuthService {
   /// Check if user is authenticated
   bool get isAuthenticated => _supabaseService.isAuthenticated;
 
-  /// Get current user
-  User? get currentUser => _supabaseService.currentUser;
+  /// Get current authenticated user (Gotrue - auth only, not profile)
+  supabase.User? get currentAuthUser => _supabaseService.currentUser;
 
   /// Get current user ID
   String? get userId => _supabaseService.userId;
@@ -28,25 +28,27 @@ class AuthService {
     required String fullName,
   }) async {
     try {
-      // Sign up user
+      // Sign up user - returns Map with 'user' and 'session' keys
       final response = await _supabaseService.signUp(
         email: email,
         password: password,
         fullName: fullName,
       );
 
-      if (response.user == null) {
+      // Extract user from response Map
+      final user = response['user'] as supabase.User?;
+      if (user == null) {
         throw Exception('Sign up failed: User is null');
       }
 
       // Create user profile in database
       await _createUserProfile(
-        userId: response.user!.id,
+        userId: user.id,
         email: email,
         fullName: fullName,
       );
 
-      return response.user!.id;
+      return user.id;
     } catch (e) {
       print('❌ Sign up error: $e');
       rethrow;
@@ -54,7 +56,7 @@ class AuthService {
   }
 
   /// Sign in with email and password
-  Future<User> signIn({
+  Future<custom_user.User> signIn({
     required String email,
     required String password,
   }) async {
@@ -69,7 +71,7 @@ class AuthService {
         throw Exception('Sign in failed: User is null');
       }
 
-      // Fetch user profile
+      // Fetch user profile from database
       return await getUserProfile(authUser.id);
     } catch (e) {
       print('❌ Sign in error: $e');
@@ -88,7 +90,7 @@ class AuthService {
   }
 
   /// Get user profile
-  Future<User> getUserProfile(String userId) async {
+  Future<custom_user.User> getUserProfile(String userId) async {
     try {
       final client = SupabaseService.client;
       final response = await client
@@ -97,7 +99,7 @@ class AuthService {
           .eq('id', userId)
           .single();
 
-      return User.fromJson(response as Map<String, dynamic>);
+      return custom_user.User.fromJson(response as Map<String, dynamic>);
     } catch (e) {
       print('❌ Error fetching user profile: $e');
       rethrow;

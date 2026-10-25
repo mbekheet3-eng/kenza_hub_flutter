@@ -5,7 +5,12 @@ import '../../providers/product_provider.dart';
 import '../../config/theme.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({Key? key}) : super(key: key);
+  final String query;
+
+  const SearchScreen({
+    Key? key,
+    this.query = '',
+  }) : super(key: key);
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
