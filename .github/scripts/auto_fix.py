@@ -114,7 +114,8 @@ def main():
     changed_files = get_changed_files()
     if not changed_files:
         print("ℹ️ No Dart files changed")
-        print("::set-output name=changes_made::false")
+        with open(os.getenv('GITHUB_OUTPUT', '/dev/null'), 'a') as f:
+            f.write("changes_made=false\n")
         return
     
     print(f"📄 Found {len(changed_files)} changed Dart files")
@@ -146,12 +147,15 @@ def main():
         else:
             print(f"❌ Failed to fix: {filepath}")
     
+    output_file = os.getenv('GITHUB_OUTPUT', '/dev/null')
     if changes_made:
         print("\n✅ Auto-fixes completed!")
-        print("::set-output name=changes_made::true")
+        with open(output_file, 'a') as f:
+            f.write("changes_made=true\n")
     else:
         print("\n ℹ️ No auto-fixes needed")
-        print("::set-output name=changes_made::false")
+        with open(output_file, 'a') as f:
+            f.write("changes_made=false\n")
 
 if __name__ == "__main__":
     main()
