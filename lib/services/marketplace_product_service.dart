@@ -30,6 +30,28 @@ class MarketplaceProductService {
       throw StateError('يجب تسجيل الدخول قبل البيع');
     }
 
+    final userProfile = await _client
+        .from('users')
+        .select('default_region_id,first_name,last_name,username')
+        .eq('id', userId)
+        .single();
+    final defaultRegionId = userProfile['default_region_id'] as String?;
+    if (defaultRegionId == null) {
+      throw StateError(
+        'لم يتم تحديد منطقة حسابك بعد. لا يمكن نشر المنتجات قبل استكمال بيانات المنطقة ونطاق الشحن.',
+      );
+    }
+    final region = await _client
+        .from('regions')
+        .select('name_ar,is_active')
+        .eq('id', defaultRegionId)
+        .single();
+    if (region['is_active'] != true) {
+      throw StateError(
+        'منطقتك (${region['name_ar'] ?? ''}) خارج نطاق الشحن الداخلي الحالي؛ يمكنك التصفح، لكن نشر المنتجات غير متاح لهذه المنطقة الآن.',
+      );
+    }
+
     final memberships = await _client
         .from('seller_profile_members')
         .select('seller_profile_id,member_role,revoked_at')
@@ -68,11 +90,6 @@ class MarketplaceProductService {
         );
       }
 
-      final userProfile = await _client
-          .from('users')
-          .select('first_name,last_name,username')
-          .eq('id', userId)
-          .single();
       final username = (userProfile['username'] as String?)?.trim() ?? '';
       final fullName = [
         (userProfile['first_name'] as String?)?.trim() ?? '',
