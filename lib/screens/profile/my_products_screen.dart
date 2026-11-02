@@ -301,8 +301,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                     children: [
                       Expanded(
                         child: OutlinedButton(
-                          onPressed: () =>
-                              context.push('/edit-product/${product.id}'),
+                          onPressed: () => _showEditUnavailable(),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 6),
                           ),
@@ -347,7 +346,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
               title: const Text('تعديل'),
               onTap: () {
                 Navigator.pop(context);
-                context.push('/edit-product/${product.id}');
+                _showEditUnavailable();
               },
             ),
             ListTile(
@@ -378,26 +377,42 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
     );
   }
 
+  void _showEditUnavailable() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('تعديل بيانات المنتج غير متاح حالياً. لم يتم تغيير المنتج.'),
+      ),
+    );
+  }
+
   void _deleteProduct(String productId) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('حذف المنتج'),
-        content: const Text('هل أنت متأكد من حذف هذا المنتج؟'),
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('إخفاء المنتج'),
+        content: const Text('هل أنت متأكد من إخفاء هذا المنتج من العرض؟'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('إلغاء'),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              context.read<ProductProvider>().deleteProduct(productId);
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              final succeeded =
+                  await context.read<ProductProvider>().deleteProduct(productId);
+              if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('تم حذف المنتج')),
+                SnackBar(
+                  content: Text(
+                    succeeded
+                        ? 'تم إخفاء المنتج'
+                        : 'تعذر إخفاء المنتج. حاول مرة أخرى.',
+                  ),
+                ),
               );
             },
-            child: const Text('حذف', style: TextStyle(color: Colors.red)),
+            child: const Text('إخفاء', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
