@@ -65,7 +65,7 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
     final screenWidth = MediaQuery.sizeOf(context).width;
     final screenHeight = MediaQuery.sizeOf(context).height;
     final isSmallScreen = screenHeight < 700;
-    final imageWidth = (screenWidth * 0.34).clamp(112.0, 145.0);
+    final imageWidth = (screenWidth * 0.33).clamp(112.0, 145.0);
     final imageHeight = imageWidth * 1.22;
     const spacing = 9.0;
 
