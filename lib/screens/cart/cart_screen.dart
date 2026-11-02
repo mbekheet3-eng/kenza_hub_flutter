@@ -129,56 +129,9 @@ class _CartScreenState extends State<CartScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Quantity Controls
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.withOpacity(0.3)),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Row(
-                          children: [
-                            InkWell(
-                              onTap: item.quantity > 1
-                                  ? () => context
-                                      .read<CartProvider>()
-                                      .updateQuantity(item.id, item.quantity - 1)
-                                  : null,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 4,
-                                ),
-                                child: Icon(
-                                  Icons.remove,
-                                  size: 16,
-                                  color: item.quantity > 1
-                                      ? AppTheme.primaryColor
-                                      : Colors.grey,
-                                ),
-                              ),
-                            ),
-                            Text(
-                              '${item.quantity}',
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                            InkWell(
-                              onTap: () => context
-                                  .read<CartProvider>()
-                                  .updateQuantity(item.id, item.quantity + 1),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 4,
-                                ),
-                                child: Icon(
-                                  Icons.add,
-                                  size: 16,
-                                  color: AppTheme.primaryColor,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                      const Text(
+                        'قطعة واحدة',
+                        style: TextStyle(fontSize: 12),
                       ),
                       // Remove Button
                       IconButton(
