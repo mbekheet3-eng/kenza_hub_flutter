@@ -218,9 +218,9 @@ class ProductCard extends StatelessWidget {
                   ),
                   color: Colors.grey[200],
                 ),
-                child: product.imageUrl != null
+                child: product.imageUrl.isNotEmpty
                     ? Image.network(
-                        product.imageUrl!,
+                        product.imageUrl,
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => Center(
                           child: Icon(
