@@ -13,7 +13,7 @@ class MarketplaceProductService {
     id,seller_id,category_id,title_ar,title_en,description_ar,description_en,
     price,views_count,created_at,updated_at,brand_id,brand,color_id,size_id,
     condition_id,status_id,currency_id,audience,
-    category:categories!products_category_id_fkey(id,slug,name_ar,name_en,parent_id),
+    category:categories!products_category_id_fkey(id,slug,name_ar,name_en,parent_id,parent:categories!categories_parent_id_fkey(slug,name_ar)),
     condition:product_conditions!products_condition_id_fkey(slug,label_ar,label_en),
     color:product_colors!products_color_id_fkey(slug,label_ar,label_en,hex_code),
     size:product_sizes!products_size_id_fkey(slug,label_ar,label_en),
