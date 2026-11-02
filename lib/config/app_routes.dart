@@ -12,6 +12,8 @@ import '../screens/orders/order_tracking_screen.dart';
 import '../screens/orders/order_history_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/profile/seller_dashboard_screen.dart';
+import '../screens/profile/about_kenza_screen.dart';
+import '../screens/profile/policies_screen.dart';
 import '../screens/profile/edit_profile_screen.dart';
 import '../screens/profile/my_products_screen.dart';
 import '../screens/search/search_screen.dart';
@@ -76,6 +78,14 @@ final goRouter = GoRouter(
       builder: (context, state) => const SellerDashboardScreen(),
     ),
     GoRoute(
+      path: '/about-kenza',
+      builder: (context, state) => const AboutKenzaScreen(),
+    ),
+    GoRoute(
+      path: '/policies',
+      builder: (context, state) => const PoliciesScreen(),
+    ),
+    GoRoute(
       path: '/profile',
       builder: (context, state) => const ProfileScreen(),
     ),
@@ -122,6 +132,8 @@ class AppRoutes {
   static const String orderHistory = '/orders';
   static const String profile = '/profile';
   static const String sellerDashboard = '/seller-dashboard';
+  static const String aboutKenza = '/about-kenza';
+  static const String policies = '/policies';
   static const String editProfile = '/edit-profile';
   static const String myProducts = '/my-products';
   static const String search = '/search';
