@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import '../screens/welcome/welcome_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
-import '../screens/auth/forgot_password_screen.dart';
 import '../screens/home/home_screen_new.dart';
 import '../screens/product/product_detail_screen.dart';
 import '../screens/cart/cart_screen.dart';
@@ -32,10 +31,6 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/login',
       builder: (context, state) => const LoginScreen(),
-    ),
-    GoRoute(
-      path: '/forgot-password',
-      builder: (context, state) => const ForgotPasswordScreen(),
     ),
     GoRoute(
       path: '/sign-up',
@@ -128,7 +123,6 @@ class AppRoutes {
   static const String welcome = '/welcome';
   static const String login = '/login';
   static const String signup = '/sign-up';
-  static const String forgotPassword = '/forgot-password';
   static const String home = '/home';
   static const String productDetails = '/product-details';
   static const String cart = '/cart';

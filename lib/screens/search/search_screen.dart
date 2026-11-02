@@ -27,8 +27,17 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
-    _searchController = TextEditingController();
+    _searchController = TextEditingController(text: widget.query);
     _loadAllProducts();
+  }
+
+  @override
+  void didUpdateWidget(covariant SearchScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.query != widget.query) {
+      _searchController.text = widget.query;
+      setState(() {});
+    }
   }
 
   @override
@@ -223,8 +232,8 @@ class _SearchScreenState extends State<SearchScreen> {
       'all': 'الكل',
       'clothes': 'ملابس',
       'shoes': 'أحذية',
-      'kids': 'أطفال',
-      'home': 'منزل',
+      'kids': 'مستلزمات أطفال',
+      'home': 'مستلزمات المنزل',
     };
 
     return SingleChildScrollView(

@@ -446,24 +446,24 @@ class AppLocalizations {
   String get kids {
     switch (locale.languageCode) {
       case 'en':
-        return 'Kids Clothes';
+        return 'Children’s Supplies';
       case 'fr':
-        return 'Vêtements enfants';
+        return 'Articles pour enfants';
       case 'ar':
       default:
-        return 'ملابس أطفال';
+        return 'مستلزمات أطفال';
     }
   }
 
   String get home {
     switch (locale.languageCode) {
       case 'en':
-        return 'Home';
+        return 'Home Supplies';
       case 'fr':
-        return 'Maison';
+        return 'Articles pour la maison';
       case 'ar':
       default:
-        return 'منزل';
+        return 'مستلزمات المنزل';
     }
   }
 
@@ -494,24 +494,24 @@ class AppLocalizations {
   String get oldClothes {
     switch (locale.languageCode) {
       case 'en':
-        return 'Have old clothes?';
+        return 'Have items you no longer need?';
       case 'fr':
-        return 'Vous avez des vêtements anciens ?';
+        return 'Vous avez des articles dont vous n’avez plus besoin ?';
       case 'ar':
       default:
-        return 'هل لديك ملابس قديمة؟';
+        return 'عندك حاجات مش محتاجها؟';
     }
   }
 
   String get sellAndEarn {
     switch (locale.languageCode) {
       case 'en':
-        return 'Sell your clothes easily and earn money';
+        return 'Sell what you no longer need easily';
       case 'fr':
-        return 'Vendez vos vêtements facilement et gagnez de l’argent';
+        return 'Vendez facilement ce dont vous n’avez plus besoin';
       case 'ar':
       default:
-        return 'بيع ملابسك بسهولة واربح أموالاً';
+        return 'بيع الحاجات اللي مش محتاجها بسهولة';
     }
   }
 
