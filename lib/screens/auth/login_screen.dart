@@ -77,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('تسجيل الدخول'),
+        title: Text(AppLocalizations.of(context).loginTitle),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
@@ -85,6 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {
+          final strings = AppLocalizations.of(context);
           if (authProvider.isSignedIn) _redirectToHome();
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppSpacing.lg),
@@ -115,8 +116,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: AppSpacing.xl),
 
                   // Title
-                  const Text(
-                    'مرحباً بعودتك',
+                  Text(
+                    strings.welcomeBack,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 24,
@@ -128,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Subtitle
                   Text(
-                    'سجّل دخولك للمتابعة',
+                    strings.loginSubtitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -143,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
-                      labelText: 'البريد الإلكتروني',
+                      labelText: strings.email,
                       hintText: 'example@email.com',
                       prefixIcon: const Icon(Icons.email_outlined),
                       border: OutlineInputBorder(
@@ -156,10 +157,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'البريد الإلكتروني مطلوب';
+                        return strings.emailRequired;
                       }
                       if (!value.contains('@')) {
-                        return 'أدخل بريد إلكتروني صحيح';
+                        return strings.invalidEmail;
                       }
                       return null;
                     },
@@ -172,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _passwordController,
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
-                      labelText: 'كلمة المرور',
+                      labelText: strings.password,
                       prefixIcon: const Icon(Icons.lock_outlined),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -196,10 +197,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'كلمة المرور مطلوبة';
+                        return strings.passwordRequired;
                       }
                       if (value.length < 6) {
-                        return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                        return strings.passwordMinLength;
                       }
                       return null;
                     },
@@ -242,8 +243,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                           )
-                        : const Text(
-                            'تسجيل الدخول',
+                        : Text(
+                            strings.login,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -262,7 +263,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: AppSpacing.md),
                         child: Text(
-                          'أو',
+                          strings.or,
                           style: TextStyle(color: Colors.grey[600]),
                         ),
                       ),
@@ -281,7 +282,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               authProvider.signInWithGoogle,
                             ),
                     icon: const Icon(Icons.g_mobiledata, size: 28),
-                    label: const Text('المتابعة باستخدام Google'),
+                    label: Text(strings.continueWithGoogle),
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   OutlinedButton.icon(
@@ -292,7 +293,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               authProvider.signInWithApple,
                             ),
                     icon: const Icon(Icons.phone_iphone),
-                    label: const Text('المتابعة باستخدام Apple'),
+                    label: Text(strings.continueWithApple),
                   ),
 
                   const SizedBox(height: AppSpacing.lg),
@@ -301,13 +302,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('ليس لديك حساب؟ '),
+                      Text(strings.noAccount),
                       TextButton(
                         onPressed: () {
                           context.push('/sign-up');
                         },
-                        child: const Text(
-                          'أنشئ حساباً',
+                        child: Text(
+                          strings.signUp,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary,
@@ -333,8 +334,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       side: BorderSide(color: Colors.grey[400]!),
                     ),
-                    child: const Text(
-                      'تصفح كزائر',
+                    child: Text(
+                      strings.continueAsGuest,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
