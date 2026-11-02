@@ -1,27 +1,27 @@
-/// Network Connectivity Checker
+import 'package:connectivity_plus/connectivity_plus.dart';
+
+/// Reports whether the device currently has a network connection.
 abstract class INetworkInfo {
-  /// التحقق من وجود اتصال إنترنت
   Future<bool> isConnected();
 }
 
-/// Implementation
 class NetworkInfo implements INetworkInfo {
+  NetworkInfo._internal();
+
   static final NetworkInfo _instance = NetworkInfo._internal();
 
-  factory NetworkInfo() {
-    return _instance;
-  }
+  factory NetworkInfo() => _instance;
 
-  NetworkInfo._internal();
+  final Connectivity _connectivity = Connectivity();
 
   @override
   Future<bool> isConnected() async {
-    // في الإصدارات المستقبلية، يمكن استخدام connectivity_plus package
-    // import 'package:connectivity_plus/connectivity_plus.dart';
-    // final result = await (Connectivity().checkConnectivity());
-    // return result != ConnectivityResult.none;
-
-    // الآن نرجع true (يمكن تحسينها لاحقاً)
-    return true;
+    try {
+      final results = await _connectivity.checkConnectivity();
+      return results.any((result) => result != ConnectivityResult.none);
+    } catch (_) {
+      // Fail closed when the connectivity check itself cannot be completed.
+      return false;
+    }
   }
 }
