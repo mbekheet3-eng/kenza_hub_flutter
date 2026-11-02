@@ -95,7 +95,8 @@ class Product {
   String get ratingDisplay => rating != null ? rating!.toStringAsFixed(1) : 'بدون تقييم';
 
   // Review count display
-  int get reviewCount => rating != null ? (rating! * 20).toInt() : 0; // Estimate
+  // Review counts must come from real review rows, never be estimated from ratings.
+  int get reviewCount => 0;
 
   static Map<String, dynamic>? _relation(
     Map<String, dynamic> json,
