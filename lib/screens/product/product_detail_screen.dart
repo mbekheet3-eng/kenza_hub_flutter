@@ -20,7 +20,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _currentImageIndex = 0;
   bool _isFavorite = false;
   bool _isFavoriteLoading = false;
-  int _quantity = 1;
 
   @override
   void initState() {
@@ -187,7 +186,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   const SizedBox(height: 24),
 
                   // Quantity Selector
-                  _buildQuantitySelector(context),
                   const SizedBox(height: 16),
 
                   // Add to Cart Button
@@ -453,47 +451,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildQuantitySelector(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'الكمية',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.withOpacity(0.3)),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.remove),
-                onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  '$_quantity',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () => setState(() => _quantity++),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   void _addToCart(BuildContext context, Product product) {
     if (!_canPurchase(product)) return;
 
@@ -502,7 +459,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       title: product.title,
       price: product.price,
       imageUrl: product.imageUrl,
-      quantity: _quantity,
+      quantity: 1,
     );
     
     ScaffoldMessenger.of(context).showSnackBar(
