@@ -219,6 +219,67 @@ class MarketplaceProductService {
         .toList(growable: false);
   }
 
+  Future<List<Product>> fetchSellerProducts(String userId,
+      {int limit = 100}) async {
+    final memberships = await _client
+        .from('seller_profile_members')
+        .select('seller_profile_id')
+        .eq('user_id', userId)
+        .isFilter('revoked_at', null)
+        .limit(1);
+
+    String? sellerProfileId;
+    if ((memberships as List).isNotEmpty) {
+      sellerProfileId =
+          (memberships.first as Map)['seller_profile_id'] as String?;
+    } else {
+      final ownedProfile = await _client
+          .from('seller_profiles')
+          .select('id')
+          .eq('owner_user_id', userId)
+          .eq('is_active', true)
+          .maybeSingle();
+      sellerProfileId = ownedProfile?['id'] as String?;
+    }
+
+    if (sellerProfileId == null) return const [];
+
+    final rows = await _client
+        .from('products')
+        .select(_productSelect)
+        .eq('seller_id', sellerProfileId)
+        .order('created_at', ascending: false)
+        .limit(limit);
+
+    return (rows as List)
+        .map((row) => Product.fromJson(Map<String, dynamic>.from(row as Map)))
+        .toList(growable: false);
+  }
+
+  Future<void> updateProductDetails(Product product) async {
+    await _client.from('products').update({
+      'title_ar': product.title,
+      'title_en': product.title,
+      'description_ar': product.description,
+      'description_en': product.description,
+      'price': product.price,
+    }).eq('id', product.id);
+  }
+
+  Future<void> softDeleteProduct(String productId) async {
+    final deletedStatus = await _client
+        .from('product_statuses')
+        .select('id')
+        .eq('slug', 'deleted')
+        .eq('is_active', true)
+        .single();
+
+    await _client
+        .from('products')
+        .update({'status_id': deletedStatus['id']})
+        .eq('id', productId);
+  }
+
   Future<Product> fetchProductById(String productId) async {
     final row = await _client
         .from('products')
