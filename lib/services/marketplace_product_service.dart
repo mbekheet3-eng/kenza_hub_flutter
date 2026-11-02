@@ -133,6 +133,7 @@ class MarketplaceProductService {
   }
 
   Future<String> createProduct({
+    required String sellerProfileId,
     required String categorySlug,
     required String title,
     required String description,
@@ -146,8 +147,6 @@ class MarketplaceProductService {
     if (imageUrls.isEmpty) {
       throw ArgumentError('يجب إضافة صورة واحدة على الأقل');
     }
-    final sellerProfileId = await ensureSellerProfile();
-
     final category = await _client
         .from('categories')
         .select('id,parent_id')
