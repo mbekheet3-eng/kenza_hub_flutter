@@ -380,7 +380,7 @@ class SupabaseService {
       email: email,
       password: password,
       data: fullName != null ? {'full_name': fullName} : null,
-      emailRedirectTo: 'com.kenza.hub://login-callback/',
+      emailRedirectTo: 'com.kenza.hub://login-callback/auth-callback',
     );
     return {'user': response.user, 'session': response.session};
   }
