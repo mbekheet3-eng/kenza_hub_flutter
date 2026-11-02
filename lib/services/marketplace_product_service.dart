@@ -305,6 +305,35 @@ class MarketplaceProductService {
         .toList(growable: false);
   }
 
+  /// Loads every active listing in bounded pages for complete catalogue search.
+  /// This avoids silently searching only the first 40/100 newest products.
+  Future<List<Product>> fetchAllActiveProducts({int pageSize = 100}) async {
+    if (pageSize < 1 || pageSize > 500) {
+      throw ArgumentError.value(pageSize, 'pageSize', 'Must be between 1 and 500');
+    }
+
+    final products = <Product>[];
+    var offset = 0;
+    while (true) {
+      final rows = await _client
+          .from('products')
+          .select(_productSelect)
+          .eq('status.slug', 'active')
+          .order('created_at', ascending: false)
+          .range(offset, offset + pageSize - 1);
+
+      final page = (rows as List)
+          .map((row) => Product.fromJson(Map<String, dynamic>.from(row as Map)))
+          .toList(growable: false);
+      products.addAll(page);
+
+      if (page.length < pageSize) break;
+      offset += page.length;
+    }
+
+    return products;
+  }
+
   Future<List<Product>> fetchSellerProducts(
     String userId, {
     int limit = 100,
