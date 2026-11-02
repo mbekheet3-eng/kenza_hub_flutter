@@ -134,6 +134,9 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
     if (category == null) return;
     try {
       final rootSlug = await _catalogService.fetchRootCategorySlug(category);
+      if (rootSlug == null) {
+        throw StateError('Category root could not be resolved');
+      }
       if (!mounted) return;
       setState(() {
         _skipVariantFields = rootSlug == 'kids' || rootSlug == 'home';
