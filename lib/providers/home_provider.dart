@@ -56,7 +56,7 @@ class HomeProvider with ChangeNotifier {
       _error = null;
       notifyListeners();
 
-      _allProducts = await _productService.fetchActiveProducts();
+      _allProducts = await _productService.fetchAllActiveProducts();
 
       _applyFilters();
       _isLoading = false;
