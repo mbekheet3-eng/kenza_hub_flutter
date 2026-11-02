@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../models/product.dart';
 import '../../../config/theme.dart';
 import '../../../services/catalog_service.dart';
 
@@ -9,6 +8,7 @@ class StepDetails extends StatefulWidget {
   final String? initialCondition;
   final String? initialColor;
   final String? initialSize;
+  final bool skipVariantFields;
 
   const StepDetails({
     required this.onDataChanged,
@@ -16,6 +16,7 @@ class StepDetails extends StatefulWidget {
     required this.initialCondition,
     required this.initialColor,
     required this.initialSize,
+    required this.skipVariantFields,
   });
 
   @override
@@ -69,8 +70,7 @@ class _StepDetailsState extends State<StepDetails> {
 
   @override
   Widget build(BuildContext context) {
-    final isHomeCategory = widget.category != null &&
-        categorySkipFields[widget.category] == true;
+    final isHomeCategory = widget.skipVariantFields;
 
     return SingleChildScrollView(
       child: Column(
