@@ -107,21 +107,30 @@ class OrderTrackingProvider with ChangeNotifier {
     }
   }
 
+  int _loadRequestId = 0;
+
   Future<void> loadOrder(String orderId) async {
+    final requestId = ++_loadRequestId;
     _isLoading = true;
     _error = null;
+    _order = null;
     _timelineEvents = [];
     notifyListeners();
 
     try {
       final orderData = await _supabaseService.fetchOrderById(orderId);
+      if (requestId != _loadRequestId) return;
       _order = order_model.Order.fromJson(orderData);
       _buildTimeline(orderData['order_status_history']);
     } catch (e) {
-      _error = 'خطأ في تحميل الطلب: $e';
+      if (requestId == _loadRequestId) {
+        _error = 'خطأ في تحميل الطلب: $e';
+      }
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (requestId == _loadRequestId) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
