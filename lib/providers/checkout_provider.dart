@@ -92,9 +92,9 @@ class CheckoutProvider with ChangeNotifier {
   // Order submission remains disabled until the server-side agreement RPC is ready.
   bool get canProceed => false;
 
-  // ✅ FIXED D6: Load addresses from Supabase instead of hardcoded
-  // NOTE: This is a temporary implementation.
-  // TODO: Implement proper addresses table in Supabase when ready
+  // Addresses are read from the existing user_addresses table.
+  // Address creation and editing remain unavailable until secure write operations
+  // are defined for region_id and the approved delivery coverage.
   Future<void> loadAddresses() async {
     _isLoading = true;
     _error = null;
