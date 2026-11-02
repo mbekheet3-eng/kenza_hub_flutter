@@ -53,11 +53,10 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
     }
 
     final productProvider = context.watch<ProductProvider>();
-    final userId = authProvider.userId!;
 
-    var products = productProvider.products
-        .where((p) => p.userId == userId)
-        .toList();
+    // loadUserProducts already scopes results to the member's active seller
+    // profile. Filtering by owner_user_id here would hide listings from staff.
+    var products = productProvider.products.toList();
 
     // Apply filter
     if (_filterStatus != 'all') {
