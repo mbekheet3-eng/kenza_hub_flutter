@@ -1,7 +1,7 @@
 // App Constants
 abstract class AppConstants {
   // App info
-  static const String appName = 'كينزا هب';
+  static const String appName = 'كنزة هب';
   static const String appVersion = '1.0.0';
   static const String appBuildNumber = '1';
 
@@ -10,7 +10,7 @@ abstract class AppConstants {
   static const int imageQuality = 80;
   static const int imageMaxHeight = 1920;
   static const int imageMaxWidth = 1080;
-  static const int maxImageFileSize = 52428800; // 50MB
+  static const int maxImageFileSize = 10485760; // 10MB
 
   // Pagination
   static const int defaultPageSize = 20;
@@ -49,14 +49,14 @@ abstract class CategoryConstants {
   static const Map<String, String> categoryLabels = {
     'clothes': 'ملابس',
     'shoes': 'أحذية',
-    'kids': 'ملابس أطفال',
-    'home': 'منزل وأثاث',
+    'kids': 'مستلزمات أطفال',
+    'home': 'مستلزمات المنزل',
   };
 
   static const Map<String, bool> categorySkipFields = {
     'clothes': false,
     'shoes': false,
-    'kids': false,
+    'kids': true,
     'home': true,
   };
 }
@@ -64,10 +64,12 @@ abstract class CategoryConstants {
 // Condition Constants
 abstract class ConditionConstants {
   static const List<String> conditions = [
-    'مستخدم نادراً - Like New',
-    'مستخدم بحالة جيدة - Good',
-    'مستخدم - Fair',
-    'للإصلاح - For Repair',
+    'جديد بالبطاقة',
+    'جديد بدون بطاقة',
+    'ممتاز - مستخدم نادراً',
+    'جيد - مستخدم بعناية',
+    'مقبول - به آثار استخدام',
+    'للتصليح أو القطع',
   ];
 }
 
@@ -76,8 +78,7 @@ abstract class SizeConstants {
   static const Map<String, List<String>> sizesByCategory = {
     'clothes': ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
     'shoes': ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45'],
-    'kids': ['2Y', '3Y', '4Y', '5Y', '6Y', '7Y', '8Y', '9Y', '10Y', '12Y'],
-  };
+      };
 
   static const Map<String, String> sizeTranslations = {
     'XS': 'إكس سمول',
@@ -105,6 +106,10 @@ abstract class ColorConstants {
     'وردي',
     'بني',
     'متعدد الألوان',
+    'بيج',
+    'ذهبي',
+    'فضي',
+    'أخرى',
   ];
 }
 
@@ -131,10 +136,10 @@ abstract class OrderStatusConstants {
 
 // Routing Constants
 abstract class RoutingConstants {
-  static const String home = '/';
+  static const String home = '/home';
   static const String login = '/login';
-  static const String signup = '/signup';
-  static const String sell = '/sell';
+  static const String signup = '/sign-up';
+  static const String sell = '/sell-wizard';
   static const String search = '/search';
   static const String productDetail = '/product/:id';
   static const String profile = '/profile';
