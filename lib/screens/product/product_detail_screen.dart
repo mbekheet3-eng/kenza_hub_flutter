@@ -56,6 +56,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Future<void> _toggleFavorite() async {
+    final productId = widget.productId;
     final userId = context.read<AuthProvider>().userId;
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -69,8 +70,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     setState(() => _isFavoriteLoading = true);
     final succeeded = await context
         .read<ProductProvider>()
-        .toggleFavorite(widget.productId, userId);
-    if (!mounted) return;
+        .toggleFavorite(productId, userId);
+    if (!mounted || productId != widget.productId) return;
 
     setState(() {
       if (succeeded) _isFavorite = !_isFavorite;
