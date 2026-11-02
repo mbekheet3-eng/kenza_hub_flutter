@@ -110,7 +110,7 @@ class ProductProvider extends ChangeNotifier {
 
   Future<void> getProductsByCategory(String category) async {
     await _run(() async {
-      final all = await _productService.fetchActiveProducts(limit: 100);
+      final all = await _productService.fetchAllActiveProducts();
       _products = all
           .where((product) => product.category == category)
           .toList(growable: false);
