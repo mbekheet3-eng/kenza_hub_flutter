@@ -163,6 +163,7 @@ class ProductProvider extends ChangeNotifier {
 
   void clearProducts() {
     _productRequestId++;
+    _isLoading = false;
     _products = [];
     _currentProduct = null;
     _error = null;
