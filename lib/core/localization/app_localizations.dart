@@ -24,6 +24,10 @@ class AppLocalizations {
     final savedLanguage = preferences.getString(_localePreferenceKey);
     if (savedLanguage != null) {
       setLocale(savedLanguage, persist: false);
+    } else {
+      final deviceLanguage =
+          WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+      setLocale(deviceLanguage, persist: false);
     }
   }
 
