@@ -74,8 +74,8 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
               useMaterial3: true,
               colorScheme: const ColorScheme.light(
-                primary: Color(0xFF0F172A),
-                secondary: Color(0xFFC85A32),
+                primary: Color(0xFFC62828),
+                secondary: Color(0xFF0F172A),
               ),
             ),
             routerConfig: goRouter,
