@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/product_provider.dart';
+import '../../models/product.dart';
 import '../../providers/auth_provider.dart';
 import '../../config/theme.dart';
 
@@ -352,7 +353,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
     );
   }
 
-  void _showProductOptions(BuildContext context, dynamic product) {
+  void _showProductOptions(BuildContext context, Product product) {
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
@@ -365,7 +366,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
               title: const Text('تعديل'),
               onTap: () {
                 Navigator.pop(context);
-                _showEditUnavailable();
+                _showEditDialog(product);
               },
             ),
             ListTile(
@@ -391,19 +392,112 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
   }
 
   void _toggleProductVisibility(String productId) {
+    // The current database contract has a soft-delete state, but no verified
+    // paused/inactive state. Do not map "pause listing" to permanent deletion.
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('إيقاف العرض مؤقتاً غير متاح حالياً. لم يتم تغيير حالة المنتج.'),
+        content: Text(
+          'إيقاف العرض مؤقتاً غير متاح حتى يتم اعتماد حالة الإيقاف في قاعدة البيانات.',
+        ),
       ),
     );
   }
 
-  void _showEditUnavailable() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('تعديل بيانات المنتج غير متاح حالياً. لم يتم تغيير المنتج.'),
+  Future<void> _showEditDialog(Product product) async {
+    final titleController = TextEditingController(text: product.title);
+    final descriptionController =
+        TextEditingController(text: product.description);
+    final priceController =
+        TextEditingController(text: product.price.toStringAsFixed(2));
+
+    final shouldSave = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('تعديل بيانات المنتج'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                textInputAction: TextInputAction.next,
+                decoration: const InputDecoration(labelText: 'اسم المنتج'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: descriptionController,
+                minLines: 3,
+                maxLines: 5,
+                decoration: const InputDecoration(labelText: 'الوصف'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: priceController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(labelText: 'السعر بالجنيه'),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final price = double.tryParse(
+                priceController.text.trim().replaceAll(',', '.'),
+              );
+              if (titleController.text.trim().isEmpty ||
+                  descriptionController.text.trim().isEmpty ||
+                  price == null ||
+                  !price.isFinite ||
+                  price <= 0) {
+                ScaffoldMessenger.of(dialogContext).showSnackBar(
+                  const SnackBar(
+                    content: Text('أدخل الاسم والوصف وسعراً صحيحاً أكبر من صفر.'),
+                  ),
+                );
+                return;
+              }
+              Navigator.pop(dialogContext, true);
+            },
+            child: const Text('حفظ التعديلات'),
+          ),
+        ],
       ),
     );
+
+    if (shouldSave == true && mounted) {
+      final price = double.parse(
+        priceController.text.trim().replaceAll(',', '.'),
+      );
+      final updated = product.copyWith(
+        title: titleController.text.trim(),
+        description: descriptionController.text.trim(),
+        price: price,
+      );
+      final succeeded =
+          await context.read<ProductProvider>().updateProduct(updated);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            succeeded
+                ? 'تم تحديث بيانات المنتج'
+                : context.read<ProductProvider>().error ??
+                    'تعذر تحديث المنتج. حاول مرة أخرى.',
+          ),
+        ),
+      );
+    }
+
+    titleController.dispose();
+    descriptionController.dispose();
+    priceController.dispose();
   }
 
   void _deleteProduct(String productId) {
