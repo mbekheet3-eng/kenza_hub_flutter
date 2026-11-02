@@ -317,7 +317,7 @@ class ProductImage {
       imageUrl: json['image_url'] as String, // ✅ FIXED: snake_case
       localPath: json['local_path'] as String? ?? '',
       order: (json['display_order'] as num?)?.toInt() ?? 0,
-      createdAt: DateTime.parse(json['created_at'] as String), // ✅ FIXED: snake_case
+      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ?? DateTime.now(),
     );
   }
 
@@ -325,7 +325,8 @@ class ProductImage {
         'product_id': productId,
         'image_url': imageUrl,
         'display_order': order,
-      };}
+      };
+}
 
 // Size translations for Arabic market
 const Map<String, String> sizeTranslations = {
@@ -340,10 +341,12 @@ const Map<String, String> sizeTranslations = {
 
 // Condition options
 const List<String> conditionOptions = [
-  'مستخدم نادراً - Like New',
-  'مستخدم بحالة جيدة - Good',
-  'مستخدم - Fair',
-  'للإصلاح - For Repair',
+  'جديد بالبطاقة',
+  'جديد بدون بطاقة',
+  'ممتاز - مستخدم نادراً',
+  'جيد - مستخدم بعناية',
+  'مقبول - به آثار استخدام',
+  'للتصليح أو القطع',
 ];
 
 // Category mappings
