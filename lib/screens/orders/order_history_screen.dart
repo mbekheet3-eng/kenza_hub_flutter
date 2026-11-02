@@ -24,14 +24,14 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     _loadOrders();
   }
 
-  void _loadOrders() {
+  void _loadOrders({bool force = false}) {
     final userId = context.read<AuthProvider>().userId;
     if (userId == null) {
       _loadedUserId = null;
       _ordersFuture = null;
       return;
     }
-    if (_loadedUserId == userId && _ordersFuture != null) return;
+    if (!force && _loadedUserId == userId && _ordersFuture != null) return;
 
     _loadedUserId = userId;
     _ordersFuture = _supabaseService.getUserOrders(
@@ -89,7 +89,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      setState(_loadOrders);
+                      setState(() => _loadOrders(force: true));
                     },
                     child: const Text('إعادة محاولة'),
                   ),
