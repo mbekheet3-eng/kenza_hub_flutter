@@ -5,6 +5,7 @@ import 'package:kenza_hub_flutter/config/app_colors.dart';
 import 'package:kenza_hub_flutter/config/app_radius.dart';
 import 'package:kenza_hub_flutter/config/app_spacing.dart';
 import 'package:kenza_hub_flutter/providers/auth_provider.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -183,15 +184,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Forgot Password
                   Align(
-                    alignment: Alignment.centerRight,
+                    alignment: AlignmentDirectional.centerEnd,
                     child: TextButton(
-                      onPressed: () {
-                        // TODO: Implement forgot password screen
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('سيتم تفعيل استرجاع كلمة المرور قريباً')),
-                        );
-                      },
-                      child: const Text('هل نسيت كلمة المرور؟'),
+                      onPressed: () => context.push('/forgot-password'),
+                      child: Text(AppLocalizations.of(context).forgotPassword),
                     ),
                   ),
 
