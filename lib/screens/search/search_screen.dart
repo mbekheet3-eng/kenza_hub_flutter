@@ -266,8 +266,10 @@ class _SearchScreenState extends State<SearchScreen> {
                     label: Text(categoryLabels[category] ?? category),
                     selected: _selectedCategory == category,
                     onSelected: (selected) {
-                      setState(() =>
-                          _selectedCategory = selected ? category : 'all');
+                      setState(() {
+                        _selectedCategory = selected ? category : 'all';
+                        _selectedCategoryId = null;
+                      });
                     },
                     backgroundColor: Colors.transparent,
                     selectedColor: AppTheme.primaryColor.withOpacity(0.2),
