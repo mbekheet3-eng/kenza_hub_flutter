@@ -70,14 +70,33 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
   }
 
-  bool _requireSignIn() {
-    if (context.read<AuthProvider>().isSignedIn) return true;
+  bool _canPurchase(Product product) {
+    final authProvider = context.read<AuthProvider>();
+    if (!authProvider.isSignedIn) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('سجّل الدخول أولاً للشراء وإضافة المنتجات إلى السلة'),
+        ),
+      );
+      context.push('/login');
+      return false;
+    }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('سجّل الدخول أولاً للشراء وإضافة المنتجات إلى السلة')),
-    );
-    context.push('/login');
-    return false;
+    if (!product.isAvailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('هذا المنتج غير متاح حالياً')),
+      );
+      return false;
+    }
+
+    if (product.userId == authProvider.userId) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('لا يمكنك شراء منتج قمت بعرضه بنفسك')),
+      );
+      return false;
+    }
+
+    return true;
   }
 
   @override
@@ -175,7 +194,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () => _addToCart(context, product),
+                      onPressed: product.isAvailable
+                          ? () => _addToCart(context, product)
+                          : null,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         backgroundColor: AppTheme.primaryColor,
@@ -192,7 +213,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(
-                      onPressed: () => _buyNow(context, product),
+                      onPressed: product.isAvailable
+                          ? () => _buyNow(context, product)
+                          : null,
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         side: BorderSide(color: AppTheme.primaryColor),
@@ -467,7 +490,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   void _addToCart(BuildContext context, Product product) {
-    if (!_requireSignIn()) return;
+    if (!_canPurchase(product)) return;
 
     context.read<CartProvider>().addItem(
       productId: product.id,
