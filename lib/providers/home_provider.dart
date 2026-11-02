@@ -29,6 +29,11 @@ class HomeProvider with ChangeNotifier {
     'مستلزمات المنزل': 'home',
     'ملابس': 'clothes',
     'أحذية': 'shoes',
+    // Accept database slugs from home category cards as well as Arabic labels.
+    'kids': 'kids',
+    'home': 'home',
+    'clothes': 'clothes',
+    'shoes': 'shoes',
   };
 
   // Getters
