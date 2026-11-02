@@ -27,6 +27,33 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!context.watch<AuthProvider>().isSignedIn) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('إتمام الطلب')),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.lock_outline, size: 48),
+                const SizedBox(height: AppSpacing.md),
+                const Text(
+                  'سجّل الدخول أولاً لمتابعة الشراء',
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                ElevatedButton(
+                  onPressed: () => context.push('/login'),
+                  child: const Text('تسجيل الدخول'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('إتمام الطلب'),
