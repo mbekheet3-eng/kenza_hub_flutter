@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppLocalizations {
   final Locale locale;
@@ -14,9 +15,19 @@ class AppLocalizations {
   static final ValueNotifier<Locale> localeNotifier =
       ValueNotifier<Locale>(const Locale('ar'));
 
+  static const String _localePreferenceKey = 'kenza_hub_locale';
+
   static Locale get currentLocale => localeNotifier.value;
 
-  static void setLocale(String languageCode) {
+  static Future<void> initialize() async {
+    final preferences = await SharedPreferences.getInstance();
+    final savedLanguage = preferences.getString(_localePreferenceKey);
+    if (savedLanguage != null) {
+      setLocale(savedLanguage, persist: false);
+    }
+  }
+
+  static void setLocale(String languageCode, {bool persist = true}) {
     final locale = supportedLocales.firstWhere(
       (supportedLocale) =>
           supportedLocale.languageCode == languageCode,
@@ -25,6 +36,14 @@ class AppLocalizations {
 
     if (localeNotifier.value.languageCode != locale.languageCode) {
       localeNotifier.value = locale;
+    }
+    if (persist) {
+      SharedPreferences.getInstance().then(
+        (preferences) => preferences.setString(
+          _localePreferenceKey,
+          locale.languageCode,
+        ),
+      );
     }
   }
 
