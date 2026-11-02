@@ -538,6 +538,79 @@ class AppLocalizations {
         return 'ج.م';
     }
   }
+
+  String get forgotPassword {
+    switch (locale.languageCode) {
+      case 'en': return 'Forgot password?';
+      case 'fr': return 'Mot de passe oublié ?';
+      case 'ar':
+      default: return 'هل نسيت كلمة المرور؟';
+    }
+  }
+
+  String get resetPasswordTitle {
+    switch (locale.languageCode) {
+      case 'en': return 'Reset password';
+      case 'fr': return 'Réinitialiser le mot de passe';
+      case 'ar':
+      default: return 'استعادة كلمة المرور';
+    }
+  }
+
+  String get resetPasswordSubtitle {
+    switch (locale.languageCode) {
+      case 'en': return 'Enter your email and we will send you a password reset link.';
+      case 'fr': return 'Saisissez votre e-mail pour recevoir un lien de réinitialisation.';
+      case 'ar':
+      default: return 'اكتب بريدك الإلكتروني وسنرسل لك رابطًا لاستعادة كلمة المرور.';
+    }
+  }
+
+  String get sendResetLink {
+    switch (locale.languageCode) {
+      case 'en': return 'Send reset link';
+      case 'fr': return 'Envoyer le lien';
+      case 'ar':
+      default: return 'إرسال رابط الاستعادة';
+    }
+  }
+
+  String get resetEmailSent {
+    switch (locale.languageCode) {
+      case 'en': return 'If this email is registered, a password reset link has been sent.';
+      case 'fr': return 'Si cette adresse est enregistrée, un lien de réinitialisation a été envoyé.';
+      case 'ar':
+      default: return 'إذا كان البريد مسجلاً، فسيصلك رابط استعادة كلمة المرور.';
+    }
+  }
+
+  String get backToLogin {
+    switch (locale.languageCode) {
+      case 'en': return 'Back to log in';
+      case 'fr': return 'Retour à la connexion';
+      case 'ar':
+      default: return 'العودة لتسجيل الدخول';
+    }
+  }
+
+  String get invalidEmail {
+    switch (locale.languageCode) {
+      case 'en': return 'Enter a valid email address';
+      case 'fr': return 'Saisissez une adresse e-mail valide';
+      case 'ar':
+      default: return 'أدخل بريدًا إلكترونيًا صحيحًا';
+    }
+  }
+
+  String get emailRequired {
+    switch (locale.languageCode) {
+      case 'en': return 'Email is required';
+      case 'fr': return 'L’adresse e-mail est obligatoire';
+      case 'ar':
+      default: return 'البريد الإلكتروني مطلوب';
+    }
+  }
+
 }
 
 class _AppLocalizationsDelegate
