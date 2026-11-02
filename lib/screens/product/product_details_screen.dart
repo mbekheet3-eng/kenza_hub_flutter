@@ -143,7 +143,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  '${product.rating} (${product.reviewCount ?? 0} تقييم)',
+                                  product.reviewCount > 0
+                                      ? '${product.rating} (${product.reviewCount} تقييم)'
+                                      : 'لا توجد تقييمات بعد',
                                   style: TextStyle(
                                     color: Colors.grey[600],
                                     fontSize: 14,
