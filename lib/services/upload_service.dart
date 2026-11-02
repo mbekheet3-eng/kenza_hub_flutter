@@ -129,7 +129,7 @@ class UploadService {
       return _detectFileExtensionFromHeader(File(filePath));
     } catch (e) {
       print('Extension detection failed: $e');
-      return '.jpg'; // Default fallback
+      throw const FormatException('Only JPEG, PNG and WebP images are supported');
     }
   }
 
@@ -150,10 +150,6 @@ class UploadService {
             bytes.length >= 4 &&
             bytes[3] == 0x47) {
           return '.png';
-        }
-        // GIF: 47 49 46
-        if (bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46) {
-          return '.gif';
         }
         // WebP: RIFF ... WEBP
         if (bytes[0] == 0x52 &&
@@ -177,7 +173,7 @@ class UploadService {
 
   /// Validate image extension
   bool _isValidImageExtension(String ext) {
-    const validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
     return validExtensions.contains(ext.toLowerCase());
   }
 
@@ -190,12 +186,10 @@ class UploadService {
         return 'image/jpeg';
       case '.png':
         return 'image/png';
-      case '.gif':
-        return 'image/gif';
       case '.webp':
         return 'image/webp';
       default:
-        return 'image/jpeg';
+        throw const FormatException('Unsupported image format');
     }
   }
 
@@ -213,13 +207,19 @@ class UploadService {
       if (fileSize == 0) {
         throw Exception('File is empty');
       }
-      if (fileSize > 50 * 1024 * 1024) {
-        throw Exception('File size exceeds 50MB limit');
+      if (fileSize > 10 * 1024 * 1024) {
+        throw Exception('حجم الصورة يتجاوز الحد المسموح 10 ميجابايت');
       }
 
       // 3. Generate remote path
-      final remoteFileName =
-          customPath ?? '${const Uuid().v4()}_${DateTime.now().millisecondsSinceEpoch}';
+      final userId = _client.auth.currentUser?.id;
+      if (userId == null) throw StateError('يجب تسجيل الدخول لرفع الصور');
+      final generatedName =
+          '${const Uuid().v4()}_${DateTime.now().millisecondsSinceEpoch}${_getFileExtension(imageFile.path)}';
+      final remoteFileName = customPath ?? 'products/$userId/$generatedName';
+      if (!remoteFileName.startsWith('products/$userId/')) {
+        throw StateError('مسار رفع الصورة غير مسموح لهذا الحساب');
+      }
 
       // 4. Upload to Supabase
       await _client.storage.from(bucketName).uploadBinary(
@@ -245,20 +245,10 @@ class UploadService {
     try {
       final uploadedUrls = <String>[];
 
-      for (int i = 0; i < imageFiles.length; i++) {
-        try {
-          final url = await uploadImage(imageFiles[i]);
-          uploadedUrls.add(url);
-        } catch (e) {
-          print('Failed to upload image ${i + 1}: $e');
-          // Continue with next image
-        }
+      for (final imageFile in imageFiles) {
+        final url = await uploadImage(imageFile);
+        uploadedUrls.add(url);
       }
-
-      if (uploadedUrls.isEmpty) {
-        throw Exception('Failed to upload any images');
-      }
-
       return uploadedUrls;
     } catch (e) {
       throw Exception('Failed to upload images: $e');
@@ -280,8 +270,13 @@ class UploadService {
 
       onProgress(0.3); // Simulated preparation progress
 
+      final userId = _client.auth.currentUser?.id;
+      if (userId == null) throw StateError('يجب تسجيل الدخول لرفع الصور');
+      if (fileBytes.length > 10 * 1024 * 1024) {
+        throw Exception('حجم الصورة يتجاوز الحد المسموح 10 ميجابايت');
+      }
       final remoteFileName =
-          '${const Uuid().v4()}_${DateTime.now().millisecondsSinceEpoch}';
+          'products/$userId/${const Uuid().v4()}_${DateTime.now().millisecondsSinceEpoch}${_getFileExtension(imageFile.path)}';
 
       await _client.storage.from(bucketName).uploadBinary(
             remoteFileName,
@@ -309,9 +304,16 @@ class UploadService {
   /// Delete image from Supabase
   Future<void> deleteImage(String imageUrl) async {
     try {
-      // Extract filename from URL
-      final fileName = imageUrl.split('/').last.split('?').first;
-      await _client.storage.from(bucketName).remove([fileName]);
+      final uri = Uri.parse(imageUrl);
+      final marker = '/storage/v1/object/public/$bucketName/';
+      final markerIndex = uri.path.indexOf(marker);
+      if (markerIndex < 0) {
+        throw FormatException('Invalid product image URL');
+      }
+      final objectPath = Uri.decodeComponent(
+        uri.path.substring(markerIndex + marker.length),
+      );
+      await _client.storage.from(bucketName).remove([objectPath]);
     } catch (e) {
       throw Exception('Failed to delete image: $e');
     }
