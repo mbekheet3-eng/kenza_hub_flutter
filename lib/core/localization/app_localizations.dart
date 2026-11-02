@@ -668,6 +668,36 @@ class AppLocalizations {
 
   String get or => _localized('OR', 'OU', 'أو');
 
+  String get tryChangeFilters => _localized(
+        'Try changing your filters or search',
+        'Essayez de modifier les filtres ou la recherche',
+        'حاول تغيير المرشحات أو البحث',
+      );
+
+  String get clearFilters => _localized(
+        'Clear filters',
+        'Effacer les filtres',
+        'إزالة المرشحات',
+      );
+
+  String get tryAgain => _localized(
+        'Try again',
+        'Réessayer',
+        'حاول مجدداً',
+      );
+
+  String get available => _localized(
+        'Available',
+        'Disponible',
+        'متوفر',
+      );
+
+  String get soldOut => _localized(
+        'Unavailable',
+        'Indisponible',
+        'غير متوفر',
+      );
+
   String _localized(String english, String french, String arabic) {
     switch (locale.languageCode) {
       case 'en':
