@@ -458,9 +458,6 @@ class _SearchScreenState extends State<SearchScreen> {
                       fontSize: 11,
                     ),
                   ),
-
-                    ],
-                  ),
                 ],
               ),
             ),
