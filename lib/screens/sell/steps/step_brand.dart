@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 
 import '../../../config/theme.dart';
-import '../../../models/product.dart';
 import '../../../services/catalog_service.dart';
 
 class StepBrand extends StatefulWidget {
   final Function(String?) onBrandSelected;
   final String? selectedBrand;
   final String? category;
+  final bool skipVariantFields;
 
   const StepBrand({
     super.key,
     required this.onBrandSelected,
     required this.selectedBrand,
     required this.category,
+    required this.skipVariantFields,
   });
 
   @override
@@ -58,8 +59,7 @@ class _StepBrandState extends State<StepBrand> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.category == null ||
-        categorySkipFields[widget.category] == true) {
+    if (widget.category == null || widget.skipVariantFields) {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(16),
