@@ -144,7 +144,7 @@ class _StepImagesState extends State<StepImages> {
           if (_selectedImages.isNotEmpty) const SizedBox(height: 16),
 
           // Add images button
-          if (_selectedImages.length < 8)
+          if (_selectedImages.isNotEmpty && _selectedImages.length < 8)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(24),
