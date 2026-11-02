@@ -108,7 +108,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     String? newlyUploadedAvatarUrl;
     try {
-      String? newAvatarUrl = _currentUserProfile!.avatarUrl;
+      final oldAvatarUrl = _currentUserProfile!.avatarUrl;
+      String? newAvatarUrl = oldAvatarUrl;
 
       // Upload new avatar if selected
       if (_selectedImage != null) {
@@ -131,6 +132,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       // Update using SupabaseService
       await SupabaseService().updateProfile(updatedUser);
+
+      if (newlyUploadedAvatarUrl != null &&
+          oldAvatarUrl != null &&
+          oldAvatarUrl != newlyUploadedAvatarUrl) {
+        try {
+          await UploadService().deleteImage(oldAvatarUrl);
+        } catch (_) {
+          // A stale or externally hosted avatar must not fail profile saving.
+        }
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
