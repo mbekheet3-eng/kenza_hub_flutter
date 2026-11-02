@@ -181,7 +181,7 @@ class MarketplaceProductService {
     if (sizeLabel != null && sizeLabel.isNotEmpty) {
       final sizes = await _client
           .from('product_sizes')
-          .select('id,label_ar,label_en,category_id')
+          .select('id,slug,label_ar,label_en,category_id')
           .eq('is_active', true);
       final allowedCategoryIds = {categoryId, if (parentId != null) parentId};
       final matchingSizes = (sizes as List).where((row) {
@@ -207,6 +207,9 @@ class MarketplaceProductService {
           .eq('name', brandName.trim())
           .maybeSingle();
       brandId = brand?['id'] as String?;
+      if (brandId == null) {
+        throw StateError('العلامة التجارية المختارة غير موجودة في القائمة المعتمدة');
+      }
     }
 
     final productPayload = <String, dynamic>{
@@ -224,8 +227,6 @@ class MarketplaceProductService {
       if (colorId != null) 'color_id': colorId,
       if (sizeId != null) 'size_id': sizeId,
       if (brandId != null) 'brand_id': brandId,
-      if (brandName != null && brandName.trim().isNotEmpty)
-        'brand': brandName.trim(),
     };
 
     final created = await _client
