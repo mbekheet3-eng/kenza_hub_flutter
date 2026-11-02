@@ -19,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
+  bool _isRedirecting = false;
 
   @override
   void dispose() {
@@ -36,10 +37,33 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (success && mounted) {
-      context.go('/home');
+      _redirectToHome();
     } else if (!mounted) return;
 
     if (authProvider.error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(authProvider.error!),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _redirectToHome() {
+    if (_isRedirecting || !mounted) return;
+    _isRedirecting = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.go('/home');
+    });
+  }
+
+  Future<void> _handleSocialSignIn(
+    AuthProvider authProvider,
+    Future<bool> Function() signIn,
+  ) async {
+    final launched = await signIn();
+    if (!launched && mounted && authProvider.error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(authProvider.error!),
@@ -61,6 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {
+          if (authProvider.isSignedIn) _redirectToHome();
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: Form(
@@ -243,6 +268,31 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       Expanded(child: Divider(color: Colors.grey[300])),
                     ],
+                  ),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Social sign-in
+                  OutlinedButton.icon(
+                    onPressed: authProvider.isLoading
+                        ? null
+                        : () => _handleSocialSignIn(
+                              authProvider,
+                              authProvider.signInWithGoogle,
+                            ),
+                    icon: const Icon(Icons.g_mobiledata, size: 28),
+                    label: const Text('المتابعة باستخدام Google'),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  OutlinedButton.icon(
+                    onPressed: authProvider.isLoading
+                        ? null
+                        : () => _handleSocialSignIn(
+                              authProvider,
+                              authProvider.signInWithApple,
+                            ),
+                    icon: const Icon(Icons.phone_iphone),
+                    label: const Text('المتابعة باستخدام Apple'),
                   ),
 
                   const SizedBox(height: AppSpacing.lg),
