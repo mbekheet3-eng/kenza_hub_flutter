@@ -77,33 +77,95 @@ class Product {
   // Review count display
   int get reviewCount => rating != null ? (rating! * 20).toInt() : 0; // Estimate
 
+  static Map<String, dynamic>? _relation(
+    Map<String, dynamic> json,
+    String key,
+  ) {
+    final value = json[key];
+    if (value is Map) return Map<String, dynamic>.from(value);
+    if (value is List && value.isNotEmpty && value.first is Map) {
+      return Map<String, dynamic>.from(value.first as Map);
+    }
+    return null;
+  }
+
   factory Product.fromJson(Map<String, dynamic> json) {
+    final categoryData = _relation(json, 'category') ??
+        _relation(json, 'categories');
+    final conditionData = _relation(json, 'condition') ??
+        _relation(json, 'product_conditions');
+    final colorData = _relation(json, 'color') ??
+        _relation(json, 'product_colors');
+    final sizeData = _relation(json, 'size') ??
+        _relation(json, 'product_sizes');
+    final statusData = _relation(json, 'status') ??
+        _relation(json, 'product_statuses');
+    final sellerData = _relation(json, 'seller') ??
+        _relation(json, 'seller_profiles');
+
+    final rawImages = json['images'] ?? json['product_images'];
+    final imageRows = rawImages is List ? rawImages : const [];
+    final sortedImages = imageRows
+        .whereType<Map>()
+        .map((row) => Map<String, dynamic>.from(row))
+        .toList()
+      ..sort((a, b) =>
+          ((a['display_order'] as num?)?.toInt() ?? 0).compareTo(
+            (b['display_order'] as num?)?.toInt() ?? 0,
+          ));
+    final imageUrls = sortedImages
+        .map((row) => row['image_url'])
+        .whereType<String>()
+        .toList();
+
+    final statusSlug = statusData?['slug'] as String? ?? 'active';
+    final sellerProfileId = json['seller_id'] as String?;
+
     return Product(
       id: json['id'] as String,
-      userId: json['user_id'] as String, // ✅ FIXED: snake_case
-      title: json['title'] as String,
-      description: json['description'] as String,
-      price: (json['price'] as num).toDouble(),
-      category: json['category'] as String,
-      subcategory: json['subcategory'] as String?,
-      condition: json['condition'] as String,
-      color: json['color'] as String?,
-      size: json['size'] as String?,
+      userId: sellerData?['owner_user_id'] as String? ??
+          sellerProfileId ??
+          '',
+      title: json['title_ar'] as String? ??
+          json['title_en'] as String? ??
+          json['title'] as String? ??
+          '',
+      description: json['description_ar'] as String? ??
+          json['description_en'] as String? ??
+          json['description'] as String? ??
+          '',
+      price: (json['price'] as num?)?.toDouble() ?? 0,
+      category: categoryData?['slug'] as String? ??
+          json['category'] as String? ??
+          '',
+      subcategory: categoryData?['parent_id'] as String? ??
+          json['subcategory'] as String?,
+      condition: conditionData?['label_ar'] as String? ??
+          json['condition'] as String? ??
+          '',
+      color: colorData?['label_ar'] as String? ??
+          json['color'] as String?,
+      size: sizeData?['label_ar'] as String? ?? json['size'] as String?,
       brand: json['brand'] as String?,
-      imageUrls: List<String>.from(json['image_urls'] as List<dynamic>? ?? []), // ✅ FIXED: snake_case
-      imagePaths: List<String>.from(json['image_paths'] as List<dynamic>? ?? []), // ✅ FIXED: snake_case
-      views: json['views'] as int? ?? 0,
-      likes: json['likes'] as int? ?? 0,
+      imageUrls: imageUrls.isNotEmpty
+          ? imageUrls
+          : List<String>.from(json['image_urls'] as List? ?? const []),
+      imagePaths: List<String>.from(json['image_paths'] as List? ?? const []),
+      views: (json['views_count'] as num?)?.toInt() ??
+          (json['views'] as num?)?.toInt() ??
+          0,
+      likes: (json['likes'] as num?)?.toInt() ?? 0,
       rating: (json['rating'] as num?)?.toDouble(),
-      isActive: json['is_active'] as bool? ?? true, // ✅ FIXED: snake_case
-      createdAt: DateTime.parse(json['created_at'] as String), // ✅ FIXED: snake_case
-      updatedAt: DateTime.parse(json['updated_at'] as String), // ✅ FIXED: snake_case
-      latitude: (json['latitude'] as num?)?.toDouble(),
-      longitude: (json['longitude'] as num?)?.toDouble(),
-      location: json['location'] as String?,
-      isSold: json['is_sold'] as bool? ?? false, // ✅ FIXED: snake_case
-      sellerName: json['seller_name'] as String?, // ✅ FIXED: snake_case
-      sellerAvatar: json['seller_avatar'] as String?, // ✅ FIXED: snake_case
+      isActive: statusSlug == 'active',
+      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ??
+          DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
+          DateTime.now(),
+      isSold: statusSlug == 'sold',
+      sellerName: sellerData?['display_name'] as String? ??
+          json['seller_name'] as String?,
+      sellerAvatar: sellerData?['avatar_url'] as String? ??
+          json['seller_avatar'] as String?,
     );
   }
 
@@ -217,8 +279,8 @@ class ProductImage {
       id: json['id'] as String,
       productId: json['product_id'] as String, // ✅ FIXED: snake_case
       imageUrl: json['image_url'] as String, // ✅ FIXED: snake_case
-      localPath: json['local_path'] as String, // ✅ FIXED: snake_case
-      order: json['order_index'] as int, // ✅ FIXED: match DB column name
+      localPath: json['local_path'] as String? ?? '',
+      order: (json['display_order'] as num?)?.toInt() ?? 0,
       createdAt: DateTime.parse(json['created_at'] as String), // ✅ FIXED: snake_case
     );
   }
@@ -228,8 +290,7 @@ class ProductImage {
       'id': id,
       'product_id': productId, // ✅ FIXED: snake_case
       'image_url': imageUrl, // ✅ FIXED: snake_case
-      'local_path': localPath, // ✅ FIXED: snake_case
-      'order_index': order, // ✅ FIXED: match DB column name
+      'display_order': order,
       'created_at': createdAt.toIso8601String(), // ✅ FIXED: snake_case
     };
   }
@@ -258,13 +319,13 @@ const List<String> conditionOptions = [
 const Map<String, String> categoryTranslations = {
   'clothes': 'ملابس',
   'shoes': 'أحذية',
-  'kids': 'ملابس أطفال',
-  'home': 'منزل وأثاث',
+  'kids': 'مستلزمات أطفال',
+  'home': 'مستلزمات المنزل',
 };
 
 const Map<String, bool> categorySkipFields = {
   'clothes': false,
   'shoes': false,
-  'kids': false,
+  'kids': true,
   'home': true, // Skip size, color, brand for home category
 };
