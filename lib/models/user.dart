@@ -5,6 +5,7 @@ class User {
   final String? phone;
   final String? avatarUrl;
   final String? bio;
+  /// Maps to users.city in the current schema.
   final String? location;
   final double? latitude;
   final double? longitude;
@@ -43,55 +44,61 @@ class User {
     this.lastSeenAt,
   });
 
+  static DateTime _date(dynamic value) =>
+      DateTime.tryParse(value?.toString() ?? '') ?? DateTime.now();
+
   factory User.fromJson(Map<String, dynamic> json) {
+    final firstName = (json['first_name'] as String?)?.trim() ?? '';
+    final lastName = (json['last_name'] as String?)?.trim() ?? '';
+    final username = (json['username'] as String?)?.trim();
+    final fullName = [firstName, lastName]
+        .where((part) => part.isNotEmpty)
+        .join(' ');
+
     return User(
       id: json['id'] as String,
-      email: json['email'] as String,
-      displayName: json['display_name'] as String?, // ✅ FIXED: snake_case
+      email: json['email'] as String? ?? '',
+      displayName: username?.isNotEmpty == true
+          ? username
+          : (fullName.isNotEmpty ? fullName : null),
       phone: json['phone'] as String?,
-      avatarUrl: json['avatar_url'] as String?, // ✅ FIXED: snake_case
+      avatarUrl: json['avatar_url'] as String?,
       bio: json['bio'] as String?,
-      location: json['location'] as String?,
-      latitude: (json['latitude'] as num?)?.toDouble(),
-      longitude: (json['longitude'] as num?)?.toDouble(),
+      location: json['city'] as String?,
       rating: (json['rating'] as num?)?.toDouble() ?? 0,
-      totalReviews: json['total_reviews'] as int? ?? 0, // ✅ FIXED: snake_case
-      productsCount: json['products_count'] as int? ?? 0, // ✅ FIXED: snake_case
-      followersCount: json['followers_count'] as int? ?? 0, // ✅ FIXED: snake_case
-      isVerified: json['is_verified'] as bool? ?? false, // ✅ FIXED: snake_case
-      isPhoneVerified: json['is_phone_verified'] as bool? ?? false, // ✅ FIXED: snake_case
-      preferredLanguage: json['preferred_language'] as String? ?? 'ar', // ✅ FIXED: snake_case
-      notificationsEnabled: json['notifications_enabled'] as bool? ?? true, // ✅ FIXED: snake_case
-      createdAt: DateTime.parse(json['created_at'] as String), // ✅ FIXED: snake_case
-      updatedAt: DateTime.parse(json['updated_at'] as String), // ✅ FIXED: snake_case
-      lastSeenAt: json['last_seen_at'] == null
-          ? null
-          : DateTime.parse(json['last_seen_at'] as String), // ✅ FIXED: snake_case
+      totalReviews: 0,
+      productsCount: (json['total_products'] as num?)?.toInt() ?? 0,
+      followersCount: (json['total_followers'] as num?)?.toInt() ?? 0,
+      isVerified: json['is_verified'] as bool? ?? false,
+      isPhoneVerified: json['phone_verified'] as bool? ?? false,
+      preferredLanguage: json['language_preference'] as String? ??
+          json['language'] as String? ??
+          'ar',
+      notificationsEnabled: json['notifications_enabled'] as bool? ?? true,
+      createdAt: _date(json['created_at']),
+      updatedAt: _date(json['updated_at']),
     );
   }
 
+  /// Fields that a member may edit on their own users row.
+  /// Never sends role, account status, verification, balances, or identifiers.
   Map<String, dynamic> toJson() {
+    final nameParts = (displayName ?? '').trim().split(RegExp(r'\s+'));
+    final firstName = nameParts.isEmpty || nameParts.first.isEmpty
+        ? null
+        : nameParts.first;
+    final lastName =
+        nameParts.length > 1 ? nameParts.skip(1).join(' ') : null;
+
     return {
-      'id': id,
-      'email': email,
-      'display_name': displayName, // ✅ FIXED: snake_case
+      if (firstName != null) 'first_name': firstName,
+      if (lastName != null) 'last_name': lastName,
       'phone': phone,
-      'avatar_url': avatarUrl, // ✅ FIXED: snake_case
+      'avatar_url': avatarUrl,
       'bio': bio,
-      'location': location,
-      'latitude': latitude,
-      'longitude': longitude,
-      'rating': rating,
-      'total_reviews': totalReviews, // ✅ FIXED: snake_case
-      'products_count': productsCount, // ✅ FIXED: snake_case
-      'followers_count': followersCount, // ✅ FIXED: snake_case
-      'is_verified': isVerified, // ✅ FIXED: snake_case
-      'is_phone_verified': isPhoneVerified, // ✅ FIXED: snake_case
-      'preferred_language': preferredLanguage, // ✅ FIXED: snake_case
-      'notifications_enabled': notificationsEnabled, // ✅ FIXED: snake_case
-      'created_at': createdAt.toIso8601String(), // ✅ FIXED: snake_case
-      'updated_at': updatedAt.toIso8601String(), // ✅ FIXED: snake_case
-      'last_seen_at': lastSeenAt?.toIso8601String(), // ✅ FIXED: snake_case
+      'city': location,
+      'language_preference': preferredLanguage,
+      'notifications_enabled': notificationsEnabled,
     };
   }
 
@@ -134,7 +141,8 @@ class User {
       isVerified: isVerified ?? this.isVerified,
       isPhoneVerified: isPhoneVerified ?? this.isPhoneVerified,
       preferredLanguage: preferredLanguage ?? this.preferredLanguage,
-      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      notificationsEnabled:
+          notificationsEnabled ?? this.notificationsEnabled,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       lastSeenAt: lastSeenAt ?? this.lastSeenAt,
@@ -148,6 +156,7 @@ class UserProfile {
   final String? bio;
   final String? avatarUrl;
   final String? location;
+  final String? phone;
 
   UserProfile({
     required this.userId,
@@ -155,25 +164,31 @@ class UserProfile {
     this.bio,
     this.avatarUrl,
     this.location,
+    this.phone,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
+    final firstName = (json['first_name'] as String?) ?? '';
+    final lastName = (json['last_name'] as String?) ?? '';
     return UserProfile(
-      userId: json['user_id'] as String, // ✅ FIXED: snake_case
-      displayName: json['display_name'] as String?, // ✅ FIXED: snake_case
+      userId: json['id'] as String,
+      displayName: [firstName, lastName].where((s) => s.isNotEmpty).join(' '),
       bio: json['bio'] as String?,
-      avatarUrl: json['avatar_url'] as String?, // ✅ FIXED: snake_case
-      location: json['location'] as String?,
+      avatarUrl: json['avatar_url'] as String?,
+      location: json['city'] as String?,
+      phone: json['phone'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
+    final parts = (displayName ?? '').trim().split(RegExp(r'\s+'));
     return {
-      'user_id': userId, // ✅ FIXED: snake_case
-      'display_name': displayName, // ✅ FIXED: snake_case
-      'bio': bio,
-      'avatar_url': avatarUrl, // ✅ FIXED: snake_case
-      'location': location,
+      if (parts.isNotEmpty && parts.first.isNotEmpty) 'first_name': parts.first,
+      if (parts.length > 1) 'last_name': parts.skip(1).join(' '),
+      if (bio != null) 'bio': bio,
+      if (avatarUrl != null) 'avatar_url': avatarUrl,
+      if (location != null) 'city': location,
+      if (phone != null) 'phone': phone,
     };
   }
 }
