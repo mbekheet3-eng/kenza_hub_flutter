@@ -40,13 +40,18 @@ class _StepDetailsState extends State<StepDetails> {
     'بنفسجي',
     'وردي',
     'بني',
+    'كحلي',
+    'بيج',
+    'ذهبي',
+    'فضي',
     'متعدد الألوان',
+    'أخرى',
   ];
 
   final Map<String, List<String>> sizes = {
-    'clothes': ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    'clothes': ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'One Size'],
     'shoes': ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45'],
-    'kids': ['2Y', '3Y', '4Y', '5Y', '6Y', '7Y', '8Y', '9Y', '10Y', '12Y'],
+    'kids': ['0-3 Months', '3-6 Months', '6-12 Months', '1-2 Years', '2-3 Years', '4-5 Years', '6-7 Years', '8-9 Years', '10-11 Years', '12-13 Years', '14-15 Years'],
   };
 
   @override
