@@ -91,6 +91,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _saveProfile() async {
+    final displayName = _nameController.text.trim();
+    if (displayName.length < 3) {
+      _showError('الاسم يجب أن يكون 3 أحرف على الأقل');
+      return;
+    }
     if (_currentUserProfile == null) {
       _showError('بيانات المستخدم غير متاحة');
       return;
@@ -101,24 +106,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _errorMessage = null;
     });
 
+    String? newlyUploadedAvatarUrl;
     try {
       String? newAvatarUrl = _currentUserProfile!.avatarUrl;
 
       // Upload new avatar if selected
       if (_selectedImage != null) {
         final uploadService = UploadService();
-        newAvatarUrl = await uploadService.uploadProfileImage(
+        newlyUploadedAvatarUrl = await uploadService.uploadProfileImage(
           _selectedImage!,
           _currentUserProfile!.id,
         );
+        newAvatarUrl = newlyUploadedAvatarUrl;
       }
 
       // Create updated user object with new values
       final updatedUser = _currentUserProfile!.copyWith(
-        displayName: _nameController.text,
-        bio: _bioController.text,
-        location: _locationController.text,
-        phone: _phoneController.text,
+        displayName: displayName,
+        bio: _bioController.text.trim(),
+        location: _locationController.text.trim(),
+        phone: _phoneController.text.trim(),
         avatarUrl: newAvatarUrl,
       );
 
@@ -135,6 +142,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         context.pop();
       }
     } catch (e) {
+      if (newlyUploadedAvatarUrl != null) {
+        try {
+          await UploadService().deleteImage(newlyUploadedAvatarUrl);
+        } catch (_) {
+          // Keep the original profile update error if cleanup also fails.
+        }
+      }
       _showError('فشل حفظ الملف الشخصي: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
