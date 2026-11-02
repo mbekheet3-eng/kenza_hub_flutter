@@ -70,15 +70,15 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     final productProvider = context.watch<ProductProvider>();
     var products = productProvider.products;
+    final searchTerm = _searchController.text.trim().toLowerCase();
 
     // Apply filters
     products = products.where((p) {
       // Search filter
-      if (_searchController.text.isNotEmpty) {
-        if (!p.title.toLowerCase().contains(_searchController.text.trim().toLowerCase()) &&
-            !p.description.toLowerCase().contains(_searchController.text.trim().toLowerCase())) {
-          return false;
-        }
+      if (searchTerm.isNotEmpty &&
+          !p.title.toLowerCase().contains(searchTerm) &&
+          !p.description.toLowerCase().contains(searchTerm)) {
+        return false;
       }
 
       // Category filter
