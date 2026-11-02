@@ -103,10 +103,12 @@ class CheckoutProvider with ChangeNotifier {
     try {
       final rows = await _addressService.fetchCurrentUserAddresses();
       _addresses = rows.map(Address.fromJson).toList(growable: false);
-      _selectedAddress = _addresses.cast<Address?>().firstWhere(
-            (address) => address?.isDefault == true,
-            orElse: () => _addresses.isNotEmpty ? _addresses.first : null,
-          );
+      _selectedAddress = _addresses.isEmpty
+          ? null
+          : _addresses.firstWhere(
+              (address) => address.isDefault,
+              orElse: () => _addresses.first,
+            );
     } catch (e) {
       _addresses = [];
       _selectedAddress = null;
