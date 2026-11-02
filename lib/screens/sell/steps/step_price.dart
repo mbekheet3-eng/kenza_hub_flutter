@@ -68,12 +68,12 @@ class _StepPriceState extends State<StepPrice> {
               ),
             ),
             onChanged: (value) {
-              try {
-                final price = double.parse(value);
-                _updatePrice(price);
-              } catch (e) {
-                // Invalid input, ignore
-              }
+              final parsedPrice = double.tryParse(value.trim());
+              _updatePrice(
+                parsedPrice != null && parsedPrice.isFinite && parsedPrice > 0
+                    ? parsedPrice
+                    : 0,
+              );
             },
           ),
 
