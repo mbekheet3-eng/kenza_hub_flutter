@@ -78,7 +78,8 @@ class SupabaseService {
       return matchesQuery && matchesCategory && matchesMin && matchesMax;
     }).toList(growable: false);
     if (offset >= filtered.length) return const [];
-    final end = (offset + limit).clamp(0, filtered.length);
+    final requestedEnd = offset + limit;
+    final end = requestedEnd < filtered.length ? requestedEnd : filtered.length;
     return filtered.sublist(offset, end);
   }
 
