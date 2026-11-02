@@ -22,6 +22,108 @@ class MarketplaceProductService {
     images:product_images!product_images_product_id_fkey(image_url,display_order,created_at)
   ''';
 
+  Future<String> ensureSellerProfile() async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) {
+      throw StateError('يجب تسجيل الدخول قبل البيع');
+    }
+
+        // Resolve the active seller profile through the member table. An auth
+        // user ID is never written into products.seller_id.
+        final memberships = await _client
+            .from('seller_profile_members')
+            .select('seller_profile_id,member_role,revoked_at')
+            .eq('user_id', userId)
+            .limit(2);
+    
+        String? sellerProfileId;
+        final membershipRows = List<Map<String, dynamic>>.from(
+          (memberships as List).map((row) => Map<String, dynamic>.from(row as Map)),
+        );
+    
+        if (membershipRows.isNotEmpty) {
+          final activeMemberships = membershipRows
+              .where((row) => row['revoked_at'] == null)
+              .toList();
+          if (activeMemberships.length != 1) {
+            throw StateError(
+              'عضوية المتجر غير نشطة أو غير محددة؛ لا يمكن نشر المنتج.',
+            );
+          }
+          final membership = activeMemberships.single;
+          if (membership['member_role'] != 'owner') {
+            throw StateError(
+              'نشر المنتجات للموظفين سيُفعّل بعد اكتمال صلاحيات الموظفين المعتمدة.',
+            );
+          }
+          sellerProfileId = membership['seller_profile_id'] as String?;
+        } else {
+          final existingProfile = await _client
+              .from('seller_profiles')
+              .select('id')
+              .eq('owner_user_id', userId)
+              .maybeSingle();
+          if (existingProfile != null) {
+            throw StateError(
+              'يوجد ملف متجر لهذا الحساب دون عضوية مالك سليمة؛ يلزم فحصه قبل النشر.',
+            );
+          }
+    
+          // The approved Edge Function creates the default seller profile and
+          // owner membership atomically. Never insert either table from Flutter.
+          final userProfile = await _client
+              .from('users')
+              .select('first_name,last_name,username,phone')
+              .eq('id', userId)
+              .single();
+          final username = (userProfile['username'] as String?)?.trim() ?? '';
+          final fullName = [
+            (userProfile['first_name'] as String?)?.trim() ?? '',
+            (userProfile['last_name'] as String?)?.trim() ?? '',
+          ].where((part) => part.isNotEmpty).join(' ');
+          final displayName = username.isNotEmpty ? username : fullName;
+          if (displayName.length < 3) {
+            throw StateError(
+              'أكمل اسمك في الملف الشخصي قبل إنشاء ملف البائع.',
+            );
+          }
+    
+          final phone = (userProfile['phone'] as String?)?.trim();
+          final functionResponse = await _client.functions.invoke(
+            'seller-profile-create',
+            body: {
+              'display_name': displayName,
+              if (phone != null && phone.isNotEmpty) 'phone': phone,
+            },
+          );
+          final responseData = functionResponse.data;
+          if (responseData is Map) {
+            sellerProfileId = responseData['seller_profile_id'] as String?;
+          }
+          if (sellerProfileId == null) {
+            throw StateError(
+              'تعذر إنشاء ملف البائع من المسار المعتمد؛ حاول مرة أخرى أو تواصل مع الدعم.',
+            );
+          }
+        }
+    
+        if (sellerProfileId == null) {
+          throw StateError('لا يوجد ملف بائع نشط لهذا الحساب');
+        }
+    
+        final sellerProfile = await _client
+            .from('seller_profiles')
+            .select('id,is_active')
+            .eq('id', sellerProfileId)
+            .single();
+        if (sellerProfile['is_active'] != true) {
+          throw StateError('ملف البائع غير نشط حالياً');
+        }
+    
+    
+    return sellerProfileId;
+  }
+
   Future<String> createProduct({
     required String categorySlug,
     required String title,
@@ -33,104 +135,9 @@ class MarketplaceProductService {
     String? brandName,
     required List<String> imageUrls,
   }) async {
-    final userId = _client.auth.currentUser?.id;
-    if (userId == null) {
-      throw StateError('يجب تسجيل الدخول قبل نشر المنتج');
-    }
+    final sellerProfileId = await ensureSellerProfile();
     if (imageUrls.isEmpty) {
       throw ArgumentError('يجب إضافة صورة واحدة على الأقل');
-    }
-
-    // Resolve the active seller profile through the member table. An auth
-    // user ID is never written into products.seller_id.
-    final memberships = await _client
-        .from('seller_profile_members')
-        .select('seller_profile_id,member_role,revoked_at')
-        .eq('user_id', userId)
-        .limit(2);
-
-    String? sellerProfileId;
-    final membershipRows = List<Map<String, dynamic>>.from(
-      (memberships as List).map((row) => Map<String, dynamic>.from(row as Map)),
-    );
-
-    if (membershipRows.isNotEmpty) {
-      final activeMemberships = membershipRows
-          .where((row) => row['revoked_at'] == null)
-          .toList();
-      if (activeMemberships.length != 1) {
-        throw StateError(
-          'عضوية المتجر غير نشطة أو غير محددة؛ لا يمكن نشر المنتج.',
-        );
-      }
-      final membership = activeMemberships.single;
-      if (membership['member_role'] != 'owner') {
-        throw StateError(
-          'نشر المنتجات للموظفين سيُفعّل بعد اكتمال صلاحيات الموظفين المعتمدة.',
-        );
-      }
-      sellerProfileId = membership['seller_profile_id'] as String?;
-    } else {
-      final existingProfile = await _client
-          .from('seller_profiles')
-          .select('id')
-          .eq('owner_user_id', userId)
-          .maybeSingle();
-      if (existingProfile != null) {
-        throw StateError(
-          'يوجد ملف متجر لهذا الحساب دون عضوية مالك سليمة؛ يلزم فحصه قبل النشر.',
-        );
-      }
-
-      // The approved Edge Function creates the default seller profile and
-      // owner membership atomically. Never insert either table from Flutter.
-      final userProfile = await _client
-          .from('users')
-          .select('first_name,last_name,username,phone')
-          .eq('id', userId)
-          .single();
-      final username = (userProfile['username'] as String?)?.trim() ?? '';
-      final fullName = [
-        (userProfile['first_name'] as String?)?.trim() ?? '',
-        (userProfile['last_name'] as String?)?.trim() ?? '',
-      ].where((part) => part.isNotEmpty).join(' ');
-      final displayName = username.isNotEmpty ? username : fullName;
-      if (displayName.length < 3) {
-        throw StateError(
-          'أكمل اسمك في الملف الشخصي قبل إنشاء ملف البائع.',
-        );
-      }
-
-      final phone = (userProfile['phone'] as String?)?.trim();
-      final functionResponse = await _client.functions.invoke(
-        'seller-profile-create',
-        body: {
-          'display_name': displayName,
-          if (phone != null && phone.isNotEmpty) 'phone': phone,
-        },
-      );
-      final responseData = functionResponse.data;
-      if (responseData is Map) {
-        sellerProfileId = responseData['seller_profile_id'] as String?;
-      }
-      if (sellerProfileId == null) {
-        throw StateError(
-          'تعذر إنشاء ملف البائع من المسار المعتمد؛ حاول مرة أخرى أو تواصل مع الدعم.',
-        );
-      }
-    }
-
-    if (sellerProfileId == null) {
-      throw StateError('لا يوجد ملف بائع نشط لهذا الحساب');
-    }
-
-    final sellerProfile = await _client
-        .from('seller_profiles')
-        .select('id,is_active')
-        .eq('id', sellerProfileId)
-        .single();
-    if (sellerProfile['is_active'] != true) {
-      throw StateError('ملف البائع غير نشط حالياً');
     }
 
     final category = await _client
