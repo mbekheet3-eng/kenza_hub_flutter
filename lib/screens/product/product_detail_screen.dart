@@ -454,18 +454,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   void _addToCart(BuildContext context, Product product) {
     if (!_canPurchase(product)) return;
 
-    context.read<CartProvider>().addItem(
+    final added = context.read<CartProvider>().addItem(
       productId: product.id,
       title: product.title,
       price: product.price,
       imageUrl: product.imageUrl,
       quantity: 1,
     );
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('تمت إضافة المنتج إلى السلة'),
-        backgroundColor: Colors.green,
+        content: Text(
+          added ? 'تمت إضافة المنتج إلى السلة' : 'هذا المنتج موجود بالفعل في السلة',
+        ),
+        backgroundColor: added ? Colors.green : Colors.blueGrey,
         duration: const Duration(seconds: 2),
       ),
     );
