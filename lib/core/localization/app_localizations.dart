@@ -611,6 +611,74 @@ class AppLocalizations {
     }
   }
 
+
+  String get passwordRequired => _localized(
+        'Password is required',
+        'Le mot de passe est obligatoire',
+        'كلمة المرور مطلوبة',
+      );
+
+  String get passwordMinLength => _localized(
+        'Password must be at least 6 characters',
+        'Le mot de passe doit contenir au moins 6 caractères',
+        'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
+      );
+
+  String get nameRequired => _localized(
+        'Full name is required',
+        'Le nom complet est obligatoire',
+        'الاسم الكامل مطلوب',
+      );
+
+  String get nameMinLength => _localized(
+        'Name must be at least 3 characters',
+        'Le nom doit contenir au moins 3 caractères',
+        'الاسم يجب أن يكون 3 أحرف على الأقل',
+      );
+
+  String get confirmPasswordRequired => _localized(
+        'Please confirm your password',
+        'Veuillez confirmer votre mot de passe',
+        'تأكيد كلمة المرور مطلوب',
+      );
+
+  String get passwordsDoNotMatch => _localized(
+        'Passwords do not match',
+        'Les mots de passe ne correspondent pas',
+        'كلمات المرور غير متطابقة',
+      );
+
+  String get termsRequired => _localized(
+        'You must agree to the terms and conditions',
+        'Vous devez accepter les conditions générales',
+        'يجب أن توافق على الشروط والأحكام',
+      );
+
+  String get continueWithGoogle => _localized(
+        'Continue with Google',
+        'Continuer avec Google',
+        'المتابعة باستخدام Google',
+      );
+
+  String get continueWithApple => _localized(
+        'Continue with Apple',
+        'Continuer avec Apple',
+        'المتابعة باستخدام Apple',
+      );
+
+  String get or => _localized('OR', 'OU', 'أو');
+
+  String _localized(String english, String french, String arabic) {
+    switch (locale.languageCode) {
+      case 'en':
+        return english;
+      case 'fr':
+        return french;
+      case 'ar':
+      default:
+        return arabic;
+    }
+  }
 }
 
 class _AppLocalizationsDelegate
