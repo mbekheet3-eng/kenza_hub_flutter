@@ -25,11 +25,24 @@ class ProductProvider extends ChangeNotifier {
     }, 'فشل تحميل المنتجات');
   }
 
+  int _productRequestId = 0;
+
   Future<void> getProduct(String productId) async {
+    final requestId = ++_productRequestId;
     _currentProduct = null;
-    await _run(() async {
-      _currentProduct = await _productService.fetchProductById(productId);
-    }, 'فشل تحميل المنتج');
+    _setLoading(true);
+    try {
+      final product = await _productService.fetchProductById(productId);
+      if (requestId != _productRequestId) return;
+      _currentProduct = product;
+      _error = null;
+    } catch (e) {
+      if (requestId == _productRequestId) {
+        _error = 'فشل تحميل المنتج: $e';
+      }
+    } finally {
+      if (requestId == _productRequestId) _setLoading(false);
+    }
   }
 
   Future<void> loadUserProducts(String userId) async {
@@ -149,6 +162,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   void clearProducts() {
+    _productRequestId++;
     _products = [];
     _currentProduct = null;
     _error = null;
