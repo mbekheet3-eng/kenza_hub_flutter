@@ -40,7 +40,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(AppLocalizations.of(context).passwordsDoNotMatch),
           backgroundColor: Colors.red,
         ),
@@ -50,7 +50,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     if (!_agreeToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(AppLocalizations.of(context).termsRequired),
           backgroundColor: Colors.red,
         ),
