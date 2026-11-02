@@ -85,26 +85,15 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          provider.simulateStatusUpdate();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 12,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppSpacing.md),
-                          ),
+                      Container(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.06),
+                          borderRadius: BorderRadius.circular(AppSpacing.md),
                         ),
                         child: const Text(
-                          'تحديث الحالة',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                          'تحديثات حالة الطلب تظهر هنا من سجل النظام المعتمد.',
+                          textAlign: TextAlign.center,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.sm),
