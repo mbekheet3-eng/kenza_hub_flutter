@@ -22,9 +22,11 @@ void main() async {
       url: 'https://qvqfzujvcnmquohieevl.supabase.co',
       anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2cWZ6dWp2Y25tcXVvaGllZXZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3Nzk5NzUsImV4cCI6MjA5NzM1NTk3NX0.MWKerHrby4y9Ok6TRixR05dB7OtQlZYq0BurZmMCDFg',
     );
-    print('✅ Supabase initialized successfully');
+    debugPrint('Supabase initialized successfully');
   } catch (e) {
-    print('❌ Supabase initialization failed: $e');
+    debugPrint('Supabase initialization failed: $e');
+    runApp(SupabaseInitializationErrorApp(message: e.toString()));
+    return;
   }
 
   try {
@@ -33,6 +35,45 @@ void main() async {
     debugPrint('Could not restore saved language: $e');
   }
   runApp(const MyApp());
+}
+
+class SupabaseInitializationErrorApp extends StatelessWidget {
+  final String message;
+
+  const SupabaseInitializationErrorApp({super.key, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.cloud_off_outlined, size: 52),
+                const SizedBox(height: 16),
+                const Text(
+                  'تعذر الاتصال بإعدادات الخدمة',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(message, textAlign: TextAlign.center),
+                const SizedBox(height: 16),
+                const Text(
+                  'أغلق التطبيق وافتحه مرة أخرى. إذا استمرت المشكلة، راجع إعدادات Supabase.',
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {
