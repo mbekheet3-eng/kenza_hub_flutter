@@ -112,6 +112,9 @@ class Product {
   factory Product.fromJson(Map<String, dynamic> json) {
     final categoryData = _relation(json, 'category') ??
         _relation(json, 'categories');
+    final parentCategoryData = categoryData == null
+        ? null
+        : _relation(categoryData, 'parent');
     final conditionData = _relation(json, 'condition') ??
         _relation(json, 'product_conditions');
     final colorData = _relation(json, 'color') ??
@@ -155,7 +158,9 @@ class Product {
           json['description'] as String? ??
           '',
       price: (json['price'] as num?)?.toDouble() ?? 0,
-      category: categoryData?['slug'] as String? ??
+      // Home filtering uses the top-level category when this is a child category.
+      category: parentCategoryData?['slug'] as String? ??
+          categoryData?['slug'] as String? ??
           json['category'] as String? ??
           '',
       subcategory: categoryData?['parent_id'] as String? ??
