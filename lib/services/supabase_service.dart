@@ -380,12 +380,16 @@ class SupabaseService {
       email: email,
       password: password,
       data: fullName != null ? {'full_name': fullName} : null,
+      emailRedirectTo: 'com.kenza.hub://login-callback/',
     );
     return {'user': response.user, 'session': response.session};
   }
 
   Future<void> resetPassword(String email) =>
-      _client.auth.resetPasswordForEmail(email);
+      _client.auth.resetPasswordForEmail(
+        email,
+        redirectTo: 'com.kenza.hub://reset-password/',
+      );
 
   Future<void> signOut() => _client.auth.signOut();
 }
