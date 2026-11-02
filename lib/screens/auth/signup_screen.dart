@@ -90,6 +90,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
     AuthProvider authProvider,
     Future<bool> Function() signIn,
   ) async {
+    if (!_agreeToTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context).termsRequired),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     final launched = await signIn();
     if (!launched && mounted && authProvider.error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
