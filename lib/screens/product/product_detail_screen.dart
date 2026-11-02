@@ -89,9 +89,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       return Scaffold(
         appBar: AppBar(title: const Text('تفاصيل المنتج')),
         body: Center(
-          child: CircularProgressIndicator(
-            color: AppTheme.primaryColor,
-          ),
+          child: productProvider.isLoading
+              ? CircularProgressIndicator(color: AppTheme.primaryColor)
+              : Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.error_outline, size: 48),
+                      const SizedBox(height: 12),
+                      Text(
+                        productProvider.error ?? 'تعذر تحميل بيانات المنتج',
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      ElevatedButton(
+                        onPressed: _loadProduct,
+                        child: const Text('إعادة المحاولة'),
+                      ),
+                    ],
+                  ),
+                ),
         ),
       );
     }
