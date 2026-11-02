@@ -59,15 +59,6 @@ class ProductDetailsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Load product variants
-  Future<void> _loadVariants(String productId) async {
-    try {
-      _variants = await _supabaseService.fetchProductVariants(productId);
-      print('✅ Loaded ${_variants.length} variants');
-    } catch (e) {
-      print('⚠️ Error loading variants: $e');
-    }
-  }
 
   // Select size
   void selectSize(String size) {
