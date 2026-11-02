@@ -41,13 +41,8 @@ class AuthService {
         throw Exception('Sign up failed: User is null');
       }
 
-      // Create user profile in database
-      await _createUserProfile(
-        userId: user.id,
-        email: email,
-        fullName: fullName,
-      );
-
+      // The database handle_new_user trigger creates public.users.
+      // Do not insert into a separate legacy profiles table.
       return user.id;
     } catch (e) {
       print('❌ Sign up error: $e');
@@ -116,12 +111,15 @@ class AuthService {
   }) async {
     try {
       final client = SupabaseService.client;
-      await client.from('profiles').update({
-        if (fullName != null) 'full_name': fullName,
+      final nameParts = (fullName ?? '').trim().split(RegExp(r'\\s+'));
+      await client.from('users').update({
+        if (fullName != null && nameParts.isNotEmpty)
+          'first_name': nameParts.first,
+        if (fullName != null)
+          'last_name': nameParts.length > 1 ? nameParts.skip(1).join(' ') : '',
         if (phone != null) 'phone': phone,
         if (bio != null) 'bio': bio,
-        if (profileImage != null) 'profile_image': profileImage,
-        'updated_at': DateTime.now().toIso8601String(),
+        if (profileImage != null) 'avatar_url': profileImage,
       }).eq('id', userId);
     } catch (e) {
       print('❌ Error updating profile: $e');
@@ -150,23 +148,4 @@ class AuthService {
     }
   }
 
-  /// Private method to create user profile
-  Future<void> _createUserProfile({
-    required String userId,
-    required String email,
-    required String fullName,
-  }) async {
-    try {
-      final client = SupabaseService.client;
-      await client.from('profiles').insert({
-        'id': userId,
-        'email': email,
-        'full_name': fullName,
-        'created_at': DateTime.now().toIso8601String(),
-      });
-    } catch (e) {
-      print('❌ Error creating user profile: $e');
-      // Don't throw here, profile might already exist
-    }
-  }
 }
