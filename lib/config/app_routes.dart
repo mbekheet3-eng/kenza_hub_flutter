@@ -193,6 +193,7 @@ class AppRoutes {
   static const String editProfile = '/edit-profile';
   static const String myProducts = '/my-products';
   static const String search = '/search';
+  static const String categories = '/categories';
   static const String settings = '/settings';
   static const String sellWizard = '/sell-wizard';
 }
