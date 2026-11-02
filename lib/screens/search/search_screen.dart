@@ -171,9 +171,16 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
 
             // Products Grid
-            products.isEmpty
-                ? _buildEmptyState()
-                : Padding(
+            productProvider.isLoading
+                ? const Padding(
+                    padding: EdgeInsets.all(40),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                : productProvider.error != null
+                    ? _buildErrorState(productProvider.error!)
+                    : products.isEmpty
+                        ? _buildEmptyState()
+                        : Padding(
                     padding: const EdgeInsets.all(12),
                     child: GridView.builder(
                       shrinkWrap: true,
@@ -340,6 +347,31 @@ class _SearchScreenState extends State<SearchScreen> {
         onChanged: (value) {
           setState(() => _sortBy = value ?? 'newest');
         },
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String message) {
+    return Padding(
+      padding: const EdgeInsets.all(32),
+      child: Center(
+        child: Column(
+          children: [
+            const Icon(Icons.error_outline, size: 56),
+            const SizedBox(height: 12),
+            Text(
+              'تعذر تحميل نتائج البحث',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            Text(message, textAlign: TextAlign.center),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: _loadAllProducts,
+              child: const Text('إعادة المحاولة'),
+            ),
+          ],
+        ),
       ),
     );
   }
