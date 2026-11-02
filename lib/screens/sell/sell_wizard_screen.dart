@@ -36,6 +36,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
   double _price = 0;
   bool _skipVariantFields = false;
   bool _isResolvingCategoryRules = false;
+  bool _categoryRulesResolved = false;
   int _categoryRulesRequestId = 0;
 
   final _productService = MarketplaceProductService();
@@ -126,6 +127,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
     setState(() {
       _category = category;
       _skipVariantFields = false;
+      _categoryRulesResolved = false;
       _isResolvingCategoryRules = category != null;
       // A category change invalidates previously selected lookup values.
       _brand = null;
@@ -143,11 +145,15 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
       if (!mounted || requestId != _categoryRulesRequestId) return;
       setState(() {
         _skipVariantFields = rootSlug == 'kids' || rootSlug == 'home';
+        _categoryRulesResolved = true;
         _isResolvingCategoryRules = false;
       });
     } catch (_) {
       if (mounted && requestId == _categoryRulesRequestId) {
-        setState(() => _isResolvingCategoryRules = false);
+        setState(() {
+          _categoryRulesResolved = false;
+          _isResolvingCategoryRules = false;
+        });
         _showError('تعذر تحديد قواعد القسم. حاول اختيار القسم مرة أخرى.');
       }
     }
@@ -187,7 +193,8 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
       case 1:
         return _category != null;
       case 2:
-        return !_isResolvingCategoryRules &&
+        return _categoryRulesResolved &&
+            !_isResolvingCategoryRules &&
             _condition != null &&
             (_skipVariantFields || (_color != null && _size != null));
       case 3:
@@ -267,6 +274,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
     return _selectedImages.isNotEmpty &&
         _category != null &&
         _condition != null &&
+        _categoryRulesResolved &&
         !_isResolvingCategoryRules &&
         (_skipVariantFields || (_color != null && _size != null)) &&
         _title.isNotEmpty &&
