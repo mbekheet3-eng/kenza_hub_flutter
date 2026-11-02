@@ -245,10 +245,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          if (checkoutProvider.addresses.isEmpty)
+          if (checkoutProvider.error != null)
+            Text(
+              checkoutProvider.error!,
+              style: TextStyle(color: Colors.red[700]),
+            )
+          else if (checkoutProvider.addresses.isEmpty)
             Center(
               child: Text(
-                'لا توجد عناوين مسجلة',
+                'لا توجد عناوين مسجلة لهذا الحساب',
                 style: TextStyle(color: Colors.grey[600]),
               ),
             )
