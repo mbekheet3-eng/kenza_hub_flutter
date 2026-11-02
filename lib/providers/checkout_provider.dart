@@ -119,15 +119,6 @@ class CheckoutProvider with ChangeNotifier {
     }
   }
 
-  // Add address
-  void addAddress(Address address) {
-    _addresses.add(address);
-    if (_addresses.length == 1) {
-      _selectedAddress = address;
-    }
-    notifyListeners();
-  }
-
   // Select address
   void selectAddress(Address address) {
     _selectedAddress = address;
