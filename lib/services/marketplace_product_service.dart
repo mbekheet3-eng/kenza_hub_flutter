@@ -320,6 +320,7 @@ class MarketplaceProductService {
           .select(_productSelect)
           .eq('status.slug', 'active')
           .order('created_at', ascending: false)
+          .order('id', ascending: true)
           .range(offset, offset + pageSize - 1);
 
       final page = (rows as List)
