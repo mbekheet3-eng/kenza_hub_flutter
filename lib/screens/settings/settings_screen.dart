@@ -10,10 +10,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _notificationsEnabled = true;
-  bool _emailNotifications = true;
-  bool _pushNotifications = true;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,31 +40,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const Divider(),
 
-            // Notifications Section
+            // Notification preferences are read-only until server persistence exists.
             _buildSectionHeader('الإشعارات'),
-            _buildSwitchTile(
+            _buildSettingsTile(
               icon: Icons.notifications_outlined,
-              title: 'تفعيل الإشعارات',
-              value: _notificationsEnabled,
-              onChanged: (value) =>
-                  _showUnavailableFeature('تفعيل الإشعارات'),
+              title: 'تفضيلات الإشعارات',
+              trailing: const Text('غير متاحة حالياً'),
             ),
-            if (_notificationsEnabled) ...[
-              _buildSwitchTile(
-                icon: Icons.mail_outline,
-                title: 'إشعارات البريد الإلكتروني',
-                value: _emailNotifications,
-                onChanged: (value) =>
-                    _showUnavailableFeature('إشعارات البريد الإلكتروني'),
-              ),
-              _buildSwitchTile(
-                icon: Icons.notifications_active_outlined,
-                title: 'الإشعارات الفورية',
-                value: _pushNotifications,
-                onChanged: (value) =>
-                    _showUnavailableFeature('الإشعارات الفورية'),
-              ),
-            ],
             const Divider(),
 
             // Privacy Section
@@ -159,24 +137,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       trailing: trailing,
       onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-    );
-  }
-
-  Widget _buildSwitchTile({
-    required IconData icon,
-    required String title,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: AppTheme.primaryColor),
-      title: Text(title),
-      trailing: Switch(
-        value: value,
-        onChanged: onChanged,
-        activeColor: AppTheme.primaryColor,
-      ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
     );
   }
