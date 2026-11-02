@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kenza_hub_flutter/models/product.dart';
-import 'package:kenza_hub_flutter/services/supabase_service.dart';
+import 'package:kenza_hub_flutter/services/marketplace_product_service.dart';
 
 class ProductDetailsProvider with ChangeNotifier {
-  final SupabaseService _supabaseService = SupabaseService();
+  final MarketplaceProductService _productService = MarketplaceProductService();
 
   // State
   Product? _product;
@@ -29,17 +29,15 @@ class ProductDetailsProvider with ChangeNotifier {
 
   // Get unique sizes and colors from variants
   Set<String> get availableSizes {
-    return _variants
-        .map((v) => v['size']?.toString() ?? '')
-        .where((s) => s.isNotEmpty)
-        .toSet();
+    final productSize = _product?.size;
+    if (productSize != null && productSize.isNotEmpty) return {productSize};
+    return _variants.map((v) => v['size']?.toString() ?? '').where((s) => s.isNotEmpty).toSet();
   }
 
   Set<String> get availableColors {
-    return _variants
-        .map((v) => v['color']?.toString() ?? '')
-        .where((c) => c.isNotEmpty)
-        .toSet();
+    final productColor = _product?.color;
+    if (productColor != null && productColor.isNotEmpty) return {productColor};
+    return _variants.map((v) => v['color']?.toString() ?? '').where((c) => c.isNotEmpty).toSet();
   }
 
   // Load product details
@@ -49,11 +47,8 @@ class ProductDetailsProvider with ChangeNotifier {
       _error = null;
       notifyListeners();
 
-      final productData = await _supabaseService.fetchProductById(productId);
-      _product = Product.fromJson(productData);
-
-      // Load variants
-      await _loadVariants(productId);
+      _product = await _productService.fetchProductById(productId);
+      _variants = [];
 
       _isLoading = false;
     } catch (e) {
