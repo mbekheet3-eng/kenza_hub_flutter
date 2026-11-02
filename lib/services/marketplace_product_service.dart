@@ -335,7 +335,26 @@ class MarketplaceProductService {
         .toList(growable: false);
   }
 
+  Future<void> _requireOwnerMembership() async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) {
+      throw StateError('يجب تسجيل الدخول أولاً');
+    }
+    final membership = await _client
+        .from('seller_profile_members')
+        .select('member_role')
+        .eq('user_id', userId)
+        .isFilter('revoked_at', null)
+        .maybeSingle();
+    if (membership == null || membership['member_role'] != 'owner') {
+      throw StateError(
+        'تعديل المنتجات وإخفاؤها متاحان لصاحب المتجر فقط حتى تكتمل صلاحيات الموظفين المعتمدة.',
+      );
+    }
+  }
+
   Future<void> updateProductDetails(Product product) async {
+    await _requireOwnerMembership();
     await _client.from('products').update({
       'title_ar': product.title,
       'title_en': product.title,
@@ -346,6 +365,7 @@ class MarketplaceProductService {
   }
 
   Future<void> softDeleteProduct(String productId) async {
+    await _requireOwnerMembership();
     final deletedStatus = await _client
         .from('product_statuses')
         .select('id')
