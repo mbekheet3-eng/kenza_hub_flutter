@@ -23,17 +23,36 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
   }
 
   Future<void> _loadProducts() async {
-    if (mounted) {
-      await context.read<ProductProvider>().loadUserProducts(
-        context.read<AuthProvider>().currentUser?.id ?? '',
-      );
-    }
+    if (!mounted) return;
+    final userId = context.read<AuthProvider>().userId;
+    if (userId == null) return;
+    await context.read<ProductProvider>().loadUserProducts(userId);
   }
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    if (!authProvider.isSignedIn || authProvider.userId == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('منتجاتي')),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('سجّل الدخول لعرض منتجاتك وإدارتها'),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => context.push('/login'),
+                child: const Text('تسجيل الدخول'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     final productProvider = context.watch<ProductProvider>();
-    final userId = context.read<AuthProvider>().currentUser?.id ?? '';
+    final userId = authProvider.userId!;
 
     var products = productProvider.products
         .where((p) => p.userId == userId)
