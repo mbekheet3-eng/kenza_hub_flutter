@@ -36,6 +36,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
   double _price = 0;
   bool _skipVariantFields = false;
   bool _isResolvingCategoryRules = false;
+  int _categoryRulesRequestId = 0;
 
   final _productService = MarketplaceProductService();
   final _catalogService = CatalogService();
@@ -121,6 +122,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
   }
 
   Future<void> _onCategorySelected(String? category) async {
+    final requestId = ++_categoryRulesRequestId;
     setState(() {
       _category = category;
       _skipVariantFields = false;
@@ -134,16 +136,17 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
     if (category == null) return;
     try {
       final rootSlug = await _catalogService.fetchRootCategorySlug(category);
+      if (!mounted || requestId != _categoryRulesRequestId) return;
       if (rootSlug == null) {
         throw StateError('Category root could not be resolved');
       }
-      if (!mounted) return;
+      if (!mounted || requestId != _categoryRulesRequestId) return;
       setState(() {
         _skipVariantFields = rootSlug == 'kids' || rootSlug == 'home';
         _isResolvingCategoryRules = false;
       });
     } catch (_) {
-      if (mounted) {
+      if (mounted && requestId == _categoryRulesRequestId) {
         setState(() => _isResolvingCategoryRules = false);
         _showError('تعذر تحديد قواعد القسم. حاول اختيار القسم مرة أخرى.');
       }
