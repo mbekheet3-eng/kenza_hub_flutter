@@ -329,7 +329,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
         const SizedBox(width: 8),
         Chip(
-          label: Text(product.category ?? ''),
+          label: Text(categoryTranslations[product.category] ?? product.category),
           backgroundColor: Colors.grey.withOpacity(0.2),
         ),
       ],
