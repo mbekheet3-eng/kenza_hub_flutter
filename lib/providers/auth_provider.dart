@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:kenza_hub_flutter/services/supabase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -10,6 +12,7 @@ class AuthProvider with ChangeNotifier {
   String? _error;
   User? _currentUser;
   bool _isSignedIn = false;
+  StreamSubscription<AuthState>? _authSubscription;
 
   // Getters
   bool get isLoading => _isLoading;
@@ -22,13 +25,56 @@ class AuthProvider with ChangeNotifier {
   // Constructor
   AuthProvider() {
     _checkCurrentUser();
+    _authSubscription =
+        SupabaseService.client.auth.onAuthStateChange.listen((authState) {
+      _currentUser = authState.session?.user;
+      _isSignedIn = authState.session != null;
+      if (_isSignedIn) _error = null;
+      notifyListeners();
+    });
   }
 
-  // Check if user is already signed in
+  // Check whether a Supabase session already exists.
   void _checkCurrentUser() {
-    _currentUser = SupabaseService.client.auth.currentUser;
-    _isSignedIn = _currentUser != null;
+    final session = SupabaseService.client.auth.currentSession;
+    _currentUser = session?.user;
+    _isSignedIn = session != null;
+  }
+
+  Future<bool> signInWithGoogle() =>
+      _signInWithOAuth(OAuthProvider.google);
+
+  Future<bool> signInWithApple() =>
+      _signInWithOAuth(OAuthProvider.apple);
+
+  Future<bool> _signInWithOAuth(OAuthProvider provider) async {
+    _isLoading = true;
+    _error = null;
     notifyListeners();
+
+    try {
+      final launched = await SupabaseService.client.auth.signInWithOAuth(
+        provider,
+        redirectTo: 'com.kenza.hub://login-callback/',
+      );
+      _isLoading = false;
+      if (!launched) {
+        _error = 'لم يتم فتح صفحة تسجيل الدخول. حاول مرة أخرى.';
+      }
+      notifyListeners();
+      return launched;
+    } catch (e) {
+      _isLoading = false;
+      _error = 'تعذر تسجيل الدخول: ${_parseError(e.toString())}';
+      notifyListeners();
+      return false;
+    }
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    super.dispose();
   }
 
   // Sign Up
