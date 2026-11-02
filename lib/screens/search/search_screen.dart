@@ -7,10 +7,12 @@ import '../../config/theme.dart';
 
 class SearchScreen extends StatefulWidget {
   final String query;
+  final String? categoryId;
 
   const SearchScreen({
     Key? key,
     this.query = '',
+    this.categoryId,
   }) : super(key: key);
 
   @override
@@ -20,6 +22,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   late TextEditingController _searchController;
   String _selectedCategory = 'all';
+  String? _selectedCategoryId;
   String _selectedCondition = 'all';
   double _minPrice = 0;
   double _maxPrice = 1000000;
@@ -30,14 +33,16 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     _searchController = TextEditingController(text: widget.query);
+    _selectedCategoryId = widget.categoryId;
     _loadAllProducts();
   }
 
   @override
   void didUpdateWidget(covariant SearchScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.query != widget.query) {
+    if (oldWidget.query != widget.query || oldWidget.categoryId != widget.categoryId) {
       _searchController.text = widget.query;
+      _selectedCategoryId = widget.categoryId;
       setState(() {});
     }
   }
@@ -58,6 +63,7 @@ class _SearchScreenState extends State<SearchScreen> {
     setState(() {
       _searchController.clear();
       _selectedCategory = 'all';
+      _selectedCategoryId = null;
       _selectedCondition = 'all';
       _minPrice = 0;
       _maxPrice = 1000000;
@@ -81,7 +87,10 @@ class _SearchScreenState extends State<SearchScreen> {
         return false;
       }
 
-      // Category filter
+      // Category filter: support both the legacy root filter and a database leaf ID.
+      if (_selectedCategoryId != null && p.categoryId != _selectedCategoryId) {
+        return false;
+      }
       if (_selectedCategory != 'all' && p.category != _selectedCategory) {
         return false;
       }
@@ -157,6 +166,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   if (_searchController.text.isNotEmpty ||
                       _selectedCategory != 'all' ||
+                      _selectedCategoryId != null ||
                       _selectedCondition != 'all')
                     GestureDetector(
                       onTap: _clearFilters,
