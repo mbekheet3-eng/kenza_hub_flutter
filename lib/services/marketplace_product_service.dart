@@ -81,7 +81,7 @@ class MarketplaceProductService {
             (userProfile['first_name'] as String?)?.trim() ?? '',
             (userProfile['last_name'] as String?)?.trim() ?? '',
           ].where((part) => part.isNotEmpty).join(' ');
-          final displayName = username.isNotEmpty ? username : fullName;
+          final displayName = fullName.length >= 3 ? fullName : username;
           if (displayName.length < 3) {
             throw StateError(
               'أكمل اسمك في الملف الشخصي قبل إنشاء ملف البائع.',
@@ -89,11 +89,308 @@ class MarketplaceProductService {
           }
     
           final phone = (userProfile['phone'] as String?)?.trim();
+          final validPhone = phone != null &&
+              RegExp(r'^(?:01[0-9]{9}|\\+?[1-9][0-9]{7,14})
+          final responseData = functionResponse.data;
+          if (responseData is Map) {
+            sellerProfileId = responseData['seller_profile_id'] as String?;
+          }
+          if (sellerProfileId == null) {
+            throw StateError(
+              'تعذر إنشاء ملف البائع من المسار المعتمد؛ حاول مرة أخرى أو تواصل مع الدعم.',
+            );
+          }
+        }
+    
+        if (sellerProfileId == null) {
+          throw StateError('لا يوجد ملف بائع نشط لهذا الحساب');
+        }
+    
+        final sellerProfile = await _client
+            .from('seller_profiles')
+            .select('id,is_active')
+            .eq('id', sellerProfileId)
+            .single();
+        if (sellerProfile['is_active'] != true) {
+          throw StateError('ملف البائع غير نشط حالياً');
+        }
+    
+    
+    return sellerProfileId;
+  }
+
+  Future<String> createProduct({
+    required String categorySlug,
+    required String title,
+    required String description,
+    required double price,
+    required String conditionLabel,
+    String? colorLabel,
+    String? sizeLabel,
+    String? brandName,
+    required List<String> imageUrls,
+  }) async {
+    final sellerProfileId = await ensureSellerProfile();
+    if (imageUrls.isEmpty) {
+      throw ArgumentError('يجب إضافة صورة واحدة على الأقل');
+    }
+
+    final category = await _client
+        .from('categories')
+        .select('id,parent_id')
+        .eq('slug', categorySlug)
+        .eq('is_active', true)
+        .single();
+    final categoryId = category['id'] as String;
+    final parentId = category['parent_id'] as String?;
+
+    final condition = await _client
+        .from('product_conditions')
+        .select('id')
+        .eq('label_ar', conditionLabel)
+        .eq('is_active', true)
+        .single();
+
+    final activeStatus = await _client
+        .from('product_statuses')
+        .select('id')
+        .eq('slug', 'active')
+        .eq('is_active', true)
+        .single();
+
+    final currency = await _client
+        .from('currencies')
+        .select('id')
+        .eq('code', 'EGP')
+        .eq('is_active', true)
+        .single();
+
+    String? colorId;
+    if (colorLabel != null && colorLabel.isNotEmpty) {
+      final color = await _client
+          .from('product_colors')
+          .select('id')
+          .eq('label_ar', colorLabel)
+          .eq('is_active', true)
+          .maybeSingle();
+      colorId = color?['id'] as String?;
+      if (colorId == null) {
+        throw StateError('اللون المختار غير موجود في بيانات قاعدة البيانات');
+      }
+    }
+
+    String? sizeId;
+    if (sizeLabel != null && sizeLabel.isNotEmpty) {
+      final sizes = await _client
+          .from('product_sizes')
+          .select('id,slug,label_ar,label_en,category_id')
+          .eq('is_active', true);
+      final categoryRows = await _client
+          .from('categories')
+          .select('id,parent_id')
+          .eq('is_active', true);
+      final categoryMap = {
+        for (final row in categoryRows as List)
+          (row as Map)['id'] as String: Map<String, dynamic>.from(row),
+      };
+      var rootCategoryId = categoryId;
+      var ancestorId = parentId;
+      while (ancestorId != null && categoryMap.containsKey(ancestorId)) {
+        rootCategoryId = ancestorId;
+        ancestorId = categoryMap[ancestorId]!['parent_id'] as String?;
+      }
+      final allowedCategoryIds = {
+        categoryId,
+        if (parentId != null) parentId,
+        rootCategoryId,
+      };
+      final matchingSizes = (sizes as List).where((row) {
+        final data = Map<String, dynamic>.from(row as Map);
+        final matchesLabel = data['label_ar'] == sizeLabel ||
+            data['label_en'] == sizeLabel ||
+            data['slug'] == sizeLabel;
+        return matchesLabel &&
+            allowedCategoryIds.contains(data['category_id']);
+      }).toList();
+      if (matchingSizes.isNotEmpty) {
+        sizeId = matchingSizes.first['id'] as String;
+      } else {
+        throw StateError('المقاس المختار غير متاح لهذا القسم');
+      }
+    }
+
+    String? brandId;
+    if (brandName != null && brandName.trim().isNotEmpty) {
+      final brand = await _client
+          .from('brands')
+          .select('id')
+          .eq('name', brandName.trim())
+          .maybeSingle();
+      brandId = brand?['id'] as String?;
+      if (brandId == null) {
+        throw StateError('العلامة التجارية المختارة غير موجودة في القائمة المعتمدة');
+      }
+    }
+
+    final productPayload = <String, dynamic>{
+      'seller_id': sellerProfileId,
+      'category_id': categoryId,
+      'title_ar': title.trim(),
+      'title_en': title.trim(),
+      'description_ar': description.trim(),
+      'description_en': description.trim(),
+      'price': price,
+      'condition_id': condition['id'],
+      'status_id': activeStatus['id'],
+      'currency_id': currency['id'],
+      'audience': 'everyone',
+      if (colorId != null) 'color_id': colorId,
+      if (sizeId != null) 'size_id': sizeId,
+      if (brandId != null) 'brand_id': brandId,
+    };
+
+    final created = await _client
+        .from('products')
+        .insert(productPayload)
+        .select('id')
+        .single();
+    final productId = created['id'] as String;
+
+    try {
+      final imageRows = <Map<String, dynamic>>[];
+      for (var index = 0; index < imageUrls.length; index++) {
+        imageRows.add({
+          'product_id': productId,
+          'image_url': imageUrls[index],
+          'display_order': index,
+        });
+      }
+      await _client.from('product_images').insert(imageRows);
+    } catch (error) {
+      // Do not leave a visible product without its images if the image-row
+      // write is rejected. This only attempts to remove the just-created row.
+      try {
+        await softDeleteProduct(productId);
+      } catch (_) {
+        // Preserve the original failure; the owner can remove the draft later.
+      }
+      rethrow;
+    }
+
+    return productId;
+  }
+
+  Future<List<Product>> fetchActiveProducts({int limit = 40}) async {
+    final rows = await _client
+        .from('products')
+        .select(_productSelect)
+        .eq('status.slug', 'active')
+        .order('created_at', ascending: false)
+        .limit(limit);
+
+    return (rows as List)
+        .map((row) => Product.fromJson(Map<String, dynamic>.from(row as Map)))
+        .toList(growable: false);
+  }
+
+  Future<List<Product>> fetchSellerProducts(String userId,
+      {int limit = 100}) async {
+    final memberships = await _client
+        .from('seller_profile_members')
+        .select('seller_profile_id')
+        .eq('user_id', userId)
+        .isFilter('revoked_at', null)
+        .limit(1);
+
+    String? sellerProfileId;
+    if ((memberships as List).isNotEmpty) {
+      sellerProfileId =
+          (memberships.first as Map)['seller_profile_id'] as String?;
+    } else {
+      final ownedProfile = await _client
+          .from('seller_profiles')
+          .select('id')
+          .eq('owner_user_id', userId)
+          .eq('is_active', true)
+          .maybeSingle();
+      sellerProfileId = ownedProfile?['id'] as String?;
+    }
+
+    if (sellerProfileId == null) return const [];
+
+    final rows = await _client
+        .from('products')
+        .select(_productSelect)
+        .eq('seller_id', sellerProfileId)
+        .order('created_at', ascending: false)
+        .limit(limit);
+
+    return (rows as List)
+        .map((row) => Product.fromJson(Map<String, dynamic>.from(row as Map)))
+        .toList(growable: false);
+  }
+
+  Future<void> _requireOwnerMembership() async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) {
+      throw StateError('يجب تسجيل الدخول أولاً');
+    }
+    final membership = await _client
+        .from('seller_profile_members')
+        .select('member_role')
+        .eq('user_id', userId)
+        .isFilter('revoked_at', null)
+        .maybeSingle();
+    if (membership == null || membership['member_role'] != 'owner') {
+      throw StateError(
+        'تعديل المنتجات وإخفاؤها متاحان لصاحب المتجر فقط حتى تكتمل صلاحيات الموظفين المعتمدة.',
+      );
+    }
+  }
+
+  Future<void> updateProductDetails(Product product) async {
+    await _requireOwnerMembership();
+    await _client.from('products').update({
+      'title_ar': product.title,
+      'title_en': product.title,
+      'description_ar': product.description,
+      'description_en': product.description,
+      'price': product.price,
+    }).eq('id', product.id);
+  }
+
+  Future<void> softDeleteProduct(String productId) async {
+    await _requireOwnerMembership();
+    final deletedStatus = await _client
+        .from('product_statuses')
+        .select('id')
+        .eq('slug', 'deleted')
+        .eq('is_active', true)
+        .single();
+
+    await _client
+        .from('products')
+        .update({'status_id': deletedStatus['id']})
+        .eq('id', productId);
+  }
+
+  Future<Product> fetchProductById(String productId) async {
+    final row = await _client
+        .from('products')
+        .select(_productSelect)
+        .eq('id', productId)
+        .single();
+
+    return Product.fromJson(Map<String, dynamic>.from(row));
+  }
+}
+)
+                  .hasMatch(phone);
           final functionResponse = await _client.functions.invoke(
             'seller-profile-create',
             body: {
               'display_name': displayName,
-              if (phone != null && phone.isNotEmpty) 'phone': phone,
+              if (validPhone) 'phone': phone,
             },
           );
           final responseData = functionResponse.data;
