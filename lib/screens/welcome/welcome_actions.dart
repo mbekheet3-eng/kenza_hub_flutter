@@ -6,83 +6,75 @@ class WelcomeActions extends StatelessWidget {
   const WelcomeActions({super.key});
 
   static const Color primaryRed = Color(0xFFC62828);
+  static const Color navy = Color(0xFF0F172A);
 
   @override
   Widget build(BuildContext context) {
-    // Safe localization access
     final strings = AppLocalizations.safeOf(context);
 
     return Column(
       children: [
-        // Sign Up Button
         SizedBox(
           width: double.infinity,
           height: 54,
           child: ElevatedButton(
-            onPressed: () {
-              context.push('/sign-up');
-            },
+            onPressed: () => context.push('/sign-up'),
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryRed,
               foregroundColor: Colors.white,
-              elevation: 0,
+              elevation: 2,
+              shadowColor: primaryRed.withOpacity(0.22),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(15),
               ),
             ),
             child: Text(
               strings.signUp,
               style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
               ),
             ),
           ),
         ),
-        const SizedBox(height: 12),
-
-        // Login Button
+        const SizedBox(height: 11),
         SizedBox(
           width: double.infinity,
-          height: 54,
-          child: ElevatedButton(
-            onPressed: () {
-              context.push('/login');
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryRed,
-              foregroundColor: Colors.white,
-              elevation: 0,
+          height: 52,
+          child: OutlinedButton(
+            onPressed: () => context.push('/login'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: navy,
+              side: const BorderSide(color: Color(0xFFCBD5E1)),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(15),
               ),
             ),
             child: Text(
               strings.login,
               style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
         ),
-        const SizedBox(height: 8),
-
-        // Continue as Guest Button
+        const SizedBox(height: 5),
         TextButton(
-          onPressed: () {
-            context.push('/home');
-          },
+          onPressed: () => context.push('/home'),
+          style: TextButton.styleFrom(
+            foregroundColor: const Color(0xFF64748B),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          ),
           child: Text(
             strings.continueAsGuest,
             style: const TextStyle(
               fontSize: 14,
-              color: Color(0xFF94A3B8),
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
       ],
     );
   }
-
 }
