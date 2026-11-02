@@ -12,6 +12,7 @@ class AuthProvider with ChangeNotifier {
   String? _error;
   User? _currentUser;
   bool _isSignedIn = false;
+  bool _isPasswordRecovery = false;
   StreamSubscription<AuthState>? _authSubscription;
 
   // Getters
@@ -19,6 +20,7 @@ class AuthProvider with ChangeNotifier {
   String? get error => _error;
   User? get currentUser => _currentUser;
   bool get isSignedIn => _isSignedIn;
+  bool get isPasswordRecovery => _isPasswordRecovery;
   String? get userEmail => _currentUser?.email;
   String? get userId => _currentUser?.id;
 
@@ -29,6 +31,11 @@ class AuthProvider with ChangeNotifier {
         SupabaseService.client.auth.onAuthStateChange.listen((authState) {
       _currentUser = authState.session?.user;
       _isSignedIn = authState.session != null;
+      if (authState.event == AuthChangeEvent.passwordRecovery) {
+        _isPasswordRecovery = true;
+      } else if (authState.event == AuthChangeEvent.signedOut) {
+        _isPasswordRecovery = false;
+      }
       if (_isSignedIn) _error = null;
       notifyListeners();
     });
@@ -192,6 +199,27 @@ class AuthProvider with ChangeNotifier {
     }
     notifyListeners();
     return _error == null;
+  }
+
+  Future<bool> updatePassword(String newPassword) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      await SupabaseService.client.auth.updateUser(
+        UserAttributes(password: newPassword),
+      );
+      _isPasswordRecovery = false;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _isLoading = false;
+      _error = 'تعذر تحديث كلمة المرور: ${_parseError(e.toString())}';
+      notifyListeners();
+      return false;
+    }
   }
 
   // Clear error
