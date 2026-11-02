@@ -54,7 +54,7 @@ class SupabaseService {
         images.add({
           'product_id': productId,
           'image_url': imageUrls[i],
-          'order': i,
+          'display_order': i,
           'created_at': DateTime.now().toIso8601String(),
         });
       }
@@ -241,17 +241,9 @@ class SupabaseService {
 
   /// Create order
   Future<String> createOrder(Order order) async {
-    try {
-      final response = await _client
-          .from('orders')
-          .insert(order.toJson())
-          .select()
-          .single();
-
-      return response['id'] as String;
-    } catch (e) {
-      throw Exception('Failed to create order: $e');
-    }
+    throw UnsupportedError(
+      'Direct order creation is disabled. Orders must be created through the approved server-side agreement workflow.',
+    );
   }
 
   /// Get order by ID
@@ -259,10 +251,11 @@ class SupabaseService {
     try {
       final response = await _client
           .from('orders')
-          .select()
+          .select(
+            '*,products(title_ar,title_en,product_images(image_url,display_order)),order_status_history(new_status,reason,action,created_at,metadata)',
+          )
           .eq('id', orderId)
           .single();
-
       return Order.fromJson(response);
     } catch (e) {
       throw Exception('Failed to get order: $e');
@@ -276,15 +269,33 @@ class SupabaseService {
     int limit = 20,
   }) async {
     try {
-      final column = asBuyer ? 'buyer_id' : 'seller_id';
-      final response = await _client
+      var request = _client
           .from('orders')
-          .select()
-          .eq(column, userId)
+          .select(
+            '*,products(title_ar,title_en,product_images(image_url,display_order)),order_status_history(new_status,reason,action,created_at,metadata)',
+          );
+
+      if (asBuyer) {
+        request = request.eq('buyer_id', userId);
+      } else {
+        final memberships = await _client
+            .from('seller_profile_members')
+            .select('seller_profile_id')
+            .eq('user_id', userId)
+            .isFilter('revoked_at', null);
+        final profileIds = (memberships as List)
+            .map((row) => (row as Map)['seller_profile_id'] as String)
+            .toList();
+        if (profileIds.isEmpty) return [];
+        request = request.inFilter('seller_profile_id', profileIds);
+      }
+
+      final response = await request
           .order('created_at', ascending: false)
           .limit(limit);
-
-      return (response as List).map((json) => Order.fromJson(json)).toList();
+      return (response as List)
+          .map((row) => Order.fromJson(Map<String, dynamic>.from(row as Map)))
+          .toList();
     } catch (e) {
       throw Exception('Failed to get user orders: $e');
     }
@@ -292,14 +303,9 @@ class SupabaseService {
 
   /// Update order status
   Future<void> updateOrderStatus(String orderId, OrderStatus status) async {
-    try {
-      await _client
-          .from('orders')
-          .update({'status': status.toString().split('.').last})
-          .eq('id', orderId);
-    } catch (e) {
-      throw Exception('Failed to update order status: $e');
-    }
+    throw UnsupportedError(
+      'Order status changes are controlled by the server-side transition workflow.',
+    );
   }
 
   /// Add order review
@@ -308,18 +314,9 @@ class SupabaseService {
     double rating,
     String review,
   ) async {
-    try {
-      await _client
-          .from('orders')
-          .update({
-            'rating': rating,
-            'review': review,
-            'updated_at': DateTime.now().toIso8601String(),
-          })
-          .eq('id', orderId);
-    } catch (e) {
-      throw Exception('Failed to add order review: $e');
-    }
+    throw UnsupportedError(
+      'Reviews must be submitted through the dedicated reviews workflow.',
+    );
   }
 
   // ==================== FAVORITES ====================
@@ -592,10 +589,12 @@ class SupabaseService {
     try {
       final result = await _client
           .from('orders')
-          .select('*')
+          .select(
+            '*,products(title_ar,title_en,product_images(image_url,display_order)),order_status_history(new_status,reason,action,created_at,metadata)',
+          )
           .eq('id', orderId)
           .single();
-      return result as Map<String, dynamic>;
+      return Map<String, dynamic>.from(result);
     } catch (e) {
       print('❌ Error fetching order: $e');
       rethrow;
