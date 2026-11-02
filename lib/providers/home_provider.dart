@@ -13,24 +13,22 @@ class HomeProvider with ChangeNotifier {
   String _selectedCategory = 'الكل';
   String _searchQuery = '';
 
-  // ✅ FIXED D5: Use categories that match DATABASE SCHEMA
-  // Database supports: clothes, shoes, kids, home
-  // UI shows: All, Clothes, Shoes, Kids, Home (5 total)
+  // Main marketplace categories approved for Kenza Hub.
   final List<String> categories = [
-    'الكل',      // 0. All (special - shows all items)
-    'ملابس',    // 1. clothes
-    'أحذية',    // 2. shoes
-    'مستلزمات أطفال',  // 3. kids
-    'مستلزمات المنزل',  // 4. home
+    'الكل',
+    'مستلزمات أطفال',
+    'مستلزمات المنزل',
+    'ملابس',
+    'أحذية',
   ];
 
-  // Mapping between UI labels and database category values
+  // Root category slugs in the categories table.
   final Map<String, String> categoryMapping = {
-    'الكل': '',           // Empty = show all
-    'ملابس': 'clothes',
-    'أحذية': 'shoes',
+    'الكل': '',
     'مستلزمات أطفال': 'kids',
     'مستلزمات المنزل': 'home',
+    'ملابس': 'clothes',
+    'أحذية': 'shoes',
   };
 
   // Getters
