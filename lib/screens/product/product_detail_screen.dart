@@ -27,6 +27,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     _loadProduct();
   }
 
+  @override
+  void didUpdateWidget(covariant ProductDetailScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.productId != widget.productId) {
+      _isFavorite = false;
+      _isFavoriteLoading = false;
+      _loadProduct();
+    }
+  }
+
   Future<void> _loadProduct() async {
     if (!mounted) return;
     final productProvider = context.read<ProductProvider>();
@@ -142,10 +152,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               color: _isFavorite ? Colors.red : null,
             ),
             onPressed: _isFavoriteLoading ? null : _toggleFavorite,
-          ),
-          IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: () => _shareProduct(product),
           ),
         ],
       ),
@@ -486,9 +492,4 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     context.push('/cart');
   }
 
-  void _shareProduct(Product product) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('مشاركة المنتج غير متاحة حالياً.')),
-    );
-  }
 }
