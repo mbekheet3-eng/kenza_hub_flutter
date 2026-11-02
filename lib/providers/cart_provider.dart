@@ -57,14 +57,11 @@ class CartProvider with ChangeNotifier {
     return _items.fold(0, (sum, item) => sum + item.subtotal);
   }
 
-  double get shippingCost {
-    // Simple shipping calculation
-    return subtotal > 200 ? 0 : 30; // Free shipping above 200 EGP
-  }
+  // Shipping and platform fees are calculated in the confirmed order agreement.
+  // The client must not invent fees before that agreement exists.
+  double get shippingCost => 0;
 
-  double get tax {
-    return subtotal * 0.14; // 14% tax
-  }
+  double get tax => 0;
 
   double get total {
     return subtotal + shippingCost + tax;
