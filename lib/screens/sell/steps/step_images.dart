@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import "../../../services/upload_service.dart";
 import '../../../config/theme.dart';
@@ -33,6 +32,7 @@ class _StepImagesState extends State<StepImages> {
     setState(() => _isLoading = true);
     try {
       final images = await _uploadService.pickMultipleImages();
+      if (!mounted) return;
       setState(() {
         _selectedImages.addAll(images);
         if (_selectedImages.length > 8) {
@@ -41,9 +41,9 @@ class _StepImagesState extends State<StepImages> {
       });
       widget.onImagesSelected(_selectedImages);
     } catch (e) {
-      _showError('فشل اختيار الصور: $e');
+      if (mounted) _showError('فشل اختيار الصور: $e');
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -51,7 +51,7 @@ class _StepImagesState extends State<StepImages> {
     setState(() => _isLoading = true);
     try {
       final image = await _uploadService.pickImage(source: ImageSource.camera);
-      if (image != null) {
+      if (image != null && mounted) {
         setState(() {
           _selectedImages.add(image);
           if (_selectedImages.length > 8) {
@@ -61,9 +61,9 @@ class _StepImagesState extends State<StepImages> {
         widget.onImagesSelected(_selectedImages);
       }
     } catch (e) {
-      _showError('فشل التقاط الصورة: $e');
+      if (mounted) _showError('فشل التقاط الصورة: $e');
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
