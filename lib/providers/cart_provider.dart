@@ -86,10 +86,7 @@ class CartProvider with ChangeNotifier {
 
     // Check if item already exists
     final existingItemIndex = _items.indexWhere(
-      (item) =>
-          item.productId == productId &&
-          item.size == size &&
-          item.color == color,
+      (item) => item.productId == productId,
     );
 
     if (existingItemIndex >= 0) {
@@ -98,7 +95,7 @@ class CartProvider with ChangeNotifier {
     } else {
       // Add new item
       final cartItem = CartItem(
-        id: '${productId}_${size}_$color',
+        id: productId,
         productId: productId,
         title: title,
         price: price,
