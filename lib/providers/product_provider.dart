@@ -108,8 +108,8 @@ class ProductProvider extends ChangeNotifier {
     try {
       final favoriteIds = await _supabaseService.getUserFavorites(userId);
       return favoriteIds.contains(productId);
-    } catch (e) {
-      _error = 'تعذر تحميل حالة المفضلة: $e';
+    } catch (_) {
+      // A favorite lookup failure must not replace the product-list error state.
       return false;
     }
   }
