@@ -199,6 +199,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               // My Products Section
               _buildMyProductsSection(context),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Card(
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(
+                          Icons.info_outline,
+                          color: Color(0xFFC62828),
+                        ),
+                        title: const Text('عن كنزة هب'),
+                        subtitle: const Text('تعرف على فكرتنا ورسالتنا'),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => context.push('/about-kenza'),
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      ListTile(
+                        leading: const Icon(
+                          Icons.policy_outlined,
+                          color: Color(0xFFC62828),
+                        ),
+                        title: const Text('السياسات والشروط'),
+                        subtitle: const Text('الخصوصية والاستخدام والبيع والشحن'),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => context.push('/policies'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               const SizedBox(height: 24),
 
               // Logout Button
