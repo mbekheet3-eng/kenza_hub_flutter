@@ -104,7 +104,9 @@ final goRouter = GoRouter(
     ),
     GoRoute(
       path: '/search',
-      builder: (context, state) => const SearchScreen(),
+      builder: (context, state) => SearchScreen(
+        query: state.uri.queryParameters['q'] ?? '',
+      ),
     ),
     GoRoute(
       path: '/settings',
