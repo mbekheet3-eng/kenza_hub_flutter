@@ -28,4 +28,17 @@ class CatalogService {
         )
         .toList(growable: false);
   }
+  Future<List<String>> fetchBrands() async {
+    final rows = await _client
+        .from('brands')
+        .select('name')
+        .order('name', ascending: true);
+
+    return (rows as List)
+        .map((row) => (row as Map)['name'] as String?)
+        .whereType<String>()
+        .where((name) => name.trim().isNotEmpty)
+        .toList(growable: false);
+  }
+
 }
