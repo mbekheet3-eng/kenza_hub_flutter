@@ -48,11 +48,18 @@ class AuthProvider with ChangeNotifier {
         fullName: fullName,
       );
 
-      _currentUser = response['user'];
-      _isSignedIn = _currentUser != null;
+      final user = response['user'] as User?;
+      final session = response['session'] as Session?;
+      _isSignedIn = user != null && session != null;
+      _currentUser = _isSignedIn ? user : null;
       _isLoading = false;
 
-      print('✅ Sign up successful');
+      if (_isSignedIn) {
+        print('✅ Sign up successful');
+      } else {
+        _error =
+            'تم إنشاء الحساب. افتح رسالة التأكيد التي أُرسلت إلى بريدك الإلكتروني، ثم سجّل الدخول.';
+      }
     } catch (e) {
       _isLoading = false;
       _error = 'خطأ في التسجيل: ${_parseError(e.toString())}';
@@ -77,11 +84,17 @@ class AuthProvider with ChangeNotifier {
         password: password,
       );
 
-      _currentUser = response['user'];
-      _isSignedIn = _currentUser != null;
+      final user = response['user'] as User?;
+      final session = response['session'] as Session?;
+      _isSignedIn = user != null && session != null;
+      _currentUser = _isSignedIn ? user : null;
       _isLoading = false;
 
-      print('✅ Sign in successful');
+      if (!_isSignedIn) {
+        _error = 'تعذر إنشاء جلسة دخول. حاول مرة أخرى.';
+      } else {
+        print('✅ Sign in successful');
+      }
     } catch (e) {
       _isLoading = false;
       _error = 'خطأ في تسجيل الدخول: ${_parseError(e.toString())}';
