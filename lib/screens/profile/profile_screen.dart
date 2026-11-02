@@ -66,9 +66,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final authProvider = context.read<AuthProvider>();
       await authProvider.signOut();
 
-      if (mounted) {
-        context.go('/welcome');
+      if (!mounted) return;
+      if (authProvider.isSignedIn) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              authProvider.error ?? 'تعذر تسجيل الخروج. حاول مرة أخرى.',
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
       }
+
+      context.go('/welcome');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
