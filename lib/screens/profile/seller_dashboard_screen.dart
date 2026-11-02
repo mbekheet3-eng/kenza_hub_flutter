@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../config/theme.dart';
 import '../../services/seller_dashboard_service.dart';
+import '../../providers/auth_provider.dart';
 
 class SellerDashboardScreen extends StatefulWidget {
   const SellerDashboardScreen({super.key});
@@ -65,6 +67,25 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!context.watch<AuthProvider>().isSignedIn) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('لوحة البائع')),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('سجّل الدخول لعرض لوحة البائع'),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => context.push('/login'),
+                child: const Text('تسجيل الدخول'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('لوحة البائع')),
       body: FutureBuilder<SellerDashboardData?>(
