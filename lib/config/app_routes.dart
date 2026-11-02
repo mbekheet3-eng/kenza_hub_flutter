@@ -20,6 +20,7 @@ import '../screens/profile/policies_screen.dart';
 import '../screens/profile/edit_profile_screen.dart';
 import '../screens/profile/my_products_screen.dart';
 import '../screens/search/search_screen.dart';
+import '../screens/categories/categories_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/sell/sell_wizard_screen.dart';
 
@@ -143,6 +144,10 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/my-products',
       builder: (context, state) => const MyProductsScreen(),
+    ),
+    GoRoute(
+      path: '/categories',
+      builder: (context, state) => const CategoriesScreen(),
     ),
     GoRoute(
       path: '/search',
