@@ -29,15 +29,32 @@ final goRouter = GoRouter(
   redirect: (context, state) {
     final hasSession =
         Supabase.instance.client.auth.currentSession != null;
+    final currentPath = state.uri.path;
     final isEntryPage = {
       '/welcome',
       '/login',
       '/sign-up',
-    }.contains(state.uri.path);
+    }.contains(currentPath);
 
-    if (state.uri.path == '/auth-callback') {
+    final protectedPaths = {
+      '/cart',
+      '/checkout',
+      '/orders',
+      '/seller-dashboard',
+      '/profile',
+      '/edit-profile',
+      '/my-products',
+      '/settings',
+      '/sell-wizard',
+    };
+    final requiresAuthentication = protectedPaths.contains(currentPath) ||
+        currentPath.startsWith('/order-confirmation/') ||
+        currentPath.startsWith('/order-tracking/');
+
+    if (currentPath == '/auth-callback') {
       return hasSession ? '/home' : '/welcome';
     }
+    if (!hasSession && requiresAuthentication) return '/login';
     if (hasSession && isEntryPage) return '/home';
     return null;
   },
