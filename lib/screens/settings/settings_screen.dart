@@ -182,60 +182,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showRatingDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('قيم التطبيق'),
-        content: const Text('هل تستمتع بتطبيق كنزة؟'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('لاحقاً'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _showRatingStars();
-            },
-            child: const Text('نعم'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showRatingStars() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('قيم التطبيق'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: List.generate(
-                5,
-                (index) => IconButton(
-                  icon: const Icon(Icons.star),
-                  color: Colors.amber,
-                  iconSize: 32,
-                  onPressed: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('شكراً لتقييمك!'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    _showUnavailableFeature('تقييم التطبيق');
   }
 
   void _showUnavailableFeature(String feature) {
