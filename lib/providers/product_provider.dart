@@ -26,6 +26,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   Future<void> getProduct(String productId) async {
+    _currentProduct = null;
     await _run(() async {
       _currentProduct = await _productService.fetchProductById(productId);
     }, 'فشل تحميل المنتج');
