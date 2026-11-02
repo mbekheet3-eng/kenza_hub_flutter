@@ -35,6 +35,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
   String _description = '';
   double _price = 0;
   bool _skipVariantFields = false;
+  bool _isResolvingCategoryRules = false;
 
   final _productService = MarketplaceProductService();
   final _catalogService = CatalogService();
@@ -123,6 +124,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
     setState(() {
       _category = category;
       _skipVariantFields = false;
+      _isResolvingCategoryRules = category != null;
       // A category change invalidates previously selected lookup values.
       _brand = null;
       _color = null;
@@ -135,9 +137,11 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
       if (!mounted) return;
       setState(() {
         _skipVariantFields = rootSlug == 'kids' || rootSlug == 'home';
+        _isResolvingCategoryRules = false;
       });
     } catch (_) {
       if (mounted) {
+        setState(() => _isResolvingCategoryRules = false);
         _showError('تعذر تحديد قواعد القسم. حاول اختيار القسم مرة أخرى.');
       }
     }
@@ -177,7 +181,8 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
       case 1:
         return _category != null;
       case 2:
-        return _condition != null &&
+        return !_isResolvingCategoryRules &&
+            _condition != null &&
             (_skipVariantFields || (_color != null && _size != null));
       case 3:
         return _category != null; // Brand is optional.
@@ -245,6 +250,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
     return _selectedImages.isNotEmpty &&
         _category != null &&
         _condition != null &&
+        !_isResolvingCategoryRules &&
         (_skipVariantFields || (_color != null && _size != null)) &&
         _title.isNotEmpty &&
         _description.isNotEmpty &&
