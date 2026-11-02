@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
 
@@ -14,8 +13,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
   bool _emailNotifications = true;
   bool _pushNotifications = true;
-  String _language = 'ar'; // Arabic by default
-  bool _darkMode = false;
 
   @override
   Widget build(BuildContext context) {
@@ -38,12 +35,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildSettingsTile(
               icon: Icons.security,
               title: 'تغيير كلمة المرور',
-              onTap: () => context.push('/change-password'),
+              onTap: () => context.push('/forgot-password'),
             ),
             _buildSettingsTile(
               icon: Icons.email_outlined,
               title: 'تغيير البريد الإلكتروني',
-              onTap: () => context.push('/change-email'),
+              onTap: () => _showUnavailableFeature('تغيير البريد الإلكتروني'),
             ),
             const Divider(),
 
@@ -82,17 +79,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildSettingsTile(
               icon: Icons.lock_outline,
               title: 'سياسة الخصوصية',
-              onTap: () => context.push('/privacy-policy'),
+              onTap: () => context.push('/policies'),
             ),
             _buildSettingsTile(
               icon: Icons.description_outlined,
               title: 'شروط الخدمة',
-              onTap: () => context.push('/terms-of-service'),
+              onTap: () => context.push('/policies'),
             ),
             _buildSettingsTile(
               icon: Icons.block_outlined,
               title: 'المستخدمون المحظورون',
-              onTap: () => context.push('/blocked-users'),
+              onTap: () => _showUnavailableFeature('قائمة المستخدمين المحظورين'),
             ),
             const Divider(),
 
@@ -111,12 +108,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildSettingsTile(
               icon: Icons.feedback_outlined,
               title: 'أرسل لنا رأيك',
-              onTap: () => context.push('/feedback'),
+              onTap: () => _showUnavailableFeature('إرسال الملاحظات'),
             ),
             _buildSettingsTile(
               icon: Icons.help_outline,
               title: 'المساعدة والدعم',
-              onTap: () => context.push('/help'),
+              onTap: () => _showUnavailableFeature('المساعدة والدعم'),
             ),
             const Divider(),
 
@@ -244,30 +241,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  void _showUnavailableFeature(String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$feature غير متاح حالياً وسيتم تفعيله بعد اكتمال تنفيذه.')),
+    );
+  }
+
   void _showDeleteAccountDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('حذف الحساب'),
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('إيقاف أو حذف الحساب'),
         content: const Text(
-          'هل أنت متأكد من رغبتك في حذف حسابك؟ هذا الإجراء لا يمكن التراجع عنه.',
+          'إدارة إيقاف الحساب وحذفه غير متاحة حالياً. لن يتم تنفيذ أي حذف من هذه الشاشة.',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('سيتم حذف حسابك قريباً'),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            },
-            child: const Text('حذف', style: TextStyle(color: Colors.red)),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('حسناً'),
           ),
         ],
       ),
