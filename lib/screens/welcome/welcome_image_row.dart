@@ -48,17 +48,24 @@ class WelcomeImageRow extends StatelessWidget {
     }
 
     return ClipRect(
-      child: Transform.translate(
-        offset: Offset(offset, 0),
-        child: SizedBox(
-          width: cycleWidth * 2,
-          height: imageHeight,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              imageSequence(),
-              imageSequence(),
-            ],
+      child: OverflowBox(
+        alignment: Alignment.topLeft,
+        minWidth: cycleWidth * 2,
+        maxWidth: cycleWidth * 2,
+        minHeight: imageHeight,
+        maxHeight: imageHeight,
+        child: Transform.translate(
+          offset: Offset(offset, 0),
+          child: SizedBox(
+            width: cycleWidth * 2,
+            height: imageHeight,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                imageSequence(),
+                imageSequence(),
+              ],
+            ),
           ),
         ),
       ),
