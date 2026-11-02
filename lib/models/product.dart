@@ -163,8 +163,9 @@ class Product {
           categoryData?['slug'] as String? ??
           json['category'] as String? ??
           '',
-      subcategory: categoryData?['parent_id'] as String? ??
-          json['subcategory'] as String?,
+      subcategory: parentCategoryData != null
+          ? categoryData?['slug'] as String?
+          : json['subcategory'] as String?,
       condition: conditionData?['label_ar'] as String? ??
           json['condition'] as String? ??
           '',
