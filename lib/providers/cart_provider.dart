@@ -73,7 +73,7 @@ class CartProvider with ChangeNotifier {
   }
 
   // Add item to cart
-  void addItem({
+  bool addItem({
     required String productId,
     required String title,
     required double price,
@@ -82,7 +82,7 @@ class CartProvider with ChangeNotifier {
     String? size,
     String? color,
   }) {
-    if (quantity <= 0) return;
+    if (quantity <= 0) return false;
 
     // Check if item already exists
     final existingItemIndex = _items.indexWhere(
@@ -94,7 +94,7 @@ class CartProvider with ChangeNotifier {
 
     if (existingItemIndex >= 0) {
       // Each listing represents one unique item; do not increase stock quantity.
-      return;
+      return false;
     } else {
       // Add new item
       final cartItem = CartItem(
@@ -111,6 +111,7 @@ class CartProvider with ChangeNotifier {
     }
 
     notifyListeners();
+    return true;
   }
 
   // Remove item from cart
