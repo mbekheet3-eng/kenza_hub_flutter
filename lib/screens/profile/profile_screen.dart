@@ -42,6 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       // Load custom User model from database
       final user = await SupabaseService().getUser(userId);
+      await context.read<ProductProvider>().loadUserProducts(userId);
 
       if (mounted) {
         setState(() {
@@ -175,6 +176,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               // Quick Actions
               _buildQuickActions(context, user),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.storefront_outlined),
+                    title: const Text('لوحة البائع'),
+                    subtitle: const Text('ملف المتجر والمبيعات وحالة الترقية'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.push('/seller-dashboard'),
+                  ),
+                ),
+              ),
               const SizedBox(height: 24),
 
               // About Section
