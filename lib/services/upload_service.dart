@@ -168,7 +168,7 @@ class UploadService {
       print('Header detection failed: $e');
     }
 
-    return '.jpg'; // Default fallback
+    throw const FormatException('Only JPEG, PNG and WebP images are supported');
   }
 
   /// Validate image extension
@@ -269,6 +269,10 @@ class UploadService {
 
       final fileBytes = await imageFile.readAsBytes();
       final mimeType = _getMimeType(imageFile.path);
+      if (fileBytes.isEmpty) throw StateError('الصورة فارغة');
+      if (fileBytes.length > 10 * 1024 * 1024) {
+        throw Exception('حجم الصورة يتجاوز الحد المسموح 10 ميجابايت');
+      }
 
       onProgress(0.3); // Simulated preparation progress
 
@@ -342,20 +346,30 @@ class UploadService {
   /// Upload profile image for user
   Future<String> uploadProfileImage(File imageFile, String userId) async {
     try {
-      const bucket = 'avatars';
-      final fileName = '$userId.jpg';
+      final currentUserId = _client.auth.currentUser?.id;
+      if (currentUserId == null || currentUserId != userId) {
+        throw StateError('لا يمكن رفع صورة حساب لمستخدم آخر');
+      }
 
-      // Upload to storage
-      final path = await _client.storage.from(bucket).upload(
-        fileName,
-        imageFile,
-        fileOptions: const FileOptions(upsert: true),
-      );
+      final fileBytes = await imageFile.readAsBytes();
+      if (fileBytes.isEmpty || fileBytes.length > 10 * 1024 * 1024) {
+        throw StateError('حجم صورة الحساب غير صالح');
+      }
+      final extension = _getFileExtension(imageFile.path);
+      final mimeType = _getMimeType(imageFile.path);
+      final objectPath =
+          'products/$userId/profile/avatar$extension';
 
-      // Get public URL
-      final publicUrl = _client.storage.from(bucket).getPublicUrl(path);
+      await _client.storage.from(bucketName).uploadBinary(
+            objectPath,
+            fileBytes,
+            fileOptions: FileOptions(
+              contentType: mimeType,
+              upsert: true,
+            ),
+          );
 
-      return publicUrl;
+      return _client.storage.from(bucketName).getPublicUrl(objectPath);
     } catch (e) {
       throw Exception('Failed to upload profile image: $e');
     }
