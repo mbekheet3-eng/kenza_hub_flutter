@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/address_service.dart';
 
 class Address {
   final String id;
@@ -9,6 +10,8 @@ class Address {
   final String governorate;
   final String postalCode;
   final String? apartment;
+  final String? regionId;
+  final String? landmark;
   bool isDefault;
 
   Address({
@@ -20,37 +23,49 @@ class Address {
     required this.governorate,
     required this.postalCode,
     this.apartment,
+    this.regionId,
+    this.landmark,
     this.isDefault = false,
   });
 
   String get displayName => '$fullName - $street, $city';
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'full_name': fullName,
-    'phone': phone,
-    'street': street,
-    'city': city,
-    'governorate': governorate,
-    'postal_code': postalCode,
-    'apartment': apartment,
-    'is_default': isDefault,
-  };
+        if (regionId != null) 'region_id': regionId,
+        'recipient_name': fullName,
+        'recipient_phone': phone,
+        'address_line_1': street,
+        'address_line_2': apartment,
+        'landmark': landmark,
+        'postal_code': postalCode,
+        'is_default': isDefault,
+      };
 
-  factory Address.fromJson(Map<String, dynamic> json) => Address(
-    id: json['id'] as String,
-    fullName: json['full_name'] as String,
-    phone: json['phone'] as String,
-    street: json['street'] as String,
-    city: json['city'] as String,
-    governorate: json['governorate'] as String,
-    postalCode: json['postal_code'] as String,
-    apartment: json['apartment'] as String?,
-    isDefault: json['is_default'] as bool? ?? false,
-  );
+  factory Address.fromJson(Map<String, dynamic> json) {
+    final regionValue = json['regions'] ?? json['region'];
+    final region = regionValue is Map
+        ? Map<String, dynamic>.from(regionValue)
+        : <String, dynamic>{};
+    return Address(
+      id: json['id'] as String,
+      fullName: json['recipient_name'] as String? ?? '',
+      phone: json['recipient_phone'] as String? ?? '',
+      street: json['address_line_1'] as String? ?? '',
+      city: region['name_ar'] as String? ??
+          region['district'] as String? ??
+          '',
+      governorate: region['city'] as String? ?? '',
+      postalCode: json['postal_code'] as String? ?? '',
+      apartment: json['address_line_2'] as String?,
+      regionId: json['region_id'] as String?,
+      landmark: json['landmark'] as String?,
+      isDefault: json['is_default'] as bool? ?? false,
+    );
+  }
 }
 
 class CheckoutProvider with ChangeNotifier {
+  final AddressService _addressService = AddressService();
 
   // State
   List<Address> _addresses = [];
@@ -81,29 +96,25 @@ class CheckoutProvider with ChangeNotifier {
   // NOTE: This is a temporary implementation.
   // TODO: Implement proper addresses table in Supabase when ready
   Future<void> loadAddresses() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
     try {
-      _isLoading = true;
-      _error = null;
-      notifyListeners();
-
-      // TODO: When addresses table is ready, fetch from Supabase:
-      // final response = await _supabaseService.getUserAddresses(userId);
-      // _addresses = (response as List)
-      //     .map((json) => Address.fromJson(json))
-      //     .toList();
-
-      // For now, return empty list (user must add addresses)
-      // In real app, this will fetch from user profile in database
+      final rows = await _addressService.fetchCurrentUserAddresses();
+      _addresses = rows.map(Address.fromJson).toList(growable: false);
+      _selectedAddress = _addresses.cast<Address?>().firstWhere(
+            (address) => address?.isDefault == true,
+            orElse: () => _addresses.isNotEmpty ? _addresses.first : null,
+          );
+    } catch (e) {
       _addresses = [];
       _selectedAddress = null;
-
+      _error = 'تعذر تحميل عناوينك: $e';
+    } finally {
       _isLoading = false;
-    } catch (e) {
-      _isLoading = false;
-      _error = 'خطأ في تحميل العناوين: ${e.toString()}';
-      print('❌ Error loading addresses: $e');
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   // Add address
