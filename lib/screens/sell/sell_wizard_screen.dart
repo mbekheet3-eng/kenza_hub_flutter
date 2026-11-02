@@ -209,7 +209,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
 
     try {
       // 1. Ensure the default seller profile exists before uploading files.
-      await _productService.ensureSellerProfile();
+      final sellerProfileId = await _productService.ensureSellerProfile();
 
       // 2. Upload images
       uploadedImageUrls.addAll(
@@ -218,6 +218,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
 
       // 3. Resolve database foreign keys and create the product + image rows.
       await _productService.createProduct(
+        sellerProfileId: sellerProfileId,
         categorySlug: _category!,
         title: _title,
         description: _description,
