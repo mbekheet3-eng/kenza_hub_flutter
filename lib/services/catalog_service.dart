@@ -28,6 +28,33 @@ class CatalogService {
         )
         .toList(growable: false);
   }
+  Future<String?> fetchRootCategorySlug(String categorySlug) async {
+    final rows = await _client
+        .from('categories')
+        .select('id,slug,parent_id')
+        .eq('is_active', true);
+
+    final categories = (rows as List)
+        .map((row) => Map<String, dynamic>.from(row as Map))
+        .toList(growable: false);
+    final byId = {
+      for (final category in categories)
+        category['id'] as String: category,
+    };
+    final matches = categories.where(
+      (category) => category['slug'] == categorySlug,
+    );
+    if (matches.isEmpty) return null;
+
+    var current = matches.first;
+    var parentId = current['parent_id'] as String?;
+    while (parentId != null && byId.containsKey(parentId)) {
+      current = byId[parentId]!;
+      parentId = current['parent_id'] as String?;
+    }
+    return current['slug'] as String?;
+  }
+
   Future<List<String>> fetchConditions() async {
     final rows = await _client
         .from('product_conditions')
