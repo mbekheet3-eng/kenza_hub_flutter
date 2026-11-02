@@ -35,6 +35,9 @@ final goRouter = GoRouter(
       '/sign-up',
     }.contains(state.uri.path);
 
+    if (state.uri.path == '/auth-callback') {
+      return hasSession ? '/home' : '/welcome';
+    }
     if (hasSession && isEntryPage) return '/home';
     return null;
   },
@@ -46,6 +49,10 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/login',
       builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      path: '/auth-callback',
+      builder: (context, state) => const HomeScreen(),
     ),
     GoRoute(
       path: '/forgot-password',
