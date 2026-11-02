@@ -103,6 +103,16 @@ class ProductProvider extends ChangeNotifier {
     }, 'فشل تحميل المنتجات');
   }
 
+  Future<bool> isFavorite(String productId, String userId) async {
+    try {
+      final favoriteIds = await _supabaseService.getUserFavorites(userId);
+      return favoriteIds.contains(productId);
+    } catch (e) {
+      _error = 'تعذر تحميل حالة المفضلة: $e';
+      return false;
+    }
+  }
+
   Future<bool> toggleFavorite(String productId, String userId) async {
     try {
       await _supabaseService.toggleFavorite(productId, userId);
