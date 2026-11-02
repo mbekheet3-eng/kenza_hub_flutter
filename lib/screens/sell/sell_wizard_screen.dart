@@ -180,13 +180,16 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
     }
 
     setState(() => _isLoading = true);
+    final uploadedImageUrls = <String>[];
 
     try {
       // 1. Ensure the default seller profile exists before uploading files.
       await _productService.ensureSellerProfile();
 
       // 2. Upload images
-      final imageUrls = await _uploadService.uploadImages(_selectedImages);
+      uploadedImageUrls.addAll(
+        await _uploadService.uploadImages(_selectedImages),
+      );
 
       // 3. Resolve database foreign keys and create the product + image rows.
       await _productService.createProduct(
@@ -198,7 +201,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         colorLabel: categorySkipFields[_category] == true ? null : _color,
         sizeLabel: categorySkipFields[_category] == true ? null : _size,
         brandName: _brand,
-        imageUrls: imageUrls,
+        imageUrls: uploadedImageUrls,
       );
 
       // 4. Clean up cache
@@ -212,6 +215,9 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         context.pushReplacement('/home');
       }
     } catch (e) {
+      if (uploadedImageUrls.isNotEmpty) {
+        await _uploadService.deleteImages(uploadedImageUrls);
+      }
       _showError('فشل نشر المنتج: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
