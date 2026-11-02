@@ -59,7 +59,13 @@ class HomeHeader extends StatelessWidget implements PreferredSizeWidget {
             ),
             IconButton(
               tooltip: 'الإشعارات',
-              onPressed: () {},
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('الإشعارات غير متاحة حالياً.'),
+                  ),
+                );
+              },
               icon: const Icon(
                 Icons.notifications_none_rounded,
                 color: AppColors.textPrimary,
