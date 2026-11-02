@@ -6,6 +6,7 @@ import 'package:kenza_hub_flutter/config/app_radius.dart';
 import 'package:kenza_hub_flutter/config/app_spacing.dart';
 import 'package:kenza_hub_flutter/providers/auth_provider.dart';
 import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
+import 'package:kenza_hub_flutter/core/helpers.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -156,10 +157,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
+                      if (value == null || value.trim().isEmpty) {
                         return strings.emailRequired;
                       }
-                      if (!value.contains('@')) {
+                      if (!StringHelpers.isValidEmail(value)) {
                         return strings.invalidEmail;
                       }
                       return null;
