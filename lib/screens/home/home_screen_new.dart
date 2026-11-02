@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     // Load products on first build
     Future.microtask(() {
-      context.read<HomeProvider>().initialize();
+      if (mounted) context.read<HomeProvider>().initialize();
     });
   }
 
