@@ -150,8 +150,23 @@ class CartProvider with ChangeNotifier {
   // Load cart from JSON
   void loadFromJson(List<dynamic> json) {
     _items.clear();
-    for (var item in json) {
-      _items.add(CartItem.fromJson(item as Map<String, dynamic>));
+    for (final item in json) {
+      final loaded = CartItem.fromJson(item as Map<String, dynamic>);
+      if (_items.any((existing) => existing.productId == loaded.productId)) {
+        continue;
+      }
+      _items.add(
+        CartItem(
+          id: loaded.productId,
+          productId: loaded.productId,
+          title: loaded.title,
+          price: loaded.price,
+          imageUrl: loaded.imageUrl,
+          quantity: 1,
+          size: loaded.size,
+          color: loaded.color,
+        ),
+      );
     }
     notifyListeners();
   }
