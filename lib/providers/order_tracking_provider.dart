@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:kenza_hub_flutter/services/supabase_service.dart';
-import 'package:kenza_hub_flutter/models/order.dart' as order_model;
 
-/// Timeline event for order status tracking
+import 'package:kenza_hub_flutter/models/order.dart' as order_model;
+import 'package:kenza_hub_flutter/services/supabase_service.dart';
+
 class OrderTimelineEvent {
   final String id;
-  final String status; // pending, accepted, shipped, delivered, cancelled
+  final String status;
   final String timestamp;
   final String? description;
   final String? location;
@@ -20,64 +20,55 @@ class OrderTimelineEvent {
 
   String get displayStatus {
     switch (status.toLowerCase()) {
-      case 'pending':
-        return 'قيد الانتظار';
-      case 'accepted':
-        return 'تم القبول';
-      case 'shipped':
-        return 'في الطريق';
-      case 'delivered':
-        return 'تم التسليم';
-      case 'cancelled':
-        return 'ملغي';
-      case 'completed':
-        return 'مكتمل';
-      case 'disputed':
-        return 'قيد النزاع';
-      default:
-        return status;
+      case 'pending': return 'قيد الانتظار';
+      case 'accepted': return 'تم القبول';
+      case 'shipped': return 'تم الشحن';
+      case 'delivered': return 'تم التسليم';
+      case 'completed': return 'مكتمل';
+      case 'cancelled': return 'ملغي';
+      case 'rejected': return 'مرفوض';
+      case 'disputed': return 'قيد النزاع';
+      case 'dispute_resolved': return 'تم حل النزاع';
+      case 'refund_approved': return 'تمت الموافقة على الاسترداد';
+      case 'refund_rejected': return 'رُفض الاسترداد';
+      case 'return_requested': return 'طلب إرجاع';
+      case 'return_approved': return 'تمت الموافقة على الإرجاع';
+      case 'return_received': return 'تم استلام المرتجع';
+      case 'refunded': return 'تم رد المبلغ';
+      default: return status;
     }
   }
 
   String get statusIcon {
     switch (status.toLowerCase()) {
-      case 'pending':
-        return '⏳';
-      case 'accepted':
-        return '✓';
-      case 'shipped':
-        return '📦';
+      case 'pending': return '⏳';
+      case 'accepted': return '✓';
+      case 'shipped': return '📦';
       case 'delivered':
-        return '✓✓';
       case 'completed':
-        return '🎉';
+      case 'refunded': return '✓✓';
       case 'cancelled':
-        return '✗';
+      case 'rejected': return '✗';
       case 'disputed':
-        return '⚠️';
-      default:
-        return '•';
+      case 'return_requested': return '⚠️';
+      default: return '•';
     }
   }
 
   Color get statusColor {
     switch (status.toLowerCase()) {
-      case 'pending':
-        return Colors.orange;
-      case 'accepted':
-        return Colors.blue;
-      case 'shipped':
-        return Colors.purple;
+      case 'pending': return Colors.orange;
+      case 'accepted': return Colors.blue;
+      case 'shipped': return Colors.indigo;
       case 'delivered':
-        return Colors.green;
       case 'completed':
-        return Colors.green;
+      case 'refunded': return Colors.green;
       case 'cancelled':
-        return Colors.red;
+      case 'rejected':
+      case 'refund_rejected': return Colors.red;
       case 'disputed':
-        return Colors.deepOrange;
-      default:
-        return Colors.grey;
+      case 'return_requested': return Colors.deepOrange;
+      default: return Colors.grey;
     }
   }
 }
@@ -97,125 +88,102 @@ class OrderTrackingProvider with ChangeNotifier {
 
   int get progressPercentage {
     if (_order == null) return 0;
-    
     switch (_order!.status) {
-      case order_model.OrderStatus.pending:
-        return 25;
-      case order_model.OrderStatus.accepted:
-        return 50;
-      case order_model.OrderStatus.shipped:
-        return 75;
-      case order_model.OrderStatus.delivered:
+      case order_model.OrderStatus.pending: return 10;
+      case order_model.OrderStatus.accepted: return 35;
+      case order_model.OrderStatus.shipped: return 65;
+      case order_model.OrderStatus.delivered: return 85;
       case order_model.OrderStatus.completed:
-        return 100;
+      case order_model.OrderStatus.refunded: return 100;
       case order_model.OrderStatus.cancelled:
+      case order_model.OrderStatus.rejected:
+      case order_model.OrderStatus.refundRejected: return 0;
       case order_model.OrderStatus.disputed:
-        return 0;
+      case order_model.OrderStatus.disputeResolved:
+      case order_model.OrderStatus.refundApproved:
+      case order_model.OrderStatus.returnRequested:
+      case order_model.OrderStatus.returnApproved:
+      case order_model.OrderStatus.returnReceived: return 50;
     }
   }
 
   Future<void> loadOrder(String orderId) async {
-    try {
-      _isLoading = true;
-      _error = null;
-      _timelineEvents.clear();
-      notifyListeners();
+    _isLoading = true;
+    _error = null;
+    _timelineEvents = [];
+    notifyListeners();
 
-      // Fetch order from Supabase
+    try {
       final orderData = await _supabaseService.fetchOrderById(orderId);
       _order = order_model.Order.fromJson(orderData);
-
-      // Build timeline from order
-      _buildTimeline();
-
-      _isLoading = false;
+      _buildTimeline(orderData['order_status_history']);
     } catch (e) {
+      _error = 'خطأ في تحميل الطلب: $e';
+    } finally {
       _isLoading = false;
-      _error = 'خطأ في تحميل الطلب: ${e.toString()}';
-      print('❌ Error loading order: $e');
+      notifyListeners();
     }
-    notifyListeners();
   }
 
-  void _buildTimeline() {
-    if (_order == null) return;
+  void _buildTimeline(dynamic rawHistory) {
+    _timelineEvents = [];
+    if (rawHistory is List) {
+      final history = rawHistory
+          .whereType<Map>()
+          .map((row) => Map<String, dynamic>.from(row))
+          .toList()
+        ..sort((a, b) =>
+            (a['created_at']?.toString() ?? '')
+                .compareTo(b['created_at']?.toString() ?? ''));
 
-    _timelineEvents.clear();
+      for (final row in history) {
+        final status = row['new_status'] as String? ?? '';
+        if (status.isEmpty) continue;
+        _timelineEvents.add(
+          OrderTimelineEvent(
+            id: row['id']?.toString() ??
+                '${status}_${row['created_at']?.toString() ?? ''}',
+            status: status,
+            timestamp: row['created_at']?.toString() ?? '',
+            description: (row['reason'] as String?) ??
+                (row['action'] as String?),
+          ),
+        );
+      }
+    }
 
-    // Add initial event
-    _timelineEvents.add(
-      OrderTimelineEvent(
-        id: '1',
-        status: 'pending',
-        timestamp: _order!.createdAt.toIso8601String(),
-        description: 'تم استقبال طلبك',
-        location: 'المستودع الرئيسي - القاهرة',
-      ),
-    );
-
-    // Add current status event
-    if (_order!.status != order_model.OrderStatus.pending) {
+    // If older orders have no history rows, show only the known order state.
+    if (_timelineEvents.isEmpty && _order != null) {
       _timelineEvents.add(
         OrderTimelineEvent(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          status: _order!.status.toString().split('.')[1],
-          timestamp: _order!.updatedAt.toIso8601String(),
-          description: _getStatusDescription(_order!.status),
-          location: _getStatusLocation(_order!.status),
+          id: _order!.id,
+          status: _statusCode(_order!.status),
+          timestamp: _order!.createdAt.toIso8601String(),
+          description: 'تم تسجيل الطلب',
         ),
       );
     }
   }
 
-  String _getStatusDescription(order_model.OrderStatus status) {
+  String _statusCode(order_model.OrderStatus status) {
     switch (status) {
-      case order_model.OrderStatus.pending:
-        return 'جاري التحقق من الطلب';
-      case order_model.OrderStatus.accepted:
-        return 'تم قبول الطلب';
-      case order_model.OrderStatus.shipped:
-        return 'تم شحن الطلب';
-      case order_model.OrderStatus.delivered:
-        return 'تم استلام الطلب';
-      case order_model.OrderStatus.completed:
-        return 'اكتمل الطلب';
-      case order_model.OrderStatus.cancelled:
-        return 'تم إلغاء الطلب';
-      case order_model.OrderStatus.disputed:
-        return 'الطلب قيد النزاع';
+      case order_model.OrderStatus.pending: return 'pending';
+      case order_model.OrderStatus.accepted: return 'accepted';
+      case order_model.OrderStatus.shipped: return 'shipped';
+      case order_model.OrderStatus.delivered: return 'delivered';
+      case order_model.OrderStatus.completed: return 'completed';
+      case order_model.OrderStatus.cancelled: return 'cancelled';
+      case order_model.OrderStatus.disputed: return 'disputed';
+      case order_model.OrderStatus.rejected: return 'rejected';
+      case order_model.OrderStatus.disputeResolved: return 'dispute_resolved';
+      case order_model.OrderStatus.refundApproved: return 'refund_approved';
+      case order_model.OrderStatus.refundRejected: return 'refund_rejected';
+      case order_model.OrderStatus.returnRequested: return 'return_requested';
+      case order_model.OrderStatus.returnApproved: return 'return_approved';
+      case order_model.OrderStatus.returnReceived: return 'return_received';
+      case order_model.OrderStatus.refunded: return 'refunded';
     }
   }
 
-  String _getStatusLocation(order_model.OrderStatus status) {
-    switch (status) {
-      case order_model.OrderStatus.pending:
-        return 'المستودع الرئيسي - القاهرة';
-      case order_model.OrderStatus.accepted:
-        return 'مركز التجميع - القاهرة';
-      case order_model.OrderStatus.shipped:
-        return 'في الطريق';
-      case order_model.OrderStatus.delivered:
-      case order_model.OrderStatus.completed:
-        return _order?.shippingAddress ?? 'وجهتك';
-      case order_model.OrderStatus.cancelled:
-      case order_model.OrderStatus.disputed:
-        return '';
-    }
-  }
-
-  // Simulate real-time updates (for testing)
-  Future<void> simulateStatusUpdate() async {
-    if (_order == null) return;
-
-    try {
-      await Future.delayed(const Duration(seconds: 2));
-      print('✅ Status simulation completed');
-    } catch (e) {
-      print('❌ Error in simulation: $e');
-    }
-  }
-
-  Future<void> retry(String orderId) async {
-    await loadOrder(orderId);
-  }
+  Future<void> retry(String orderId) => loadOrder(orderId);
 }
