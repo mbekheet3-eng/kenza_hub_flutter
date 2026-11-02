@@ -182,11 +182,14 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // 1. Upload images
+      // 1. Ensure the default seller profile exists before uploading files.
+      await _productService.ensureSellerProfile();
+
+      // 2. Upload images
       final imageUrls = await _uploadService.uploadImages(_selectedImages);
 
-      // 2. Resolve database foreign keys and create the product + image rows.
-      final productId = await _productService.createProduct(
+      // 3. Resolve database foreign keys and create the product + image rows.
+      await _productService.createProduct(
         categorySlug: _category!,
         title: _title,
         description: _description,
