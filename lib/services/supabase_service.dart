@@ -58,7 +58,7 @@ class SupabaseService {
     int limit = 20,
     int offset = 0,
   }) async {
-    final all = await _products.fetchActiveProducts(limit: 100);
+    final all = await _products.fetchAllActiveProducts();
     final normalized = query.trim().toLowerCase();
     final filtered = all.where((product) {
       final matchesQuery = normalized.isEmpty ||
@@ -106,7 +106,7 @@ class SupabaseService {
       _products.fetchActiveProducts(limit: limit);
 
   Future<List<Product>> getTrendingProducts({int limit = 10}) async {
-    final items = await _products.fetchActiveProducts(limit: 100);
+    final items = await _products.fetchAllActiveProducts();
     items.sort((a, b) => b.views.compareTo(a.views));
     return items.take(limit).toList(growable: false);
   }
@@ -124,7 +124,7 @@ class SupabaseService {
       fetchProductsWithImages();
 
   Future<List<Map<String, dynamic>>> fetchProductsWithImages() async {
-    final items = await _products.fetchActiveProducts(limit: 100);
+    final items = await _products.fetchAllActiveProducts();
     return items
         .map((product) => {
               ...product.toJson(),
