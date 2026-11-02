@@ -334,7 +334,14 @@ class SupabaseService {
   // Search / analytics
   // ---------------------------------------------------------------------------
 
-  Future<List<Product>> searchByImage(String imagePath) async => const [];
+  /// Visual search is intentionally unavailable until a real image-embedding
+  /// service and its secured endpoint are configured. Never report an empty
+  /// result list as if image matching had actually run.
+  Future<List<Product>> searchByImage(String imagePath) async {
+    throw UnsupportedError(
+      'البحث بالصورة يحتاج إلى تفعيل خدمة المطابقة البصرية على الخادم.',
+    );
+  }
 
   Future<void> incrementProductViews(String productId) async {
     try {
