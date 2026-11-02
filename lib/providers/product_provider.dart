@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+
 import '../models/product.dart';
+import '../services/marketplace_product_service.dart';
 import '../services/supabase_service.dart';
 
 class ProductProvider extends ChangeNotifier {
+  final MarketplaceProductService _productService =
+      MarketplaceProductService();
   final SupabaseService _supabaseService = SupabaseService();
 
   List<Product> _products = [];
@@ -10,148 +14,95 @@ class ProductProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
 
-  // Getters
   List<Product> get products => _products;
   Product? get currentProduct => _currentProduct;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  // Load all products
   Future<void> loadAllProducts() async {
-    _setLoading(true);
-    try {
-      _products = await _supabaseService.getAllProducts();
-      _error = null;
-    } catch (e) {
-      _error = 'فشل تحميل المنتجات: $e';
-      print('Error loading products: $e');
-    } finally {
-      _setLoading(false);
-    }
+    await _run(() async {
+      _products = await _productService.fetchActiveProducts();
+    }, 'فشل تحميل المنتجات');
   }
 
-  // Get single product by ID
   Future<void> getProduct(String productId) async {
-    _setLoading(true);
-    try {
-      _currentProduct = await _supabaseService.getProduct(productId);
-      _error = null;
-    } catch (e) {
-      _error = 'فشل تحميل المنتج: $e';
-      print('Error getting product: $e');
-    } finally {
-      _setLoading(false);
-    }
+    await _run(() async {
+      _currentProduct = await _productService.fetchProductById(productId);
+    }, 'فشل تحميل المنتج');
   }
 
-  // Load user products
   Future<void> loadUserProducts(String userId) async {
-    _setLoading(true);
-    try {
-      _products = await _supabaseService.getUserProducts(userId);
-      _error = null;
-    } catch (e) {
-      _error = 'فشل تحميل منتجاتك: $e';
-      print('Error loading user products: $e');
-    } finally {
-      _setLoading(false);
-    }
+    await _run(() async {
+      _products = await _productService.fetchSellerProducts(userId);
+    }, 'فشل تحميل منتجاتك');
   }
 
-  // Search products
   Future<void> searchProducts(String query) async {
-    _setLoading(true);
-    try {
-      _products = await _supabaseService.searchProducts(query: query);
-      _error = null;
-    } catch (e) {
-      _error = 'فشلت عملية البحث: $e';
-      print('Error searching products: $e');
-    } finally {
-      _setLoading(false);
-    }
+    await _run(() async {
+      final all = await _productService.fetchActiveProducts(limit: 100);
+      final normalized = query.trim().toLowerCase();
+      _products = normalized.isEmpty
+          ? all
+          : all
+              .where((product) =>
+                  product.title.toLowerCase().contains(normalized) ||
+                  product.description.toLowerCase().contains(normalized))
+              .toList(growable: false);
+    }, 'فشلت عملية البحث');
   }
 
-  // Create product
+  /// Publishing must go through SellWizardScreen so the service can resolve
+  /// seller membership, lookup IDs and image rows. Do not insert Product.toJson.
   Future<String?> createProduct(Product product) async {
-    _setLoading(true);
-    try {
-      final productId = await _supabaseService.createProduct(product);
-      if (productId != null) {
-        await loadUserProducts(product.userId!);
-      }
-      _error = null;
-      return productId;
-    } catch (e) {
-      _error = 'فشل إنشاء المنتج: $e';
-      print('Error creating product: $e');
-      return null;
-    } finally {
-      _setLoading(false);
-    }
+    _error = 'استخدم شاشة نشر المنتج لإتمام التحقق من بيانات البائع والقسم';
+    notifyListeners();
+    return null;
   }
 
-  // Update product
   Future<bool> updateProduct(Product product) async {
     _setLoading(true);
     try {
-      await _supabaseService.updateProduct(product);
-      // Update in local list
-      final index = _products.indexWhere((p) => p.id == product.id);
-      if (index != -1) {
-        _products[index] = product;
-      }
-      if (_currentProduct?.id == product.id) {
-        _currentProduct = product;
-      }
+      await _productService.updateProductDetails(product);
+      final index = _products.indexWhere((item) => item.id == product.id);
+      if (index != -1) _products[index] = product;
+      if (_currentProduct?.id == product.id) _currentProduct = product;
       _error = null;
       notifyListeners();
       return true;
     } catch (e) {
       _error = 'فشل تحديث المنتج: $e';
-      print('Error updating product: $e');
       return false;
     } finally {
       _setLoading(false);
     }
   }
 
-  // Delete product
   Future<bool> deleteProduct(String productId) async {
     _setLoading(true);
     try {
-      await _supabaseService.deleteProduct(productId);
-      _products.removeWhere((p) => p.id == productId);
-      if (_currentProduct?.id == productId) {
-        _currentProduct = null;
-      }
+      await _productService.softDeleteProduct(productId);
+      _products.removeWhere((item) => item.id == productId);
+      if (_currentProduct?.id == productId) _currentProduct = null;
       _error = null;
       notifyListeners();
       return true;
     } catch (e) {
-      _error = 'فشل حذف المنتج: $e';
-      print('Error deleting product: $e');
+      _error = 'فشل إخفاء المنتج: $e';
       return false;
     } finally {
       _setLoading(false);
     }
   }
 
-  // Get products by category
   Future<void> getProductsByCategory(String category) async {
-    _setLoading(true);
-    try {
-      _products = await _supabaseService.getProductsByCategory(category);
-      _error = null;
-    } catch (e) {
-      _error = 'فشل تحميل المنتجات: $e';
-      print('Error getting products by category: $e');
-    } finally {
-      _setLoading(false);
-    }
+    await _run(() async {
+      final all = await _productService.fetchActiveProducts(limit: 100);
+      _products = all
+          .where((product) => product.category == category)
+          .toList(growable: false);
+    }, 'فشل تحميل المنتجات');
   }
 
-  // Toggle favorite
   Future<bool> toggleFavorite(String productId, String userId) async {
     try {
       await _supabaseService.toggleFavorite(productId, userId);
@@ -159,27 +110,33 @@ class ProductProvider extends ChangeNotifier {
       return true;
     } catch (e) {
       _error = 'فشل تحديث المفضلات: $e';
-      print('Error toggling favorite: $e');
       return false;
+    } finally {
+      notifyListeners();
     }
   }
 
-  // Update view count
   Future<void> incrementViewCount(String productId) async {
+    await _supabaseService.incrementProductViews(productId);
+  }
+
+  Future<void> _run(Future<void> Function() action, String errorPrefix) async {
+    _setLoading(true);
     try {
-      await _supabaseService.incrementProductViews(productId);
+      await action();
+      _error = null;
     } catch (e) {
-      print('Error incrementing view count: $e');
+      _error = '$errorPrefix: $e';
+    } finally {
+      _setLoading(false);
     }
   }
 
-  // Private helper
   void _setLoading(bool value) {
     _isLoading = value;
     notifyListeners();
   }
 
-  // Clear products
   void clearProducts() {
     _products = [];
     _currentProduct = null;
