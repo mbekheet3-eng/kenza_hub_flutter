@@ -24,52 +24,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     });
   }
 
-  void _handleCheckout(BuildContext context) async {
-    final checkoutProvider = context.read<CheckoutProvider>();
-    final cartProvider = context.read<CartProvider>();
-    final authProvider = context.read<AuthProvider>();
-
-    if (!checkoutProvider.canProceed) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('يرجى ملء جميع البيانات المطلوبة'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    if (authProvider.userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('يرجى تسجيل الدخول أولاً'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    final success = await checkoutProvider.processPayment(
-      buyerId: authProvider.userId!,
-      cartItems: cartProvider.getCartJson(),
-      totalAmount: cartProvider.total,
-    );
-
-    if (success && mounted) {
-      // Clear cart
-      cartProvider.clear();
-
-      // Navigate to order confirmation
-      context.go('/order-confirmation/${checkoutProvider.orderId}');
-    } else if (checkoutProvider.error != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(checkoutProvider.error!),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,10 +69,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      Container(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(AppSpacing.md),
+                        ),
+                        child: const Text(
+                          'تأكيد الطلب متوقف مؤقتًا لحين اكتمال الاتفاقية الآمنة على الخادم. لن يتم إنشاء طلب أو تحصيل مبلغ من هذه الشاشة حاليًا.',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
                       ElevatedButton(
-                        onPressed: checkoutProvider.isProcessing
-                            ? null
-                            : () => _handleCheckout(context),
+                        onPressed: null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           padding: const EdgeInsets.symmetric(
@@ -139,7 +103,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 ),
                               )
                             : const Text(
-                                'تأكيد الطلب',
+                                'تأكيد الطلب غير متاح حاليًا',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -199,7 +163,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('السعر الفرعي'),
-              Text('${cartProvider.subtotal.toStringAsFixed(2)} ريال'),
+              Text('${cartProvider.subtotal.toStringAsFixed(2)} ج.م'),
             ],
           ),
           const SizedBox(height: 8),
@@ -207,22 +171,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('الشحن'),
-              Text(
-                cartProvider.shippingCost == 0
-                    ? 'مجاني'
-                    : '${cartProvider.shippingCost.toStringAsFixed(2)} ريال',
-                style: TextStyle(
-                  color: cartProvider.shippingCost == 0 ? Colors.green : null,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('الضريبة (14%)'),
-              Text('${cartProvider.tax.toStringAsFixed(2)} ريال'),
+              const Text('يُحدد عند تأكيد الاتفاقية'),
             ],
           ),
           const SizedBox(height: 12),
@@ -240,7 +189,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  '${cartProvider.total.toStringAsFixed(2)} ريال',
+                  '${cartProvider.total.toStringAsFixed(2)} ج.م',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: AppColors.primary,
@@ -372,18 +321,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          RadioListTile<String>(
-            title: const Text('بطاقة ائتمان/خصم'),
-            subtitle: const Text('Visa, Mastercard'),
-            value: 'card',
-            groupValue: checkoutProvider.paymentMethod,
-            onChanged: (value) {
-              if (value != null) {
-                checkoutProvider.setPaymentMethod(value);
-              }
-            },
-            dense: true,
-          ),
           RadioListTile<String>(
             title: const Text('الدفع عند الاستلام'),
             value: 'cash',
