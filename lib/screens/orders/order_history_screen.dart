@@ -222,7 +222,17 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       case OrderStatus.cancelled:
         return Colors.red;
       case OrderStatus.disputed:
+      case OrderStatus.returnRequested:
         return Colors.redAccent;
+      case OrderStatus.rejected:
+      case OrderStatus.refundRejected:
+        return Colors.red;
+      case OrderStatus.disputeResolved:
+      case OrderStatus.refundApproved:
+      case OrderStatus.returnApproved:
+      case OrderStatus.returnReceived:
+      case OrderStatus.refunded:
+        return Colors.green;
     }
   }
 }
