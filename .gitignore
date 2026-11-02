@@ -46,6 +46,7 @@ android/key.keystore
 ios/Flutter/Flutter.framework
 ios/Flutter/Flutter.podspec
 ios/Flutter/Generated.xcconfig
+ios/Flutter/ephemeral/
 ios/Flutter/ephemeralflutter_assets
 ios/Flutter/app.flx
 ios/Flutter/app.zip
