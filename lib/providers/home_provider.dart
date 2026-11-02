@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kenza_hub_flutter/models/product.dart';
-import 'package:kenza_hub_flutter/services/supabase_service.dart';
+import 'package:kenza_hub_flutter/services/marketplace_product_service.dart';
 
 class HomeProvider with ChangeNotifier {
-  final SupabaseService _supabaseService = SupabaseService();
+  final MarketplaceProductService _productService = MarketplaceProductService();
 
   // State
   List<Product> _allProducts = [];
@@ -20,8 +20,8 @@ class HomeProvider with ChangeNotifier {
     'الكل',      // 0. All (special - shows all items)
     'ملابس',    // 1. clothes
     'أحذية',    // 2. shoes
-    'ملابس أطفال',  // 3. kids
-    'منزل وأثاث',  // 4. home
+    'مستلزمات أطفال',  // 3. kids
+    'مستلزمات المنزل',  // 4. home
   ];
 
   // Mapping between UI labels and database category values
@@ -29,8 +29,8 @@ class HomeProvider with ChangeNotifier {
     'الكل': '',           // Empty = show all
     'ملابس': 'clothes',
     'أحذية': 'shoes',
-    'ملابس أطفال': 'kids',
-    'منزل وأثاث': 'home',
+    'مستلزمات أطفال': 'kids',
+    'مستلزمات المنزل': 'home',
   };
 
   // Getters
@@ -53,11 +53,7 @@ class HomeProvider with ChangeNotifier {
       _error = null;
       notifyListeners();
 
-      final productsData = await _supabaseService.fetchProducts();
-      
-      _allProducts = productsData
-          .map((data) => Product.fromJson(data))
-          .toList();
+      _allProducts = await _productService.fetchActiveProducts();
 
       _applyFilters();
       _isLoading = false;
