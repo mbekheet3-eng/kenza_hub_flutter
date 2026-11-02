@@ -49,6 +49,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       // Load the actual user profile from database
       final user = await SupabaseService().getUser(userId);
+      if (!mounted) return;
 
       setState(() {
         _currentUserProfile = user;
@@ -59,6 +60,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _isLoadingProfile = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMessage = 'فشل تحميل الملف الشخصي: $e';
         _isLoadingProfile = false;
@@ -80,11 +82,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final picker = ImagePicker();
       final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-      if (pickedFile != null) {
+      if (pickedFile != null && mounted) {
         setState(() => _selectedImage = File(pickedFile.path));
       }
     } catch (e) {
-      _showError('فشل اختيار الصورة: $e');
+      if (mounted) _showError('فشل اختيار الصورة: $e');
     }
   }
 
@@ -135,11 +137,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     } catch (e) {
       _showError('فشل حفظ الملف الشخصي: $e');
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   void _showError(String message) {
+    if (!mounted) return;
     setState(() => _errorMessage = message);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
