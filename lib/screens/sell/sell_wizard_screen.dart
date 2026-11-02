@@ -1,9 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../models/product.dart';
-import '../../services/supabase_service.dart';
+import '../../services/marketplace_product_service.dart';
 import '../../services/upload_service.dart';
 import '../../config/theme.dart';
 import 'steps/step_images.dart';
@@ -34,7 +33,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
   String _description = '';
   double _price = 0;
 
-  final _supabaseService = SupabaseService();
+  final _productService = MarketplaceProductService();
   final _uploadService = UploadService();
 
   late List<Step> steps;
@@ -164,8 +163,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
             (categorySkipFields[_category] != true) || 
             (_color != null && _size != null));
       case 3:
-        return _category != null && 
-            (categorySkipFields[_category] == true || _brand != null);
+        return _category != null; // Brand is optional.
       case 4:
         return _title.isNotEmpty && _description.isNotEmpty;
       case 5:
@@ -187,32 +185,18 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
       // 1. Upload images
       final imageUrls = await _uploadService.uploadImages(_selectedImages);
 
-      // 2. Create product
-      final currentUser = Supabase.instance.client.auth.currentUser;
-      if (currentUser == null) {
-        throw Exception('المستخدم غير مسجل');
-      }
-
-      final product = Product(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        userId: currentUser.id,
+      // 2. Resolve database foreign keys and create the product + image rows.
+      final productId = await _productService.createProduct(
+        categorySlug: _category!,
         title: _title,
         description: _description,
         price: _price,
-        category: _category!,
-        condition: _condition!,
-        color: _color,
-        size: _size,
-        brand: _brand,
+        conditionLabel: _condition!,
+        colorLabel: categorySkipFields[_category] == true ? null : _color,
+        sizeLabel: categorySkipFields[_category] == true ? null : _size,
+        brandName: _brand,
         imageUrls: imageUrls,
-        imagePaths: _selectedImages.map((f) => f.path).toList(),
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
       );
-
-      // 3. Save to database
-      final productId = await _supabaseService.addProduct(product);
-      await _supabaseService.addProductImages(productId, imageUrls);
 
       // 4. Clean up cache
       await _uploadService.cleanupCache();
@@ -222,12 +206,12 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('تم نشر المنتج بنجاح')),
         );
-        context.pushReplacement('/');
+        context.pushReplacement('/home');
       }
     } catch (e) {
       _showError('فشل نشر المنتج: $e');
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -236,7 +220,6 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         _category != null &&
         _condition != null &&
         (categorySkipFields[_category] == true || (_color != null && _size != null)) &&
-        (categorySkipFields[_category] == true || _brand != null) &&
         _title.isNotEmpty &&
         _description.isNotEmpty &&
         _price > 0;
