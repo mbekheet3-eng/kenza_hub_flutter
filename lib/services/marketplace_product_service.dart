@@ -88,9 +88,10 @@ class MarketplaceProductService {
             );
           }
     
-          final phone = (userProfile['phone'] as String?)?.trim();
-          final validPhone = phone != null &&
-              RegExp(r'^(?:01[0-9]{9}|\\+?[1-9][0-9]{7,14})
+          final functionResponse = await _client.functions.invoke(
+            'seller-profile-create',
+            body: {'display_name': displayName},
+          );
           final responseData = functionResponse.data;
           if (responseData is Map) {
             sellerProfileId = responseData['seller_profile_id'] as String?;
