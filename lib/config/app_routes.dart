@@ -153,6 +153,7 @@ final goRouter = GoRouter(
       path: '/search',
       builder: (context, state) => SearchScreen(
         query: state.uri.queryParameters['q'] ?? '',
+        categoryId: state.uri.queryParameters['categoryId'],
       ),
     ),
     GoRoute(
