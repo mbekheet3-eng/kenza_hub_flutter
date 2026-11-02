@@ -183,7 +183,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
     );
   }
 
-  Widget _buildProductCard(BuildContext context, dynamic product) {
+  Widget _buildProductCard(BuildContext context, Product product) {
     return GestureDetector(
       onTap: () => context.push('/product/${product.id}'),
       onLongPress: () => _showProductOptions(context, product),
@@ -301,7 +301,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product.title ?? '',
+                    product.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -321,7 +321,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                     children: [
                       Expanded(
                         child: OutlinedButton(
-                          onPressed: () => _showEditUnavailable(),
+                          onPressed: () => _showEditDialog(product),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 6),
                           ),
