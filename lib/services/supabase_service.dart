@@ -388,7 +388,7 @@ class SupabaseService {
   Future<void> resetPassword(String email) =>
       _client.auth.resetPasswordForEmail(
         email,
-        redirectTo: 'com.kenza.hub://reset-password/',
+        redirectTo: 'com.kenza.hub://login-callback/reset-password',
       );
 
   Future<void> signOut() => _client.auth.signOut();
