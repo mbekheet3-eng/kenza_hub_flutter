@@ -47,7 +47,6 @@ final class AppTheme {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: colorScheme.surface,
       textTheme: textTheme,
-
       appBarTheme: AppBarTheme(
         backgroundColor: colorScheme.surface,
         elevation: 0,
@@ -57,7 +56,6 @@ final class AppTheme {
             textTheme.titleLarge?.copyWith(color: colorScheme.onSurface),
         toolbarHeight: 56,
       ),
-
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: colorScheme.surface,
@@ -85,7 +83,6 @@ final class AppTheme {
           borderSide: BorderSide(color: colorScheme.error),
         ),
       ),
-
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: colorScheme.primary,
@@ -101,7 +98,6 @@ final class AppTheme {
           ),
         ),
       ),
-
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: colorScheme.primary,
@@ -116,7 +112,6 @@ final class AppTheme {
           ),
         ),
       ),
-
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: colorScheme.primary,
@@ -131,15 +126,13 @@ final class AppTheme {
           ),
         ),
       ),
-
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: colorScheme.primary,
           textStyle: textTheme.labelLarge,
         ),
       ),
-
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: colorScheme.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -147,23 +140,19 @@ final class AppTheme {
         ),
         margin: EdgeInsets.zero,
       ),
-
       dividerTheme: DividerThemeData(
         color: colorScheme.outline,
         thickness: 1,
         space: 1,
       ),
-
       iconTheme: IconThemeData(
         color: colorScheme.onSurface,
       ),
-
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
         elevation: 6,
       ),
-
       snackBarTheme: SnackBarThemeData(
         backgroundColor: colorScheme.surface,
         contentTextStyle: textTheme.bodyMedium?.copyWith(
@@ -171,7 +160,6 @@ final class AppTheme {
         ),
         behavior: SnackBarBehavior.floating,
       ),
-
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: colorScheme.surface,
         indicatorColor: colorScheme.primary.withOpacity(0.08),
@@ -185,7 +173,6 @@ final class AppTheme {
           ),
         ),
       ),
-
       visualDensity: VisualDensity.adaptivePlatformDensity,
     );
   }
