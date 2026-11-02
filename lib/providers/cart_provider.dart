@@ -91,8 +91,8 @@ class CartProvider with ChangeNotifier {
     );
 
     if (existingItemIndex >= 0) {
-      // Update quantity
-      _items[existingItemIndex].quantity += quantity;
+      // Each listing represents one unique item; do not increase stock quantity.
+      return;
     } else {
       // Add new item
       final cartItem = CartItem(
@@ -101,7 +101,7 @@ class CartProvider with ChangeNotifier {
         title: title,
         price: price,
         imageUrl: imageUrl,
-        quantity: quantity,
+        quantity: 1,
         size: size,
         color: color,
       );
@@ -124,7 +124,8 @@ class CartProvider with ChangeNotifier {
       if (newQuantity <= 0) {
         removeItem(itemId);
       } else {
-        _items[itemIndex].quantity = newQuantity;
+        // A listing has one unit because the sell flow does not collect stock.
+        _items[itemIndex].quantity = 1;
         notifyListeners();
       }
     }
