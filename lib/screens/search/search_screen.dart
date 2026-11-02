@@ -451,22 +451,14 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        product.condition ?? 'جديد',
-                        style:
-                            Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppTheme.textSecondary,
-                          fontSize: 11,
-                        ),
-                      ),
-                      Icon(
-                        Icons.favorite_border,
-                        size: 16,
-                        color: AppTheme.textTertiary,
-                      ),
+                  Text(
+                    product.condition ?? 'جديد',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppTheme.textSecondary,
+                      fontSize: 11,
+                    ),
+                  ),
+
                     ],
                   ),
                 ],
