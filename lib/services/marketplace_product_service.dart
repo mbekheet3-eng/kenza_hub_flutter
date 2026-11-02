@@ -19,7 +19,7 @@ class MarketplaceProductService {
     size:product_sizes!products_size_id_fkey(slug,label_ar,label_en),
     status:product_statuses!products_status_id_fkey(slug,label_ar,label_en),
     seller:seller_profiles!products_seller_id_fkey(owner_user_id,display_name,avatar_url),
-    images:product_images!product_images_product_id_fkey(image_url,display_order)
+    images:product_images!product_images_product_id_fkey(image_url,display_order,created_at)
   ''';
 
   Future<String> createProduct({
@@ -183,7 +183,25 @@ class MarketplaceProductService {
           .from('product_sizes')
           .select('id,slug,label_ar,label_en,category_id')
           .eq('is_active', true);
-      final allowedCategoryIds = {categoryId, if (parentId != null) parentId};
+      final categoryRows = await _client
+          .from('categories')
+          .select('id,parent_id')
+          .eq('is_active', true);
+      final categoryMap = {
+        for (final row in categoryRows as List)
+          (row as Map)['id'] as String: Map<String, dynamic>.from(row),
+      };
+      var rootCategoryId = categoryId;
+      var ancestorId = parentId;
+      while (ancestorId != null && categoryMap.containsKey(ancestorId)) {
+        rootCategoryId = ancestorId;
+        ancestorId = categoryMap[ancestorId]!['parent_id'] as String?;
+      }
+      final allowedCategoryIds = {
+        categoryId,
+        if (parentId != null) parentId,
+        rootCategoryId,
+      };
       final matchingSizes = (sizes as List).where((row) {
         final data = Map<String, dynamic>.from(row as Map);
         final matchesLabel = data['label_ar'] == sizeLabel ||
@@ -250,7 +268,7 @@ class MarketplaceProductService {
       // Do not leave a visible product without its images if the image-row
       // write is rejected. This only attempts to remove the just-created row.
       try {
-        await _client.from('products').delete().eq('id', productId);
+        await softDeleteProduct(productId);
       } catch (_) {
         // Preserve the original failure; the owner can remove the draft later.
       }
