@@ -23,6 +23,7 @@ class _StepCategoryState extends State<StepCategory> {
   late Future<List<DatabaseCategory>> _categoriesFuture;
   final List<DatabaseCategory> _path = [];
   String? _selectedCategory;
+  bool _selectionRestored = false;
   bool _preservePathOnNextNullUpdate = false;
 
   @override
@@ -35,30 +36,65 @@ class _StepCategoryState extends State<StepCategory> {
   @override
   void didUpdateWidget(covariant StepCategory oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.selectedCategory != widget.selectedCategory) {
-      _selectedCategory = widget.selectedCategory;
-      if (_preservePathOnNextNullUpdate && widget.selectedCategory == null) {
-        _preservePathOnNextNullUpdate = false;
-      } else {
-        _path.clear();
-      }
+    if (oldWidget.selectedCategory == widget.selectedCategory) return;
+
+    _selectedCategory = widget.selectedCategory;
+    if (_preservePathOnNextNullUpdate && widget.selectedCategory == null) {
+      // Opening another branch clears the previous leaf selection, but must
+      // keep the navigation path the user just opened.
+      _preservePathOnNextNullUpdate = false;
+      _selectionRestored = true;
+    } else {
+      _path.clear();
+      _selectionRestored = false;
     }
+  }
+
+  void _restoreSelectionPath(List<DatabaseCategory> categories) {
+    if (_selectionRestored) return;
+    _selectionRestored = true;
+    _path.clear();
+    _selectedCategory = widget.selectedCategory;
+
+    if (widget.selectedCategory == null) return;
+
+    final byId = {for (final item in categories) item.id: item};
+    final selected = categories.where(
+      (item) => item.slug == widget.selectedCategory,
+    );
+    if (selected.isEmpty) {
+      _selectedCategory = null;
+      return;
+    }
+
+    var parentId = selected.first.parentId;
+    final ancestors = <DatabaseCategory>[];
+    final visited = <String>{selected.first.id};
+
+    // Guard against malformed cyclic parent relationships in remote data.
+    while (parentId != null && visited.add(parentId)) {
+      final parent = byId[parentId];
+      if (parent == null) break;
+      ancestors.add(parent);
+      parentId = parent.parentId;
+    }
+
+    _path.addAll(ancestors.reversed);
   }
 
   void _openCategory(
     DatabaseCategory category,
     List<DatabaseCategory> allCategories,
   ) {
-    final children = allCategories
-        .where((item) => item.parentId == category.id)
-        .toList();
+    final hasChildren = allCategories.any(
+      (item) => item.parentId == category.id,
+    );
 
-    if (children.isNotEmpty) {
+    if (hasChildren) {
       setState(() {
         _path.add(category);
         _selectedCategory = null;
       });
-      // Clear a previous leaf selection without losing the newly opened path.
       if (widget.selectedCategory != null) {
         _preservePathOnNextNullUpdate = true;
         widget.onCategorySelected(null);
@@ -70,10 +106,23 @@ class _StepCategoryState extends State<StepCategory> {
     widget.onCategorySelected(category.slug);
   }
 
+  void _goBack() {
+    if (_path.isEmpty) return;
+    setState(() {
+      _path.removeLast();
+      _selectedCategory = null;
+    });
+    if (widget.selectedCategory != null) {
+      _preservePathOnNextNullUpdate = true;
+      widget.onCategorySelected(null);
+    }
+  }
+
   void _retry() {
     setState(() {
       _path.clear();
       _selectedCategory = null;
+      _selectionRestored = true;
       _categoriesFuture = _catalogService.fetchCategories();
     });
     widget.onCategorySelected(null);
@@ -110,9 +159,7 @@ class _StepCategoryState extends State<StepCategory> {
           );
         }
 
-        if (snapshot.hasError) {
-          return _buildErrorState();
-        }
+        if (snapshot.hasError) return _buildErrorState();
 
         final categories = snapshot.data ?? const <DatabaseCategory>[];
         if (categories.isEmpty) {
@@ -123,6 +170,8 @@ class _StepCategoryState extends State<StepCategory> {
             ),
           );
         }
+
+        _restoreSelectionPath(categories);
 
         final currentParent = _path.isEmpty ? null : _path.last;
         final visibleCategories = categories
@@ -143,25 +192,40 @@ class _StepCategoryState extends State<StepCategory> {
                     : 'اختر القسم الفرعي',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
-              if (currentParent != null) ...[
-                const SizedBox(height: 12),
-                Row(
+              if (_path.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 4,
+                  runSpacing: 4,
                   children: [
-                    IconButton(
-                      tooltip: 'رجوع',
-                      onPressed: () => setState(() => _path.removeLast()),
-                      icon: const Icon(Icons.arrow_back),
-                    ),
-                    Expanded(
-                      child: Text(
-                        currentParent.labelFor(languageCode),
-                        style: Theme.of(context).textTheme.titleSmall,
+                    for (var index = 0; index < _path.length; index++) ...[
+                      if (index > 0)
+                        const Icon(Icons.chevron_right, size: 16),
+                      Text(
+                        _path[index].labelFor(languageCode),
+                        style: TextStyle(
+                          color: index == _path.length - 1
+                              ? AppTheme.primaryColor
+                              : AppTheme.textSecondary,
+                          fontWeight: index == _path.length - 1
+                              ? FontWeight.w700
+                              : FontWeight.normal,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: TextButton.icon(
+                    onPressed: _goBack,
+                    icon: const Icon(Icons.arrow_back, size: 18),
+                    label: const Text('رجوع للقسم السابق'),
+                  ),
+                ),
               ],
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -211,6 +275,8 @@ class _StepCategoryState extends State<StepCategory> {
                             child: Text(
                               category.labelFor(languageCode),
                               textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 color: isSelected
@@ -248,8 +314,11 @@ class _StepCategoryState extends State<StepCategory> {
                   ),
                   child: const Row(
                     children: [
-                      Icon(Icons.check_circle_outline,
-                          color: AppTheme.infoColor, size: 20),
+                      Icon(
+                        Icons.check_circle_outline,
+                        color: AppTheme.infoColor,
+                        size: 20,
+                      ),
                       SizedBox(width: 12),
                       Expanded(
                         child: Text(
