@@ -370,14 +370,6 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.visibility_off),
-              title: const Text('إيقاف العرض'),
-              onTap: () {
-                Navigator.pop(context);
-                _toggleProductVisibility(product.id);
-              },
-            ),
-            ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
               title: const Text('حذف', style: TextStyle(color: Colors.red)),
               onTap: () {
@@ -386,18 +378,6 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
               },
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  void _toggleProductVisibility(String productId) {
-    // The current database contract has a soft-delete state, but no verified
-    // paused/inactive state. Do not map "pause listing" to permanent deletion.
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'إيقاف العرض مؤقتاً غير متاح حتى يتم اعتماد حالة الإيقاف في قاعدة البيانات.',
         ),
       ),
     );
