@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../screens/welcome/welcome_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
@@ -24,6 +25,18 @@ import '../screens/sell/sell_wizard_screen.dart';
 // GoRouter configuration
 final goRouter = GoRouter(
   initialLocation: '/welcome',
+  redirect: (context, state) {
+    final hasSession =
+        Supabase.instance.client.auth.currentSession != null;
+    final isEntryPage = {
+      '/welcome',
+      '/login',
+      '/sign-up',
+    }.contains(state.uri.path);
+
+    if (hasSession && isEntryPage) return '/home';
+    return null;
+  },
   routes: [
     GoRoute(
       path: '/welcome',
