@@ -372,14 +372,14 @@ class UploadService {
       final extension = _getFileExtension(imageFile.path);
       final mimeType = _getMimeType(imageFile.path);
       final objectPath =
-          'products/$userId/profile/avatar$extension';
+          'products/$userId/profile/${const Uuid().v4()}$extension';
 
       await _client.storage.from(bucketName).uploadBinary(
             objectPath,
             fileBytes,
             fileOptions: FileOptions(
               contentType: mimeType,
-              upsert: true,
+              upsert: false,
             ),
           );
 
