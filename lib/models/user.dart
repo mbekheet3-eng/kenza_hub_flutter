@@ -92,7 +92,7 @@ class User {
 
     return {
       if (firstName != null) 'first_name': firstName,
-      if (lastName != null) 'last_name': lastName,
+      'last_name': lastName,
       'phone': phone,
       'avatar_url': avatarUrl,
       'bio': bio,
@@ -184,7 +184,7 @@ class UserProfile {
     final parts = (displayName ?? '').trim().split(RegExp(r'\s+'));
     return {
       if (parts.isNotEmpty && parts.first.isNotEmpty) 'first_name': parts.first,
-      if (parts.length > 1) 'last_name': parts.skip(1).join(' '),
+      'last_name': parts.length > 1 ? parts.skip(1).join(' ') : null,
       if (bio != null) 'bio': bio,
       if (avatarUrl != null) 'avatar_url': avatarUrl,
       if (location != null) 'city': location,
