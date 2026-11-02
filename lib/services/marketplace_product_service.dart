@@ -314,12 +314,20 @@ class MarketplaceProductService {
         .select('seller_profile_id')
         .eq('user_id', userId)
         .isFilter('revoked_at', null)
-        .limit(1);
+        .limit(2);
+
+    final membershipRows = (memberships as List)
+        .map((row) => Map<String, dynamic>.from(row as Map))
+        .toList(growable: false);
+    if (membershipRows.length > 1) {
+      throw StateError(
+        'حسابك مرتبط بأكثر من متجر نشط. اختر المتجر المطلوب قبل عرض المنتجات.',
+      );
+    }
 
     String? sellerProfileId;
-    if ((memberships as List).isNotEmpty) {
-      sellerProfileId =
-          (memberships.first as Map)['seller_profile_id'] as String?;
+    if (membershipRows.isNotEmpty) {
+      sellerProfileId = membershipRows.single['seller_profile_id'] as String?;
     } else {
       final ownedProfile = await _client
           .from('seller_profiles')
