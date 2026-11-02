@@ -46,9 +46,8 @@ class _StepBrandState extends State<StepBrand> {
     if (oldWidget.selectedBrand != widget.selectedBrand) {
       _selectedBrand = widget.selectedBrand;
     }
-    if (oldWidget.category != widget.category &&
-        categorySkipFields[widget.category] == true) {
-      _selectBrand(null);
+    if (oldWidget.category != widget.category) {
+      _selectedBrand = widget.selectedBrand;
     }
   }
 
