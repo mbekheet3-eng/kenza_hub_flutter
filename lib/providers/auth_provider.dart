@@ -210,7 +210,6 @@ class AuthProvider with ChangeNotifier {
       await SupabaseService.client.auth.updateUser(
         UserAttributes(password: newPassword),
       );
-      _isPasswordRecovery = false;
       _isLoading = false;
       notifyListeners();
       return true;
@@ -220,6 +219,10 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
       return false;
     }
+  }
+
+  void clearPasswordRecovery() {
+    _isPasswordRecovery = false;
   }
 
   // Clear error
