@@ -11,6 +11,7 @@ import '../screens/checkout/order_confirmation_screen.dart';
 import '../screens/orders/order_tracking_screen.dart';
 import '../screens/orders/order_history_screen.dart';
 import '../screens/profile/profile_screen.dart';
+import '../screens/profile/seller_dashboard_screen.dart';
 import '../screens/profile/edit_profile_screen.dart';
 import '../screens/profile/my_products_screen.dart';
 import '../screens/search/search_screen.dart';
@@ -71,6 +72,10 @@ final goRouter = GoRouter(
       builder: (context, state) => const OrderHistoryScreen(),
     ),
     GoRoute(
+      path: '/seller-dashboard',
+      builder: (context, state) => const SellerDashboardScreen(),
+    ),
+    GoRoute(
       path: '/profile',
       builder: (context, state) => const ProfileScreen(),
     ),
@@ -116,6 +121,7 @@ class AppRoutes {
   static const String orderTracking = '/order-tracking';
   static const String orderHistory = '/orders';
   static const String profile = '/profile';
+  static const String sellerDashboard = '/seller-dashboard';
   static const String editProfile = '/edit-profile';
   static const String myProducts = '/my-products';
   static const String search = '/search';
