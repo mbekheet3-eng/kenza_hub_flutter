@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/product_provider.dart';
+import '../../models/product.dart';
 import '../../config/theme.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -21,7 +22,8 @@ class _SearchScreenState extends State<SearchScreen> {
   String _selectedCategory = 'all';
   String _selectedCondition = 'all';
   double _minPrice = 0;
-  double _maxPrice = 10000;
+  double _maxPrice = 1000000;
+  bool _priceFilterEnabled = false;
   String _sortBy = 'newest'; // newest, price_low, price_high, most_viewed
 
   @override
@@ -58,7 +60,8 @@ class _SearchScreenState extends State<SearchScreen> {
       _selectedCategory = 'all';
       _selectedCondition = 'all';
       _minPrice = 0;
-      _maxPrice = 10000;
+      _maxPrice = 1000000;
+      _priceFilterEnabled = false;
       _sortBy = 'newest';
     });
   }
@@ -72,8 +75,8 @@ class _SearchScreenState extends State<SearchScreen> {
     products = products.where((p) {
       // Search filter
       if (_searchController.text.isNotEmpty) {
-        if (!(p.title?.toLowerCase().contains(_searchController.text.toLowerCase()) ?? false) &&
-            !(p.description?.toLowerCase().contains(_searchController.text.toLowerCase()) ?? false)) {
+        if (!p.title.toLowerCase().contains(_searchController.text.trim().toLowerCase()) &&
+            !p.description.toLowerCase().contains(_searchController.text.trim().toLowerCase())) {
           return false;
         }
       }
@@ -89,12 +92,12 @@ class _SearchScreenState extends State<SearchScreen> {
       }
 
       // Price filter
-      if (p.price != null && (p.price! < _minPrice || p.price! > _maxPrice)) {
+      if (_priceFilterEnabled && (p.price < _minPrice || p.price > _maxPrice)) {
         return false;
       }
 
       // Only show active products
-      if (p.isActive != true || p.isSold == true) {
+      if (!p.isActive || p.isSold) {
         return false;
       }
 
@@ -104,18 +107,17 @@ class _SearchScreenState extends State<SearchScreen> {
     // Apply sorting
     switch (_sortBy) {
       case 'price_low':
-        products.sort((a, b) => (a.price ?? 0).compareTo(b.price ?? 0));
+        products.sort((a, b) => a.price.compareTo(b.price));
         break;
       case 'price_high':
-        products.sort((a, b) => (b.price ?? 0).compareTo(a.price ?? 0));
+        products.sort((a, b) => b.price.compareTo(a.price));
         break;
       case 'most_viewed':
-        products.sort((a, b) => (b.views ?? 0).compareTo(a.views ?? 0));
+        products.sort((a, b) => b.views.compareTo(a.views));
         break;
       case 'newest':
       default:
-        products.sort((a, b) => (b.createdAt ?? DateTime.now())
-            .compareTo(a.createdAt ?? DateTime.now()));
+        products.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     }
 
     return Scaffold(
@@ -133,7 +135,7 @@ class _SearchScreenState extends State<SearchScreen> {
             _buildCategoryFilter(),
 
             // Filter Chips
-            _buildFilterChips(),
+            _buildFilterChips(productProvider.products),
 
             // More Filters Button
             _buildMoreFiltersButton(context),
@@ -271,8 +273,14 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildFilterChips() {
-    final conditions = ['all', 'جديد', 'ممتاز', 'جيد', 'يحتاج إصلاح'];
+  Widget _buildFilterChips(List<Product> allProducts) {
+    final availableConditions = allProducts
+        .map((product) => product.condition.trim())
+        .where((condition) => condition.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
+    final conditions = ['all', ...availableConditions];
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -435,7 +443,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product.title ?? '',
+                    product.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -452,7 +460,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    product.condition ?? 'جديد',
+                    product.condition.isNotEmpty ? product.condition : '—',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: AppTheme.textSecondary,
                       fontSize: 11,
@@ -484,17 +492,20 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'نطاق السعر: ${_minPrice.toStringAsFixed(0)} - ${_maxPrice.toStringAsFixed(0)} ج.م',
+              _priceFilterEnabled
+                ? 'نطاق السعر: ${_minPrice.toStringAsFixed(0)} - ${_maxPrice.toStringAsFixed(0)} ج.م'
+                : 'اختر نطاقاً لتفعيل فلتر السعر',
               style: Theme.of(context).textTheme.bodySmall,
             ),
             RangeSlider(
               values: RangeValues(_minPrice, _maxPrice),
               min: 0,
-              max: 10000,
+              max: 1000000,
               onChanged: (values) {
                 setState(() {
                   _minPrice = values.start;
                   _maxPrice = values.end;
+                  _priceFilterEnabled = true;
                 });
               },
               activeColor: AppTheme.primaryColor,
