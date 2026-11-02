@@ -176,7 +176,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     padding: EdgeInsets.all(40),
                     child: Center(child: CircularProgressIndicator()),
                   )
-                : productProvider.error != null
+                : productProvider.error != null && products.isEmpty
                     ? _buildErrorState(productProvider.error!)
                     : products.isEmpty
                         ? _buildEmptyState()
