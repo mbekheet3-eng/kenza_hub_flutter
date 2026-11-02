@@ -22,6 +22,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _agreeToTerms = false;
+  bool _isRedirecting = false;
 
   @override
   void dispose() {
@@ -62,10 +63,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
 
     if (success && mounted) {
-      context.go('/home');
+      _redirectToHome();
     } else if (!mounted) return;
 
     if (authProvider.error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(authProvider.error!),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _redirectToHome() {
+    if (_isRedirecting || !mounted) return;
+    _isRedirecting = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.go('/home');
+    });
+  }
+
+  Future<void> _handleSocialSignIn(
+    AuthProvider authProvider,
+    Future<bool> Function() signIn,
+  ) async {
+    final launched = await signIn();
+    if (!launched && mounted && authProvider.error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(authProvider.error!),
@@ -87,6 +111,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {
+          if (authProvider.isSignedIn) _redirectToHome();
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: Form(
@@ -337,6 +362,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               color: Colors.white,
                             ),
                           ),
+                  ),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  const Row(
+                    children: [
+                      Expanded(child: Divider()),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                        child: Text('أو أنشئ حسابك باستخدام'),
+                      ),
+                      Expanded(child: Divider()),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  OutlinedButton.icon(
+                    onPressed: authProvider.isLoading
+                        ? null
+                        : () => _handleSocialSignIn(
+                              authProvider,
+                              authProvider.signInWithGoogle,
+                            ),
+                    icon: const Icon(Icons.g_mobiledata, size: 28),
+                    label: const Text('المتابعة باستخدام Google'),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  OutlinedButton.icon(
+                    onPressed: authProvider.isLoading
+                        ? null
+                        : () => _handleSocialSignIn(
+                              authProvider,
+                              authProvider.signInWithApple,
+                            ),
+                    icon: const Icon(Icons.phone_iphone),
+                    label: const Text('المتابعة باستخدام Apple'),
                   ),
 
                   const SizedBox(height: AppSpacing.lg),
