@@ -20,6 +20,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _currentImageIndex = 0;
   bool _isFavorite = false;
   bool _isFavoriteLoading = false;
+  int _loadRequestId = 0;
 
   @override
   void initState() {
@@ -39,15 +40,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Future<void> _loadProduct() async {
     if (!mounted) return;
+    final requestId = ++_loadRequestId;
     final productProvider = context.read<ProductProvider>();
     await productProvider.getProduct(widget.productId);
 
+    if (!mounted || requestId != _loadRequestId) return;
     final userId = context.read<AuthProvider>().userId;
-    if (userId == null || !mounted) return;
+    if (userId == null) return;
 
     final isFavorite =
         await productProvider.isFavorite(widget.productId, userId);
-    if (mounted) setState(() => _isFavorite = isFavorite);
+    if (mounted && requestId == _loadRequestId) {
+      setState(() => _isFavorite = isFavorite);
+    }
   }
 
   Future<void> _toggleFavorite() async {
