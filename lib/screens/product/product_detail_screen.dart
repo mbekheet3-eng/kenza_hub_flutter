@@ -479,7 +479,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       title: product.title,
       price: product.price,
       imageUrl: product.imageUrl,
-      quantity: _quantity,
+      quantity: 1,
     );
     context.push('/cart');
   }
