@@ -214,7 +214,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       if (value == null || value.trim().isEmpty) {
                         return strings.emailRequired;
                       }
-                      if (!StringHelpers.isValidEmail(value)) {
+                      if (!StringHelpers.isValidEmail(value.trim())) {
                         return strings.invalidEmail;
                       }
                       return null;
