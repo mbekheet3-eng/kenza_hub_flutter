@@ -116,12 +116,10 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
   void _onCategorySelected(String? category) {
     setState(() {
       _category = category;
-      // Reset fields that depend on category
-      if (category != null && categorySkipFields[category] == true) {
-        _brand = null;
-        _color = null;
-        _size = null;
-      }
+      // A category change invalidates previously selected lookup values.
+      _brand = null;
+      _color = null;
+      _size = null;
     });
   }
 
