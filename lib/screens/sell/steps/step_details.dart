@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/product.dart';
 import '../../../config/theme.dart';
+import '../../../services/catalog_service.dart';
 
 class StepDetails extends StatefulWidget {
   final Function(Map<String, String?>) onDataChanged;
@@ -25,6 +26,8 @@ class _StepDetailsState extends State<StepDetails> {
   late String? _selectedCondition;
   late String? _selectedColor;
   late String? _selectedSize;
+  late Future<List<String>> _sizesFuture;
+  final CatalogService _catalogService = CatalogService();
 
   final List<String> conditions = conditionOptions;
 
@@ -48,11 +51,7 @@ class _StepDetailsState extends State<StepDetails> {
     'أخرى',
   ];
 
-  final Map<String, List<String>> sizes = {
-    'clothes': ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'One Size'],
-    'shoes': ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45'],
-    'kids': ['0-3 Months', '3-6 Months', '6-12 Months', '1-2 Years', '2-3 Years', '4-5 Years', '6-7 Years', '8-9 Years', '10-11 Years', '12-13 Years', '14-15 Years'],
-  };
+
 
   @override
   void initState() {
@@ -60,6 +59,21 @@ class _StepDetailsState extends State<StepDetails> {
     _selectedCondition = widget.initialCondition;
     _selectedColor = widget.initialColor;
     _selectedSize = widget.initialSize;
+    _sizesFuture = widget.category == null
+        ? Future.value(const <String>[])
+        : _catalogService.fetchSizesForCategory(widget.category!);
+  }
+
+  @override
+  void didUpdateWidget(covariant StepDetails oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.category != widget.category) {
+      _selectedSize = null;
+      _sizesFuture = widget.category == null
+          ? Future.value(const <String>[])
+          : _catalogService.fetchSizesForCategory(widget.category!);
+      _notifyChanges();
+    }
   }
 
   void _notifyChanges() {
@@ -70,10 +84,6 @@ class _StepDetailsState extends State<StepDetails> {
     });
   }
 
-  List<String> _getSizesForCategory() {
-    if (widget.category == null) return [];
-    return sizes[widget.category] ?? [];
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -176,65 +186,90 @@ class _StepDetailsState extends State<StepDetails> {
       'shoes': AppTheme.secondaryColor,
       'kids': AppTheme.accentColor,
     };
+    final categoryColor =
+        categoryColors[widget.category] ?? AppTheme.primaryColor;
 
-    final availableSizes = _getSizesForCategory();
-    if (availableSizes.isEmpty) {
-      return Center(
-        child: Text(
-          'اختر فئة أولاً',
-          style: TextStyle(color: AppTheme.textTertiary),
-        ),
-      );
-    }
+    return FutureBuilder<List<String>>(
+      future: _sizesFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Padding(
+            padding: EdgeInsets.all(16),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (snapshot.hasError) {
+          return Text(
+            'تعذر تحميل المقاسات من قاعدة البيانات',
+            style: TextStyle(color: AppTheme.textSecondary),
+          );
+        }
 
-    final categoryColor = categoryColors[widget.category] ?? AppTheme.primaryColor;
+        final availableSizes = snapshot.data ?? const <String>[];
+        if (availableSizes.isEmpty) {
+          return Text(
+            'لا توجد مقاسات مسجلة لهذا القسم',
+            style: TextStyle(color: AppTheme.textSecondary),
+          );
+        }
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-      ),
-      itemCount: availableSizes.length,
-      itemBuilder: (context, index) {
-        final size = availableSizes[index];
-        final isSelected = _selectedSize == size;
-
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              _selectedSize = isSelected ? null : size;
-            });
-            _notifyChanges();
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: isSelected ? categoryColor.withOpacity(0.1) : AppTheme.surfaceColor,
-              border: Border.all(
-                color: isSelected ? categoryColor : AppTheme.borderLight,
-                width: isSelected ? 2 : 1,
-              ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    size,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: isSelected ? categoryColor : AppTheme.textPrimary,
-                    ),
-                  ),
-                  if (isSelected)
-                    Icon(Icons.check_circle, size: 14, color: categoryColor),
-                ],
-              ),
-            ),
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
           ),
+          itemCount: availableSizes.length,
+          itemBuilder: (context, index) {
+            final size = availableSizes[index];
+            final isSelected = _selectedSize == size;
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedSize = isSelected ? null : size;
+                });
+                _notifyChanges();
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? categoryColor.withOpacity(0.1)
+                      : AppTheme.surfaceColor,
+                  border: Border.all(
+                    color: isSelected
+                        ? categoryColor
+                        : AppTheme.borderLight,
+                    width: isSelected ? 2 : 1,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        size,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: isSelected
+                              ? categoryColor
+                              : AppTheme.textPrimary,
+                        ),
+                      ),
+                      if (isSelected)
+                        Icon(
+                          Icons.check_circle,
+                          size: 14,
+                          color: categoryColor,
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         );
       },
     );
