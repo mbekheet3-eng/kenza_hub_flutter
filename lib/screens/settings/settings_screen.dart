@@ -50,26 +50,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
               icon: Icons.notifications_outlined,
               title: 'تفعيل الإشعارات',
               value: _notificationsEnabled,
-              onChanged: (value) {
-                setState(() => _notificationsEnabled = value);
-              },
+              onChanged: (value) =>
+                  _showUnavailableFeature('تفعيل الإشعارات'),
             ),
             if (_notificationsEnabled) ...[
               _buildSwitchTile(
                 icon: Icons.mail_outline,
                 title: 'إشعارات البريد الإلكتروني',
                 value: _emailNotifications,
-                onChanged: (value) {
-                  setState(() => _emailNotifications = value);
-                },
+                onChanged: (value) =>
+                    _showUnavailableFeature('إشعارات البريد الإلكتروني'),
               ),
               _buildSwitchTile(
                 icon: Icons.notifications_active_outlined,
                 title: 'الإشعارات الفورية',
                 value: _pushNotifications,
-                onChanged: (value) {
-                  setState(() => _pushNotifications = value);
-                },
+                onChanged: (value) =>
+                    _showUnavailableFeature('الإشعارات الفورية'),
               ),
             ],
             const Divider(),
