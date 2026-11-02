@@ -1,86 +1,62 @@
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
-import '../models/product.dart';
-import '../models/user.dart'; // Custom User model for profile data
-import '../models/order.dart';
 
+import '../models/order.dart';
+import '../models/product.dart';
+import '../models/user.dart';
+import 'marketplace_product_service.dart';
+
+/// Compatibility facade for the app's existing providers.
+/// All product reads/writes use the current schema-aware service.
 class SupabaseService {
   static final SupabaseService _instance = SupabaseService._internal();
-  late final supabase.SupabaseClient _client;
 
-  factory SupabaseService() {
-    return _instance;
-  }
+  late final supabase.SupabaseClient _client;
+  late final MarketplaceProductService _products;
+
+  factory SupabaseService() => _instance;
 
   SupabaseService._internal() {
     _client = supabase.Supabase.instance.client;
+    _products = MarketplaceProductService(client: _client);
   }
 
-  // Static getter for client
   static supabase.SupabaseClient get client => _instance._client;
 
-  // ==================== AUTH PROPERTIES ====================
-
-  /// Check if user is authenticated
   bool get isAuthenticated => _client.auth.currentUser != null;
-
-  /// Get current authenticated user (Gotrue User - auth only, not profile data)
   supabase.User? get currentUser => _client.auth.currentUser;
-
-  /// Get current user ID
   String? get userId => _client.auth.currentUser?.id;
 
-  // ==================== PRODUCTS ====================
+  // ---------------------------------------------------------------------------
+  // Products
+  // ---------------------------------------------------------------------------
 
-  /// Add a new product
   Future<String> addProduct(Product product) async {
-    try {
-      final response = await _client
-          .from('products')
-          .insert(product.toJson())
-          .select()
-          .single();
-
-      return response['id'] as String;
-    } catch (e) {
-      throw Exception('Failed to add product: $e');
-    }
+    throw UnsupportedError(
+      'Use MarketplaceProductService.createProduct so seller membership and all lookup IDs are validated.',
+    );
   }
 
-  /// Add product images
-  Future<void> addProductImages(String productId, List<String> imageUrls) async {
-    try {
-      final images = <Map<String, dynamic>>[];
-      for (int i = 0; i < imageUrls.length; i++) {
-        images.add({
-          'product_id': productId,
-          'image_url': imageUrls[i],
-          'display_order': i,
-          'created_at': DateTime.now().toIso8601String(),
-        });
-      }
+  Future<String> createProduct(Product product) => addProduct(product);
 
-      await _client.from('product_images').insert(images);
-    } catch (e) {
-      throw Exception('Failed to add product images: $e');
+  Future<void> addProductImages(
+    String productId,
+    List<String> imageUrls,
+  ) async {
+    if (imageUrls.isEmpty) return;
+    final rows = <Map<String, dynamic>>[];
+    for (var index = 0; index < imageUrls.length; index++) {
+      rows.add({
+        'product_id': productId,
+        'image_url': imageUrls[index],
+        'display_order': index,
+      });
     }
+    await _client.from('product_images').insert(rows);
   }
 
-  /// Get product by ID
-  Future<Product> getProduct(String productId) async {
-    try {
-      final response = await _client
-          .from('products')
-          .select()
-          .eq('id', productId)
-          .single();
+  Future<Product> getProduct(String productId) =>
+      _products.fetchProductById(productId);
 
-      return Product.fromJson(response);
-    } catch (e) {
-      throw Exception('Failed to get product: $e');
-    }
-  }
-
-  /// Search products
   Future<List<Product>> searchProducts({
     required String query,
     String? category,
@@ -89,591 +65,326 @@ class SupabaseService {
     int limit = 20,
     int offset = 0,
   }) async {
-    try {
-      var request = _client
-          .from('products')
-          .select()
-          .eq('is_active', true)
-          .neq('is_sold', true)
-          .ilike('title', '%$query%');
-
-      if (category != null && category.isNotEmpty) {
-        request = request.eq('category', category);
-      }
-
-      if (minPrice != null) {
-        request = request.gte('price', minPrice);
-      }
-
-      if (maxPrice != null) {
-        request = request.lte('price', maxPrice);
-      }
-
-      final response = await request
-          .order('created_at', ascending: false)
-          .range(offset, offset + limit - 1);
-
-      return (response as List)
-          .map((json) => Product.fromJson(json))
-          .toList();
-    } catch (e) {
-      throw Exception('Failed to search products: $e');
-    }
+    final all = await _products.fetchActiveProducts(limit: 100);
+    final normalized = query.trim().toLowerCase();
+    final filtered = all.where((product) {
+      final matchesQuery = normalized.isEmpty ||
+          product.title.toLowerCase().contains(normalized) ||
+          product.description.toLowerCase().contains(normalized);
+      final matchesCategory =
+          category == null || category.isEmpty || product.category == category;
+      final matchesMin = minPrice == null || product.price >= minPrice;
+      final matchesMax = maxPrice == null || product.price <= maxPrice;
+      return matchesQuery && matchesCategory && matchesMin && matchesMax;
+    }).toList(growable: false);
+    if (offset >= filtered.length) return const [];
+    final end = (offset + limit).clamp(0, filtered.length);
+    return filtered.sublist(offset, end);
   }
 
-  /// Get products by category
   Future<List<Product>> getProductsByCategory(
     String category, {
     int limit = 20,
     int offset = 0,
   }) async {
-    try {
-      final response = await _client
-          .from('products')
-          .select()
-          .eq('category', category)
-          .eq('is_active', true)
-          .neq('is_sold', true)
-          .order('created_at', ascending: false)
-          .range(offset, offset + limit - 1);
-
-      return (response as List)
-          .map((json) => Product.fromJson(json))
-          .toList();
-    } catch (e) {
-      throw Exception('Failed to get products by category: $e');
-    }
-  }
-
-  /// Get user's products
-  Future<List<Product>> getUserProducts(String userId, {int limit = 20}) async {
-    try {
-      final response = await _client
-          .from('products')
-          .select()
-          .eq('user_id', userId)
-          .order('created_at', ascending: false)
-          .limit(limit);
-
-      return (response as List)
-          .map((json) => Product.fromJson(json))
-          .toList();
-    } catch (e) {
-      throw Exception('Failed to get user products: $e');
-    }
-  }
-
-  /// Update product
-  Future<void> updateProduct(Product product) async {
-    try {
-      await _client
-          .from('products')
-          .update(product.toJson())
-          .eq('id', product.id);
-    } catch (e) {
-      throw Exception('Failed to update product: $e');
-    }
-  }
-
-  /// Delete product
-  Future<void> deleteProduct(String productId) async {
-    try {
-      await _client.from('products').delete().eq('id', productId);
-    } catch (e) {
-      throw Exception('Failed to delete product: $e');
-    }
-  }
-
-  // ==================== USERS ====================
-
-  /// Get user by ID
-  Future<User> getUser(String userId) async {
-    try {
-      final response = await _client
-          .from('users')
-          .select()
-          .eq('id', userId)
-          .single();
-
-      return User.fromJson(response);
-    } catch (e) {
-      throw Exception('Failed to get user: $e');
-    }
-  }
-
-  /// Create user
-  Future<void> createUser(User user) async {
-    try {
-      await _client.from('users').insert(user.toJson());
-    } catch (e) {
-      throw Exception('Failed to create user: $e');
-    }
-  }
-
-  /// Update user profile
-  Future<void> updateUserProfile(String userId, UserProfile profile) async {
-    try {
-      await _client
-          .from('users')
-          .update(profile.toJson())
-          .eq('id', userId);
-    } catch (e) {
-      throw Exception('Failed to update user profile: $e');
-    }
-  }
-
-  /// Get user rating
-  Future<double> getUserRating(String userId) async {
-    try {
-      final response = await _client
-          .from('users')
-          .select('rating')
-          .eq('id', userId)
-          .single();
-
-      return (response['rating'] as num).toDouble();
-    } catch (e) {
-      throw Exception('Failed to get user rating: $e');
-    }
-  }
-
-  // ==================== ORDERS ====================
-
-  /// Create order
-  Future<String> createOrder(Order order) async {
-    throw UnsupportedError(
-      'Direct order creation is disabled. Orders must be created through the approved server-side agreement workflow.',
+    return searchProducts(
+      query: '',
+      category: category,
+      limit: limit,
+      offset: offset,
     );
   }
 
-  /// Get order by ID
-  Future<Order> getOrder(String orderId) async {
+  Future<List<Product>> getUserProducts(
+    String userId, {
+    int limit = 20,
+  }) =>
+      _products.fetchSellerProducts(userId, limit: limit);
+
+  Future<void> updateProduct(Product product) =>
+      _products.updateProductDetails(product);
+
+  /// Uses the database's soft-delete status; no hard DELETE from the client.
+  Future<void> deleteProduct(String productId) =>
+      _products.softDeleteProduct(productId);
+
+  Future<List<Product>> getAllProducts({int limit = 100}) =>
+      _products.fetchActiveProducts(limit: limit);
+
+  Future<List<Product>> getTrendingProducts({int limit = 10}) async {
+    final items = await _products.fetchActiveProducts(limit: 100);
+    items.sort((a, b) => b.views.compareTo(a.views));
+    return items.take(limit).toList(growable: false);
+  }
+
+  Future<Map<String, dynamic>> fetchProductById(String productId) async {
+    final product = await _products.fetchProductById(productId);
+    return {
+      ...product.toJson(),
+      'image_urls': product.imageUrls,
+      'image_paths': product.imagePaths,
+    };
+  }
+
+  Future<List<Map<String, dynamic>>> fetchProducts() async =>
+      fetchProductsWithImages();
+
+  Future<List<Map<String, dynamic>>> fetchProductsWithImages() async {
+    final items = await _products.fetchActiveProducts(limit: 100);
+    return items
+        .map((product) => {
+              ...product.toJson(),
+              'image_urls': product.imageUrls,
+              'image_paths': product.imagePaths,
+            })
+        .toList(growable: false);
+  }
+
+  Future<Map<String, dynamic>> fetchProductByIdWithImages(
+    String productId,
+  ) async =>
+      fetchProductById(productId);
+
+  /// Product variants are not a table in the approved schema.
+  Future<List<Map<String, dynamic>>> fetchProductVariants(
+    String productId,
+  ) async =>
+      const [];
+
+  Future<List<Map<String, dynamic>>> fetchProductImages(
+    String productId,
+  ) async {
+    final rows = await _client
+        .from('product_images')
+        .select('id,product_id,image_url,display_order,created_at')
+        .eq('product_id', productId)
+        .order('display_order', ascending: true);
+    return List<Map<String, dynamic>>.from(rows as List);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Users
+  // ---------------------------------------------------------------------------
+
+  Future<User> getUser(String userId) async {
+    final row = await _client
+        .from('users')
+        .select()
+        .eq('id', userId)
+        .single();
+    return User.fromJson(Map<String, dynamic>.from(row));
+  }
+
+  /// public.users is created by the handle_new_user auth trigger.
+  Future<void> createUser(User user) async {
+    throw UnsupportedError(
+      'User profiles are created by the database auth trigger.',
+    );
+  }
+
+  Future<void> updateUserProfile(
+    String userId,
+    UserProfile profile,
+  ) async {
+    await _client
+        .from('users')
+        .update(profile.toJson())
+        .eq('id', userId);
+  }
+
+  Future<double> getUserRating(String userId) async {
+    final row = await _client
+        .from('users')
+        .select('rating')
+        .eq('id', userId)
+        .single();
+    return (row['rating'] as num?)?.toDouble() ?? 0;
+  }
+
+  Future<void> updateProfile(User user) async {
+    await _client.from('users').update(user.toJson()).eq('id', user.id);
+  }
+
+  Future<User?> getCurrentUser(String userId) async {
     try {
-      final response = await _client
-          .from('orders')
-          .select(
-            '*,products(title_ar,title_en,product_images(image_url,display_order)),order_status_history(new_status,reason,action,created_at,metadata)',
-          )
-          .eq('id', orderId)
-          .single();
-      return Order.fromJson(response);
-    } catch (e) {
-      throw Exception('Failed to get order: $e');
+      return await getUser(userId);
+    } catch (_) {
+      return null;
     }
   }
 
-  /// Get user's orders
+  // ---------------------------------------------------------------------------
+  // Orders — read-only until the approved agreement/OTP flow is implemented.
+  // ---------------------------------------------------------------------------
+
+  Future<String> createOrder(Order order) async {
+    throw UnsupportedError(
+      'Order creation is disabled. order-create currently returns 503 until both parties confirm the agreement.',
+    );
+  }
+
+  Future<Order> getOrder(String orderId) async {
+    final row = await fetchOrderById(orderId);
+    return Order.fromJson(row);
+  }
+
   Future<List<Order>> getUserOrders(
     String userId, {
     bool asBuyer = true,
     int limit = 20,
   }) async {
-    try {
-      var request = _client
-          .from('orders')
-          .select(
-            '*,products(title_ar,title_en,product_images(image_url,display_order)),order_status_history(new_status,reason,action,created_at,metadata)',
-          );
+    var request = _client
+        .from('orders')
+        .select(
+          '*,products(title_ar,title_en,product_images(image_url,display_order)),order_status_history(new_status,reason,action,created_at,metadata)',
+        );
 
-      if (asBuyer) {
-        request = request.eq('buyer_id', userId);
-      } else {
-        final memberships = await _client
-            .from('seller_profile_members')
-            .select('seller_profile_id')
-            .eq('user_id', userId)
-            .isFilter('revoked_at', null);
-        final profileIds = (memberships as List)
-            .map((row) => (row as Map)['seller_profile_id'] as String)
-            .toList();
-        if (profileIds.isEmpty) return [];
-        request = request.inFilter('seller_profile_id', profileIds);
-      }
-
-      final response = await request
-          .order('created_at', ascending: false)
-          .limit(limit);
-      return (response as List)
-          .map((row) => Order.fromJson(Map<String, dynamic>.from(row as Map)))
+    if (asBuyer) {
+      request = request.eq('buyer_id', userId);
+    } else {
+      final memberships = await _client
+          .from('seller_profile_members')
+          .select('seller_profile_id')
+          .eq('user_id', userId)
+          .isFilter('revoked_at', null);
+      final profileIds = (memberships as List)
+          .map((row) => (row as Map)['seller_profile_id'] as String)
           .toList();
-    } catch (e) {
-      throw Exception('Failed to get user orders: $e');
+      if (profileIds.isEmpty) return const [];
+      request = request.inFilter('seller_profile_id', profileIds);
     }
+
+    final rows = await request
+        .order('created_at', ascending: false)
+        .limit(limit);
+    return (rows as List)
+        .map((row) => Order.fromJson(Map<String, dynamic>.from(row as Map)))
+        .toList(growable: false);
   }
 
-  /// Update order status
-  Future<void> updateOrderStatus(String orderId, OrderStatus status) async {
+  Future<void> updateOrderStatus(
+    String orderId,
+    OrderStatus status,
+  ) async {
     throw UnsupportedError(
-      'Order status changes are controlled by the server-side transition workflow.',
+      'Order status transitions are controlled by the server.',
     );
   }
 
-  /// Add order review
   Future<void> addOrderReview(
     String orderId,
     double rating,
     String review,
   ) async {
     throw UnsupportedError(
-      'Reviews must be submitted through the dedicated reviews workflow.',
+      'Reviews must use the dedicated reviews workflow, not orders columns.',
     );
   }
 
-  // ==================== FAVORITES ====================
+  Future<Map<String, dynamic>> fetchOrderById(String orderId) async {
+    final row = await _client
+        .from('orders')
+        .select(
+          '*,products(title_ar,title_en,product_images(image_url,display_order)),order_status_history(new_status,reason,action,created_at,metadata)',
+        )
+        .eq('id', orderId)
+        .single();
+    return Map<String, dynamic>.from(row);
+  }
 
-  /// Add to favorites
+  // ---------------------------------------------------------------------------
+  // Favorites
+  // ---------------------------------------------------------------------------
+
   Future<void> addToFavorites(String userId, String productId) async {
-    try {
-      await _client.from('favorites').insert({
-        'user_id': userId,
-        'product_id': productId,
-      });
-    } catch (e) {
-      throw Exception('Failed to add to favorites: $e');
-    }
+    await _client.from('favorites').insert({
+      'user_id': userId,
+      'product_id': productId,
+    });
   }
 
-  /// Remove from favorites
   Future<void> removeFromFavorites(String userId, String productId) async {
-    try {
-      await _client
-          .from('favorites')
-          .delete()
-          .eq('user_id', userId)
-          .eq('product_id', productId);
-    } catch (e) {
-      throw Exception('Failed to remove from favorites: $e');
-    }
+    await _client
+        .from('favorites')
+        .delete()
+        .eq('user_id', userId)
+        .eq('product_id', productId);
   }
 
-  /// Get user favorites
   Future<List<String>> getUserFavorites(String userId) async {
-    try {
-      final response = await _client
-          .from('favorites')
-          .select('product_id')
-          .eq('user_id', userId);
+    final rows = await _client
+        .from('favorites')
+        .select('product_id')
+        .eq('user_id', userId);
+    return (rows as List)
+        .map((row) => (row as Map)['product_id'] as String)
+        .toList(growable: false);
+  }
 
-      return (response as List)
-          .map((json) => json['product_id'] as String)
-          .toList();
-    } catch (e) {
-      throw Exception('Failed to get user favorites: $e');
+  Future<void> toggleFavorite(String productId, String userId) async {
+    final existing = await _client
+        .from('favorites')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('product_id', productId)
+        .maybeSingle();
+
+    if (existing != null) {
+      await removeFromFavorites(userId, productId);
+    } else {
+      await addToFavorites(userId, productId);
     }
   }
 
-  // ==================== SEARCH ====================
+  // ---------------------------------------------------------------------------
+  // Search / analytics
+  // ---------------------------------------------------------------------------
 
-  /// Search products by image
-  Future<List<Product>> searchByImage(String imagePath) async {
-    // This is a placeholder - actual implementation would use
-    // a vision API or ML service
-    try {
-      // TODO: Implement image search using ML or vision API
-      return [];
-    } catch (e) {
-      throw Exception('Failed to search by image: $e');
-    }
-  }
+  Future<List<Product>> searchByImage(String imagePath) async => const [];
 
-  // ==================== ANALYTICS ====================
-
-  /// Increment product views
   Future<void> incrementProductViews(String productId) async {
     try {
-      await _client.rpc('increment_product_views', params: {
-        'product_id': productId,
-      });
-    } catch (e) {
-      // Silent failure - not critical
-      print('Failed to increment views: $e');
+      await _client.rpc(
+        'increment_product_views',
+        params: {'p_product_id': productId},
+      );
+    } catch (error) {
+      // View tracking is non-blocking; the database RPC remains authoritative.
+      // ignore: avoid_print
+      print('Failed to increment product views: $error');
     }
   }
 
-  /// Get trending products
-  Future<List<Product>> getTrendingProducts({int limit = 10}) async {
-    try {
-      final response = await _client
-          .from('products')
-          .select()
-          .eq('is_active', true)
-          .neq('is_sold', true)
-          .order('views', ascending: false)
-          .limit(limit);
+  // ---------------------------------------------------------------------------
+  // Authentication
+  // ---------------------------------------------------------------------------
 
-      return (response as List)
-          .map((json) => Product.fromJson(json))
-          .toList();
-    } catch (e) {
-      throw Exception('Failed to get trending products: $e');
-    }
-  }
-
-  /// Fetch a single product by ID WITH IMAGES ✅ FIXED D10
-  Future<Map<String, dynamic>> fetchProductById(String productId) async {
-    return fetchProductByIdWithImages(productId);
-  }
-
-  /// Fetch all products WITH IMAGES assembled ✅ FIXED D10
-  Future<List<Map<String, dynamic>>> fetchProducts() async {
-    return fetchProductsWithImages();
-  }
-
-  /// Fetch product variants (sizes, colors, etc.)
-  Future<List<Map<String, dynamic>>> fetchProductVariants(String productId) async {
-    try {
-      final response = await _client
-          .from('product_variants')
-          .select()
-          .eq('product_id', productId);
-
-      return List<Map<String, dynamic>>.from(response as List);
-    } catch (e) {
-      print('❌ Error fetching product variants: $e');
-      rethrow;
-    }
-  }
-
-  // ==================== PRODUCT IMAGES ====================
-
-  /// ✅ FIXED D10: Fetch product images from separate product_images table
-  Future<List<Map<String, dynamic>>> fetchProductImages(String productId) async {
-    try {
-      final response = await _client
-          .from('product_images')
-          .select()
-          .eq('product_id', productId)
-          .order('order_index', ascending: true);
-
-      return List<Map<String, dynamic>>.from(response as List);
-    } catch (e) {
-      print('❌ Error fetching product images for $productId: $e');
-      return []; // Return empty list if images not found
-    }
-  }
-
-  /// ✅ FIXED D10: Fetch products with images assembled from product_images table
-  Future<List<Map<String, dynamic>>> fetchProductsWithImages() async {
-    try {
-      // Fetch all products
-      final productsResponse = await _client
-          .from('products')
-          .select()
-          .eq('is_active', true)
-          .order('created_at', ascending: false);
-
-      final products = List<Map<String, dynamic>>.from(productsResponse as List);
-
-      // For each product, fetch its images
-      final enrichedProducts = <Map<String, dynamic>>[];
-      
-      for (final product in products) {
-        final productId = product['id'] as String;
-        
-        // Fetch images for this product
-        final images = await fetchProductImages(productId);
-        
-        // Extract image URLs and sort by order_index
-        final imageUrls = (images as List)
-            .map((img) => img['image_url'] as String)
-            .toList();
-
-        // Add assembled image data to product
-        product['image_urls'] = imageUrls;  // ✅ Add as snake_case
-        product['image_paths'] = [];  // Empty local paths initially
-        
-        enrichedProducts.add(product);
-      }
-
-      return enrichedProducts;
-    } catch (e) {
-      print('❌ Error fetching products with images: $e');
-      rethrow;
-    }
-  }
-
-  /// ✅ FIXED D10: Fetch single product WITH images
-  Future<Map<String, dynamic>> fetchProductByIdWithImages(String productId) async {
-    try {
-      final product = await _client
-          .from('products')
-          .select()
-          .eq('id', productId)
-          .single();
-
-      final productData = product as Map<String, dynamic>;
-
-      // Fetch images for this product
-      final images = await fetchProductImages(productId);
-      
-      // Extract image URLs
-      final imageUrls = (images as List)
-          .map((img) => img['image_url'] as String)
-          .toList();
-
-      // Add assembled image data
-      productData['image_urls'] = imageUrls;
-      productData['image_paths'] = [];
-
-      return productData;
-    } catch (e) {
-      print('❌ Error fetching product with images: $e');
-      rethrow;
-    }
-  }
-
-  // ==================== AUTHENTICATION ====================
-
-  /// Sign in with email and password
   Future<Map<String, dynamic>> signIn({
     required String email,
     required String password,
   }) async {
-    try {
-      final response = await _client.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
-      return {
-        'user': response.user,
-        'session': response.session,
-      };
-    } catch (e) {
-      throw Exception('Failed to sign in: $e');
-    }
+    final response = await _client.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
+    return {'user': response.user, 'session': response.session};
   }
 
-  /// Sign up with email and password
   Future<Map<String, dynamic>> signUp({
     required String email,
     required String password,
     String? fullName,
   }) async {
-    try {
-      final response = await _client.auth.signUp(
-        email: email,
-        password: password,
-        data: fullName != null ? {'full_name': fullName} : null,
-      );
-      return {
-        'user': response.user,
-        'session': response.session,
-      };
-    } catch (e) {
-      throw Exception('Failed to sign up: $e');
-    }
+    final response = await _client.auth.signUp(
+      email: email,
+      password: password,
+      data: fullName != null ? {'full_name': fullName} : null,
+    );
+    return {'user': response.user, 'session': response.session};
   }
 
-  /// Reset password
-  Future<void> resetPassword(String email) async {
-    try {
-      await _client.auth.resetPasswordForEmail(email);
-    } catch (e) {
-      throw Exception('Failed to reset password: $e');
-    }
-  }
+  Future<void> resetPassword(String email) =>
+      _client.auth.resetPasswordForEmail(email);
 
-  /// Sign out
-  Future<void> signOut() async {
-    try {
-      await _client.auth.signOut();
-    } catch (e) {
-      throw Exception('Failed to sign out: $e');
-    }
-  }
-
-  // ==================== ORDERS ====================
-
-  /// Fetch order by ID
-  Future<Map<String, dynamic>> fetchOrderById(String orderId) async {
-    try {
-      final result = await _client
-          .from('orders')
-          .select(
-            '*,products(title_ar,title_en,product_images(image_url,display_order)),order_status_history(new_status,reason,action,created_at,metadata)',
-          )
-          .eq('id', orderId)
-          .single();
-      return Map<String, dynamic>.from(result);
-    } catch (e) {
-      print('❌ Error fetching order: $e');
-      rethrow;
-    }
-  }
-
-  // ==================== PRODUCT PROVIDER ALIASES ====================
-
-  /// Get all active products (alias for getTrendingProducts)
-  Future<List<Product>> getAllProducts({int limit = 100}) async {
-    try {
-      final response = await _client
-          .from('products')
-          .select()
-          .eq('is_active', true)
-          .neq('is_sold', true)
-          .order('created_at', ascending: false)
-          .limit(limit);
-
-      return (response as List)
-          .map((json) => Product.fromJson(json))
-          .toList();
-    } catch (e) {
-      throw Exception('Failed to get all products: $e');
-    }
-  }
-
-  /// Create a new product (alias for addProduct)
-  Future<String> createProduct(Product product) async {
-    return addProduct(product);
-  }
-
-  /// Toggle favorite (combine add/remove logic)
-  Future<void> toggleFavorite(String productId, String userId) async {
-    try {
-      // Check if already favorited
-      final existing = await _client
-          .from('favorites')
-          .select()
-          .eq('user_id', userId)
-          .eq('product_id', productId);
-
-      if ((existing as List).isNotEmpty) {
-        // Remove if exists
-        await removeFromFavorites(userId, productId);
-      } else {
-        // Add if doesn't exist
-        await addToFavorites(userId, productId);
-      }
-    } catch (e) {
-      throw Exception('Failed to toggle favorite: $e');
-    }
-  }
-
-  /// Update user profile
-  Future<void> updateProfile(User user) async {
-    try {
-      await _client
-          .from('users')
-          .update(user.toJson())
-          .eq('id', user.id);
-    } catch (e) {
-      throw Exception('Failed to update profile: $e');
-    }
-  }
-
-  /// Load current user by ID
-  Future<User?> getCurrentUser(String userId) async {
-    try {
-      final response = await _client
-          .from('users')
-          .select()
-          .eq('id', userId)
-          .single();
-
-      return User.fromJson(response);
-    } catch (e) {
-      print('Error loading current user: $e');
-      return null;
-    }
-  }
+  Future<void> signOut() => _client.auth.signOut();
 }
