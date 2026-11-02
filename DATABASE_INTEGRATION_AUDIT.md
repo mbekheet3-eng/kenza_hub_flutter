@@ -92,7 +92,7 @@ Important live column contracts:
 3. Users profile model/service against public.users; seller profile setup through seller-profile-create Edge Function.
 4. Address model/service against user_addresses + regions, including deleted/default flags and service coverage.
 5. Read-only order/order_status_history DTOs and UI; no order creation or status mutation until the approved server workflow is ready.
-6. Seller dashboard, Pro Seller upgrade request and business directories, preserving one seller profile/store per account and employee privacy/permissions.
+6. Read-only seller dashboard is implemented; Pro Seller request submission/approval and business directories remain disabled until the approved workflow and business-type persistence path are confirmed. Employee management remains disabled until DB permission enforcement/privacy is fixed.
 7. Disputes UI only after state transition/evidence permissions are independently tested.
 8. Run Flutter analyze/tests/build CI and independent AI review before proposing PR merge. No merge to main or production changes without explicit approval.
 
