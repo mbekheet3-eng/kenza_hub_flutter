@@ -24,6 +24,15 @@ class Product {
   final bool isSold;
   final String? sellerName;
   final String? sellerAvatar;
+  final String? sellerProfileId;
+  final String? categoryId;
+  final String? conditionId;
+  final String? statusId;
+  final String? currencyId;
+  final String? colorId;
+  final String? sizeId;
+  final String? brandId;
+  final String audience;
 
   Product({
     required this.id,
@@ -51,6 +60,15 @@ class Product {
     this.isSold = false,
     this.sellerName,
     this.sellerAvatar,
+    this.sellerProfileId,
+    this.categoryId,
+    this.conditionId,
+    this.statusId,
+    this.currencyId,
+    this.colorId,
+    this.sizeId,
+    this.brandId,
+    this.audience = 'everyone',
   });
 
   // Check if category is "home" (furniture & home items)
@@ -166,36 +184,36 @@ class Product {
           json['seller_name'] as String?,
       sellerAvatar: sellerData?['avatar_url'] as String? ??
           json['seller_avatar'] as String?,
+      sellerProfileId: sellerProfileId,
+      categoryId: json['category_id'] as String?,
+      conditionId: json['condition_id'] as String?,
+      statusId: json['status_id'] as String?,
+      currencyId: json['currency_id'] as String?,
+      colorId: json['color_id'] as String?,
+      sizeId: json['size_id'] as String?,
+      brandId: json['brand_id'] as String?,
+      audience: json['audience'] as String? ?? 'everyone',
     );
   }
 
+  /// Current products table fields only. Images are stored separately.
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'user_id': userId, // ✅ FIXED: snake_case
-      'title': title,
-      'description': description,
+      if (id.isNotEmpty) 'id': id,
+      if (sellerProfileId != null) 'seller_id': sellerProfileId,
+      if (categoryId != null) 'category_id': categoryId,
+      'title_ar': title,
+      'title_en': title,
+      'description_ar': description,
+      'description_en': description,
       'price': price,
-      'category': category,
-      'subcategory': subcategory,
-      'condition': condition,
-      'color': color,
-      'size': size,
-      'brand': brand,
-      'image_urls': imageUrls, // ✅ FIXED: snake_case
-      'image_paths': imagePaths, // ✅ FIXED: snake_case
-      'views': views,
-      'likes': likes,
-      'rating': rating,
-      'is_active': isActive, // ✅ FIXED: snake_case
-      'created_at': createdAt.toIso8601String(), // ✅ FIXED: snake_case
-      'updated_at': updatedAt.toIso8601String(), // ✅ FIXED: snake_case
-      'latitude': latitude,
-      'longitude': longitude,
-      'location': location,
-      'is_sold': isSold, // ✅ FIXED: snake_case
-      'seller_name': sellerName, // ✅ FIXED: snake_case
-      'seller_avatar': sellerAvatar, // ✅ FIXED: snake_case
+      if (conditionId != null) 'condition_id': conditionId,
+      if (statusId != null) 'status_id': statusId,
+      if (currencyId != null) 'currency_id': currencyId,
+      if (brandId != null) 'brand_id': brandId,
+      if (colorId != null) 'color_id': colorId,
+      if (sizeId != null) 'size_id': sizeId,
+      'audience': audience,
     };
   }
 
@@ -226,6 +244,15 @@ class Product {
     bool? isSold,
     String? sellerName,
     String? sellerAvatar,
+    String? sellerProfileId,
+    String? categoryId,
+    String? conditionId,
+    String? statusId,
+    String? currencyId,
+    String? colorId,
+    String? sizeId,
+    String? brandId,
+    String? audience,
   }) {
     return Product(
       id: id ?? this.id,
@@ -253,6 +280,15 @@ class Product {
       isSold: isSold ?? this.isSold,
       sellerName: sellerName ?? this.sellerName,
       sellerAvatar: sellerAvatar ?? this.sellerAvatar,
+      sellerProfileId: sellerProfileId ?? this.sellerProfileId,
+      categoryId: categoryId ?? this.categoryId,
+      conditionId: conditionId ?? this.conditionId,
+      statusId: statusId ?? this.statusId,
+      currencyId: currencyId ?? this.currencyId,
+      colorId: colorId ?? this.colorId,
+      sizeId: sizeId ?? this.sizeId,
+      brandId: brandId ?? this.brandId,
+      audience: audience ?? this.audience,
     );
   }
 }
@@ -285,16 +321,11 @@ class ProductImage {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'product_id': productId, // ✅ FIXED: snake_case
-      'image_url': imageUrl, // ✅ FIXED: snake_case
-      'display_order': order,
-      'created_at': createdAt.toIso8601String(), // ✅ FIXED: snake_case
-    };
-  }
-}
+  Map<String, dynamic> toJson() => {
+        'product_id': productId,
+        'image_url': imageUrl,
+        'display_order': order,
+      };}
 
 // Size translations for Arabic market
 const Map<String, String> sizeTranslations = {
