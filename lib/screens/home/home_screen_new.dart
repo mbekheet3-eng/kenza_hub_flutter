@@ -102,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                 child: Row(
                   children: [
-                    const Text(
+                    Text(
                       strings.categories,
                       style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                     ),
@@ -453,7 +453,7 @@ class EmptyState extends StatelessWidget {
                 vertical: 12,
               ),
             ),
-            child: const Text(
+            child: Text(
               AppLocalizations.of(context).clearFilters,
               style: TextStyle(color: Colors.white),
             ),
@@ -517,7 +517,7 @@ class ErrorState extends StatelessWidget {
                 vertical: 12,
               ),
             ),
-            child: const Text(
+            child: Text(
               AppLocalizations.of(context).tryAgain,
               style: TextStyle(color: Colors.white),
             ),
