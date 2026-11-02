@@ -5,6 +5,8 @@ import 'package:kenza_hub_flutter/config/app_colors.dart';
 import 'package:kenza_hub_flutter/config/app_radius.dart';
 import 'package:kenza_hub_flutter/config/app_spacing.dart';
 import 'package:kenza_hub_flutter/providers/auth_provider.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
+import 'package:kenza_hub_flutter/core/helpers.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -39,7 +41,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('كلمات المرور غير متطابقة'),
+          content: Text(AppLocalizations.of(context).passwordsDoNotMatch),
           backgroundColor: Colors.red,
         ),
       );
@@ -49,7 +51,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (!_agreeToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('يجب أن توافق على الشروط والأحكام'),
+          content: Text(AppLocalizations.of(context).termsRequired),
           backgroundColor: Colors.red,
         ),
       );
@@ -103,7 +105,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('إنشاء حساب جديد'),
+        title: Text(AppLocalizations.of(context).signupTitle),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
@@ -111,6 +113,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {
+          final strings = AppLocalizations.of(context);
           if (authProvider.isSignedIn) _redirectToHome();
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppSpacing.lg),
@@ -141,8 +144,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(height: AppSpacing.xl),
 
                   // Title
-                  const Text(
-                    'أنشئ حسابك الآن',
+                  Text(
+                    strings.signupTitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 24,
@@ -153,7 +156,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(height: AppSpacing.sm),
 
                   Text(
-                    'انضم إلى مجتمع كنزة هب',
+                    strings.signupSubtitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -167,7 +170,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   TextFormField(
                     controller: _fullNameController,
                     decoration: InputDecoration(
-                      labelText: 'الاسم الكامل',
+                      labelText: strings.fullName,
                       hintText: 'أحمد محمد',
                       prefixIcon: const Icon(Icons.person_outlined),
                       border: OutlineInputBorder(
@@ -180,10 +183,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'الاسم الكامل مطلوب';
+                        return strings.nameRequired;
                       }
-                      if (value.length < 3) {
-                        return 'الاسم يجب أن يكون 3 أحرف على الأقل';
+                      if (value.trim().length < 3) {
+                        return strings.nameMinLength;
                       }
                       return null;
                     },
@@ -196,7 +199,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
-                      labelText: 'البريد الإلكتروني',
+                      labelText: strings.email,
                       hintText: 'example@email.com',
                       prefixIcon: const Icon(Icons.email_outlined),
                       border: OutlineInputBorder(
@@ -208,11 +211,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'البريد الإلكتروني مطلوب';
+                      if (value == null || value.trim().isEmpty) {
+                        return strings.emailRequired;
                       }
-                      if (!value.contains('@')) {
-                        return 'أدخل بريد إلكتروني صحيح';
+                      if (!StringHelpers.isValidEmail(value)) {
+                        return strings.invalidEmail;
                       }
                       return null;
                     },
@@ -225,7 +228,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     controller: _passwordController,
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
-                      labelText: 'كلمة المرور',
+                      labelText: strings.password,
                       prefixIcon: const Icon(Icons.lock_outlined),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -249,10 +252,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'كلمة المرور مطلوبة';
+                        return strings.passwordRequired;
                       }
                       if (value.length < 6) {
-                        return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                        return strings.passwordMinLength;
                       }
                       return null;
                     },
@@ -265,7 +268,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     controller: _confirmPasswordController,
                     obscureText: _obscureConfirmPassword,
                     decoration: InputDecoration(
-                      labelText: 'تأكيد كلمة المرور',
+                      labelText: strings.confirmPassword,
                       prefixIcon: const Icon(Icons.lock_outlined),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -290,7 +293,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'تأكيد كلمة المرور مطلوب';
+                        return strings.confirmPasswordRequired;
                       }
                       return null;
                     },
@@ -354,8 +357,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                           )
-                        : const Text(
-                            'إنشاء الحساب',
+                        : Text(
+                            strings.signUp,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -385,7 +388,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               authProvider.signInWithGoogle,
                             ),
                     icon: const Icon(Icons.g_mobiledata, size: 28),
-                    label: const Text('المتابعة باستخدام Google'),
+                    label: Text(strings.continueWithGoogle),
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   OutlinedButton.icon(
@@ -396,7 +399,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               authProvider.signInWithApple,
                             ),
                     icon: const Icon(Icons.phone_iphone),
-                    label: const Text('المتابعة باستخدام Apple'),
+                    label: Text(strings.continueWithApple),
                   ),
 
                   const SizedBox(height: AppSpacing.lg),
@@ -405,13 +408,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('هل لديك حساب بالفعل؟ '),
+                      Text(strings.haveAccount),
                       TextButton(
                         onPressed: () {
                           context.push('/login');
                         },
-                        child: const Text(
-                          'سجّل دخول',
+                        child: Text(
+                          strings.login,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary,
