@@ -121,7 +121,23 @@ class Order {
   }
 
   static String _statusToString(OrderStatus status) {
-    return status.toString().split('.')[1];
+    switch (status) {
+      case OrderStatus.pending: return 'pending';
+      case OrderStatus.accepted: return 'accepted';
+      case OrderStatus.shipped: return 'shipped';
+      case OrderStatus.delivered: return 'delivered';
+      case OrderStatus.completed: return 'completed';
+      case OrderStatus.cancelled: return 'cancelled';
+      case OrderStatus.disputed: return 'disputed';
+      case OrderStatus.rejected: return 'rejected';
+      case OrderStatus.disputeResolved: return 'dispute_resolved';
+      case OrderStatus.refundApproved: return 'refund_approved';
+      case OrderStatus.refundRejected: return 'refund_rejected';
+      case OrderStatus.returnRequested: return 'return_requested';
+      case OrderStatus.returnApproved: return 'return_approved';
+      case OrderStatus.returnReceived: return 'return_received';
+      case OrderStatus.refunded: return 'refunded';
+    }
   }
 
   /// Read/display model serialization only. Order creation is server-controlled.
