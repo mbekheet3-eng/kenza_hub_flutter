@@ -510,7 +510,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   void _buyNow(BuildContext context, Product product) {
-    if (!_requireSignIn()) return;
+    if (!_canPurchase(product)) return;
 
     context.read<CartProvider>().addItem(
       productId: product.id,
