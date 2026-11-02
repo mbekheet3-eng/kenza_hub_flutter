@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../models/product.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/marketplace_product_service.dart';
+import '../../services/catalog_service.dart';
 import '../../services/upload_service.dart';
 import '../../config/theme.dart';
 import 'steps/step_images.dart';
@@ -34,8 +34,10 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
   String _title = '';
   String _description = '';
   double _price = 0;
+  bool _skipVariantFields = false;
 
   final _productService = MarketplaceProductService();
+  final _catalogService = CatalogService();
   final _uploadService = UploadService();
 
   late List<Step> steps;
@@ -72,6 +74,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
           initialCondition: _condition,
           initialColor: _color,
           initialSize: _size,
+          skipVariantFields: _skipVariantFields,
         ),
         isActive: _currentStep >= 2,
       ),
@@ -81,6 +84,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
           onBrandSelected: _onBrandSelected,
           selectedBrand: _brand,
           category: _category,
+          skipVariantFields: _skipVariantFields,
         ),
         isActive: _currentStep >= 3,
       ),
@@ -115,14 +119,28 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
     });
   }
 
-  void _onCategorySelected(String? category) {
+  Future<void> _onCategorySelected(String? category) async {
     setState(() {
       _category = category;
+      _skipVariantFields = false;
       // A category change invalidates previously selected lookup values.
       _brand = null;
       _color = null;
       _size = null;
     });
+
+    if (category == null) return;
+    try {
+      final rootSlug = await _catalogService.fetchRootCategorySlug(category);
+      if (!mounted) return;
+      setState(() {
+        _skipVariantFields = rootSlug == 'kids' || rootSlug == 'home';
+      });
+    } catch (_) {
+      if (mounted) {
+        _showError('تعذر تحديد قواعد القسم. حاول اختيار القسم مرة أخرى.');
+      }
+    }
   }
 
   void _onDetailsChanged(Map<String, String?> data) {
@@ -159,9 +177,8 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
       case 1:
         return _category != null;
       case 2:
-        return _condition != null && (_category == null || 
-            (categorySkipFields[_category] != true) || 
-            (_color != null && _size != null));
+        return _condition != null &&
+            (_skipVariantFields || (_color != null && _size != null));
       case 3:
         return _category != null; // Brand is optional.
       case 4:
@@ -198,8 +215,8 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         description: _description,
         price: _price,
         conditionLabel: _condition!,
-        colorLabel: categorySkipFields[_category] == true ? null : _color,
-        sizeLabel: categorySkipFields[_category] == true ? null : _size,
+        colorLabel: _skipVariantFields ? null : _color,
+        sizeLabel: _skipVariantFields ? null : _size,
         brandName: _brand,
         imageUrls: uploadedImageUrls,
       );
@@ -228,7 +245,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
     return _selectedImages.isNotEmpty &&
         _category != null &&
         _condition != null &&
-        (categorySkipFields[_category] == true || (_color != null && _size != null)) &&
+        (_skipVariantFields || (_color != null && _size != null)) &&
         _title.isNotEmpty &&
         _description.isNotEmpty &&
         _price > 0;
@@ -251,7 +268,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
           _buildReviewSection('الصور', _buildImagePreview()),
           _buildReviewSection('الفئة', Text(_category ?? '-')),
           _buildReviewSection('الحالة', Text(_condition ?? '-')),
-          if (categorySkipFields[_category] != true) ...[
+          if (!_skipVariantFields) ...[
             _buildReviewSection('اللون', Text(_color ?? '-')),
             _buildReviewSection('المقاس', Text(_size ?? '-')),
             _buildReviewSection('العلامة التجارية', Text(_brand ?? '-')),
