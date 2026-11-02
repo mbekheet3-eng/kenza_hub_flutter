@@ -50,7 +50,7 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(
-                      height: isSmallScreen ? 235 : 275,
+                      height: isSmallScreen ? 310 : 350,
                       child: const Center(
                         child: WelcomeImageRows(),
                       ),
@@ -58,9 +58,9 @@ class WelcomeScreen extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.fromLTRB(
                         24,
-                        isSmallScreen ? 4 : 12,
+                        isSmallScreen ? 2 : 8,
                         24,
-                        12,
+                        16,
                       ),
                       child: Column(
                         children: [
@@ -68,10 +68,11 @@ class WelcomeScreen extends StatelessWidget {
                             strings.welcomeTitle,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: isSmallScreen ? 24 : 26,
-                              fontWeight: FontWeight.bold,
+                              fontSize: isSmallScreen ? 23 : 27,
+                              fontWeight: FontWeight.w800,
                               color: const Color(0xFF0F172A),
-                              height: 1.35,
+                              height: 1.3,
+                              letterSpacing: -0.3,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -79,8 +80,9 @@ class WelcomeScreen extends StatelessWidget {
                             strings.welcomeSubtitle,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: isSmallScreen ? 15 : 16,
+                              fontSize: isSmallScreen ? 14 : 15,
                               color: const Color(0xFF64748B),
+                              height: 1.5,
                             ),
                           ),
                           SizedBox(
