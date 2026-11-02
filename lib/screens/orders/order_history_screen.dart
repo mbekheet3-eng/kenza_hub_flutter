@@ -15,7 +15,8 @@ class OrderHistoryScreen extends StatefulWidget {
 
 class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   final SupabaseService _supabaseService = SupabaseService();
-  late Future<List<Order>> _ordersFuture;
+  Future<List<Order>>? _ordersFuture;
+  String? _loadedUserId;
 
   @override
   void initState() {
@@ -24,13 +25,19 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   }
 
   void _loadOrders() {
-    final authProvider = context.read<AuthProvider>();
-    if (authProvider.userId != null) {
-      _ordersFuture = _supabaseService.getUserOrders(
-        authProvider.userId!,
-        asBuyer: true, // Show orders where user is buyer
-      );
+    final userId = context.read<AuthProvider>().userId;
+    if (userId == null) {
+      _loadedUserId = null;
+      _ordersFuture = null;
+      return;
     }
+    if (_loadedUserId == userId && _ordersFuture != null) return;
+
+    _loadedUserId = userId;
+    _ordersFuture = _supabaseService.getUserOrders(
+      userId,
+      asBuyer: true,
+    );
   }
 
   @override
@@ -43,11 +50,23 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           title: const Text('سجل الطلبات'),
           centerTitle: true,
         ),
-        body: const Center(
-          child: Text('يرجى تسجيل الدخول أولاً'),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('يرجى تسجيل الدخول لعرض طلباتك'),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => context.push('/login'),
+                child: const Text('تسجيل الدخول'),
+              ),
+            ],
+          ),
         ),
       );
     }
+
+    _loadOrders();
 
     return Scaffold(
       appBar: AppBar(
@@ -55,7 +74,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         centerTitle: true,
       ),
       body: FutureBuilder<List<Order>>(
-        future: _ordersFuture,
+        future: _ordersFuture!,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
