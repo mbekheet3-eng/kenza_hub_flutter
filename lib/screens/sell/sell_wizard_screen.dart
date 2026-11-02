@@ -248,7 +248,11 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
       }
     } catch (e) {
       if (!productCreated && uploadedImageUrls.isNotEmpty) {
-        await _uploadService.deleteImages(uploadedImageUrls);
+        try {
+          await _uploadService.deleteImages(uploadedImageUrls);
+        } catch (_) {
+          // Preserve the original publishing error if image cleanup fails.
+        }
       }
       _showError('فشل نشر المنتج: $e');
     } finally {
