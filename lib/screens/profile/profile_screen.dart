@@ -26,6 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadUserData() async {
+    if (!mounted) return;
     try {
       setState(() => _isLoadingProfile = true);
 
@@ -59,6 +60,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
       }
     }
+  }
+
+  Future<void> _openEditProfile() async {
+    await context.push('/edit-profile');
+    if (mounted) await _loadUserData();
   }
 
   Future<void> _handleLogout() async {
@@ -276,7 +282,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           // Avatar
           GestureDetector(
-            onTap: () => context.push('/edit-profile'),
+            onTap: _openEditProfile,
             child: Container(
               width: 80,
               height: 80,
@@ -337,7 +343,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // Edit Button
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () => context.push('/edit-profile'),
+            onPressed: _openEditProfile,
           ),
         ],
       ),
