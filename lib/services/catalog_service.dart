@@ -126,8 +126,8 @@ class CatalogService {
     return (rows as List)
         .map((row) {
           final data = Map<String, dynamic>.from(row as Map);
-          return (data['label_en'] as String?) ??
-              (data['label_ar'] as String?) ??
+          return (data['label_ar'] as String?) ??
+              (data['label_en'] as String?) ??
               '';
         })
         .where((label) => label.isNotEmpty)
