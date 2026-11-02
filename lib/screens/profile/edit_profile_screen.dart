@@ -151,6 +151,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!context.watch<AuthProvider>().isSignedIn) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('تحرير الملف الشخصي')),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('سجّل الدخول لتعديل بيانات حسابك'),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => context.push('/login'),
+                child: const Text('تسجيل الدخول'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
 
