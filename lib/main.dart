@@ -27,7 +27,11 @@ void main() async {
     print('❌ Supabase initialization failed: $e');
   }
 
-  await AppLocalizations.initialize();
+  try {
+    await AppLocalizations.initialize();
+  } catch (e) {
+    debugPrint('Could not restore saved language: $e');
+  }
   runApp(const MyApp());
 }
 
