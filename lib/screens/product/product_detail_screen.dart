@@ -306,14 +306,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Icon(Icons.star, color: Colors.amber, size: 18),
-            const SizedBox(width: 4),
-            Text('${product.rating?.toStringAsFixed(1) ?? "0.0"} (12 مراجعة)'),
-          ],
-        ),
+        if (product.rating != null) ...[
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(Icons.star, color: Colors.amber, size: 18),
+              const SizedBox(width: 4),
+              Text(product.rating!.toStringAsFixed(1)),
+            ],
+          ),
+        ],
       ],
     );
   }
@@ -409,7 +411,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               CircleAvatar(
                 radius: 24,
                 backgroundColor: AppTheme.primaryColor.withOpacity(0.2),
-                child: Icon(Icons.person, color: AppTheme.primaryColor),
+                backgroundImage: product.sellerAvatar != null &&
+                        product.sellerAvatar!.isNotEmpty
+                    ? NetworkImage(product.sellerAvatar!)
+                    : null,
+                child: product.sellerAvatar == null ||
+                        product.sellerAvatar!.isEmpty
+                    ? Icon(Icons.person, color: AppTheme.primaryColor)
+                    : null,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -417,29 +426,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'اسم البائع',
+                      product.sellerName?.trim().isNotEmpty == true
+                          ? product.sellerName!
+                          : 'بائع على كنزة هب',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(Icons.star, size: 16, color: Colors.amber),
-                        const SizedBox(width: 4),
-                        Text('4.8 (45 مراجعة)'),
-                      ],
-                    ),
+                    if (product.rating != null) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(Icons.star, size: 16, color: Colors.amber),
+                          const SizedBox(width: 4),
+                          Text(product.rating!.toStringAsFixed(1)),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
-              ),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  backgroundColor: AppTheme.primaryColor,
-                ),
-                child: const Text('المتجر', style: TextStyle(fontSize: 12)),
               ),
             ],
           ),
@@ -523,9 +528,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   void _shareProduct(Product product) {
-    // TODO: Implement share functionality
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('سيتم تفعيل المشاركة قريباً')),
+      const SnackBar(content: Text('مشاركة المنتج غير متاحة حالياً.')),
     );
   }
 }
