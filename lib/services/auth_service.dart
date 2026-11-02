@@ -111,7 +111,7 @@ class AuthService {
   }) async {
     try {
       final client = SupabaseService.client;
-      final nameParts = (fullName ?? '').trim().split(RegExp(r'\\s+'));
+      final nameParts = (fullName ?? '').trim().split(RegExp(r'\s+'));
       await client.from('users').update({
         if (fullName != null && nameParts.isNotEmpty)
           'first_name': nameParts.first,
