@@ -36,6 +36,7 @@ class _StepCategoryState extends State<StepCategory> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.selectedCategory != widget.selectedCategory) {
       _selectedCategory = widget.selectedCategory;
+      _path.clear();
     }
   }
 
@@ -48,7 +49,13 @@ class _StepCategoryState extends State<StepCategory> {
         .toList();
 
     if (children.isNotEmpty) {
-      setState(() => _path.add(category));
+      setState(() {
+        _path.add(category);
+        _selectedCategory = null;
+      });
+      // A previous leaf selection must not survive when the user starts
+      // navigating a different category branch.
+      widget.onCategorySelected(null);
       return;
     }
 
@@ -59,8 +66,10 @@ class _StepCategoryState extends State<StepCategory> {
   void _retry() {
     setState(() {
       _path.clear();
+      _selectedCategory = null;
       _categoriesFuture = _catalogService.fetchCategories();
     });
+    widget.onCategorySelected(null);
   }
 
   IconData _iconFor(String slug) {
