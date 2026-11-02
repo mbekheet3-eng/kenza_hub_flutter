@@ -6,6 +6,14 @@ enum OrderStatus {
   completed,
   cancelled,
   disputed,
+  rejected,
+  disputeResolved,
+  refundApproved,
+  refundRejected,
+  returnRequested,
+  returnApproved,
+  returnReceived,
+  refunded,
 }
 
 class Order {
@@ -28,6 +36,7 @@ class Order {
   final String? productImage;
   final String? buyerName;
   final String? sellerName;
+  final String? orderNumber;
 
   Order({
     required this.id,
@@ -49,54 +58,65 @@ class Order {
     this.productImage,
     this.buyerName,
     this.sellerName,
+    this.orderNumber,
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
+    final productValue = json['product'] ?? json['products'];
+    final product = productValue is Map
+        ? Map<String, dynamic>.from(productValue)
+        : <String, dynamic>{};
+    final imageValue = product['product_images'];
+    final imageRows = imageValue is List ? imageValue : const [];
+    String? firstImage;
+    if (imageRows.isNotEmpty && imageRows.first is Map) {
+      firstImage =
+          (imageRows.first as Map)['image_url'] as String?;
+    }
+
     return Order(
       id: json['id'] as String,
-      productId: json['product_id'] as String, // ✅ FIXED: snake_case
-      buyerId: json['buyer_id'] as String, // ✅ FIXED: snake_case
-      sellerId: json['seller_id'] as String, // ✅ FIXED: snake_case
-      amount: (json['amount'] as num).toDouble(),
-      status: _statusFromString(json['status'] as String),
-      shippingAddress: json['shipping_address'] as String?, // ✅ FIXED: snake_case
-      trackingNumber: json['tracking_number'] as String?, // ✅ FIXED: snake_case
-      createdAt: DateTime.parse(json['created_at'] as String), // ✅ FIXED: snake_case
-      updatedAt: DateTime.parse(json['updated_at'] as String), // ✅ FIXED: snake_case
-      shippedAt: json['shipped_at'] == null
-          ? null
-          : DateTime.parse(json['shipped_at'] as String), // ✅ FIXED: snake_case
-      deliveredAt: json['delivered_at'] == null
-          ? null
-          : DateTime.parse(json['delivered_at'] as String), // ✅ FIXED: snake_case
-      notes: json['notes'] as String?,
-      rating: (json['rating'] as num?)?.toDouble(),
-      review: json['review'] as String?,
-      productTitle: json['product_title'] as String?, // ✅ FIXED: snake_case
-      productImage: json['product_image'] as String?, // ✅ FIXED: snake_case
-      buyerName: json['buyer_name'] as String?, // ✅ FIXED: snake_case
-      sellerName: json['seller_name'] as String?, // ✅ FIXED: snake_case
+      productId: json['product_id'] as String,
+      buyerId: json['buyer_id'] as String,
+      sellerId: json['seller_profile_id'] as String,
+      amount: (json['total_amount'] as num?)?.toDouble() ?? 0,
+      status: _statusFromString(json['status'] as String? ?? 'pending'),
+      shippingAddress: json['shipping_address'] as String?,
+      trackingNumber: json['tracking_number'] as String?,
+      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ??
+          DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
+          DateTime.now(),
+      shippedAt: null,
+      deliveredAt: null,
+      notes: null,
+      rating: null,
+      review: null,
+      productTitle: product['title_ar'] as String? ??
+          product['title_en'] as String?,
+      productImage: firstImage,
+      orderNumber: json['order_number'] as String?,
     );
   }
 
   static OrderStatus _statusFromString(String status) {
     switch (status) {
-      case 'pending':
-        return OrderStatus.pending;
-      case 'accepted':
-        return OrderStatus.accepted;
-      case 'shipped':
-        return OrderStatus.shipped;
-      case 'delivered':
-        return OrderStatus.delivered;
-      case 'completed':
-        return OrderStatus.completed;
-      case 'cancelled':
-        return OrderStatus.cancelled;
-      case 'disputed':
-        return OrderStatus.disputed;
-      default:
-        return OrderStatus.pending;
+      case 'pending': return OrderStatus.pending;
+      case 'accepted': return OrderStatus.accepted;
+      case 'shipped': return OrderStatus.shipped;
+      case 'delivered': return OrderStatus.delivered;
+      case 'completed': return OrderStatus.completed;
+      case 'cancelled': return OrderStatus.cancelled;
+      case 'disputed': return OrderStatus.disputed;
+      case 'rejected': return OrderStatus.rejected;
+      case 'dispute_resolved': return OrderStatus.disputeResolved;
+      case 'refund_approved': return OrderStatus.refundApproved;
+      case 'refund_rejected': return OrderStatus.refundRejected;
+      case 'return_requested': return OrderStatus.returnRequested;
+      case 'return_approved': return OrderStatus.returnApproved;
+      case 'return_received': return OrderStatus.returnReceived;
+      case 'refunded': return OrderStatus.refunded;
+      default: return OrderStatus.pending;
     }
   }
 
@@ -104,27 +124,20 @@ class Order {
     return status.toString().split('.')[1];
   }
 
+  /// Read/display model serialization only. Order creation is server-controlled.
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'product_id': productId, // ✅ FIXED: snake_case
-      'buyer_id': buyerId, // ✅ FIXED: snake_case
-      'seller_id': sellerId, // ✅ FIXED: snake_case
-      'amount': amount,
+      if (id.isNotEmpty) 'id': id,
+      'product_id': productId,
+      'buyer_id': buyerId,
+      'seller_profile_id': sellerId,
+      'total_amount': amount,
       'status': _statusToString(status),
-      'shipping_address': shippingAddress, // ✅ FIXED: snake_case
-      'tracking_number': trackingNumber, // ✅ FIXED: snake_case
-      'created_at': createdAt.toIso8601String(), // ✅ FIXED: snake_case
-      'updated_at': updatedAt.toIso8601String(), // ✅ FIXED: snake_case
-      'shipped_at': shippedAt?.toIso8601String(), // ✅ FIXED: snake_case
-      'delivered_at': deliveredAt?.toIso8601String(), // ✅ FIXED: snake_case
-      'notes': notes,
-      'rating': rating,
-      'review': review,
-      'product_title': productTitle, // ✅ FIXED: snake_case
-      'product_image': productImage, // ✅ FIXED: snake_case
-      'buyer_name': buyerName, // ✅ FIXED: snake_case
-      'seller_name': sellerName, // ✅ FIXED: snake_case
+      'shipping_address': shippingAddress,
+      'tracking_number': trackingNumber,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      if (orderNumber != null) 'order_number': orderNumber,
     };
   }
 
@@ -144,6 +157,22 @@ class Order {
         return 'ملغى';
       case OrderStatus.disputed:
         return 'قيد النزاع';
+      case OrderStatus.rejected:
+        return 'مرفوض';
+      case OrderStatus.disputeResolved:
+        return 'تم حل النزاع';
+      case OrderStatus.refundApproved:
+        return 'تمت الموافقة على الاسترداد';
+      case OrderStatus.refundRejected:
+        return 'رُفض الاسترداد';
+      case OrderStatus.returnRequested:
+        return 'طلب إرجاع';
+      case OrderStatus.returnApproved:
+        return 'تمت الموافقة على الإرجاع';
+      case OrderStatus.returnReceived:
+        return 'تم استلام المرتجع';
+      case OrderStatus.refunded:
+        return 'تم رد المبلغ';
     }
   }
 
@@ -167,6 +196,7 @@ class Order {
     String? productImage,
     String? buyerName,
     String? sellerName,
+    String? orderNumber,
   }) {
     return Order(
       id: id ?? this.id,
@@ -188,6 +218,7 @@ class Order {
       productImage: productImage ?? this.productImage,
       buyerName: buyerName ?? this.buyerName,
       sellerName: sellerName ?? this.sellerName,
+      orderNumber: orderNumber ?? this.orderNumber,
     );
   }
 }
@@ -248,12 +279,16 @@ class OrderTimeline {
   });
 
   factory OrderTimeline.fromJson(Map<String, dynamic> json) {
+    final newStatus = json['new_status'] as String? ?? 'pending';
+    final reason = json['reason'] as String?;
+    final action = json['action'] as String? ?? newStatus;
     return OrderTimeline(
-      orderId: json['order_id'] as String, // ✅ FIXED: snake_case
-      status: Order._statusFromString(json['status'] as String),
-      message: json['message'] as String,
-      timestamp: DateTime.parse(json['created_at'] as String), // ✅ FIXED: use created_at
-      metadata: json['metadata'] as String?,
+      orderId: json['order_id'] as String,
+      status: Order._statusFromString(newStatus),
+      message: reason?.isNotEmpty == true ? reason! : action,
+      timestamp: DateTime.tryParse(json['created_at']?.toString() ?? '') ??
+          DateTime.now(),
+      metadata: json['metadata']?.toString(),
     );
   }
 
