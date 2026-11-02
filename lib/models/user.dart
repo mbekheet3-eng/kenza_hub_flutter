@@ -58,9 +58,9 @@ class User {
     return User(
       id: json['id'] as String,
       email: json['email'] as String? ?? '',
-      displayName: username?.isNotEmpty == true
-          ? username
-          : (fullName.isNotEmpty ? fullName : null),
+      displayName: fullName.isNotEmpty
+          ? fullName
+          : (username?.isNotEmpty == true ? username : null),
       phone: json['phone'] as String?,
       avatarUrl: json['avatar_url'] as String?,
       bio: json['bio'] as String?,
