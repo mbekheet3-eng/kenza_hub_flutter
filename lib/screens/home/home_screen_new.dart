@@ -95,34 +95,62 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // Category Filter
+              // Main category cards
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                child: Row(
+                  children: [
+                    const Text(
+                      'تسوق حسب القسم',
+                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                    ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () => homeProvider.filterByCategory('الكل'),
+                      child: const Text('كل المنتجات'),
+                    ),
+                  ],
+                ),
+              ),
               SizedBox(
-                height: 50,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
+                height: 166,
+                child: GridView.count(
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                  itemCount: homeProvider.categories.length,
-                  itemBuilder: (context, index) {
-                    final category = homeProvider.categories[index];
-                    final isSelected = homeProvider.selectedCategory == category;
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: FilterChip(
-                        label: Text(
-                          category,
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        selected: isSelected,
-                        onSelected: (_) => homeProvider.filterByCategory(category),
-                        backgroundColor: Colors.grey[200],
-                        selectedColor: AppColors.primary,
-                      ),
-                    );
-                  },
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                  childAspectRatio: 2.7,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    _MainCategoryTile(
+                      title: 'مستلزمات أطفال',
+                      subtitle: 'كل احتياجات الطفل ما عدا الملابس',
+                      icon: Icons.child_friendly_outlined,
+                      selected: homeProvider.selectedCategory == 'مستلزمات أطفال',
+                      onTap: () => homeProvider.filterByCategory('مستلزمات أطفال'),
+                    ),
+                    _MainCategoryTile(
+                      title: 'مستلزمات المنزل',
+                      subtitle: 'كل ما تحتاجه داخل المنزل',
+                      icon: Icons.chair_outlined,
+                      selected: homeProvider.selectedCategory == 'مستلزمات المنزل',
+                      onTap: () => homeProvider.filterByCategory('مستلزمات المنزل'),
+                    ),
+                    _MainCategoryTile(
+                      title: 'ملابس',
+                      subtitle: 'رجالي • حريمي • أطفال',
+                      icon: Icons.checkroom_outlined,
+                      selected: homeProvider.selectedCategory == 'ملابس',
+                      onTap: () => homeProvider.filterByCategory('ملابس'),
+                    ),
+                    _MainCategoryTile(
+                      title: 'أحذية',
+                      subtitle: 'رجالي • حريمي • أطفال',
+                      icon: Icons.hiking_outlined,
+                      selected: homeProvider.selectedCategory == 'أحذية',
+                      onTap: () => homeProvider.filterByCategory('أحذية'),
+                    ),
+                  ],
                 ),
               ),
 
@@ -150,6 +178,71 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _MainCategoryTile extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _MainCategoryTile({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected ? AppColors.primary.withOpacity(0.10) : Colors.white,
+      borderRadius: BorderRadius.circular(AppRadius.md),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            border: Border.all(
+              color: selected ? AppColors.primary : Colors.grey.shade300,
+              width: selected ? 1.5 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: AppColors.primary, size: 27),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: Colors.grey.shade600, fontSize: 10),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
