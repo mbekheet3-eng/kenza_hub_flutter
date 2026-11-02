@@ -27,29 +27,9 @@ class _StepDetailsState extends State<StepDetails> {
   late String? _selectedColor;
   late String? _selectedSize;
   late Future<List<String>> _sizesFuture;
+  late Future<List<String>> _conditionsFuture;
+  late Future<List<String>> _colorsFuture;
   final CatalogService _catalogService = CatalogService();
-
-  final List<String> conditions = conditionOptions;
-
-  final List<String> colors = [
-    'أسود',
-    'أبيض',
-    'رمادي',
-    'أحمر',
-    'أزرق',
-    'أخضر',
-    'أصفر',
-    'برتقالي',
-    'بنفسجي',
-    'وردي',
-    'بني',
-    'كحلي',
-    'بيج',
-    'ذهبي',
-    'فضي',
-    'متعدد الألوان',
-    'أخرى',
-  ];
 
 
 
@@ -62,6 +42,8 @@ class _StepDetailsState extends State<StepDetails> {
     _sizesFuture = widget.category == null
         ? Future.value(const <String>[])
         : _catalogService.fetchSizesForCategory(widget.category!);
+    _conditionsFuture = _catalogService.fetchConditions();
+    _colorsFuture = _catalogService.fetchColors();
   }
 
   @override
@@ -129,54 +111,116 @@ class _StepDetailsState extends State<StepDetails> {
   }
 
   Widget _buildConditionOptions() {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: conditions.map((condition) {
-        final isSelected = _selectedCondition == condition;
-        return FilterChip(
-          label: Text(condition),
-          selected: isSelected,
-          onSelected: (selected) {
-            setState(() {
-              _selectedCondition = selected ? condition : null;
-            });
-            _notifyChanges();
-          },
-          backgroundColor: AppTheme.surfaceColor,
-          selectedColor: AppTheme.primaryColor.withOpacity(0.1),
-          side: BorderSide(
-            color: isSelected ? AppTheme.primaryColor : AppTheme.borderLight,
-            width: isSelected ? 2 : 1,
-          ),
+    return FutureBuilder<List<String>>(
+      future: _conditionsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Padding(
+            padding: EdgeInsets.all(16),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (snapshot.hasError) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('تعذر تحميل حالات المنتجات'),
+              TextButton(
+                onPressed: () => setState(
+                  () => _conditionsFuture = _catalogService.fetchConditions(),
+                ),
+                child: const Text('إعادة المحاولة'),
+              ),
+            ],
+          );
+        }
+
+        final conditions = snapshot.data ?? const <String>[];
+        if (conditions.isEmpty) {
+          return const Text('لا توجد حالات منتجات مفعّلة في قاعدة البيانات');
+        }
+
+        return Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: conditions.map((condition) {
+            final isSelected = _selectedCondition == condition;
+            return FilterChip(
+              label: Text(condition),
+              selected: isSelected,
+              onSelected: (selected) {
+                setState(() {
+                  _selectedCondition = selected ? condition : null;
+                });
+                _notifyChanges();
+              },
+              backgroundColor: AppTheme.surfaceColor,
+              selectedColor: AppTheme.primaryColor.withOpacity(0.1),
+              side: BorderSide(
+                color: isSelected ? AppTheme.primaryColor : AppTheme.borderLight,
+                width: isSelected ? 2 : 1,
+              ),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
     );
   }
 
   Widget _buildColorOptions() {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: colors.map((color) {
-        final isSelected = _selectedColor == color;
-        return FilterChip(
-          label: Text(color),
-          selected: isSelected,
-          onSelected: (selected) {
-            setState(() {
-              _selectedColor = selected ? color : null;
-            });
-            _notifyChanges();
-          },
-          backgroundColor: AppTheme.surfaceColor,
-          selectedColor: AppTheme.primaryColor.withOpacity(0.1),
-          side: BorderSide(
-            color: isSelected ? AppTheme.primaryColor : AppTheme.borderLight,
-            width: isSelected ? 2 : 1,
-          ),
+    return FutureBuilder<List<String>>(
+      future: _colorsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Padding(
+            padding: EdgeInsets.all(16),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (snapshot.hasError) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('تعذر تحميل الألوان'),
+              TextButton(
+                onPressed: () => setState(
+                  () => _colorsFuture = _catalogService.fetchColors(),
+                ),
+                child: const Text('إعادة المحاولة'),
+              ),
+            ],
+          );
+        }
+
+        final availableColors = snapshot.data ?? const <String>[];
+        if (availableColors.isEmpty) {
+          return const Text('لا توجد ألوان مسجلة لهذا القسم');
+        }
+
+        return Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: availableColors.map((color) {
+            final isSelected = _selectedColor == color;
+            return FilterChip(
+              label: Text(color),
+              selected: isSelected,
+              onSelected: (selected) {
+                setState(() {
+                  _selectedColor = selected ? color : null;
+                });
+                _notifyChanges();
+              },
+              backgroundColor: AppTheme.surfaceColor,
+              selectedColor: AppTheme.primaryColor.withOpacity(0.1),
+              side: BorderSide(
+                color: isSelected ? AppTheme.primaryColor : AppTheme.borderLight,
+                width: isSelected ? 2 : 1,
+              ),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
     );
   }
 
