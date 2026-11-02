@@ -326,7 +326,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 8),
                 // Rating
-                if (user.rating > 0)
+                if (user.rating > 0 && user.totalReviews > 0)
                   Row(
                     children: [
                       const Icon(Icons.star, size: 16, color: Colors.amber),
