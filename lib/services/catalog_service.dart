@@ -28,6 +28,30 @@ class CatalogService {
         )
         .toList(growable: false);
   }
+  Future<List<String>> fetchConditions() async {
+    final rows = await _client
+        .from('product_conditions')
+        .select('label_ar')
+        .eq('is_active', true);
+    return (rows as List)
+        .map((row) => (row as Map)['label_ar'] as String?)
+        .whereType<String>()
+        .where((label) => label.trim().isNotEmpty)
+        .toList(growable: false);
+  }
+
+  Future<List<String>> fetchColors() async {
+    final rows = await _client
+        .from('product_colors')
+        .select('label_ar')
+        .eq('is_active', true);
+    return (rows as List)
+        .map((row) => (row as Map)['label_ar'] as String?)
+        .whereType<String>()
+        .where((label) => label.trim().isNotEmpty)
+        .toList(growable: false);
+  }
+
   Future<List<String>> fetchBrands() async {
     final rows = await _client
         .from('brands')
