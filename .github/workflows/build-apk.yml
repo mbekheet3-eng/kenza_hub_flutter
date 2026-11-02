@@ -1,8 +1,7 @@
 name: Build APK
 
+# Automatic builds are paused; run manually when explicitly requested.
 on:
-  push:
-    branches: ["**"]
   workflow_dispatch: {}
 
 jobs:
