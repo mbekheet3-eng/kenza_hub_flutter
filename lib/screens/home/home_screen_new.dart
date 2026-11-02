@@ -6,6 +6,7 @@ import 'package:kenza_hub_flutter/config/app_radius.dart';
 import 'package:kenza_hub_flutter/config/app_spacing.dart';
 import 'package:kenza_hub_flutter/providers/home_provider.dart';
 import 'package:kenza_hub_flutter/models/product.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -62,6 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Consumer<HomeProvider>(
         builder: (context, homeProvider, _) {
+          final strings = AppLocalizations.of(context);
           return Column(
             children: [
               // Search Bar
@@ -71,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   controller: _searchController,
                   onChanged: (value) => homeProvider.search(value),
                   decoration: InputDecoration(
-                    hintText: 'ابحث عن المنتجات...',
+                    hintText: strings.searchProduct,
                     prefixIcon: const Icon(Icons.search, color: Colors.grey),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
@@ -101,13 +103,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Row(
                   children: [
                     const Text(
-                      'تسوق حسب القسم',
+                      strings.categories,
                       style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                     ),
                     const Spacer(),
                     TextButton(
                       onPressed: () => homeProvider.filterByCategory('الكل'),
-                      child: const Text('كل المنتجات'),
+                      child: Text(strings.viewAll),
                     ),
                   ],
                 ),
@@ -123,28 +125,28 @@ class _HomeScreenState extends State<HomeScreen> {
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
                     _MainCategoryTile(
-                      title: 'مستلزمات أطفال',
+                      title: strings.kids,
                       subtitle: 'كل احتياجات الطفل ما عدا الملابس',
                       icon: Icons.child_friendly_outlined,
                       selected: homeProvider.selectedCategory == 'kids',
                       onTap: () => homeProvider.filterByCategory('kids'),
                     ),
                     _MainCategoryTile(
-                      title: 'مستلزمات المنزل',
+                      title: strings.home,
                       subtitle: 'كل ما تحتاجه داخل المنزل',
                       icon: Icons.chair_outlined,
                       selected: homeProvider.selectedCategory == 'home',
                       onTap: () => homeProvider.filterByCategory('home'),
                     ),
                     _MainCategoryTile(
-                      title: 'ملابس',
+                      title: strings.clothes,
                       subtitle: 'رجالي • حريمي • أطفال',
                       icon: Icons.checkroom_outlined,
                       selected: homeProvider.selectedCategory == 'clothes',
                       onTap: () => homeProvider.filterByCategory('clothes'),
                     ),
                     _MainCategoryTile(
-                      title: 'أحذية',
+                      title: strings.shoes,
                       subtitle: 'رجالي • حريمي • أطفال',
                       icon: Icons.hiking_outlined,
                       selected: homeProvider.selectedCategory == 'shoes',
@@ -383,7 +385,9 @@ class ProductCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          product.isAvailable ? 'متوفر' : 'نفد',
+                          product.isAvailable
+                              ? AppLocalizations.of(context).available
+                              : AppLocalizations.of(context).soldOut,
                           style: TextStyle(
                             fontSize: 10,
                             color: product.isAvailable
@@ -424,7 +428,7 @@ class EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'لا توجد منتجات',
+            AppLocalizations.of(context).noProducts,
             style: TextStyle(
               color: Colors.grey[600],
               fontSize: 18,
@@ -433,7 +437,7 @@ class EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'حاول تغيير المرشحات أو البحث',
+            AppLocalizations.of(context).tryChangeFilters,
             style: TextStyle(
               color: Colors.grey[500],
               fontSize: 14,
@@ -450,7 +454,7 @@ class EmptyState extends StatelessWidget {
               ),
             ),
             child: const Text(
-              'إزالة المرشحات',
+              AppLocalizations.of(context).clearFilters,
               style: TextStyle(color: Colors.white),
             ),
           ),
@@ -514,7 +518,7 @@ class ErrorState extends StatelessWidget {
               ),
             ),
             child: const Text(
-              'حاول مجدداً',
+              AppLocalizations.of(context).tryAgain,
               style: TextStyle(color: Colors.white),
             ),
           ),
