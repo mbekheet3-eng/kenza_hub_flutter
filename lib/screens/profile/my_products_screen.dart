@@ -392,7 +392,9 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
 
   void _toggleProductVisibility(String productId) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('تم إيقاف العرض')),
+      const SnackBar(
+        content: Text('إيقاف العرض مؤقتاً غير متاح حالياً. لم يتم تغيير حالة المنتج.'),
+      ),
     );
   }
 
