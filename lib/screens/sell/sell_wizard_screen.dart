@@ -258,6 +258,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
   }
 
   void _showError(String message) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
