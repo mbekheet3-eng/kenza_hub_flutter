@@ -476,52 +476,79 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _showAdvancedFilters(BuildContext context) {
+    var draftMinPrice = _minPrice;
+    var draftMaxPrice = _maxPrice;
+    var draftPriceFilterEnabled = _priceFilterEnabled;
+
     showModalBottomSheet(
       context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'فلاتر متقدمة',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _priceFilterEnabled
-                ? 'نطاق السعر: ${_minPrice.toStringAsFixed(0)} - ${_maxPrice.toStringAsFixed(0)} ج.م'
-                : 'اختر نطاقاً لتفعيل فلتر السعر',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            RangeSlider(
-              values: RangeValues(_minPrice, _maxPrice),
-              min: 0,
-              max: 1000000,
-              onChanged: (values) {
-                setState(() {
-                  _minPrice = values.start;
-                  _maxPrice = values.end;
-                  _priceFilterEnabled = true;
-                });
-              },
-              activeColor: AppTheme.primaryColor,
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryColor,
+      isScrollControlled: true,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (sheetContext, setSheetState) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'فلاتر متقدمة',
+                  style: Theme.of(sheetContext).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                child: const Text('تطبيق الفلاتر'),
-              ),
+                const SizedBox(height: 16),
+                Text(
+                  draftPriceFilterEnabled
+                      ? 'نطاق السعر: ${draftMinPrice.toStringAsFixed(0)} - ${draftMaxPrice.toStringAsFixed(0)} ج.م'
+                      : 'اختر نطاقاً لتفعيل فلتر السعر',
+                  style: Theme.of(sheetContext).textTheme.bodySmall,
+                ),
+                RangeSlider(
+                  values: RangeValues(draftMinPrice, draftMaxPrice),
+                  min: 0,
+                  max: 1000000,
+                  onChanged: (values) {
+                    setSheetState(() {
+                      draftMinPrice = values.start;
+                      draftMaxPrice = values.end;
+                      draftPriceFilterEnabled = true;
+                    });
+                  },
+                  activeColor: AppTheme.primaryColor,
+                ),
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        setSheetState(() {
+                          draftMinPrice = 0;
+                          draftMaxPrice = 1000000;
+                          draftPriceFilterEnabled = false;
+                        });
+                      },
+                      child: const Text('إلغاء فلتر السعر'),
+                    ),
+                    const Spacer(),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _minPrice = draftMinPrice;
+                          _maxPrice = draftMaxPrice;
+                          _priceFilterEnabled = draftPriceFilterEnabled;
+                        });
+                        Navigator.pop(sheetContext);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryColor,
+                      ),
+                      child: const Text('تطبيق الفلاتر'),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
