@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const Spacer(),
                     TextButton(
-                      onPressed: () => homeProvider.filterByCategory('الكل'),
+                      onPressed: () => context.push('/categories'),
                       child: Text(strings.viewAll),
                     ),
                   ],
