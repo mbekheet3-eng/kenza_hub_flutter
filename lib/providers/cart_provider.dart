@@ -82,6 +82,8 @@ class CartProvider with ChangeNotifier {
     String? size,
     String? color,
   }) {
+    if (quantity <= 0) return;
+
     // Check if item already exists
     final existingItemIndex = _items.indexWhere(
       (item) =>
