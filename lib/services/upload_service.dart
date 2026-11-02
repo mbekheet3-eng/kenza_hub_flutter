@@ -242,15 +242,17 @@ class UploadService {
 
   /// Upload multiple images
   Future<List<String>> uploadImages(List<File> imageFiles) async {
+    final uploadedUrls = <String>[];
     try {
-      final uploadedUrls = <String>[];
-
       for (final imageFile in imageFiles) {
         final url = await uploadImage(imageFile);
         uploadedUrls.add(url);
       }
       return uploadedUrls;
     } catch (e) {
+      if (uploadedUrls.isNotEmpty) {
+        await deleteImages(uploadedUrls);
+      }
       throw Exception('Failed to upload images: $e');
     }
   }
