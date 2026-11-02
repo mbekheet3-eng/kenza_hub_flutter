@@ -78,9 +78,9 @@ class AboutKenzaScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: _red.withValues(alpha: 0.07),
+              color: _red.withOpacity(0.07),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: _red.withValues(alpha: 0.18)),
+              border: Border.all(color: _red.withOpacity(0.18)),
             ),
             child: const Row(
               crossAxisAlignment: CrossAxisAlignment.start,
