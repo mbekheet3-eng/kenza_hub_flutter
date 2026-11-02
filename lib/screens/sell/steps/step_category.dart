@@ -23,6 +23,7 @@ class _StepCategoryState extends State<StepCategory> {
   late Future<List<DatabaseCategory>> _categoriesFuture;
   final List<DatabaseCategory> _path = [];
   String? _selectedCategory;
+  bool _preservePathOnNextNullUpdate = false;
 
   @override
   void initState() {
@@ -36,7 +37,11 @@ class _StepCategoryState extends State<StepCategory> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.selectedCategory != widget.selectedCategory) {
       _selectedCategory = widget.selectedCategory;
-      _path.clear();
+      if (_preservePathOnNextNullUpdate && widget.selectedCategory == null) {
+        _preservePathOnNextNullUpdate = false;
+      } else {
+        _path.clear();
+      }
     }
   }
 
@@ -53,9 +58,11 @@ class _StepCategoryState extends State<StepCategory> {
         _path.add(category);
         _selectedCategory = null;
       });
-      // A previous leaf selection must not survive when the user starts
-      // navigating a different category branch.
-      widget.onCategorySelected(null);
+      // Clear a previous leaf selection without losing the newly opened path.
+      if (widget.selectedCategory != null) {
+        _preservePathOnNextNullUpdate = true;
+        widget.onCategorySelected(null);
+      }
       return;
     }
 
