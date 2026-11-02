@@ -62,7 +62,7 @@ class AuthProvider with ChangeNotifier {
     try {
       final launched = await SupabaseService.client.auth.signInWithOAuth(
         provider,
-        redirectTo: 'com.kenza.hub://login-callback/',
+        redirectTo: 'com.kenza.hub://login-callback/auth-callback',
       );
       _isLoading = false;
       if (!launched) {
