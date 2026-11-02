@@ -208,7 +208,7 @@ class _CartScreenState extends State<CartScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'الإجمالي',
+                'إجمالي المنتجات',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -221,6 +221,17 @@ class _CartScreenState extends State<CartScreen> {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 6),
+          Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: Text(
+              'المبلغ لا يشمل الشحن؛ سيتم تحديده عند تفعيل الاتفاق على الطلب.',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppTheme.textSecondary,
+              ),
+              textAlign: TextAlign.end,
+            ),
           ),
           const SizedBox(height: 16),
 
