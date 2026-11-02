@@ -206,6 +206,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
 
     setState(() => _isLoading = true);
     final uploadedImageUrls = <String>[];
+    var productCreated = false;
 
     try {
       // 1. Ensure the default seller profile exists before uploading files.
@@ -229,9 +230,14 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         brandName: _brand,
         imageUrls: uploadedImageUrls,
       );
+      productCreated = true;
 
-      // 4. Clean up cache
-      await _uploadService.cleanupCache();
+      // Cache cleanup must not invalidate a successfully published listing.
+      try {
+        await _uploadService.cleanupCache();
+      } catch (_) {
+        // The uploaded images and database listing are already committed.
+      }
 
       // Success
       if (mounted) {
@@ -241,7 +247,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         context.pushReplacement('/home');
       }
     } catch (e) {
-      if (uploadedImageUrls.isNotEmpty) {
+      if (!productCreated && uploadedImageUrls.isNotEmpty) {
         await _uploadService.deleteImages(uploadedImageUrls);
       }
       _showError('فشل نشر المنتج: $e');
