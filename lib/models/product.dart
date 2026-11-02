@@ -22,6 +22,7 @@ class Product {
   final double? longitude;
   final String? location;
   final bool isSold;
+  final bool isDeleted;
   final String? sellerName;
   final String? sellerAvatar;
   final String? sellerProfileId;
@@ -58,6 +59,7 @@ class Product {
     this.longitude,
     this.location,
     this.isSold = false,
+    this.isDeleted = false,
     this.sellerName,
     this.sellerAvatar,
     this.sellerProfileId,
@@ -180,6 +182,7 @@ class Product {
       updatedAt: DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
           DateTime.now(),
       isSold: statusSlug == 'sold',
+      isDeleted: statusSlug == 'deleted',
       sellerName: sellerData?['display_name'] as String? ??
           json['seller_name'] as String?,
       sellerAvatar: sellerData?['avatar_url'] as String? ??
@@ -242,6 +245,7 @@ class Product {
     double? longitude,
     String? location,
     bool? isSold,
+    bool? isDeleted,
     String? sellerName,
     String? sellerAvatar,
     String? sellerProfileId,
@@ -278,6 +282,7 @@ class Product {
       longitude: longitude ?? this.longitude,
       location: location ?? this.location,
       isSold: isSold ?? this.isSold,
+      isDeleted: isDeleted ?? this.isDeleted,
       sellerName: sellerName ?? this.sellerName,
       sellerAvatar: sellerAvatar ?? this.sellerAvatar,
       sellerProfileId: sellerProfileId ?? this.sellerProfileId,
