@@ -19,6 +19,7 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _currentImageIndex = 0;
   bool _isFavorite = false;
+  bool _isFavoriteLoading = false;
   int _quantity = 1;
 
   @override
@@ -28,9 +29,55 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Future<void> _loadProduct() async {
-    if (mounted) {
-      await context.read<ProductProvider>().getProduct(widget.productId);
+    if (!mounted) return;
+    final productProvider = context.read<ProductProvider>();
+    await productProvider.getProduct(widget.productId);
+
+    final userId = context.read<AuthProvider>().userId;
+    if (userId == null || !mounted) return;
+
+    final isFavorite =
+        await productProvider.isFavorite(widget.productId, userId);
+    if (mounted) setState(() => _isFavorite = isFavorite);
+  }
+
+  Future<void> _toggleFavorite() async {
+    final userId = context.read<AuthProvider>().userId;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('سجّل الدخول لإضافة المنتجات إلى المفضلة')),
+      );
+      context.push('/login');
+      return;
     }
+    if (_isFavoriteLoading) return;
+
+    setState(() => _isFavoriteLoading = true);
+    final succeeded = await context
+        .read<ProductProvider>()
+        .toggleFavorite(widget.productId, userId);
+    if (!mounted) return;
+
+    setState(() {
+      if (succeeded) _isFavorite = !_isFavorite;
+      _isFavoriteLoading = false;
+    });
+
+    if (!succeeded) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تعذر تحديث المفضلة. حاول مرة أخرى.')),
+      );
+    }
+  }
+
+  bool _requireSignIn() {
+    if (context.read<AuthProvider>().isSignedIn) return true;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('سجّل الدخول أولاً للشراء وإضافة المنتجات إلى السلة')),
+    );
+    context.push('/login');
+    return false;
   }
 
   @override
@@ -58,7 +105,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               _isFavorite ? Icons.favorite : Icons.favorite_outline,
               color: _isFavorite ? Colors.red : null,
             ),
-            onPressed: () => setState(() => _isFavorite = !_isFavorite),
+            onPressed: _isFavoriteLoading ? null : _toggleFavorite,
           ),
           IconButton(
             icon: const Icon(Icons.share),
@@ -402,6 +449,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   void _addToCart(BuildContext context, Product product) {
+    if (!_requireSignIn()) return;
+
     context.read<CartProvider>().addItem(
       productId: product.id,
       title: product.title,
@@ -420,6 +469,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   void _buyNow(BuildContext context, Product product) {
+    if (!_requireSignIn()) return;
+
     context.read<CartProvider>().addItem(
       productId: product.id,
       title: product.title,
