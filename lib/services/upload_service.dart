@@ -217,7 +217,13 @@ class UploadService {
       final generatedName =
           '${const Uuid().v4()}_${DateTime.now().millisecondsSinceEpoch}${_getFileExtension(imageFile.path)}';
       final remoteFileName = customPath ?? 'products/$userId/$generatedName';
-      if (!remoteFileName.startsWith('products/$userId/')) {
+      final pathSegments = remoteFileName.split('/');
+      if (!remoteFileName.startsWith('products/$userId/') ||
+          remoteFileName.contains('\\') ||
+          pathSegments.any(
+            (segment) =>
+                segment.isEmpty || segment == '.' || segment == '..',
+          )) {
         throw StateError('مسار رفع الصورة غير مسموح لهذا الحساب');
       }
 
@@ -278,9 +284,6 @@ class UploadService {
 
       final userId = _client.auth.currentUser?.id;
       if (userId == null) throw StateError('يجب تسجيل الدخول لرفع الصور');
-      if (fileBytes.length > 10 * 1024 * 1024) {
-        throw Exception('حجم الصورة يتجاوز الحد المسموح 10 ميجابايت');
-      }
       final remoteFileName =
           'products/$userId/${const Uuid().v4()}_${DateTime.now().millisecondsSinceEpoch}${_getFileExtension(imageFile.path)}';
 
