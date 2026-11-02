@@ -14,7 +14,7 @@ class CatalogService {
     final rows = await _client
         .from('categories')
         .select(
-          'id,name_ar,name_en,slug,icon_url,parent_id,display_order',
+          'id,name_ar,name_en,slug,icon,parent_id,display_order',
         )
         .eq('is_active', true)
         .order('display_order', ascending: true)
