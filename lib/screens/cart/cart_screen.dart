@@ -78,7 +78,7 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  Widget _buildCartItem(BuildContext context, dynamic item, int index) {
+  Widget _buildCartItem(BuildContext context, CartItem item, int index) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Padding(
@@ -93,9 +93,9 @@ class _CartScreenState extends State<CartScreen> {
                 color: AppTheme.surfaceColor,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: item.product?.imageUrls?.isNotEmpty == true
+              child: item.imageUrl != null && item.imageUrl!.isNotEmpty
                   ? Image.network(
-                      item.product!.imageUrls![0],
+                      item.imageUrl!,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) =>
                           Icon(Icons.image, color: AppTheme.textTertiary),
@@ -110,7 +110,7 @@ class _CartScreenState extends State<CartScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item.product?.title ?? '',
+                    item.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -119,7 +119,7 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${item.product?.price} ج.م',
+                    '${item.price.toStringAsFixed(2)} ج.م',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: AppTheme.primaryColor,
                       fontWeight: FontWeight.bold,
