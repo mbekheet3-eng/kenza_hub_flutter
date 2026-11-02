@@ -87,9 +87,9 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
             return _message(
               icon: Icons.storefront_outlined,
               message:
-                  'لم يتم إنشاء ملف بائع لهذا الحساب بعد. يتم إنشاؤه تلقائيًا من المسار المعتمد عند نشر أول منتج.',
-              actionLabel: 'ابدأ البيع',
-              onAction: () => context.push('/sell-wizard'),
+                  'لم يتم إنشاء ملف بائع لهذا الحساب بعد. ينشأ تلقائيًا عند أول نشر، لكن نشر المنتجات متوقف حاليًا لحين تحديد منطقة الحساب ومراجعة نطاق الشحن المعتمد.',
+              actionLabel: 'العودة إلى الرئيسية',
+              onAction: () => context.go('/home'),
             );
           }
 
