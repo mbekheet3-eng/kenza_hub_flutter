@@ -243,9 +243,23 @@ class _StepDetailsState extends State<StepDetails> {
           );
         }
         if (snapshot.hasError) {
-          return Text(
-            'تعذر تحميل المقاسات من قاعدة البيانات',
-            style: TextStyle(color: AppTheme.textSecondary),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'تعذر تحميل المقاسات من قاعدة البيانات',
+                style: TextStyle(color: AppTheme.textSecondary),
+              ),
+              TextButton(
+                onPressed: widget.category == null
+                    ? null
+                    : () => setState(
+                          () => _sizesFuture =
+                              _catalogService.fetchSizesForCategory(widget.category!),
+                        ),
+                child: const Text('إعادة المحاولة'),
+              ),
+            ],
           );
         }
 
