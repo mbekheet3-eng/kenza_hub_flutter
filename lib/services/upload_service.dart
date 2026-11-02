@@ -322,6 +322,17 @@ class UploadService {
       final objectPath = Uri.decodeComponent(
         uri.path.substring(markerIndex + marker.length),
       );
+      final userId = _client.auth.currentUser?.id;
+      final pathSegments = objectPath.split('/');
+      if (userId == null ||
+          !objectPath.startsWith('products/$userId/') ||
+          objectPath.contains('\\') ||
+          pathSegments.any(
+            (segment) =>
+                segment.isEmpty || segment == '.' || segment == '..',
+          )) {
+        throw StateError('لا يمكن حذف ملف خارج مساحة صور حسابك');
+      }
       await _client.storage.from(bucketName).remove([objectPath]);
     } catch (e) {
       throw Exception('Failed to delete image: $e');
