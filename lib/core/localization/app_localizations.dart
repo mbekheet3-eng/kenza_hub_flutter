@@ -668,6 +668,24 @@ class AppLocalizations {
 
   String get or => _localized('OR', 'OU', 'أو');
 
+  String get newPasswordTitle => _localized(
+        'Create a new password',
+        'Créer un nouveau mot de passe',
+        'إنشاء كلمة مرور جديدة',
+      );
+
+  String get updatePassword => _localized(
+        'Update password',
+        'Mettre à jour le mot de passe',
+        'تحديث كلمة المرور',
+      );
+
+  String get passwordUpdated => _localized(
+        'Your password has been updated successfully',
+        'Votre mot de passe a été mis à jour',
+        'تم تحديث كلمة المرور بنجاح',
+      );
+
   String get tryChangeFilters => _localized(
         'Try changing your filters or search',
         'Essayez de modifier les filtres ou la recherche',
