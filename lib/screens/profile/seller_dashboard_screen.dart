@@ -16,16 +16,19 @@ class SellerDashboardScreen extends StatefulWidget {
 class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
   final SellerDashboardService _service = SellerDashboardService();
   late Future<SellerDashboardData?> _dashboardFuture;
+  String? _loadedUserId;
 
   @override
   void initState() {
     super.initState();
-    _dashboardFuture = _service.load();
+    _dashboardFuture = Future.value(null);
   }
 
   Future<void> _refresh() async {
-    setState(() => _dashboardFuture = _service.load());
-    await _dashboardFuture;
+    if (!mounted || _loadedUserId == null) return;
+    final future = _service.load();
+    setState(() => _dashboardFuture = future);
+    await future;
   }
 
   String _sellerTypeLabel(String? type) {
@@ -67,7 +70,15 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (!context.watch<AuthProvider>().isSignedIn) {
+    final authProvider = context.watch<AuthProvider>();
+    if (authProvider.userId != _loadedUserId) {
+      _loadedUserId = authProvider.userId;
+      _dashboardFuture = authProvider.isSignedIn
+          ? _service.load()
+          : Future.value(null);
+    }
+
+    if (!authProvider.isSignedIn) {
       return Scaffold(
         appBar: AppBar(title: const Text('لوحة البائع')),
         body: Center(
