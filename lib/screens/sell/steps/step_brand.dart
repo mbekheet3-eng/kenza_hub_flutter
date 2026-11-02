@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../models/product.dart';
+
 import '../../../config/theme.dart';
+import '../../../models/product.dart';
+import '../../../services/catalog_service.dart';
 
 class StepBrand extends StatefulWidget {
   final Function(String?) onBrandSelected;
@@ -8,6 +10,7 @@ class StepBrand extends StatefulWidget {
   final String? category;
 
   const StepBrand({
+    super.key,
     required this.onBrandSelected,
     required this.selectedBrand,
     required this.category,
@@ -18,33 +21,17 @@ class StepBrand extends StatefulWidget {
 }
 
 class _StepBrandState extends State<StepBrand> {
-  late String? _selectedBrand;
-  late TextEditingController _searchController;
-  late List<String> _filteredBrands;
-
-  final Map<String, List<String>> brandsByCategory = {
-    'clothes': [
-      'Zara', 'H&M', 'Forever 21', 'Shein', 'Gap', 'Calvin Klein',
-      'Lacoste', 'Ralph Lauren', 'Tommy Hilfiger', 'Versace',
-      'Gucci', 'Prada', 'Louis Vuitton', 'Christian Dior',
-    ],
-    'shoes': [
-      'Nike', 'Adidas', 'Puma', 'Reebok', 'Skechers', 'Converse',
-      'Vans', 'New Balance', 'Clarks', 'Crocs',
-      'Jordan', 'Asics', 'Salomon', 'Timberland',
-    ],
-    'kids': [
-      'H&M Kids', 'Zara Kids', 'Gap Kids', 'Next', 'Mothercare',
-      'Disney', 'Marvel', 'Carter\'s', 'Old Navy',
-    ],
-  };
+  final CatalogService _catalogService = CatalogService();
+  final TextEditingController _searchController = TextEditingController();
+  late Future<List<String>> _brandsFuture;
+  String? _selectedBrand;
+  String _query = '';
 
   @override
   void initState() {
     super.initState();
     _selectedBrand = widget.selectedBrand;
-    _searchController = TextEditingController();
-    _filteredBrands = _getBrandsForCategory();
+    _brandsFuture = _catalogService.fetchBrands();
   }
 
   @override
@@ -53,119 +40,138 @@ class _StepBrandState extends State<StepBrand> {
     super.dispose();
   }
 
-  List<String> _getBrandsForCategory() {
-    if (widget.category == null || categorySkipFields[widget.category] == true) {
-      return [];
+  @override
+  void didUpdateWidget(covariant StepBrand oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedBrand != widget.selectedBrand) {
+      _selectedBrand = widget.selectedBrand;
     }
-    return brandsByCategory[widget.category!] ?? [];
+    if (oldWidget.category != widget.category &&
+        categorySkipFields[widget.category] == true) {
+      _selectBrand(null);
+    }
   }
 
-  void _filterBrands(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        _filteredBrands = _getBrandsForCategory();
-      } else {
-        _filteredBrands = _getBrandsForCategory()
-            .where((brand) => brand.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-      }
-    });
+  void _selectBrand(String? brand) {
+    setState(() => _selectedBrand = brand);
+    widget.onBrandSelected(brand);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.category == null || categorySkipFields[widget.category] == true) {
-      return Center(
+    if (widget.category == null ||
+        categorySkipFields[widget.category] == true) {
+      return const Center(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16),
           child: Text(
-            'هذه الفئة لا تتطلب تحديد علامة تجارية',
-            style: Theme.of(context).textTheme.bodyLarge,
+            'يمكن ترك العلامة التجارية فارغة لهذه الفئة',
             textAlign: TextAlign.center,
           ),
         ),
       );
     }
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'اختر العلامة التجارية (اختياري)',
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              hintText: 'ابحث عن العلامة التجارية...',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
+    return FutureBuilder<List<String>>(
+      future: _brandsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: CircularProgressIndicator(),
             ),
-            onChanged: _filterBrands,
-          ),
-          const SizedBox(height: 16),
-          if (_filteredBrands.isEmpty)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  _searchController.text.isEmpty
-                      ? 'لا توجد علامات تجارية لهذه الفئة'
-                      : 'لم يتم العثور على نتائج',
-                  style: TextStyle(color: AppTheme.textSecondary),
-                ),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Column(
+            children: [
+              const Text('تعذر تحميل العلامات التجارية'),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    _brandsFuture = _catalogService.fetchBrands();
+                  });
+                },
+                child: const Text('إعادة المحاولة'),
               ),
-            )
-          else
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _filteredBrands.map((brand) {
-                final isSelected = _selectedBrand == brand;
-                return FilterChip(
-                  label: Text(brand),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedBrand = selected ? brand : null;
-                    });
-                    widget.onBrandSelected(_selectedBrand);
-                  },
-                  backgroundColor: AppTheme.surfaceColor,
-                  selectedColor: AppTheme.primaryColor.withOpacity(0.1),
-                  side: BorderSide(
-                    color: isSelected ? AppTheme.primaryColor : AppTheme.borderLight,
-                    width: isSelected ? 2 : 1,
+            ],
+          );
+        }
+
+        final brands = snapshot.data ?? const <String>[];
+        final filtered = brands
+            .where((brand) =>
+                brand.toLowerCase().contains(_query.trim().toLowerCase()))
+            .toList(growable: false);
+
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'اختر العلامة التجارية (اختياري)',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'ابحث في العلامات التجارية المتاحة...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                );
-              }).toList(),
-            ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppTheme.backgroundColor,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.info, color: AppTheme.infoColor, size: 20),
-                const SizedBox(width: 12),
-                Expanded(
+                ),
+                onChanged: (value) => setState(() => _query = value),
+              ),
+              const SizedBox(height: 12),
+              FilterChip(
+                label: const Text('بدون علامة تجارية'),
+                selected: _selectedBrand == null,
+                onSelected: (_) => _selectBrand(null),
+                backgroundColor: AppTheme.surfaceColor,
+                selectedColor: AppTheme.primaryColor.withOpacity(0.1),
+              ),
+              const SizedBox(height: 12),
+              if (filtered.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(12),
                   child: Text(
-                    'إذا لم تجد العلامة التجارية، يمكنك تركها فارغة',
-                    style: Theme.of(context).textTheme.bodySmall,
+                    brands.isEmpty
+                        ? 'لا توجد علامات تجارية مسجلة حاليًا'
+                        : 'لم يتم العثور على نتائج',
+                    style: TextStyle(color: AppTheme.textSecondary),
                   ),
+                )
+              else
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: filtered.map((brand) {
+                    final selected = _selectedBrand == brand;
+                    return FilterChip(
+                      label: Text(brand),
+                      selected: selected,
+                      onSelected: (_) =>
+                          _selectBrand(selected ? null : brand),
+                      backgroundColor: AppTheme.surfaceColor,
+                      selectedColor:
+                          AppTheme.primaryColor.withOpacity(0.1),
+                      side: BorderSide(
+                        color: selected
+                            ? AppTheme.primaryColor
+                            : AppTheme.borderLight,
+                        width: selected ? 2 : 1,
+                      ),
+                    );
+                  }).toList(),
                 ),
-              ],
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
