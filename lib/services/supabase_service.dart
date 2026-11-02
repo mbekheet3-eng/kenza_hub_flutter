@@ -42,16 +42,9 @@ class SupabaseService {
     String productId,
     List<String> imageUrls,
   ) async {
-    if (imageUrls.isEmpty) return;
-    final rows = <Map<String, dynamic>>[];
-    for (var index = 0; index < imageUrls.length; index++) {
-      rows.add({
-        'product_id': productId,
-        'image_url': imageUrls[index],
-        'display_order': index,
-      });
-    }
-    await _client.from('product_images').insert(rows);
+    throw UnsupportedError(
+      'Product images are created atomically with the schema-aware listing flow.',
+    );
   }
 
   Future<Product> getProduct(String productId) =>
