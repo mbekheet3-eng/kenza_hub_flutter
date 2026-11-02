@@ -21,7 +21,7 @@ class ProductProvider extends ChangeNotifier {
 
   Future<void> loadAllProducts() async {
     await _run(() async {
-      _products = await _productService.fetchActiveProducts();
+      _products = await _productService.fetchAllActiveProducts();
     }, 'فشل تحميل المنتجات');
   }
 
@@ -53,7 +53,7 @@ class ProductProvider extends ChangeNotifier {
 
   Future<void> searchProducts(String query) async {
     await _run(() async {
-      final all = await _productService.fetchActiveProducts(limit: 100);
+      final all = await _productService.fetchAllActiveProducts();
       final normalized = query.trim().toLowerCase();
       _products = normalized.isEmpty
           ? all
