@@ -80,8 +80,9 @@ class HomeProvider with ChangeNotifier {
 
   // Search products
   void search(String query) {
-    if (_searchQuery != query) {
-      _searchQuery = query;
+    final normalizedQuery = query.trim();
+    if (_searchQuery != normalizedQuery) {
+      _searchQuery = normalizedQuery;
       _applyFilters();
       notifyListeners();
     }
