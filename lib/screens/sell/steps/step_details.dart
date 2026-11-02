@@ -68,11 +68,11 @@ class _StepDetailsState extends State<StepDetails> {
   void didUpdateWidget(covariant StepDetails oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.category != widget.category) {
+      _selectedColor = null;
       _selectedSize = null;
       _sizesFuture = widget.category == null
           ? Future.value(const <String>[])
           : _catalogService.fetchSizesForCategory(widget.category!);
-      _notifyChanges();
     }
   }
 
