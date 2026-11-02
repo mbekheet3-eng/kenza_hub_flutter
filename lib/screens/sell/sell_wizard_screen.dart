@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../models/product.dart';
+import '../../providers/auth_provider.dart';
 import '../../services/marketplace_product_service.dart';
 import '../../services/upload_service.dart';
 import '../../config/theme.dart';
@@ -328,6 +330,33 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
   @override
   Widget build(BuildContext context) {
     _initializeSteps();
+
+    if (!context.watch<AuthProvider>().isSignedIn) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('بيع منتج')),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.lock_outline, size: 48),
+                const SizedBox(height: 12),
+                const Text(
+                  'سجّل الدخول أولاً حتى تتمكن من عرض منتجاتك للبيع',
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () => context.push('/login'),
+                  child: const Text('تسجيل الدخول'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
