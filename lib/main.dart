@@ -27,6 +27,7 @@ void main() async {
     print('❌ Supabase initialization failed: $e');
   }
 
+  await AppLocalizations.initialize();
   runApp(const MyApp());
 }
 
