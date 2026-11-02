@@ -6,16 +6,16 @@ class WelcomeLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 58,
+      height: 62,
       child: Image.asset(
         'assets/images/logo.png',
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
           return const Text(
-            'Kenza Hub',
+            'كنزة هب',
             style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
+              fontSize: 23,
+              fontWeight: FontWeight.w800,
               color: Color(0xFF0F172A),
             ),
           );
