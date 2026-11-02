@@ -116,6 +116,12 @@ class Product {
     final parentCategoryData = categoryData == null
         ? null
         : _relation(categoryData, 'parent');
+    var rootCategoryData = categoryData;
+    var ancestorCategoryData = parentCategoryData;
+    while (ancestorCategoryData != null) {
+      rootCategoryData = ancestorCategoryData;
+      ancestorCategoryData = _relation(ancestorCategoryData, 'parent');
+    }
     final conditionData = _relation(json, 'condition') ??
         _relation(json, 'product_conditions');
     final colorData = _relation(json, 'color') ??
@@ -160,8 +166,7 @@ class Product {
           '',
       price: (json['price'] as num?)?.toDouble() ?? 0,
       // Home filtering uses the top-level category when this is a child category.
-      category: parentCategoryData?['slug'] as String? ??
-          categoryData?['slug'] as String? ??
+      category: rootCategoryData?['slug'] as String? ??
           json['category'] as String? ??
           '',
       subcategory: parentCategoryData != null
