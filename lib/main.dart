@@ -88,7 +88,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProductDetailsProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
-        ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(
+          create: (_) => CartProvider(
+            authUserChanges: Supabase.instance.client.auth.onAuthStateChange
+                .map((authState) => authState.session?.user.id),
+            initialUserId: Supabase.instance.client.auth.currentUser?.id,
+          ),
+        ),
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
         ChangeNotifierProvider(create: (_) => OrderTrackingProvider()),
       ],
