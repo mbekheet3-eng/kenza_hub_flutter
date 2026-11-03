@@ -139,31 +139,6 @@ class _StepPriceState extends State<StepPrice> {
 
           const SizedBox(height: 24),
 
-          // Discount Info
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppTheme.infoColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppTheme.infoColor.withOpacity(0.3)),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.info, color: AppTheme.infoColor, size: 20),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'قد يتم تطبيق رسوم منصة بنسبة معينة من السعر',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
           const SizedBox(height: 24),
 
           // Price Summary

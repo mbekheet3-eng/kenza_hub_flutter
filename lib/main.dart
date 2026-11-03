@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:kenza_hub_flutter/config/app_routes.dart';
+import 'package:kenza_hub_flutter/config/app_theme.dart';
 import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:kenza_hub_flutter/providers/home_provider.dart';
 import 'package:kenza_hub_flutter/providers/auth_provider.dart';
@@ -112,13 +113,7 @@ class MyApp extends StatelessWidget {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            theme: ThemeData(
-              useMaterial3: true,
-              colorScheme: const ColorScheme.light(
-                primary: Color(0xFFC62828),
-                secondary: Color(0xFF0F172A),
-              ),
-            ),
+            theme: AppTheme.lightTheme,
             routerConfig: goRouter,
           );
         },

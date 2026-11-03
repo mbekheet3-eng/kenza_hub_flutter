@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class CartItem {
@@ -47,7 +49,36 @@ class CartItem {
 }
 
 class CartProvider with ChangeNotifier {
+  CartProvider({
+    Stream<String?>? authUserChanges,
+    String? initialUserId,
+  }) : _currentUserId = initialUserId {
+    _authSubscription = authUserChanges?.listen(handleAuthUserChanged);
+  }
+
   final List<CartItem> _items = [];
+  String? _currentUserId;
+  StreamSubscription<String?>? _authSubscription;
+
+  /// Keeps in-memory cart contents from leaking between authenticated accounts.
+  /// A guest cart is retained when the first user signs in; a signed-in user's
+  /// cart is cleared when that account signs out or another account signs in.
+  void handleAuthUserChanged(String? nextUserId) {
+    if (nextUserId == _currentUserId) return;
+
+    final previousUserId = _currentUserId;
+    _currentUserId = nextUserId;
+
+    if (previousUserId != null) {
+      clear();
+    }
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    super.dispose();
+  }
 
   List<CartItem> get items => _items;
   int get itemCount => _items.length;
