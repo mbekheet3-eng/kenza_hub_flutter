@@ -139,8 +139,6 @@ class _StepPriceState extends State<StepPrice> {
 
           const SizedBox(height: 24),
 
-          const SizedBox(height: 24),
-
           // Price Summary
           if (_currentPrice > 0)
             Container(
