@@ -65,6 +65,7 @@ class MarketplaceProductService {
         .from('seller_profile_members')
         .select('seller_profile_id,member_role,revoked_at')
         .eq('user_id', userId)
+        .isFilter('revoked_at', null)
         .limit(2);
 
     final membershipRows = (memberships as List)
