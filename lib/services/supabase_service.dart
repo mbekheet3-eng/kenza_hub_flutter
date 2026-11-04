@@ -185,7 +185,14 @@ class SupabaseService {
         .select()
         .eq('id', userId)
         .single();
-    return User.fromJson(Map<String, dynamic>.from(row));
+    final profile = Map<String, dynamic>.from(row);
+    final authUser = _client.auth.currentUser;
+    if (authUser != null && authUser.id == userId) {
+      profile['email'] = authUser.email;
+      profile['phone'] = authUser.phone;
+      profile['phone_confirmed_at'] = authUser.phoneConfirmedAt?.toIso8601String();
+    }
+    return User.fromJson(profile);
   }
 
   /// public.users is created by the handle_new_user auth trigger.
@@ -226,6 +233,15 @@ class SupabaseService {
   }
 
   Future<void> updateProfile(User user) async {
+    final currentAuthUser = _client.auth.currentUser;
+    if (currentAuthUser == null || currentAuthUser.id != user.id) {
+      throw StateError('لا يمكن تعديل ملف مستخدم آخر');
+    }
+    if (user.phone != currentAuthUser.phone) {
+      throw StateError(
+        'تغيير رقم الهاتف يحتاج إلى إتمام توثيق OTP أولاً؛ لم يتم تغيير الرقم.',
+      );
+    }
     await _client.from('users').update(user.toJson()).eq('id', user.id);
   }
 
