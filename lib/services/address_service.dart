@@ -15,7 +15,7 @@ class AddressService {
     final rows = await _client
         .from('user_addresses')
         .select(
-          'id,user_id,region_id,recipient_name,recipient_phone,address_line_1,address_line_2,landmark,postal_code,is_default,is_deleted,regions(name_ar,city,district)',
+          'id,user_id,region_id,recipient_name,recipient_phone,address_line_1,address_line_2,landmark,postal_code,is_default,is_deleted,regions(name_ar,city_ar)',
         )
         .eq('user_id', userId)
         .eq('is_deleted', false)
