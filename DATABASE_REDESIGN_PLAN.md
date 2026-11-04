@@ -29,7 +29,7 @@ Mandatory order:
 - No dropping/overwriting production objects merely to make a migration pass.
 - Migrations must be ordered, documented, and tested against a clean local database; make them reversible where practical.
 - Never invent columns, enum values, RPC contracts, or business rules to fill unresolved decisions.
-- Keep order creation, checkout, and payment disabled until the complete buyer/seller agreement and OTP workflow is approved and implemented.
+- Keep order creation, checkout, and payment disabled until the buyer/seller agreement and the approved first-purchase phone OTP workflow are implemented and tested.
 - Never commit credentials, access tokens, service-role keys, or connection strings.
 
 ## 3. Approved target requirements
@@ -57,7 +57,20 @@ Core requirements:
 - Audit records are append-only.
 - Chat contact-detail handling is server-side, not Flutter-only.
 - Dispute evidence belongs in a private Storage bucket separate from public product images.
-- Apply the approved seven-day delivery-data retention rule with an open-dispute hold. It does not mean deleting Auth identity, optional address-book entries, or commercial order records.
+- Apply the approved 60-day delivery-data retention rule, counted from delivery/closure, with an open-dispute legal hold. It does not mean deleting Auth identity, optional address-book entries, or commercial order records. Dispute evidence has a separate retention policy and must not be deleted by the delivery-data purge.
+
+### Authentication and phone verification
+- Email/password, Google, and Apple sign-in remain unchanged; no OTP at login or first login on a new device.
+- Persistent sessions must survive app closure and device restart, with secure refresh-token handling.
+- Verify a phone by SMS OTP only at the first product-publication attempt or first purchase attempt when the phone is not already verified.
+- Once verified, do not repeat OTP for every listing or purchase. A phone-number change requires verification of the new number.
+- Phone verification must be enforced server-side. It does not replace login protections against compromised passwords.
+- Keep order creation disabled until the buyer/seller agreement and first-purchase phone-verification flow are implemented and tested.
+
+### AI image review
+- Every uploaded product image must pass image quality, relevance, and prohibited/explicit-content review before product publication.
+- The database already has an AI review status/result gate; the external provider integration is not yet configured.
+- Do not invent a provider or commit credentials. Keep provider selection/configuration as a deployment prerequisite.
 
 ### Disputes
 - Participants may perform only permitted participant transitions.
@@ -91,7 +104,7 @@ These are confirmed design issues, not permission to change production:
 12. Product image Storage insertion does not currently enforce the uploader UID folder in the object path.
 13. Active service regions do not match approved internal delivery coverage.
 14. Existing users lack default region; signup/profile setup needs region selection compatible with nationwide browsing and service validation.
-15. Backup/restore and scheduled deletion must account for seven-day retention; do not assume pg_cron exists.
+15. Backup/restore and scheduled deletion must account for 60-day retention; do not assume pg_cron exists.
 
 Retain existing controls only after tests confirm them, including seller-profile creation transaction, order transition protections, immutable agreement snapshots, dispute-evidence append-only protection, and authenticated daily-deduplicated product-view RPC.
 
@@ -101,9 +114,11 @@ Do not silently decide:
 - Is `seller_profiles.phone` a public business contact or private personal number?
 - Should chat contact details be rejected or redacted server-side before storage?
 - What legal retention period applies to original dispute evidence in private Storage?
+- Which supported scheduler/operations mechanism runs the 60-day purge, and how do backup/restore procedures prevent expired delivery details from being reintroduced?
+- What happens if a dispute is opened after the 60-day delivery-data window?
 - How must backup retention/restore prevent expired delivery details being reintroduced?
 - Which supported scheduler/operations mechanism runs retention cleanup without assuming pg_cron?
-- What if a dispute is opened after the seven-day delivery-data deletion window?
+- What if a dispute is opened after the 60-day delivery-data deletion window?
 - ADR-02 for the layered database architecture has not been approved.
 
 Proceed with independent work that does not depend on these answers. Isolate unresolved behavior behind explicit interfaces or mark it blocked.
