@@ -64,17 +64,16 @@ class User {
       phone: json['phone'] as String?,
       avatarUrl: json['avatar_url'] as String?,
       bio: json['bio'] as String?,
-      location: json['city'] as String?,
+      location: null,
       rating: (json['rating'] as num?)?.toDouble() ?? 0,
       totalReviews: 0,
-      productsCount: (json['total_products'] as num?)?.toInt() ?? 0,
-      followersCount: (json['total_followers'] as num?)?.toInt() ?? 0,
-      isVerified: json['is_verified'] as bool? ?? false,
-      isPhoneVerified: json['phone_verified'] as bool? ?? false,
+      productsCount: 0,
+      followersCount: 0,
+      isVerified: false,
+      isPhoneVerified: json['phone_confirmed_at'] != null,
       preferredLanguage: json['language_preference'] as String? ??
-          json['language'] as String? ??
           'ar',
-      notificationsEnabled: json['notifications_enabled'] as bool? ?? true,
+      notificationsEnabled: true,
       createdAt: _date(json['created_at']),
       updatedAt: _date(json['updated_at']),
     );
@@ -93,12 +92,9 @@ class User {
     return {
       if (firstName != null) 'first_name': firstName,
       'last_name': lastName,
-      'phone': phone,
       'avatar_url': avatarUrl,
       'bio': bio,
-      'city': location,
       'language_preference': preferredLanguage,
-      'notifications_enabled': notificationsEnabled,
     };
   }
 
@@ -187,8 +183,6 @@ class UserProfile {
       'last_name': parts.length > 1 ? parts.skip(1).join(' ') : null,
       if (bio != null) 'bio': bio,
       if (avatarUrl != null) 'avatar_url': avatarUrl,
-      if (location != null) 'city': location,
-      if (phone != null) 'phone': phone,
     };
   }
 }
