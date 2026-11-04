@@ -150,10 +150,29 @@ class SupabaseService {
   ) async {
     final rows = await _client
         .from('product_images')
-        .select('id,product_id,image_url,display_order,created_at')
+        .select('id,product_id,image_path,storage_bucket,display_order,created_at')
         .eq('product_id', productId)
         .order('display_order', ascending: true);
-    return List<Map<String, dynamic>>.from(rows as List);
+    final result = <Map<String, dynamic>>[];
+    for (final raw in rows as List) {
+      final row = Map<String, dynamic>.from(raw as Map);
+      final path = row['image_path'] as String?;
+      final bucket = row['storage_bucket'] as String?;
+      if (path != null && bucket != null) {
+        if (bucket == 'product-images') {
+          row['image_url'] = _client.storage.from(bucket).getPublicUrl(path);
+        } else {
+          try {
+            row['image_url'] =
+                await _client.storage.from(bucket).createSignedUrl(path, 3600);
+          } catch (_) {
+            row['image_url'] = null;
+          }
+        }
+      }
+      result.add(row);
+    }
+    return result;
   }
 
   // ---------------------------------------------------------------------------
@@ -187,12 +206,23 @@ class SupabaseService {
   }
 
   Future<double> getUserRating(String userId) async {
-    final row = await _client
-        .from('users')
+    final sellerProfile = await _client
+        .from('seller_profiles')
+        .select('id')
+        .eq('owner_user_id', userId)
+        .maybeSingle();
+    if (sellerProfile == null) return 0;
+    final rows = await _client
+        .from('reviews')
         .select('rating')
-        .eq('id', userId)
-        .single();
-    return (row['rating'] as num?)?.toDouble() ?? 0;
+        .eq('seller_profile_id', sellerProfile['id']);
+    final ratings = (rows as List)
+        .map((row) => (row as Map)['rating'])
+        .whereType<num>()
+        .map((rating) => rating.toDouble())
+        .toList(growable: false);
+    if (ratings.isEmpty) return 0;
+    return ratings.reduce((a, b) => a + b) / ratings.length;
   }
 
   Future<void> updateProfile(User user) async {
@@ -230,7 +260,7 @@ class SupabaseService {
     var request = _client
         .from('orders')
         .select(
-          '*,products(title_ar,title_en,product_images(image_url,display_order)),order_status_history(new_status,reason,action,created_at,metadata)',
+          '*,products(title_ar,title_en,product_images(image_path,storage_bucket,display_order)),order_status_history(new_status,reason,action,created_at,metadata)',
         );
 
     if (asBuyer) {
