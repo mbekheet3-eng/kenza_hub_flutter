@@ -1,7 +1,9 @@
 name: Build APK
 
-# Automatic builds are paused; run manually when explicitly requested.
+# Build the working MVP branch after each code update and allow manual runs.
 on:
+  push:
+    branches: [feature/db-schema-alignment]
   workflow_dispatch: {}
 
 jobs:
