@@ -202,9 +202,9 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                       top: Radius.circular(8),
                     ),
                   ),
-                  child: product.imageUrls?.isNotEmpty == true
+                  child: product.imageUrls.isNotEmpty
                       ? Image.network(
-                          product.imageUrls![0],
+                          product.imageUrls[0],
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) =>
                               Icon(Icons.image, color: AppTheme.textTertiary),
@@ -281,7 +281,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${product.views ?? 0}',
+                          '${product.views}',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12,
