@@ -111,6 +111,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       return false;
     }
 
+    if (product.sellerType != 'pro_seller') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('السلة متاحة حاليًا لمنتجات البائع المحترف فقط.'),
+        ),
+      );
+      return false;
+    }
+
     return true;
   }
 
