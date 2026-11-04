@@ -1,60 +1,95 @@
 import 'package:flutter/material.dart';
 import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 
-class LanguageSelector extends StatefulWidget {
+class LanguageSelector extends StatelessWidget {
   const LanguageSelector({super.key});
 
-  @override
-  State<LanguageSelector> createState() => _LanguageSelectorState();
-}
-
-class _LanguageSelectorState extends State<LanguageSelector> {
-  static const Map<String, String> _languages = {
-    'AR': 'العربية',
-    'EN': 'English',
-    'FR': 'Français',
+  static const Map<String, String> _labels = {
+    'ar': 'العربية',
+    'en': 'English',
+    'fr': 'Français',
   };
 
   @override
   Widget build(BuildContext context) {
-    final selectedLanguage =
-        AppLocalizations.currentLocale.languageCode.toUpperCase();
+    return ValueListenableBuilder<Locale>(
+      valueListenable: AppLocalizations.localeNotifier,
+      builder: (context, locale, _) {
+        final code = locale.languageCode;
+        final label = _labels[code] ?? _labels['ar']!;
+        return PopupMenuButton<String>(
+          tooltip: 'Language',
+          onSelected: AppLocalizations.setLocale,
+          offset: const Offset(0, 44),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          itemBuilder: (context) => const [
+            PopupMenuItem(value: 'ar', child: _LanguageOption(label: 'العربية', code: 'AR')),
+            PopupMenuItem(value: 'en', child: _LanguageOption(label: 'English', code: 'EN')),
+            PopupMenuItem(value: 'fr', child: _LanguageOption(label: 'Français', code: 'FR')),
+          ],
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x0D0F172A),
+                  blurRadius: 10,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.language_rounded, size: 18, color: Color(0xFF0F172A)),
+                const SizedBox(width: 7),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: Color(0xFF0F172A),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(width: 3),
+                const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: Color(0xFF64748B)),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: _languages.containsKey(selectedLanguage)
-              ? selectedLanguage
-              : 'AR',
-          icon: const Icon(
-            Icons.keyboard_arrow_down_rounded,
-            color: Color(0xFF0F172A),
+class _LanguageOption extends StatelessWidget {
+  final String label;
+  final String code;
+
+  const _LanguageOption({required this.label, required this.code});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 34,
+          child: Text(
+            code,
+            style: const TextStyle(
+              color: Color(0xFFC62828),
+              fontWeight: FontWeight.w800,
+              fontSize: 12,
+            ),
           ),
-          borderRadius: BorderRadius.circular(12),
-          isDense: true,
-          style: const TextStyle(
-            color: Color(0xFF0F172A),
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-          ),
-          onChanged: (value) {
-            if (value == null) return;
-            AppLocalizations.setLocale(value.toLowerCase());
-          },
-          items: _languages.entries.map((entry) {
-            return DropdownMenuItem<String>(
-              value: entry.key,
-              child: Text(entry.value),
-            );
-          }).toList(),
         ),
-      ),
+        Text(label),
+      ],
     );
   }
 }
