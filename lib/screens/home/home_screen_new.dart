@@ -6,8 +6,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:kenza_hub_flutter/config/app_colors.dart';
-import 'package:kenza_hub_flutter/config/app_spacing.dart';
 import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:kenza_hub_flutter/models/database_category.dart';
 import 'package:kenza_hub_flutter/models/product.dart';
@@ -23,8 +21,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   final ImagePicker _imagePicker = ImagePicker();
-  final PageController _promoController = PageController();
-  Timer? _promoTimer;
   List<DatabaseCategory> _categories = const [];
   bool _categoriesLoading = true;
   String? _categoriesError;
@@ -38,21 +34,10 @@ class _HomeScreenState extends State<HomeScreen> {
       context.read<HomeProvider>().initialize();
       _loadCategories();
     });
-    _promoTimer = Timer.periodic(const Duration(seconds: 5), (_) {
-      if (!mounted || !_promoController.hasClients) return;
-      final next = (_promoIndex + 1) % 3;
-      _promoController.animateToPage(
-        next,
-        duration: const Duration(milliseconds: 450),
-        curve: Curves.easeInOut,
-      );
-    });
   }
 
   @override
   void dispose() {
-    _promoTimer?.cancel();
-    _promoController.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -61,9 +46,8 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final rows = await Supabase.instance.client
           .from('categories')
-          .select('id,name_ar,name_en,slug,icon_url,parent_id,display_order')
+          .select('id,name_ar,name_en,slug,icon,parent_id')
           .eq('is_active', true)
-          .order('display_order')
           .order('name_ar');
       final categories = (rows as List)
           .map((row) => DatabaseCategory.fromJson(
@@ -433,8 +417,8 @@ class _CategoryItem extends StatelessWidget {
   IconData _iconForSlug(String slug) {
     final value = slug.toLowerCase();
     if (value.contains('dress') || value.contains('fustan')) return Icons.checkroom;
-    if (value.contains('shoe') || value.contains('boot')) return Icons.steps;
-    if (value.contains('shirt') || value.contains('top')) return Icons.apparel_outlined;
+    if (value.contains('shoe') || value.contains('boot')) return Icons.directions_walk;
+    if (value.contains('shirt') || value.contains('top')) return Icons.checkroom;
     if (value.contains('bag')) return Icons.shopping_bag_outlined;
     if (value.contains('baby') || value.contains('child') || value.contains('kids')) return Icons.child_friendly_outlined;
     if (value.contains('kitchen')) return Icons.soup_kitchen_outlined;
