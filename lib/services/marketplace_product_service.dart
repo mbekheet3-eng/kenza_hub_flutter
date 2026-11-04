@@ -11,8 +11,8 @@ class MarketplaceProductService {
 
   static const String _productSelect = '''
     id,seller_id,category_id,title_ar,title_en,description_ar,description_en,
-    price,views_count,created_at,updated_at,brand_id,brand,color_id,size_id,
-    condition_id,status_id,currency_id,audience,
+    price,views_count,created_at,updated_at,brand_name,weight_kg,moderation_status,
+    brand_id,color_id,size_id,condition_id,status_id,currency_id,audience,
     category:categories!products_category_id_fkey(
       id,slug,name_ar,name_en,parent_id,
       parent:categories!categories_parent_id_fkey(
@@ -23,13 +23,44 @@ class MarketplaceProductService {
         )
       )
     ),
-    condition:product_conditions!products_condition_id_fkey(slug,label_ar,label_en),
-    color:product_colors!products_color_id_fkey(slug,label_ar,label_en,hex_code),
-    size:product_sizes!products_size_id_fkey(slug,label_ar,label_en),
-    status:product_statuses!products_status_id_fkey(slug,label_ar,label_en),
+    condition:product_conditions!products_condition_id_fkey(name_ar,name_en,slug),
+    color:product_colors!products_color_id_fkey(name_ar,name_en,hex_code),
+    size:product_sizes!products_size_id_fkey(name_ar,name_en,size_group),
+    status:product_statuses!products_status_id_fkey(name_ar,name_en,slug),
     seller:seller_profiles!products_seller_id_fkey(owner_user_id,display_name,avatar_url),
-    images:product_images!product_images_product_id_fkey(image_url,display_order,created_at)
+    images:product_images!product_images_product_id_fkey(image_path,storage_bucket,display_order,created_at)
   ''';
+
+  Future<Product> _parseProductRow(Map<String, dynamic> row) async {
+    final rawImages = row['images'];
+    final imageRows = rawImages is List ? rawImages : const [];
+    final urls = <String>[];
+    final paths = <String>[];
+
+    for (final rawImage in imageRows) {
+      if (rawImage is! Map) continue;
+      final image = Map<String, dynamic>.from(rawImage);
+      final path = image['image_path'] as String?;
+      final bucket = image['storage_bucket'] as String?;
+      if (path == null || bucket == null) continue;
+      paths.add(path);
+      if (bucket == 'product-images') {
+        urls.add(_client.storage.from(bucket).getPublicUrl(path));
+      } else {
+        try {
+          urls.add(await _client.storage.from(bucket).createSignedUrl(path, 3600));
+        } catch (_) {
+          // A restricted image is omitted if a signed URL cannot be issued.
+        }
+      }
+    }
+
+    return Product.fromJson({
+      ...row,
+      'image_urls': urls,
+      'image_paths': paths,
+    });
+  }
 
   /// Ensures the signed-in member has exactly one active owner membership.
   /// New seller profiles are created only by the approved Edge Function.
@@ -52,10 +83,10 @@ class MarketplaceProductService {
     }
     final region = await _client
         .from('regions')
-        .select('name_ar,is_active')
+        .select('name_ar,is_delivery_active')
         .eq('id', defaultRegionId)
         .single();
-    if (region['is_active'] != true) {
+    if (region['is_delivery_active'] != true) {
       throw StateError(
         'منطقتك (${region['name_ar'] ?? ''}) خارج نطاق الشحن الداخلي الحالي؛ يمكنك التصفح، لكن نشر المنتجات غير متاح لهذه المنطقة الآن.',
       );
@@ -152,45 +183,27 @@ class MarketplaceProductService {
     String? colorLabel,
     String? sizeLabel,
     String? brandName,
-    required List<String> imageUrls,
   }) async {
-    if (imageUrls.isEmpty) {
-      throw ArgumentError('يجب إضافة صورة واحدة على الأقل');
-    }
     final category = await _client
         .from('categories')
-        .select('id,parent_id')
+        .select('id')
         .eq('slug', categorySlug)
         .eq('is_active', true)
         .single();
-    final categoryId = category['id'] as String;
-    final parentId = category['parent_id'] as String?;
 
     final condition = await _client
         .from('product_conditions')
         .select('id')
-        .eq('label_ar', conditionLabel)
-        .eq('is_active', true)
-        .single();
-    final activeStatus = await _client
-        .from('product_statuses')
-        .select('id')
-        .eq('slug', 'active')
-        .eq('is_active', true)
-        .single();
-    final currency = await _client
-        .from('currencies')
-        .select('id')
-        .eq('code', 'EGP')
+        .eq('name_ar', conditionLabel)
         .eq('is_active', true)
         .single();
 
     String? colorId;
-    if (colorLabel != null && colorLabel.isNotEmpty) {
+    if (colorLabel != null && colorLabel.trim().isNotEmpty) {
       final color = await _client
           .from('product_colors')
           .select('id')
-          .eq('label_ar', colorLabel)
+          .eq('name_ar', colorLabel.trim())
           .eq('is_active', true)
           .maybeSingle();
       colorId = color?['id'] as String?;
@@ -200,106 +213,59 @@ class MarketplaceProductService {
     }
 
     String? sizeId;
-    if (sizeLabel != null && sizeLabel.isNotEmpty) {
-      final sizes = await _client
+    if (sizeLabel != null && sizeLabel.trim().isNotEmpty) {
+      final size = await _client
           .from('product_sizes')
-          .select('id,slug,label_ar,label_en,category_id')
-          .eq('is_active', true);
-      final categoryRows = await _client
-          .from('categories')
-          .select('id,parent_id')
-          .eq('is_active', true);
-      final categoryMap = {
-        for (final row in categoryRows as List)
-          (row as Map)['id'] as String: Map<String, dynamic>.from(row),
-      };
-
-      var rootCategoryId = categoryId;
-      var ancestorId = parentId;
-      while (ancestorId != null && categoryMap.containsKey(ancestorId)) {
-        rootCategoryId = ancestorId;
-        ancestorId = categoryMap[ancestorId]!['parent_id'] as String?;
-      }
-      final allowedCategoryIds = {
-        categoryId,
-        if (parentId != null) parentId,
-        rootCategoryId,
-      };
-
-      final matchingSizes = (sizes as List).where((row) {
-        final data = Map<String, dynamic>.from(row as Map);
-        final matchesLabel = data['label_ar'] == sizeLabel ||
-            data['label_en'] == sizeLabel ||
-            data['slug'] == sizeLabel;
-        return matchesLabel &&
-            allowedCategoryIds.contains(data['category_id']);
-      }).toList(growable: false);
-
-      if (matchingSizes.isEmpty) {
-        throw StateError('المقاس المختار غير متاح لهذا القسم');
-      }
-      sizeId = matchingSizes.first['id'] as String;
-    }
-
-    String? brandId;
-    if (brandName != null && brandName.trim().isNotEmpty) {
-      final brand = await _client
-          .from('brands')
           .select('id')
-          .eq('name', brandName.trim())
+          .eq('name_ar', sizeLabel.trim())
+          .eq('is_active', true)
           .maybeSingle();
-      brandId = brand?['id'] as String?;
-      if (brandId == null) {
-        throw StateError(
-          'العلامة التجارية المختارة غير موجودة في القائمة المعتمدة',
-        );
+      sizeId = size?['id'] as String?;
+      if (sizeId == null) {
+        throw StateError('المقاس المختار غير موجود في بيانات قاعدة البيانات');
       }
     }
 
-    final payload = <String, dynamic>{
-      'seller_id': sellerProfileId,
-      'category_id': categoryId,
-      'title_ar': title.trim(),
-      'title_en': title.trim(),
-      'description_ar': description.trim(),
-      'description_en': description.trim(),
-      'price': price,
-      'condition_id': condition['id'],
-      'status_id': activeStatus['id'],
-      'currency_id': currency['id'],
-      'audience': 'everyone',
-      if (colorId != null) 'color_id': colorId,
-      if (sizeId != null) 'size_id': sizeId,
-      if (brandId != null) 'brand_id': brandId,
-    };
+    // V2 stores the seller-entered brand as products.brand_name (text).
+    // Product creation must use the guarded RPC, not a direct table INSERT.
+    final productId = await _client.rpc('create_product', params: {
+      'p_seller_profile_id': sellerProfileId,
+      'p_category_id': category['id'],
+      'p_title_ar': title.trim(),
+      'p_title_en': title.trim(),
+      'p_description_ar': description.trim(),
+      'p_description_en': description.trim(),
+      'p_price': price,
+      'p_condition_id': condition['id'],
+      'p_color_id': colorId,
+      'p_size_id': sizeId,
+      'p_brand_name': brandName?.trim().isNotEmpty == true ? brandName!.trim() : null,
+      'p_weight_kg': null,
+      'p_audience': 'public',
+    });
 
-    final created = await _client
-        .from('products')
-        .insert(payload)
-        .select('id')
-        .single();
-    final productId = created['id'] as String;
-
-    try {
-      final imageRows = <Map<String, dynamic>>[];
-      for (var index = 0; index < imageUrls.length; index++) {
-        imageRows.add({
-          'product_id': productId,
-          'image_url': imageUrls[index],
-          'display_order': index,
-        });
-      }
-      await _client.from('product_images').insert(imageRows);
-    } catch (_) {
-      try {
-        await softDeleteProduct(productId);
-      } catch (_) {
-        // Keep the original image-row failure; the listing remains owner-only.
-      }
-      rethrow;
+    if (productId is! String || productId.isEmpty) {
+      throw StateError('لم تُرجع قاعدة البيانات رقم المنتج بعد إنشائه');
     }
-
     return productId;
+  }
+
+  Future<void> addProductImage({
+    required String productId,
+    required String imagePath,
+    required int displayOrder,
+  }) async {
+    await _client.rpc('add_product_image', params: {
+      'p_product_id': productId,
+      'p_image_path': imagePath,
+      'p_display_order': displayOrder,
+    });
+  }
+
+  Future<void> archiveProduct(String productId) async {
+    await _client.rpc('archive_product', params: {
+      'p_product_id': productId,
+    });
   }
 
   Future<List<Product>> fetchActiveProducts({int limit = 40}) async {
@@ -310,9 +276,8 @@ class MarketplaceProductService {
         .order('created_at', ascending: false)
         .limit(limit);
 
-    return (rows as List)
-        .map((row) => Product.fromJson(Map<String, dynamic>.from(row as Map)))
-        .toList(growable: false);
+    return await Future.wait((rows as List)
+        .map((row) => _parseProductRow(Map<String, dynamic>.from(row as Map))));
   }
 
   /// Loads every active listing in bounded pages for complete catalogue search.
@@ -444,6 +409,6 @@ class MarketplaceProductService {
         .eq('id', productId)
         .single();
 
-    return Product.fromJson(Map<String, dynamic>.from(row));
+    return _parseProductRow(Map<String, dynamic>.from(row));
   }
 }
