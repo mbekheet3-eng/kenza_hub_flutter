@@ -42,7 +42,7 @@ class SellerDashboardService {
     final profile = await _client
         .from('seller_profiles')
         .select(
-          'id,display_name,seller_type,business_name,verification_status,total_sales,subscription_plan,is_active,rating',
+          'id,display_name,seller_type,business_name,verification_status,is_active',
         )
         .eq('id', sellerProfileId)
         .single();
