@@ -1,6 +1,5 @@
 name: Build APK
 
-# Build the working MVP branch after each code update and allow manual runs.
 on:
   push:
     branches: [feature/db-schema-alignment]
@@ -8,7 +7,7 @@ on:
 
 jobs:
   build-apk:
-    name: Build debug APK
+    name: Build signed release APK
     concurrency:
       group: build-apk-${{ github.ref }}
       cancel-in-progress: true
@@ -25,23 +24,15 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Verify Java version
-        run: java -version
-
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.47.8'
 
-      - name: Check Flutter and Dart versions
-        run: |
-          flutter --version
-          dart --version
-
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Generate Android launcher icons from Kenza Hub logo
+      - name: Generate Android launcher icons
         run: |
           dart run flutter_launcher_icons -f pubspec.yaml
           test -f android/app/src/main/res/mipmap-hdpi/ic_launcher.png
@@ -59,21 +50,35 @@ jobs:
             echo "No Dart test files found; test execution skipped."
           fi
 
-      - name: Build debug APK
-        run: flutter build apk --debug --no-shrink
+      - name: Prepare stable Android signing key
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$ANDROID_KEYSTORE_BASE64" || (echo "Missing GitHub secret ANDROID_KEYSTORE_BASE64" && exit 1)
+          test -n "$ANDROID_KEYSTORE_PASSWORD" || (echo "Missing GitHub secret ANDROID_KEYSTORE_PASSWORD" && exit 1)
+          test -n "$ANDROID_KEY_ALIAS" || (echo "Missing GitHub secret ANDROID_KEY_ALIAS" && exit 1)
+          test -n "$ANDROID_KEY_PASSWORD" || (echo "Missing GitHub secret ANDROID_KEY_PASSWORD" && exit 1)
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/upload-keystore.jks
+          test -s android/upload-keystore.jks
+
+      - name: Build signed release APK
+        run: |
+          flutter build apk --release --no-shrink \
+            --build-name=0.1.0 \
+            --build-number="${GITHUB_RUN_NUMBER}"
 
       - name: Verify APK exists
         run: |
-          if [ ! -f "build/app/outputs/flutter-apk/app-debug.apk" ]; then
-            echo "APK file not found: build/app/outputs/flutter-apk/app-debug.apk"
-            exit 1
-          fi
-          echo "APK file found"
-          ls -lh build/app/outputs/flutter-apk/app-debug.apk
+          test -s build/app/outputs/flutter-apk/app-release.apk
+          ls -lh build/app/outputs/flutter-apk/app-release.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          name: kenza-hub-android-release
+          path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
