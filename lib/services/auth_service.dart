@@ -117,10 +117,17 @@ class AuthService {
           'first_name': nameParts.first,
         if (fullName != null)
           'last_name': nameParts.length > 1 ? nameParts.skip(1).join(' ') : '',
-        if (phone != null) 'phone': phone,
         if (bio != null) 'bio': bio,
         if (profileImage != null) 'avatar_url': profileImage,
       }).eq('id', userId);
+
+      // Phone numbers live in Supabase Auth, not public.users. Supabase sends
+      // an SMS OTP for the new number; it is not accepted as verified yet.
+      if (phone != null && phone.trim().isNotEmpty) {
+        await SupabaseService.client.auth.updateUser(
+          supabase.UserAttributes(phone: phone.trim()),
+        );
+      }
     } catch (e) {
       print('❌ Error updating profile: $e');
       rethrow;
