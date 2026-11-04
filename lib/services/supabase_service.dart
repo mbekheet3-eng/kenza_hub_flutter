@@ -309,7 +309,7 @@ class SupabaseService {
     final row = await _client
         .from('orders')
         .select(
-          '*,products(title_ar,title_en,product_images(image_url,display_order)),order_status_history(new_status,reason,action,created_at,metadata)',
+          '*,products(title_ar,title_en,product_images(image_path,storage_bucket,display_order)),order_status_history(new_status,reason,action,created_at,metadata)',
         )
         .eq('id', orderId)
         .single();
