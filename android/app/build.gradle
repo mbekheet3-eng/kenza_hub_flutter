@@ -40,9 +40,19 @@ android {
         versionName = flutterVersionName
     }
 
+    signingConfigs {
+        release {
+            storeFile = rootProject.file("upload-keystore.jks")
+            storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: ""
+            keyAlias = System.getenv("ANDROID_KEY_ALIAS") ?: ""
+            keyPassword = System.getenv("ANDROID_KEY_PASSWORD") ?: ""
+        }
+    }
+
     buildTypes {
         release {
-            signingConfig = signingConfigs.debug
+            // Release builds must use the same private signing key for every update.
+            signingConfig = signingConfigs.release
         }
     }
 }
