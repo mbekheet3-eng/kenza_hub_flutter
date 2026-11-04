@@ -250,16 +250,20 @@ class MarketplaceProductService {
     return productId;
   }
 
-  Future<void> addProductImage({
+  Future<String> addProductImage({
     required String productId,
     required String imagePath,
     required int displayOrder,
   }) async {
-    await _client.rpc('add_product_image', params: {
+    final imageId = await _client.rpc('add_product_image', params: {
       'p_product_id': productId,
       'p_image_path': imagePath,
       'p_display_order': displayOrder,
     });
+    if (imageId is! String || imageId.isEmpty) {
+      throw StateError('لم تُرجع قاعدة البيانات معرّف الصورة بعد حفظها');
+    }
+    return imageId;
   }
 
   Future<void> archiveProduct(String productId) async {
@@ -272,7 +276,7 @@ class MarketplaceProductService {
     final rows = await _client
         .from('products')
         .select(_productSelect)
-        .eq('status.slug', 'active')
+        .eq('status.slug', 'available')
         .order('created_at', ascending: false)
         .limit(limit);
 
