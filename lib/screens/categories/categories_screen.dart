@@ -118,7 +118,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       return Icons.chair_alt_outlined;
     }
     if (value.contains('shoe') || value.contains('sneaker')) {
-      return Icons.steps_outlined;
+      return Icons.directions_walk;
     }
     if (value.contains('clothes') || value.contains('dress') ||
         value.contains('shirt') || value.contains('women') ||
@@ -135,13 +135,13 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     if (value.contains('book') || value.contains('school')) {
       return Icons.menu_book_outlined;
     }
-    if (value.contains('light')) return Icons.light_outlined;
+    if (value.contains('light')) return Icons.lightbulb_outline;
     if (value.contains('garden')) return Icons.yard_outlined;
     if (value.contains('textile') || value.contains('bedding')) {
       return Icons.bed_outlined;
     }
     if (value.contains('decor')) return Icons.brush_outlined;
-    if (value.contains('appliance')) return Icons.electrical_services_outlined;
+    if (value.contains('appliance')) return Icons.kitchen_outlined;
     return Icons.category_outlined;
   }
 
