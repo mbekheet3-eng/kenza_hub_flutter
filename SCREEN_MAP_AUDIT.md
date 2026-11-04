@@ -63,7 +63,7 @@ Several product-map items are states or components inside a screen rather than s
 
 ## Approved navigation mismatch
 
-The current Home bottom navigation still has **five** items: Home, Discover, Sell, Cart and Account. The approved navigation is **six** items: Home, Discover, Sell, Chats, My Orders and Account. Favorites belong inside Account. The Chats destination is not yet available, so this is a known follow-up rather than a working tab.
+The Home bottom navigation now has the approved **six** items: Home, Discover, Sell, Chats, My Orders and Account. Favorites belong inside Account. The Chats tab and route are visible, but currently lead to a temporary placeholder; the conversation list and messaging workflow are still not implemented. Cart remains available through its existing route, but is no longer a bottom-navigation item.
 
 ## Authentication bottom sheet change
 
