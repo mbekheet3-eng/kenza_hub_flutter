@@ -193,7 +193,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   const SizedBox(height: 16),
 
                   // Description
-                  if (product.description?.isNotEmpty == true)
+                  if (product.description.isNotEmpty)
                     _buildDescriptionSection(context, product),
 
                   const SizedBox(height: 16),
@@ -256,7 +256,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildImageGallery(Product product) {
-    final images = product.imageUrls ?? [];
+    final images = product.imageUrls;
     
     return Column(
       children: [
@@ -312,7 +312,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          product.title ?? '',
+          product.title,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -343,7 +343,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return Row(
       children: [
         Chip(
-          label: Text(product.condition ?? 'جديد'),
+          label: Text(product.condition),
           backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
         ),
         const SizedBox(width: 8),
@@ -367,7 +367,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          product.description ?? '',
+          product.description,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
