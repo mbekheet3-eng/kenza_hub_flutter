@@ -119,8 +119,9 @@ class _AuthSheetContentState extends State<_AuthSheetContent> {
 
     if (!mounted) return;
     if (success) {
+      final router = GoRouter.of(context);
       Navigator.of(context).pop();
-      GoRouter.of(context).go('/home');
+      router.go('/home');
     } else if (auth.error != null) {
       _message(auth.error!);
     }
@@ -383,7 +384,7 @@ class _AuthSheetContentState extends State<_AuthSheetContent> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(_isSignUp ? strings.noAccount : strings.noAccount),
+                        Text(_isSignUp ? 'لديك حساب بالفعل؟' : strings.noAccount),
                         TextButton(
                           onPressed: () => _switchMode(_isSignUp ? AuthSheetMode.login : AuthSheetMode.signUp),
                           child: Text(
@@ -410,4 +411,36 @@ class _AuthSheetContentState extends State<_AuthSheetContent> {
       ),
     );
   }
+}
+
+
+/// Route fallback for authentication-required actions. It keeps a guest
+/// marketplace screen behind the modal instead of presenting a full-page form.
+class AuthBottomSheetRoute extends StatefulWidget {
+  const AuthBottomSheetRoute({
+    super.key,
+    required this.initialMode,
+    required this.background,
+  });
+
+  final AuthSheetMode initialMode;
+  final Widget background;
+
+  @override
+  State<AuthBottomSheetRoute> createState() => _AuthBottomSheetRouteState();
+}
+
+class _AuthBottomSheetRouteState extends State<AuthBottomSheetRoute> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await AuthBottomSheet.show(context, initialMode: widget.initialMode);
+      if (mounted) context.go('/home');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.background;
 }
