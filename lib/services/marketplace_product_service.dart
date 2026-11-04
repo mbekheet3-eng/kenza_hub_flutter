@@ -62,6 +62,37 @@ class MarketplaceProductService {
     });
   }
 
+  Future<List<Map<String, dynamic>>> fetchDeliveryRegions() async {
+    final rows = await _client
+        .from('regions')
+        .select('id,name_ar,city_ar')
+        .eq('is_active', true)
+        .eq('is_delivery_active', true)
+        .order('name_ar', ascending: true);
+    return (rows as List)
+        .map((row) => Map<String, dynamic>.from(row as Map))
+        .toList(growable: false);
+  }
+
+  Future<void> setDefaultDeliveryRegion(String regionId) async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) throw StateError('يجب تسجيل الدخول أولاً');
+    final region = await _client
+        .from('regions')
+        .select('id')
+        .eq('id', regionId)
+        .eq('is_active', true)
+        .eq('is_delivery_active', true)
+        .maybeSingle();
+    if (region == null) {
+      throw StateError('منطقة التوصيل المختارة غير متاحة');
+    }
+    await _client
+        .from('users')
+        .update({'default_region_id': regionId})
+        .eq('id', userId);
+  }
+
   /// Ensures the signed-in member has exactly one active owner membership.
   /// New seller profiles are created only by the approved Edge Function.
   Future<String> ensureSellerProfile() async {
@@ -77,9 +108,7 @@ class MarketplaceProductService {
         .single();
     final defaultRegionId = userProfile['default_region_id'] as String?;
     if (defaultRegionId == null) {
-      throw StateError(
-        'لم يتم تحديد منطقة حسابك بعد. لا يمكن نشر المنتجات قبل استكمال بيانات المنطقة ونطاق الشحن.',
-      );
+      throw StateError('DEFAULT_REGION_REQUIRED');
     }
     final region = await _client
         .from('regions')
