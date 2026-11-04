@@ -246,6 +246,46 @@ class UploadService {
     }
   }
 
+  /// Upload a product image to the V2 path expected by add_product_image.
+  /// Returns the Storage object path (not a public URL).
+  Future<String> uploadProductImage(
+    File imageFile, {
+    required String productId,
+  }) async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) throw StateError('يجب تسجيل الدخول لرفع الصور');
+
+    final fileBytes = await imageFile.readAsBytes();
+    if (fileBytes.isEmpty || fileBytes.length > 10 * 1024 * 1024) {
+      throw StateError('حجم الصورة غير صالح؛ الحد الأقصى 10 ميجابايت');
+    }
+
+    final mimeType = _getMimeType(imageFile.path);
+    final objectPath =
+        'products/$productId/$userId/${const Uuid().v4()}${_getFileExtension(imageFile.path)}';
+
+    await _client.storage.from(bucketName).uploadBinary(
+          objectPath,
+          fileBytes,
+          fileOptions: FileOptions(contentType: mimeType, upsert: false),
+        );
+    return objectPath;
+  }
+
+  Future<void> deleteProductImagePath(String objectPath) async {
+    final userId = _client.auth.currentUser?.id;
+    final segments = objectPath.split('/');
+    if (userId == null ||
+        segments.length != 4 ||
+        segments[0] != 'products' ||
+        segments[2] != userId ||
+        segments.any((part) => part.isEmpty || part == '.' || part == '..') ||
+        objectPath.contains('\\\\')) {
+      throw StateError('مسار حذف الصورة غير صالح لهذا الحساب');
+    }
+    await _client.storage.from(bucketName).remove([objectPath]);
+  }
+
   /// Upload multiple images
   Future<List<String>> uploadImages(List<File> imageFiles) async {
     final uploadedUrls = <String>[];
