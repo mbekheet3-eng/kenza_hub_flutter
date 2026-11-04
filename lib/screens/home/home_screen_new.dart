@@ -420,7 +420,7 @@ class _CategoryItem extends StatelessWidget {
     if (value.contains('shirt') || value.contains('top')) return Icons.checkroom;
     if (value.contains('bag')) return Icons.shopping_bag_outlined;
     if (value.contains('baby') || value.contains('child') || value.contains('kids')) return Icons.child_friendly_outlined;
-    if (value.contains('kitchen')) return Icons.soup_kitchen_outlined;
+    if (value.contains('kitchen')) return Icons.restaurant_outlined;
     if (value.contains('furniture') || value.contains('sofa')) return Icons.chair_outlined;
     return Icons.category_outlined;
   }
