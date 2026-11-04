@@ -36,12 +36,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF7F8FA),
       appBar: AppBar(
-        title: const Text('كنزة هب'),
+        automaticallyImplyLeading: true,
+        title: const Text('كنزة هب', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: 0.2)),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        foregroundColor: const Color(0xFF0F172A),
+        surfaceTintColor: Colors.white,
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
@@ -68,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               // Search Bar
               Padding(
-                padding: const EdgeInsets.all(AppSpacing.md),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
                 child: TextField(
                   controller: _searchController,
                   onChanged: (value) => homeProvider.search(value),
@@ -84,15 +87,21 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                           )
                         : null,
+                    filled: true,
+                    fillColor: Colors.white,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.md),
-                      borderSide: const BorderSide(color: Colors.grey, width: 0.5),
+                      borderRadius: BorderRadius.circular(18),
+                      borderSide: BorderSide.none,
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.md),
-                      borderSide: const BorderSide(color: Colors.grey, width: 0.5),
+                      borderRadius: BorderRadius.circular(18),
+                      borderSide: const BorderSide(color: Color(0xFFE8EAF0)),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(18),
+                      borderSide: const BorderSide(color: Color(0xFFC62828), width: 1.4),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
                   ),
                 ),
               ),
@@ -115,13 +124,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               SizedBox(
-                height: 166,
+                height: 184,
                 child: GridView.count(
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                   crossAxisCount: 2,
                   mainAxisSpacing: 8,
                   crossAxisSpacing: 8,
-                  childAspectRatio: 2.7,
+                  childAspectRatio: 2.45,
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
                     _MainCategoryTile(
@@ -209,11 +218,11 @@ class _MainCategoryTile extends StatelessWidget {
         onTap: onTap,
         borderRadius: AppRadius.medium,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
             borderRadius: AppRadius.medium,
             border: Border.all(
-              color: selected ? AppColors.primary : Colors.grey.shade300,
+              color: selected ? AppColors.primary : const Color(0xFFEDF0F4),
               width: selected ? 1.5 : 1,
             ),
           ),
