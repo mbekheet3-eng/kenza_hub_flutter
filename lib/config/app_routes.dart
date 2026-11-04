@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../screens/splash/splash_screen.dart';
 import '../screens/welcome/welcome_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
@@ -26,7 +27,7 @@ import '../screens/sell/sell_wizard_screen.dart';
 
 // GoRouter configuration
 final goRouter = GoRouter(
-  initialLocation: '/welcome',
+  initialLocation: '/splash',
   redirect: (context, state) {
     final hasSession =
         Supabase.instance.client.auth.currentSession != null;
@@ -52,6 +53,7 @@ final goRouter = GoRouter(
         currentPath.startsWith('/order-confirmation/') ||
         currentPath.startsWith('/order-tracking/');
 
+    if (currentPath == '/splash') return null;
     if (currentPath == '/auth-callback') {
       return hasSession ? '/home' : '/welcome';
     }
@@ -60,6 +62,10 @@ final goRouter = GoRouter(
     return null;
   },
   routes: [
+    GoRoute(
+      path: '/splash',
+      builder: (context, state) => const SplashScreen(),
+    ),
     GoRoute(
       path: '/welcome',
       builder: (context, state) => const WelcomeScreen(),
