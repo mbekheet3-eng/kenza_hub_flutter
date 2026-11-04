@@ -210,25 +210,20 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
 
   Future<void> _publishProduct() async {
     if (!_validateAllData()) {
-      _showError('يرجى ملء جميع البيانات المطلوبة');
+      _showError('يرجى ملء البيانات المطلوبة وإضافة صورة واحدة على الأقل');
       return;
     }
 
     setState(() => _isLoading = true);
-    final uploadedImageUrls = <String>[];
-    var productCreated = false;
+    final uploadedImagePaths = <String>[];
+    String? createdProductId;
 
     try {
-      // 1. Ensure the default seller profile exists before uploading files.
       final sellerProfileId = await _productService.ensureSellerProfile();
 
-      // 2. Upload images
-      uploadedImageUrls.addAll(
-        await _uploadService.uploadImages(_selectedImages),
-      );
-
-      // 3. Resolve database foreign keys and create the product + image rows.
-      await _productService.createProduct(
+      // The V2 RPC creates the listing as pending_review and enforces
+      // verified-phone, seller permission, service coverage and weight rules.
+      createdProductId = await _productService.createProduct(
         sellerProfileId: sellerProfileId,
         categorySlug: _category!,
         title: _title,
@@ -238,33 +233,58 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         colorLabel: _skipVariantFields ? null : _color,
         sizeLabel: _skipVariantFields ? null : _size,
         brandName: _brand,
-        imageUrls: uploadedImageUrls,
       );
-      productCreated = true;
 
-      // Cache cleanup must not invalidate a successfully published listing.
+      // V2 image paths must be scoped to product UUID + authenticated user.
+      for (var index = 0; index < _selectedImages.length; index++) {
+        final imagePath = await _uploadService.uploadProductImage(
+          _selectedImages[index],
+          productId: createdProductId,
+        );
+        uploadedImagePaths.add(imagePath);
+        await _productService.addProductImage(
+          productId: createdProductId,
+          imagePath: imagePath,
+          displayOrder: index,
+        );
+      }
+
       try {
         await _uploadService.cleanupCache();
       } catch (_) {
-        // The uploaded images and database listing are already committed.
+        // Cache cleanup is non-critical after a successful submission.
       }
 
-      // Success
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم نشر المنتج بنجاح')),
+          const SnackBar(content: Text('تم إرسال المنتج للمراجعة بنجاح')),
         );
         context.pushReplacement('/home');
       }
     } catch (e) {
-      if (!productCreated && uploadedImageUrls.isNotEmpty) {
+      if (createdProductId != null) {
         try {
-          await _uploadService.deleteImages(uploadedImageUrls);
+          await _productService.archiveProduct(createdProductId);
         } catch (_) {
-          // Preserve the original publishing error if image cleanup fails.
+          // Preserve the original error if cleanup is blocked.
         }
       }
-      _showError('فشل نشر المنتج: $e');
+      for (final imagePath in uploadedImagePaths) {
+        try {
+          await _uploadService.deleteProductImagePath(imagePath);
+        } catch (_) {
+          // Continue cleaning remaining uploaded objects.
+        }
+      }
+
+      final errorText = e.toString();
+      if (errorText.contains('PHONE_VERIFICATION_REQUIRED')) {
+        _showError('قبل أول عملية بيع، لازم توثّق رقم هاتفك برسالة SMS.');
+      } else if (errorText.contains('OUTSIDE_DELIVERY_COVERAGE')) {
+        _showError('منطقتك خارج نطاق التوصيل الداخلي الحالي؛ يمكنك التصفح فقط.');
+      } else {
+        _showError('فشل إرسال المنتج للمراجعة: $e');
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -276,7 +296,6 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         _condition != null &&
         _categoryRulesResolved &&
         !_isResolvingCategoryRules &&
-        (_skipVariantFields || (_color != null && _size != null)) &&
         _title.isNotEmpty &&
         _description.isNotEmpty &&
         _price > 0;
