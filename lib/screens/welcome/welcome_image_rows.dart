@@ -45,7 +45,7 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
     super.initState();
     _row1Controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 25),
+      duration: const Duration(milliseconds: 27500),
     )..repeat();
     _row2Controller = AnimationController(
       vsync: this,
@@ -65,7 +65,7 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
     final screenWidth = MediaQuery.sizeOf(context).width;
     final screenHeight = MediaQuery.sizeOf(context).height;
     final isSmallScreen = screenHeight < 700;
-    final imageWidth = (screenWidth * 0.33).clamp(112.0, 145.0);
+    final imageWidth = (screenWidth * 0.35).clamp(120.0, 155.0);
     final imageHeight = imageWidth * 1.22;
     const spacing = 9.0;
 
@@ -89,13 +89,13 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
         ),
         SizedBox(height: isSmallScreen ? 8 : 11),
         SizedBox(
-          height: imageHeight * 0.88,
+          height: imageHeight * 0.90,
           width: double.infinity,
           child: AnimatedBuilder(
             animation: _row2Controller,
             builder: (context, child) => WelcomeImageRow(
               images: _row2Images,
-              imageWidth: imageWidth * 0.9,
+              imageWidth: imageWidth * 0.94,
               imageHeight: imageHeight * 0.88,
               spacing: spacing,
               progress: _row2Controller.value,
