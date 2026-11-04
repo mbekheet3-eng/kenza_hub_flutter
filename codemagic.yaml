@@ -9,7 +9,10 @@ workflows:
       - name: Install dependencies
         script: flutter pub get
       - name: Generate Android launcher icons
-        script: dart run flutter_launcher_icons
+        script: |
+          dart run flutter_launcher_icons -f pubspec.yaml
+          test -f android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          test -f android/app/src/main/res/mipmap-mdpi/ic_launcher.png
       - name: Analyze Flutter code
         script: flutter analyze
       - name: Build debug APK
