@@ -16,7 +16,7 @@ class WelcomeActions extends StatelessWidget {
       children: [
         SizedBox(
           width: double.infinity,
-          height: 54,
+          height: 48,
           child: ElevatedButton(
             onPressed: () => context.push('/sign-up'),
             style: ElevatedButton.styleFrom(
@@ -40,7 +40,7 @@ class WelcomeActions extends StatelessWidget {
         const SizedBox(height: 11),
         SizedBox(
           width: double.infinity,
-          height: 52,
+          height: 46,
           child: OutlinedButton(
             onPressed: () => context.push('/login'),
             style: OutlinedButton.styleFrom(
