@@ -172,13 +172,13 @@ class Product {
       subcategory: parentCategoryData != null
           ? categoryData?['slug'] as String?
           : json['subcategory'] as String?,
-      condition: conditionData?['label_ar'] as String? ??
+      condition: conditionData?['name_ar'] as String? ?? conditionData?['label_ar'] as String? ??
           json['condition'] as String? ??
           '',
-      color: colorData?['label_ar'] as String? ??
+      color: colorData?['name_ar'] as String? ?? colorData?['label_ar'] as String? ??
           json['color'] as String?,
-      size: sizeData?['label_ar'] as String? ?? json['size'] as String?,
-      brand: json['brand'] as String?,
+      size: sizeData?['name_ar'] as String? ?? sizeData?['label_ar'] as String? ?? json['size'] as String?,
+      brand: json['brand_name'] as String? ?? json['brand'] as String?,
       imageUrls: imageUrls.isNotEmpty
           ? imageUrls
           : List<String>.from(json['image_urls'] as List? ?? const []),
