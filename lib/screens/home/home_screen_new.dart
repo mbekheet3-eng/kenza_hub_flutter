@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:kenza_hub_flutter/config/app_colors.dart';
 import 'package:kenza_hub_flutter/config/app_radius.dart';
 import 'package:kenza_hub_flutter/config/app_spacing.dart';
@@ -17,6 +18,44 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final ImagePicker _imagePicker = ImagePicker();
+
+  Future<void> _openVisualSearchPicker() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('اختيار صورة من المعرض'),
+              onTap: () => Navigator.pop(sheetContext, ImageSource.gallery),
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined),
+              title: const Text('التقاط صورة بالكاميرا'),
+              onTap: () => Navigator.pop(sheetContext, ImageSource.camera),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (source == null || !mounted) return;
+    try {
+      final image = await _imagePicker.pickImage(source: source, imageQuality: 85);
+      if (image == null || !mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تم اختيار الصورة. البحث بالصورة يحتاج ربط خدمة البحث البصري قبل تفعيله.')),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تعذر فتح الصورة. تحقق من صلاحية الكاميرا أو المعرض.')),
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -69,51 +108,70 @@ class _HomeScreenState extends State<HomeScreen> {
           final strings = AppLocalizations.of(context);
           return Column(
             children: [
-              // Search Bar
+              // Search bar with visual-search camera action
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: (value) => homeProvider.search(value),
-                  decoration: InputDecoration(
-                    hintText: strings.searchProduct,
-                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: () {
-                              _searchController.clear();
-                              homeProvider.search('');
-                            },
-                          )
-                        : null,
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(18),
-                      borderSide: BorderSide.none,
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: (value) => homeProvider.search(value),
+                        decoration: InputDecoration(
+                          hintText: strings.searchProduct,
+                          prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                          suffixIcon: _searchController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    homeProvider.search('');
+                                    setState(() {});
+                                  },
+                                )
+                              : null,
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: const BorderSide(color: Color(0xFFE8EAF0)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: const BorderSide(color: Color(0xFFC62828), width: 1.4),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+                        ),
+                      ),
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(18),
-                      borderSide: const BorderSide(color: Color(0xFFE8EAF0)),
+                    const SizedBox(width: 9),
+                    Material(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(16),
+                      child: IconButton(
+                        tooltip: 'البحث بالصورة',
+                        onPressed: _openVisualSearchPicker,
+                        icon: const Icon(Icons.camera_alt_outlined, color: Colors.white),
+                        iconSize: 25,
+                        constraints: const BoxConstraints.tightFor(width: 54, height: 54),
+                      ),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(18),
-                      borderSide: const BorderSide(color: Color(0xFFC62828), width: 1.4),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-                  ),
+                  ],
                 ),
               ),
 
-              // Main category cards
+              // Horizontally scrollable main categories
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                padding: const EdgeInsets.fromLTRB(AppSpacing.md, 0, AppSpacing.md, 10),
                 child: Row(
                   children: [
                     Text(
                       strings.categories,
-                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                     ),
                     const Spacer(),
                     TextButton(
@@ -124,39 +182,31 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               SizedBox(
-                height: 184,
-                child: GridView.count(
+                height: 88,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                  childAspectRatio: 2.45,
-                  physics: const NeverScrollableScrollPhysics(),
                   children: [
-                    _MainCategoryTile(
+                    _HomeCategoryChip(
                       title: strings.kids,
-                      subtitle: 'كل احتياجات الطفل ما عدا الملابس',
                       icon: Icons.child_friendly_outlined,
                       selected: homeProvider.selectedCategory == 'kids',
                       onTap: () => homeProvider.filterByCategory('kids'),
                     ),
-                    _MainCategoryTile(
+                    _HomeCategoryChip(
                       title: strings.home,
-                      subtitle: 'كل ما تحتاجه داخل المنزل',
                       icon: Icons.chair_outlined,
                       selected: homeProvider.selectedCategory == 'home',
                       onTap: () => homeProvider.filterByCategory('home'),
                     ),
-                    _MainCategoryTile(
+                    _HomeCategoryChip(
                       title: strings.clothes,
-                      subtitle: 'رجالي • حريمي • أطفال',
                       icon: Icons.checkroom_outlined,
                       selected: homeProvider.selectedCategory == 'clothes',
                       onTap: () => homeProvider.filterByCategory('clothes'),
                     ),
-                    _MainCategoryTile(
+                    _HomeCategoryChip(
                       title: strings.shoes,
-                      subtitle: 'رجالي • حريمي • أطفال',
                       icon: Icons.hiking_outlined,
                       selected: homeProvider.selectedCategory == 'shoes',
                       onTap: () => homeProvider.filterByCategory('shoes'),
@@ -252,6 +302,62 @@ class _MainCategoryTile extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HomeCategoryChip extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _HomeCategoryChip({
+    required this.title,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(end: 10),
+      child: Material(
+        color: selected ? AppColors.primary : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            width: 104,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: selected ? AppColors.primary : const Color(0xFFE8EAF0),
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 25, color: selected ? Colors.white : AppColors.primary),
+                const SizedBox(height: 6),
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: selected ? Colors.white : const Color(0xFF0F172A),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
