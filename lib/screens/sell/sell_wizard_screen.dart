@@ -196,7 +196,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         return _categoryRulesResolved &&
             !_isResolvingCategoryRules &&
             _condition != null &&
-            (_skipVariantFields || (_color != null && _size != null));
+            true;
       case 3:
         return _category != null; // Brand is optional.
       case 4:
