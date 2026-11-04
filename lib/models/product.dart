@@ -207,7 +207,7 @@ class Product {
       colorId: json['color_id'] as String?,
       sizeId: json['size_id'] as String?,
       brandId: json['brand_id'] as String?,
-      audience: json['audience'] as String? ?? 'everyone',
+      audience: json['audience'] as String? ?? 'public',
     );
   }
 
