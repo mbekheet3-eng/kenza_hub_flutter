@@ -64,6 +64,7 @@ class _AuthSheetContentState extends State<_AuthSheetContent> {
   bool _hidePassword = true;
   bool _hideConfirmation = true;
   bool _acceptedTerms = false;
+  bool _didNavigate = false;
 
   bool get _isSignUp => _mode == AuthSheetMode.signUp;
 
@@ -90,6 +91,14 @@ class _AuthSheetContentState extends State<_AuthSheetContent> {
       _formKey.currentState?.reset();
     });
     context.read<AuthProvider>().clearError();
+  }
+
+  void _finishAuthentication() {
+    if (_didNavigate || !mounted) return;
+    _didNavigate = true;
+    final router = GoRouter.of(context);
+    Navigator.of(context).pop();
+    router.go('/home');
   }
 
   Future<void> _submit(AuthProvider auth) async {
@@ -119,9 +128,7 @@ class _AuthSheetContentState extends State<_AuthSheetContent> {
 
     if (!mounted) return;
     if (success) {
-      final router = GoRouter.of(context);
-      Navigator.of(context).pop();
-      router.go('/home');
+      _finishAuthentication();
     } else if (auth.error != null) {
       _message(auth.error!);
     }
@@ -215,6 +222,9 @@ class _AuthSheetContentState extends State<_AuthSheetContent> {
     final strings = AppLocalizations.of(context);
     final auth = context.watch<AuthProvider>();
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    if (auth.isSignedIn && !_didNavigate) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _finishAuthentication());
+    }
 
     return Material(
       color: Colors.white,
@@ -329,8 +339,9 @@ class _AuthSheetContentState extends State<_AuthSheetContent> {
                         alignment: AlignmentDirectional.centerEnd,
                         child: TextButton(
                           onPressed: () {
+                            final router = GoRouter.of(context);
                             Navigator.of(context).pop();
-                            context.push('/forgot-password');
+                            router.push('/forgot-password');
                           },
                           child: Text(strings.forgotPassword),
                         ),
