@@ -47,12 +47,6 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
 
   late List<Step> steps;
 
-  @override
-  void initState() {
-    super.initState();
-    _initializeSteps();
-  }
-
   void _initializeSteps() {
     steps = [
       Step(
