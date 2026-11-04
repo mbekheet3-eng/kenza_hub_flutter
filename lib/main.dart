@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:kenza_hub_flutter/config/app_routes.dart';
 import 'package:kenza_hub_flutter/config/app_theme.dart';
+import 'package:kenza_hub_flutter/config/supabase_config.dart';
 import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:kenza_hub_flutter/providers/home_provider.dart';
 import 'package:kenza_hub_flutter/providers/auth_provider.dart';
@@ -20,8 +21,8 @@ void main() async {
   // Initialize Supabase
   try {
     await Supabase.initialize(
-      url: 'https://qvqfzujvcnmquohieevl.supabase.co',
-      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2cWZ6dWp2Y25tcXVvaGllZXZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3Nzk5NzUsImV4cCI6MjA5NzM1NTk3NX0.MWKerHrby4y9Ok6TRixR05dB7OtQlZYq0BurZmMCDFg',
+      url: SupabaseConfig.url,
+      anonKey: SupabaseConfig.publishableKey,
     );
     debugPrint('Supabase initialized successfully');
   } catch (e) {
