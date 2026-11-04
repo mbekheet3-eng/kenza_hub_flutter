@@ -34,6 +34,7 @@ class Product {
   final String? sizeId;
   final String? brandId;
   final String audience;
+  final String sellerType;
 
   Product({
     required this.id,
@@ -70,7 +71,8 @@ class Product {
     this.colorId,
     this.sizeId,
     this.brandId,
-    this.audience = 'everyone',
+    this.audience = 'public',
+    this.sellerType = 'seller',
   });
 
   // Check if category is "home" (furniture & home items)
@@ -200,6 +202,7 @@ class Product {
       sellerAvatar: sellerData?['avatar_url'] as String? ??
           json['seller_avatar'] as String?,
       sellerProfileId: sellerProfileId,
+      sellerType: sellerData?['seller_type'] as String? ?? 'seller',
       categoryId: json['category_id'] as String?,
       conditionId: json['condition_id'] as String?,
       statusId: json['status_id'] as String?,
