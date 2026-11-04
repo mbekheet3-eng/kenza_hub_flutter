@@ -7,28 +7,9 @@ allprojects {
 
 rootProject.buildDir = "../build"
 
-// Configure all subprojects
 subprojects { project ->
-    // Set buildDir
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-    
-    // Ensure app is evaluated first
     project.evaluationDependsOn(":app")
-    
-    // Configure compileSdk for plugin dependencies
-    afterEvaluate {
-        if (project.plugins.hasPlugin('com.android.library')) {
-            if (!android.compileSdk) {
-                android.compileSdk = 35
-            }
-            if (!android.defaultConfig.minSdk) {
-                android.defaultConfig.minSdk = 21
-            }
-            if (!android.defaultConfig.targetSdk) {
-                android.defaultConfig.targetSdk = 34
-            }
-        }
-    }
 }
 
 tasks.register("clean", Delete) {
