@@ -23,7 +23,7 @@ class DatabaseCategory {
       nameAr: json['name_ar'] as String? ?? '',
       nameEn: json['name_en'] as String? ?? '',
       slug: json['slug'] as String,
-      iconUrl: json['icon_url'] as String?,
+      iconUrl: (json['icon_url'] ?? json['icon']) as String?,
       parentId: json['parent_id'] as String?,
       displayOrder: (json['display_order'] as num?)?.toInt() ?? 0,
     );
