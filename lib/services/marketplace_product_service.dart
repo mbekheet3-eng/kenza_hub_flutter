@@ -208,6 +208,7 @@ class MarketplaceProductService {
     required String title,
     required String description,
     required double price,
+    required double weightKg,
     required String conditionLabel,
     String? colorLabel,
     String? sizeLabel,
@@ -265,11 +266,11 @@ class MarketplaceProductService {
       'p_description_ar': description.trim(),
       'p_description_en': description.trim(),
       'p_price': price,
+      'p_weight_kg': weightKg,
       'p_condition_id': condition['id'],
       'p_color_id': colorId,
       'p_size_id': sizeId,
       'p_brand_name': brandName?.trim().isNotEmpty == true ? brandName!.trim() : null,
-      'p_weight_kg': null,
       'p_audience': 'public',
     });
 
