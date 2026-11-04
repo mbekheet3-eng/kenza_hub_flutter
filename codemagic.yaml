@@ -26,6 +26,6 @@ workflows:
           test -s android/upload-keystore.jks
           flutter build apk --release --no-shrink \
             --build-name=0.1.0 \
-            --build-number="$CM_BUILD_NUMBER"
+            --build-number="$(date +%s)"
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
