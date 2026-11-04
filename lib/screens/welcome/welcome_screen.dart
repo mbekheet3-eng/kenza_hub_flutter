@@ -58,7 +58,7 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                     Padding(
                       padding: EdgeInsets.fromLTRB(
-                        24,
+                        16,
                         isSmallScreen ? 2 : 8,
                         24,
                         16,
