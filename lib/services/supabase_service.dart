@@ -190,7 +190,7 @@ class SupabaseService {
     if (authUser != null && authUser.id == userId) {
       profile['email'] = authUser.email;
       profile['phone'] = authUser.phone;
-      profile['phone_confirmed_at'] = authUser.phoneConfirmedAt?.toIso8601String();
+      profile['phone_confirmed_at'] = authUser.phoneConfirmedAt;
     }
     return User.fromJson(profile);
   }
