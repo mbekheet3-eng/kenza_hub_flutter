@@ -2,8 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/database_category.dart';
 
-/// Reads catalogue reference data from the live database schema.
-/// This service is read-only: category management remains an admin operation.
+/// Read-only reference-data access aligned with Supabase V2.
 class CatalogService {
   CatalogService({SupabaseClient? client})
       : _client = client ?? Supabase.instance.client;
@@ -13,37 +12,30 @@ class CatalogService {
   Future<List<DatabaseCategory>> fetchCategories() async {
     final rows = await _client
         .from('categories')
-        .select(
-          'id,name_ar,name_en,slug,icon,parent_id,display_order',
-        )
+        .select('id,name_ar,name_en,slug,icon_url,parent_id,display_order')
         .eq('is_active', true)
         .order('display_order', ascending: true)
         .order('name_ar', ascending: true);
 
     return (rows as List)
-        .map(
-          (row) => DatabaseCategory.fromJson(
-            Map<String, dynamic>.from(row as Map),
-          ),
-        )
+        .map((row) => DatabaseCategory.fromJson(
+              Map<String, dynamic>.from(row as Map),
+            ))
         .toList(growable: false);
   }
+
   Future<String?> fetchRootCategorySlug(String categorySlug) async {
     final rows = await _client
         .from('categories')
         .select('id,slug,parent_id')
         .eq('is_active', true);
-
     final categories = (rows as List)
         .map((row) => Map<String, dynamic>.from(row as Map))
         .toList(growable: false);
     final byId = {
-      for (final category in categories)
-        category['id'] as String: category,
+      for (final category in categories) category['id'] as String: category,
     };
-    final matches = categories.where(
-      (category) => category['slug'] == categorySlug,
-    );
+    final matches = categories.where((category) => category['slug'] == categorySlug);
     if (matches.isEmpty) return null;
 
     var current = matches.first;
@@ -58,10 +50,11 @@ class CatalogService {
   Future<List<String>> fetchConditions() async {
     final rows = await _client
         .from('product_conditions')
-        .select('label_ar')
-        .eq('is_active', true);
+        .select('name_ar')
+        .eq('is_active', true)
+        .order('display_order', ascending: true);
     return (rows as List)
-        .map((row) => (row as Map)['label_ar'] as String?)
+        .map((row) => (row as Map)['name_ar'] as String?)
         .whereType<String>()
         .where((label) => label.trim().isNotEmpty)
         .toList(growable: false);
@@ -70,10 +63,11 @@ class CatalogService {
   Future<List<String>> fetchColors() async {
     final rows = await _client
         .from('product_colors')
-        .select('label_ar')
-        .eq('is_active', true);
+        .select('name_ar')
+        .eq('is_active', true)
+        .order('display_order', ascending: true);
     return (rows as List)
-        .map((row) => (row as Map)['label_ar'] as String?)
+        .map((row) => (row as Map)['name_ar'] as String?)
         .whereType<String>()
         .where((label) => label.trim().isNotEmpty)
         .toList(growable: false);
@@ -82,56 +76,32 @@ class CatalogService {
   Future<List<String>> fetchBrands() async {
     final rows = await _client
         .from('brands')
-        .select('name')
-        .order('name', ascending: true);
-
+        .select('name_ar')
+        .eq('is_active', true)
+        .order('name_ar', ascending: true);
     return (rows as List)
-        .map((row) => (row as Map)['name'] as String?)
+        .map((row) => (row as Map)['name_ar'] as String?)
         .whereType<String>()
         .where((name) => name.trim().isNotEmpty)
         .toList(growable: false);
   }
 
+  /// V2 sizes are global reference values grouped by size_group; they are not
+  /// linked to categories through category_id.
   Future<List<String>> fetchSizesForCategory(String categorySlug) async {
-    final categoryRows = await _client
-        .from('categories')
-        .select('id,slug,parent_id')
-        .eq('is_active', true);
-    final categories = (categoryRows as List)
-        .map((row) => Map<String, dynamic>.from(row as Map))
-        .toList(growable: false);
-    final byId = {
-      for (final category in categories)
-        category['id'] as String: category,
-    };
-    final selected = categories.where(
-      (category) => category['slug'] == categorySlug,
-    );
-    if (selected.isEmpty) return const [];
-
-    var root = selected.first;
-    var parentId = root['parent_id'] as String?;
-    while (parentId != null && byId.containsKey(parentId)) {
-      root = byId[parentId]!;
-      parentId = root['parent_id'] as String?;
-    }
-
     final rows = await _client
         .from('product_sizes')
-        .select('label_en,label_ar')
-        .eq('category_id', root['id'])
+        .select('name_ar,name_en,size_group')
         .eq('is_active', true)
-        .order('sort_order', ascending: true);
-
+        .order('display_order', ascending: true);
     return (rows as List)
         .map((row) {
           final data = Map<String, dynamic>.from(row as Map);
-          return (data['label_ar'] as String?) ??
-              (data['label_en'] as String?) ??
+          return (data['name_ar'] as String?) ??
+              (data['name_en'] as String?) ??
               '';
         })
-        .where((label) => label.isNotEmpty)
+        .where((label) => label.trim().isNotEmpty)
         .toList(growable: false);
   }
-
 }
