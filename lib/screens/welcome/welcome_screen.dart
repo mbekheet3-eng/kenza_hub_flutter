@@ -38,7 +38,7 @@ class WelcomeScreen extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: 20,
-                        vertical: isSmallScreen ? 8 : 12,
+                        vertical: isSmallScreen ? 6 : 8,
                       ),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -49,9 +49,10 @@ class WelcomeScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    SizedBox(
-                      height: isSmallScreen ? 310 : 350,
-                      child: const Center(
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: const Align(
+                        alignment: Alignment.topCenter,
                         child: WelcomeImageRows(),
                       ),
                     ),
