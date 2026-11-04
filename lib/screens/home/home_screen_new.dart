@@ -292,25 +292,28 @@ class _HomeScreenState extends State<HomeScreen> {
               controller: _searchController,
               textInputAction: TextInputAction.search,
               onSubmitted: (_) => _submitSearch(),
-              onChanged: (value) => provider.search(value),
+              onChanged: (value) {
+                provider.search(value);
+                setState(() {});
+              },
               decoration: InputDecoration(
                 hintText: strings.searchProduct,
                 hintStyle: const TextStyle(color: Color(0xFF9CA3AF)),
-                suffixIcon: const Icon(
+                // In RTL, prefix is on the right and suffix is on the left.
+                prefixIcon: const Icon(
                   Icons.search_rounded,
                   color: Color(0xFF0F172A),
                   size: 27,
                 ),
-                prefixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () {
-                          _searchController.clear();
-                          provider.search('');
-                          setState(() {});
-                        },
-                      )
-                    : null,
+                suffixIcon: IconButton(
+                  tooltip: 'البحث بالصورة',
+                  onPressed: _openVisualSearchPicker,
+                  icon: const Icon(
+                    Icons.camera_alt_outlined,
+                    color: Color(0xFF0F172A),
+                    size: 25,
+                  ),
+                ),
                 filled: true,
                 fillColor: Colors.white,
                 contentPadding: const EdgeInsets.symmetric(
@@ -332,24 +335,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 1.3,
                   ),
                 ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 9),
-          Material(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(18),
-            child: IconButton(
-              tooltip: 'البحث بالصورة',
-              onPressed: _openVisualSearchPicker,
-              icon: const Icon(
-                Icons.camera_alt_outlined,
-                color: Color(0xFF0F172A),
-                size: 27,
-              ),
-              constraints: const BoxConstraints.tightFor(
-                width: 54,
-                height: 54,
               ),
             ),
           ),
