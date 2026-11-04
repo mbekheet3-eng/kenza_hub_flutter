@@ -509,7 +509,9 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         !_isResolvingCategoryRules &&
         _title.isNotEmpty &&
         _description.isNotEmpty &&
-        _price > 0;
+        _price > 0 &&
+        _weightKg > 0 &&
+        _weightKg <= 10;
   }
 
   void _showError(String message) {
