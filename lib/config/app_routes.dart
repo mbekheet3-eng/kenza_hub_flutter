@@ -3,8 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../screens/splash/splash_screen.dart';
 import '../screens/welcome/welcome_screen.dart';
-import '../screens/auth/login_screen.dart';
-import '../screens/auth/signup_screen.dart';
+import '../screens/auth/auth_bottom_sheet.dart';
 import '../screens/auth/forgot_password_screen.dart';
 import '../screens/auth/reset_password_screen.dart';
 import '../screens/home/home_screen_new.dart';
@@ -72,7 +71,10 @@ final goRouter = GoRouter(
     ),
     GoRoute(
       path: '/login',
-      builder: (context, state) => const LoginScreen(),
+      builder: (context, state) => const AuthBottomSheetRoute(
+        initialMode: AuthSheetMode.login,
+        background: HomeScreen(),
+      ),
     ),
     GoRoute(
       path: '/auth-callback',
@@ -88,7 +90,10 @@ final goRouter = GoRouter(
     ),
     GoRoute(
       path: '/sign-up',
-      builder: (context, state) => const SignUpScreen(),
+      builder: (context, state) => const AuthBottomSheetRoute(
+        initialMode: AuthSheetMode.signUp,
+        background: HomeScreen(),
+      ),
     ),
     GoRoute(
       path: '/home',
