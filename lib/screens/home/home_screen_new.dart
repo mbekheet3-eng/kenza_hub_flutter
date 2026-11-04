@@ -812,8 +812,8 @@ class _HomeBottomNavigation extends StatelessWidget {
             ),
             _NavItem(
               icon: Icons.search_rounded,
-              label: 'بحث',
-              onTap: () => context.push('/search'),
+              label: 'اكتشف',
+              onTap: () => context.push('/categories'),
             ),
             _NavItem(
               icon: Icons.add_circle_rounded,
