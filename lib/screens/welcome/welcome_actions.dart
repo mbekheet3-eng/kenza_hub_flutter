@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
+import 'package:kenza_hub_flutter/screens/auth/auth_bottom_sheet.dart';
 
 class WelcomeActions extends StatelessWidget {
   const WelcomeActions({super.key});
@@ -18,7 +19,10 @@ class WelcomeActions extends StatelessWidget {
           width: double.infinity,
           height: 48,
           child: ElevatedButton(
-            onPressed: () => context.push('/sign-up'),
+            onPressed: () => AuthBottomSheet.show(
+              context,
+              initialMode: AuthSheetMode.signUp,
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryRed,
               foregroundColor: Colors.white,
@@ -42,7 +46,10 @@ class WelcomeActions extends StatelessWidget {
           width: double.infinity,
           height: 46,
           child: OutlinedButton(
-            onPressed: () => context.push('/login'),
+            onPressed: () => AuthBottomSheet.show(
+              context,
+              initialMode: AuthSheetMode.login,
+            ),
             style: OutlinedButton.styleFrom(
               foregroundColor: navy,
               side: const BorderSide(color: Color(0xFFCBD5E1)),
