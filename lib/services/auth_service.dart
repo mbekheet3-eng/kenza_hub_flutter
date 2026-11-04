@@ -94,7 +94,7 @@ class AuthService {
           .eq('id', userId)
           .single();
 
-      return custom_user.User.fromJson(response as Map<String, dynamic>);
+      return custom_user.User.fromJson(response);
     } catch (e) {
       print('❌ Error fetching user profile: $e');
       rethrow;
