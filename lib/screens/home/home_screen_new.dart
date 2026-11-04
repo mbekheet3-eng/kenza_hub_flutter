@@ -822,9 +822,14 @@ class _HomeBottomNavigation extends StatelessWidget {
               onTap: () => context.push('/sell-wizard'),
             ),
             _NavItem(
-              icon: Icons.shopping_cart_outlined,
-              label: 'سلة المشتريات',
-              onTap: () => context.push('/cart'),
+              icon: Icons.chat_bubble_outline_rounded,
+              label: 'الرسائل',
+              onTap: () => context.push('/chats'),
+            ),
+            _NavItem(
+              icon: Icons.receipt_long_outlined,
+              label: 'طلباتي',
+              onTap: () => context.push('/orders'),
             ),
             _NavItem(
               icon: Icons.person_outline_rounded,
