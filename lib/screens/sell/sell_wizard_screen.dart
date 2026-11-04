@@ -391,7 +391,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
                       try {
                         final phone =
                             _normalizeEgyptianPhone(phoneController.text.trim());
-                        if (!RegExp(r'^\\+[1-9]\\d{7,14}
+                        if (!RegExp(r'^\+[1-9]\d{7,14}$').hasMatch(phone)) {
     return _selectedImages.isNotEmpty &&
         _category != null &&
         _condition != null &&
