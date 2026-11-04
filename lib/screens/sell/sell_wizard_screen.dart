@@ -35,6 +35,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
   String _title = '';
   String _description = '';
   double _price = 0;
+  double _weightKg = 0;
   bool _skipVariantFields = false;
   bool _isResolvingCategoryRules = false;
   bool _categoryRulesResolved = false;
@@ -106,6 +107,8 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         content: StepPrice(
           onPriceChanged: _onPriceChanged,
           initialPrice: _price,
+          onWeightChanged: (value) => setState(() => _weightKg = value),
+          initialWeight: _weightKg,
         ),
         isActive: _currentStep >= 5,
       ),
@@ -202,7 +205,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
       case 4:
         return _title.isNotEmpty && _description.isNotEmpty;
       case 5:
-        return _price > 0;
+        return _price > 0 && _weightKg > 0 && _weightKg <= 10;
       default:
         return true;
     }
@@ -230,6 +233,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         title: _title,
         description: _description,
         price: _price,
+        weightKg: _weightKg,
         conditionLabel: _condition!,
         colorLabel: _skipVariantFields ? null : _color,
         sizeLabel: _skipVariantFields ? null : _size,
@@ -448,7 +452,9 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         !_isResolvingCategoryRules &&
         _title.isNotEmpty &&
         _description.isNotEmpty &&
-        _price > 0;
+        _price > 0 &&
+        _weightKg > 0 &&
+        _weightKg <= 10;
   }
 
   void _showError(String message) {
@@ -476,6 +482,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
           ],
           _buildReviewSection('العنوان', Text(_title)),
           _buildReviewSection('الوصف', Text(_description)),
+          _buildReviewSection('الوزن', Text('$_weightKg كجم')),
           _buildReviewSection('السعر', Text('$_price ج.م', 
             style: TextStyle(
               color: AppTheme.primaryColor,
