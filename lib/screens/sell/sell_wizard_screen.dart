@@ -311,7 +311,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
   }
 
   String _normalizeEgyptianPhone(String input) {
-    final compact = input.replaceAll(RegExp(r'[\\s()-]'), '');
+    final compact = input.replaceAll(RegExp(r'[\s()-]'), '');
     if (compact.startsWith('+')) return compact;
     if (compact.startsWith('00')) return '+${compact.substring(2)}';
     if (compact.startsWith('0')) return '+20${compact.substring(1)}';
