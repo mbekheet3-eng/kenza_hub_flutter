@@ -327,14 +327,13 @@ class MarketplaceProductService {
       final rows = await _client
           .from('products')
           .select(_productSelect)
-          .eq('status.slug', 'active')
+          .eq('status.slug', 'available')
           .order('created_at', ascending: false)
           .order('id', ascending: true)
           .range(offset, offset + pageSize - 1);
 
-      final page = (rows as List)
-          .map((row) => Product.fromJson(Map<String, dynamic>.from(row as Map)))
-          .toList(growable: false);
+      final page = await Future.wait((rows as List)
+          .map((row) => _parseProductRow(Map<String, dynamic>.from(row as Map))));
       products.addAll(page);
 
       if (page.length < pageSize) break;
