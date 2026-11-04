@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_isRedirecting || !mounted) return;
     _isRedirecting = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) context.go('/home');
+      if (mounted) context.push('/home');
     });
   }
 
