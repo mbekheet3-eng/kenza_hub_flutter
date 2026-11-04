@@ -408,8 +408,9 @@ class _AuthSheetContentState extends State<_AuthSheetContent> {
                     if (!_isSignUp)
                       TextButton(
                         onPressed: () {
+                          final router = GoRouter.of(context);
                           Navigator.of(context).pop();
-                          context.go('/home');
+                          router.go('/home');
                         },
                         child: Text(strings.continueAsGuest),
                       ),
