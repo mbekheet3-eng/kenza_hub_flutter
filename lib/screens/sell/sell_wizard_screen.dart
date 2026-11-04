@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
@@ -241,11 +242,26 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
           productId: createdProductId,
         );
         uploadedImagePaths.add(imagePath);
-        await _productService.addProductImage(
+        final imageId = await _productService.addProductImage(
           productId: createdProductId,
           imagePath: imagePath,
           displayOrder: index,
         );
+
+        // Run server-side AI moderation when its provider key is configured.
+        // A provider outage leaves the listing pending review; it never marks
+        // an unreviewed image as approved.
+        try {
+          final moderation = await Supabase.instance.client.functions.invoke(
+            'moderate-product-image',
+            body: {'image_id': imageId},
+          );
+          if (moderation.status < 200 || moderation.status >= 300) {
+            debugPrint('Image moderation remains pending: ${moderation.status}');
+          }
+        } catch (moderationError) {
+          debugPrint('Image moderation remains pending: $moderationError');
+        }
       }
 
       try {
