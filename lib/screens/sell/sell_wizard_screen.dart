@@ -296,6 +296,16 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
       final errorText = e.toString();
       if (errorText.contains('PHONE_VERIFICATION_REQUIRED')) {
         retryAfterPhoneVerification = await _showPhoneVerificationDialog();
+      } else if (errorText.contains('DEFAULT_REGION_REQUIRED')) {
+        try {
+          final regionId = await _showDeliveryRegionDialog();
+          if (regionId != null) {
+            await _productService.setDefaultDeliveryRegion(regionId);
+            retryAfterPhoneVerification = true;
+          }
+        } catch (regionError) {
+          _showError('تعذر حفظ منطقة التوصيل: $regionError');
+        }
       } else if (errorText.contains('OUTSIDE_DELIVERY_COVERAGE')) {
         _showError('منطقتك خارج نطاق التوصيل الداخلي الحالي؛ يمكنك التصفح فقط.');
       } else {
@@ -308,6 +318,45 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
     if (retryAfterPhoneVerification && mounted) {
       await _publishProduct();
     }
+  }
+
+  Future<String?> _showDeliveryRegionDialog() async {
+    final regions = await _productService.fetchDeliveryRegions();
+    if (regions.isEmpty) {
+      _showError('لا توجد مناطق توصيل مفعّلة حاليًا.');
+      return null;
+    }
+
+    return showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('اختيار منطقة التوصيل'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 300,
+          child: ListView.separated(
+            shrinkWrap: true,
+            itemCount: regions.length,
+            separatorBuilder: (_, __) => const Divider(height: 1),
+            itemBuilder: (context, index) {
+              final region = regions[index];
+              return ListTile(
+                title: Text(region['name_ar'] as String? ?? ''),
+                subtitle: Text(region['city_ar'] as String? ?? ''),
+                onTap: () => Navigator.of(dialogContext)
+                    .pop(region['id'] as String),
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('إلغاء'),
+          ),
+        ],
+      ),
+    );
   }
 
   String _normalizeEgyptianPhone(String input) {
