@@ -65,7 +65,7 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
     final screenWidth = MediaQuery.sizeOf(context).width;
     final screenHeight = MediaQuery.sizeOf(context).height;
     final isSmallScreen = screenHeight < 700;
-    final imageWidth = (screenWidth * 0.35).clamp(120.0, 155.0);
+    final imageWidth = (screenWidth * 0.40).clamp(145.0, 175.0);
     final imageHeight = imageWidth * 1.22;
     const spacing = 9.0;
 
@@ -95,8 +95,8 @@ class _WelcomeImageRowsState extends State<WelcomeImageRows>
             animation: _row2Controller,
             builder: (context, child) => WelcomeImageRow(
               images: _row2Images,
-              imageWidth: imageWidth * 0.94,
-              imageHeight: imageHeight * 0.88,
+              imageWidth: imageWidth * 0.98,
+              imageHeight: imageHeight * 0.90,
               spacing: spacing,
               progress: _row2Controller.value,
               direction: WelcomeImageDirection.leftToRight,
