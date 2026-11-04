@@ -422,10 +422,18 @@ class SupabaseService {
     required String password,
     String? fullName,
   }) async {
+    final nameParts = (fullName ?? '')
+        .trim()
+        .split(RegExp(r'\\s+'))
+        .where((part) => part.isNotEmpty)
+        .toList(growable: false);
     final response = await _client.auth.signUp(
       email: email,
       password: password,
-      data: fullName != null ? {'full_name': fullName} : null,
+      data: {
+        if (nameParts.isNotEmpty) 'first_name': nameParts.first,
+        if (nameParts.length > 1) 'last_name': nameParts.skip(1).join(' '),
+      },
       emailRedirectTo: 'com.kenza.hub://login-callback/auth-callback',
     );
     return {'user': response.user, 'session': response.session};
