@@ -54,7 +54,7 @@ class Address {
       city: region['name_ar'] as String? ??
           region['district'] as String? ??
           '',
-      governorate: region['city'] as String? ?? '',
+      governorate: region['city_ar'] as String? ?? '',
       postalCode: json['postal_code'] as String? ?? '',
       apartment: json['address_line_2'] as String?,
       regionId: json['region_id'] as String?,
