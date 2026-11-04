@@ -7,6 +7,7 @@ import '../screens/auth/auth_bottom_sheet.dart';
 import '../screens/auth/forgot_password_screen.dart';
 import '../screens/auth/reset_password_screen.dart';
 import '../screens/home/home_screen_new.dart';
+import '../screens/chats/chats_screen.dart';
 import '../screens/product/product_detail_screen.dart';
 import '../screens/cart/cart_screen.dart';
 import '../screens/checkout/checkout_screen.dart';
@@ -127,6 +128,10 @@ final goRouter = GoRouter(
         final orderId = state.pathParameters['id'] ?? '';
         return OrderTrackingScreen(orderId: orderId);
       },
+    ),
+    GoRoute(
+      path: '/chats',
+      builder: (context, state) => const ChatsScreen(),
     ),
     GoRoute(
       path: '/orders',
