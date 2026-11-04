@@ -387,20 +387,8 @@ class MarketplaceProductService {
     }).eq('id', product.id);
   }
 
-  Future<void> softDeleteProduct(String productId) async {
-    await _requireOwnerMembership();
-    final deletedStatus = await _client
-        .from('product_statuses')
-        .select('id')
-        .eq('slug', 'deleted')
-        .eq('is_active', true)
-        .single();
-
-    await _client
-        .from('products')
-        .update({'status_id': deletedStatus['id']})
-        .eq('id', productId);
-  }
+  Future<void> softDeleteProduct(String productId) =>
+      archiveProduct(productId);
 
   Future<Product> fetchProductById(String productId) async {
     final row = await _client
