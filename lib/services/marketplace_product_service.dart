@@ -27,7 +27,7 @@ class MarketplaceProductService {
     color:product_colors!products_color_id_fkey(name_ar,name_en,hex_code),
     size:product_sizes!products_size_id_fkey(name_ar,name_en,size_group),
     status:product_statuses!products_status_id_fkey(name_ar,name_en,slug),
-    seller:seller_profiles!products_seller_id_fkey(owner_user_id,display_name,avatar_url),
+    seller:seller_profiles!products_seller_id_fkey(owner_user_id,display_name,avatar_url,seller_type),
     images:product_images!product_images_product_id_fkey(image_path,storage_bucket,display_order,created_at)
   ''';
 
