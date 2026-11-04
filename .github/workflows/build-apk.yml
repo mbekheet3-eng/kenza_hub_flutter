@@ -69,7 +69,7 @@ jobs:
         run: |
           flutter build apk --release --no-shrink \
             --build-name=0.1.0 \
-            --build-number="${GITHUB_RUN_NUMBER}"
+            --build-number="$(date +%s)"
 
       - name: Verify APK exists
         run: |
