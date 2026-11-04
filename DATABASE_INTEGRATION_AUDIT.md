@@ -1,3 +1,15 @@
+# Decision amendment — 2026-11-04
+
+**This amendment supersedes conflicting database-closure wording in this audit.**
+
+The user has reconfirmed that the 2026-10-31 decision to redesign the Supabase database (option 3) is active. The 2026-11-02 statements that production is structurally final and that no further migrations may be added are historical and no longer govern the redesign.
+
+The approved sequence is: production remains read-only reference → target design → local Supabase migrations and tests → independent review → explicit approval for a specific production deployment. Work is on `feature/db-schema-alignment`; do not change `main`. No production schema/data changes, paid resources, or plan upgrades are authorized by this amendment.
+
+The detailed current requirements and boundaries are in `DATABASE_REDESIGN_PLAN.md`. Findings below remain evidence from the read-only audit and must be revalidated against the local target before they are treated as final implementation contracts.
+
+---
+
 # Kenza Hub — Database / Flutter Integration Audit
 
 Audit date: 2026-11-02
