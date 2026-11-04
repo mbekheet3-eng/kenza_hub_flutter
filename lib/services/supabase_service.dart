@@ -364,7 +364,7 @@ class SupabaseService {
   Future<void> toggleFavorite(String productId, String userId) async {
     final existing = await _client
         .from('favorites')
-        .select('id')
+        .select('product_id')
         .eq('user_id', userId)
         .eq('product_id', productId)
         .maybeSingle();
