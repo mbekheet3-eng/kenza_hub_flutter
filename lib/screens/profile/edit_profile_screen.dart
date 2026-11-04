@@ -7,7 +7,6 @@ import '../../models/user.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/supabase_service.dart';
 import '../../services/upload_service.dart';
-import '../../config/theme.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({Key? key}) : super(key: key);
@@ -195,8 +194,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
     }
 
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
 
     if (_isLoadingProfile) {
       return Scaffold(
