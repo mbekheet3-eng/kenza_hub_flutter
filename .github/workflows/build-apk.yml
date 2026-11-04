@@ -11,7 +11,7 @@ jobs:
     name: Build debug APK
     concurrency:
       group: build-apk-${{ github.ref }}
-      cancel-in-progress: false
+      cancel-in-progress: true
     runs-on: ubuntu-22.04
     timeout-minutes: 60
 
