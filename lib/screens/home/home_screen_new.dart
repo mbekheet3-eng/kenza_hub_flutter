@@ -24,7 +24,6 @@ class _HomeScreenState extends State<HomeScreen> {
   List<DatabaseCategory> _categories = const [];
   bool _categoriesLoading = true;
   String? _categoriesError;
-  int _promoIndex = 0;
 
   @override
   void initState() {
@@ -77,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final firstName = (metadata['first_name'] ?? '').toString().trim();
     if (firstName.isNotEmpty) return firstName;
     final fullName = (metadata['full_name'] ?? metadata['name'] ?? '').toString().trim();
-    if (fullName.isNotEmpty) return fullName.split(RegExp(r'\\s+')).first;
+    if (fullName.isNotEmpty) return fullName.split(RegExp(r'\s+')).first;
     final email = user?.email ?? '';
     return email.contains('@') ? email.split('@').first : 'عضو كنزة';
   }
