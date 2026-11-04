@@ -110,9 +110,8 @@ class AppLocalizations {
   String get welcomeSubtitle {
     switch (locale.languageCode) {
       case 'en':
-        return 'Buy and sell easily with no commission';
       case 'fr':
-        return 'Achetez et vendez facilement sans commission';
+        return 'Join us and sell\nwith no fees';
       case 'ar':
       default:
         return 'بيع واشتري بسهولة من غير عمولة';
