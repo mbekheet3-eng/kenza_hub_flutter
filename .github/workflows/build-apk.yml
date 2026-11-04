@@ -42,7 +42,10 @@ jobs:
         run: flutter pub get
 
       - name: Generate Android launcher icons from Kenza Hub logo
-        run: dart run flutter_launcher_icons
+        run: |
+          dart run flutter_launcher_icons -f pubspec.yaml
+          test -f android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          test -f android/app/src/main/res/mipmap-mdpi/ic_launcher.png
 
       - name: Analyze code
         run: flutter analyze
