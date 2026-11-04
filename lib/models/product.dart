@@ -188,13 +188,13 @@ class Product {
           0,
       likes: (json['likes'] as num?)?.toInt() ?? 0,
       rating: (json['rating'] as num?)?.toDouble(),
-      isActive: statusSlug == 'active',
+      isActive: statusSlug == 'available' || statusSlug == 'active',
       createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ??
           DateTime.now(),
       updatedAt: DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
           DateTime.now(),
       isSold: statusSlug == 'sold',
-      isDeleted: statusSlug == 'deleted',
+      isDeleted: statusSlug == 'hidden' || statusSlug == 'deleted',
       sellerName: sellerData?['display_name'] as String? ??
           json['seller_name'] as String?,
       sellerAvatar: sellerData?['avatar_url'] as String? ??
