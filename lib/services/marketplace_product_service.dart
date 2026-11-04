@@ -382,13 +382,27 @@ class MarketplaceProductService {
 
   Future<void> updateProductDetails(Product product) async {
     await _requireOwnerMembership();
-    await _client.from('products').update({
-      'title_ar': product.title,
-      'title_en': product.title,
-      'description_ar': product.description,
-      'description_en': product.description,
-      'price': product.price,
-    }).eq('id', product.id);
+    final current = await _client
+        .from('products')
+        .select('category_id,condition_id,color_id,size_id,brand_name,weight_kg,audience')
+        .eq('id', product.id)
+        .single();
+
+    await _client.rpc('edit_product', params: {
+      'p_product_id': product.id,
+      'p_category_id': product.categoryId ?? current['category_id'],
+      'p_title_ar': product.title,
+      'p_title_en': product.title,
+      'p_description_ar': product.description,
+      'p_description_en': product.description,
+      'p_price': product.price,
+      'p_condition_id': product.conditionId ?? current['condition_id'],
+      'p_color_id': product.colorId ?? current['color_id'],
+      'p_size_id': product.sizeId ?? current['size_id'],
+      'p_brand_name': product.brand ?? current['brand_name'],
+      'p_weight_kg': current['weight_kg'],
+      'p_audience': product.audience,
+    });
   }
 
   Future<void> softDeleteProduct(String productId) =>
