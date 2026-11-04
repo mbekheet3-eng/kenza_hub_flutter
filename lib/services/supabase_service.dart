@@ -424,7 +424,7 @@ class SupabaseService {
   }) async {
     final nameParts = (fullName ?? '')
         .trim()
-        .split(RegExp(r'\\s+'))
+        .split(RegExp(r'\s+'))
         .where((part) => part.isNotEmpty)
         .toList(growable: false);
     final response = await _client.auth.signUp(
