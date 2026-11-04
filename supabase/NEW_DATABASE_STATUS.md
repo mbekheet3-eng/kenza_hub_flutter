@@ -19,7 +19,7 @@ Updated: 2026-11-04
 - Product create/edit/archive, image metadata, audience-aware media storage, AI review status gate, moderation, and daily-deduplicated product views.
 - Favorites, follows, brands, brand follows, Pro Seller-only carts, offers, auctions/bids, Pro Seller-only exchange, reviews, reports, notifications, preferences, referrals, help and policy content.
 - Orders and delivery are separated. Delivery details are not directly selectable by clients; couriers can access details only for active assignments. Exceptional admin access requires a reason and is audited.
-- Delivery-data retention is modeled as seven days after delivery/closure, with legal hold during active disputes.
+- Delivery-data retention is modeled as 60 days after delivery/closure, with legal hold during active disputes.
 - Account-deactivation RPC and Edge Function.
 - `order-create` deliberately returns HTTP 503 (`ORDER_AGREEMENT_FLOW_NOT_READY`); direct order inserts are not granted.
 
@@ -38,15 +38,15 @@ Updated: 2026-11-04
 - Performance advisor: only unused-index informational notices remain; no missing FK indexes.
 
 ## Awaiting approved decisions / integrations
-1. Chat message writes remain closed until the contact-data policy is chosen (reject vs redact).
-2. Delivery-retention purge function exists, but no recurring scheduler is attached until scheduler/backup decisions are approved.
+1. Chat message writes remain closed until the contact-data policy is chosen (reject vs redact). No choice has been silently made.
+2. The delivery-retention purge function exists; the approved retention is 60 days after delivery/closure. No recurring scheduler is attached yet, and backup/restore handling still needs an approved operational design.
 3. Dispute-evidence legal retention duration is not set; evidence remains in a private bucket.
-4. Handling a dispute opened after the seven-day delivery-data window still needs a decision.
+4. Handling a dispute opened after the 60-day delivery-data window still needs a decision.
 5. Whether `seller_profiles.phone` is a public business contact or a private personal number remains undecided; no phone field was added.
 6. The layered architecture ADR remains pending formal approval.
-7. AI image-review state and publication gate are present; external AI provider integration still needs approved provider credentials/configuration.
-8. Detailed leaf subcategories and exact adjacent delivery areas have not been invented; only approved category roots/groups and six named areas are seeded.
-9. Checkout/order creation remains disabled pending buyer/seller agreement and OTP confirmation design.
+7. AI image-review state and publication gate are present; external AI provider integration still needs a selected provider and secure credentials/configuration.
+8. Detailed leaf subcategories and exact adjacent delivery areas remain to be finalized; only approved category roots/groups and six named areas are seeded.
+9. Checkout/order creation remains disabled pending implementation and testing of the buyer/seller agreement and phone OTP flow. Approved auth rule: no OTP at login or on a new device; SMS OTP only at first listing or first purchase when the phone is unverified; verify a changed phone number; no repeated OTP after verification.
 
 ## Not done
 - No user accounts, sellers, products, orders, courier profiles, or other business records were seeded.
