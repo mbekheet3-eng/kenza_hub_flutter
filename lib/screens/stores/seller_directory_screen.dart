@@ -57,7 +57,7 @@ class _SellerDirectoryScreenState extends State<SellerDirectoryScreen> {
             return _DirectoryMessage(
               icon: Icons.storefront_outlined,
               message: widget.agency
-                  ? 'لا توجد محلات معتمدة معروضة حاليًا'
+                  ? 'لا توجد محلات معروضة حاليًا'
                   : 'لا توجد متاجر أونلاين معروضة حاليًا',
               action: 'تحديث',
               onPressed: _refresh,
