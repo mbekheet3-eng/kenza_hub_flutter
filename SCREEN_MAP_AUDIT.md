@@ -6,11 +6,11 @@
 
 ## Confirmed route coverage
 
-The current router registers 24 routes:
+The current router registers 25 routes:
 - Splash, Welcome, Home
 - Login, Sign-up, Forgot Password, Reset Password, Auth callback
 - Product details, Cart, Checkout, Order confirmation, Order tracking, Order history
-- Seller dashboard, Profile, Edit Profile, My Products, About Kenza, Policies, Settings
+- Seller dashboard, Profile, Edit Profile, My Products, About Kenza, Policies, Settings, Dispute Evidence
 - Categories/Browse and Search
 
 Several product-map items are states or components inside a screen rather than separate routes.
@@ -28,7 +28,7 @@ Several product-map items are states or components inside a screen rather than s
 - My Products list, edit/delete actions.
 - Profile, edit profile (including profile photo), Settings, About and Policies.
 - Forgot/reset password.
-- Order history and order tracking presentation.
+- Order history for buyer and seller orders, order tracking presentation, and a dispute-evidence screen for disputed orders. Evidence upload uses the authenticated server function, calculates SHA-256 on the server, and retrieves files through five-minute signed URLs with access-request audit logging.
 - Seller dashboard presentation.
 
 ## Partially implemented / needs completion
@@ -57,13 +57,13 @@ Several product-map items are states or components inside a screen rather than s
 - Pro Seller upgrade application, store setup/profile/products management, employee invitation and permission screens.
 - Buyer/seller agreement screens and order workflow states.
 - Courier delivery proof, buyer receipt confirmation, report-issue and cancellation workflows.
-- Dispute opening, evidence upload, dispute timeline, review and decision-result screens.
+- Dispute opening, dispute timeline, review and decision-result screens. Evidence upload/view is now present from a disputed order; the full dispute lifecycle is still incomplete.
 - Admin dashboard and administration screens for members, listings, orders, disputes/evidence, categories, delivery regions, stores/employees, notifications and audit log.
 - Dedicated admin experience in mobile and the separate web admin interface.
 
 ## Approved navigation mismatch
 
-The Home bottom navigation now has the approved **six** items: Home, Discover, Sell, Chats, My Orders and Account. Favorites belong inside Account. The Chats tab and route are visible, but currently lead to a temporary placeholder; the conversation list and messaging workflow are still not implemented. Cart remains available through its existing route, but is no longer a bottom-navigation item.
+The Home bottom navigation now has the approved **five** items: Home, Discover, Sell, Chats and Account. My Orders is inside Account, alongside account-related actions. Favorites belong inside Account when the dedicated list is implemented. The Chats tab and route are visible, but currently lead to a temporary placeholder; the conversation list and messaging workflow are still not implemented. Cart remains available through its existing route, but is no longer a bottom-navigation item.
 
 ## Authentication bottom sheet change
 
@@ -87,4 +87,4 @@ The sheet retains:
 - No Flutter build, analyzer, emulator or device test was run because the database-first workflow remains in effect and APK/build work is deferred.
 - The bottom sheet needs a real-device check for keyboard resizing, drag behavior, Android back handling and OAuth return.
 - Existing standalone `LoginScreen` and `SignUpScreen` source files remain for compatibility, but the current router and Welcome entry actions now use the shared bottom sheet.
-- The six-item bottom navigation and the missing feature families remain to be implemented after the database workflow is finalized.
+- The five-item bottom navigation and the order-history shortcut inside Account are now implemented in source. The dispute-evidence screen is wired in source but still needs analyzer and device verification.
