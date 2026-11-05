@@ -213,12 +213,22 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // Navigate to order tracking
                   context.push('/order-tracking/${order.id}');
                 },
                 child: const Text('تفاصيل الطلب'),
               ),
             ),
+            if (order.status == OrderStatus.disputed) ...[
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => context.push('/dispute-evidence/${order.id}'),
+                  icon: const Icon(Icons.attach_file),
+                  label: const Text('أدلة النزاع'),
+                ),
+              ),
+            ],
           ],
         ),
       ),
