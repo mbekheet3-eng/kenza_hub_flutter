@@ -197,6 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
               SliverToBoxAdapter(child: _buildCategoryStrip()),
               const SliverToBoxAdapter(child: SizedBox(height: 8)),
               const SliverToBoxAdapter(child: _PromoCarousel()),
+              const SliverToBoxAdapter(child: _StoreSections()),
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -456,6 +457,91 @@ class _CategoryItem extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StoreSections extends StatelessWidget {
+  const _StoreSections();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: _StoreSectionCard(
+              title: 'ركن الوكالة',
+              subtitle: 'محلات فعلية',
+              icon: Icons.storefront_outlined,
+              onTap: () => context.push('/agency-corner'),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _StoreSectionCard(
+              title: 'Online Stores',
+              subtitle: 'متاجر أونلاين',
+              icon: Icons.shopping_bag_outlined,
+              onTap: () => context.push('/online-stores'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StoreSectionCard extends StatelessWidget {
+  const _StoreSectionCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+          child: Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: const Color(0xFFFCEBEC),
+                child: Icon(icon, color: const Color(0xFFC62828)),
+              ),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 3),
+                    Text(subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
