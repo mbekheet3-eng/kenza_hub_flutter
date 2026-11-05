@@ -71,7 +71,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
       final profileId = membership['seller_profile_id'] as String;
       final profile = await _client
           .from('seller_profiles')
-          .select('id,display_name,business_name,bio,avatar_url,business_type,shop_area,show_storefront,cover_image_url,social_links')
+          .select('id,display_name,business_name,bio,avatar_url,business_type,shop_area,show_storefront,social_links')
           .eq('id', profileId)
           .single();
 
@@ -82,6 +82,11 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
               .eq('seller_profile_id', profileId)
               .maybeSingle()
           : null;
+      final mediaRow = await _client
+          .from('seller_store_media')
+          .select('cover_image_url')
+          .eq('seller_profile_id', profileId)
+          .maybeSingle();
       final links = profile['social_links'] is Map
           ? Map<String, dynamic>.from(profile['social_links'] as Map)
           : <String, dynamic>{};
@@ -97,7 +102,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
         _isOwner = membership['member_role'] == 'owner';
         _area.text = profile['shop_area'] as String? ?? '';
         _address.text = addressRow?['address_line'] as String? ?? '';
-        _cover.text = profile['cover_image_url'] as String? ?? '';
+        _cover.text = mediaRow?['cover_image_url'] as String? ?? '';
         _facebook.text = links['facebook'] as String? ?? '';
         _instagram.text = links['instagram'] as String? ?? '';
         _website.text = links['website'] as String? ?? '';
@@ -217,7 +222,6 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
         'business_name': _businessName.text.trim().isEmpty ? null : _businessName.text.trim(),
         'bio': _bio.text.trim().isEmpty ? null : _bio.text.trim(),
         'avatar_url': avatar,
-        'cover_image_url': cover,
         'social_links': links,
         if (_agency) ...{
           'shop_area': _area.text.trim().isEmpty ? null : _area.text.trim(),
@@ -249,6 +253,18 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
           .from('seller_profiles')
           .update(update)
           .eq('id', _profileId!);
+
+      if (cover == null) {
+        await _client
+            .from('seller_store_media')
+            .delete()
+            .eq('seller_profile_id', _profileId!);
+      } else {
+        await _client.from('seller_store_media').upsert({
+          'seller_profile_id': _profileId,
+          'cover_image_url': cover,
+        }, onConflict: 'seller_profile_id');
+      }
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
