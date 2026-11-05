@@ -220,12 +220,17 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
 
       if (_agency) {
         final address = _address.text.trim();
-        if (address.isEmpty) {
+        if (address.isEmpty && !_showStorefront) {
+          // Turn off public disclosure before removing the address row.
+          await _client
+              .from('seller_profiles')
+              .update({'show_storefront': false})
+              .eq('id', _profileId!);
           await _client
               .from('seller_shop_addresses')
               .delete()
               .eq('seller_profile_id', _profileId!);
-        } else {
+        } else if (address.isNotEmpty) {
           await _client.from('seller_shop_addresses').upsert({
             'seller_profile_id': _profileId,
             'address_line': address,
