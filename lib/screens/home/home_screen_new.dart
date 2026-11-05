@@ -209,7 +209,6 @@ class _HomeScreenState extends State<HomeScreen> {
               SliverToBoxAdapter(child: _buildCategoryStrip()),
               const SliverToBoxAdapter(child: SizedBox(height: 8)),
               const SliverToBoxAdapter(child: _PromoCarousel()),
-              const SliverToBoxAdapter(child: _StoreSections()),
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -475,91 +474,6 @@ class _CategoryItem extends StatelessWidget {
   }
 }
 
-class _StoreSections extends StatelessWidget {
-  const _StoreSections();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 4),
-      child: Row(
-        children: [
-          Expanded(
-            child: _StoreSectionCard(
-              title: 'ركن الوكالة',
-              subtitle: 'محلات فعلية',
-              icon: Icons.storefront_outlined,
-              onTap: () => context.push('/agency-corner'),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: _StoreSectionCard(
-              title: 'Online Stores',
-              subtitle: 'متاجر أونلاين',
-              icon: Icons.shopping_bag_outlined,
-              onTap: () => context.push('/online-stores'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StoreSectionCard extends StatelessWidget {
-  const _StoreSectionCard({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.onTap,
-  });
-
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.zero,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-          child: Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: const Color(0xFFFCEBEC),
-                child: Icon(icon, color: const Color(0xFFC62828)),
-              ),
-              const SizedBox(width: 9),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 3),
-                    Text(subtitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 11, color: Colors.black54)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _PromoCarousel extends StatefulWidget {
   const _PromoCarousel();
 
@@ -602,6 +516,22 @@ class _PromoCarouselState extends State<_PromoCarousel> {
       background: Color(0xFFF4EEE3),
       accent: Color(0xFFC62828),
     ),
+    _PromoData(
+      title: 'ركن الوكالة',
+      subtitle: 'محلات فعلية وأسواق وكالة البلح',
+      icon: Icons.storefront_outlined,
+      background: Color(0xFFF4EEE3),
+      accent: Color(0xFF9A5B2A),
+      route: '/agency-corner',
+    ),
+    _PromoData(
+      title: 'Social Corner',
+      subtitle: 'متاجر وصفحات البيع أونلاين',
+      icon: Icons.shopping_bag_outlined,
+      background: Color(0xFFE8EEF8),
+      accent: Color(0xFF5367A5),
+      route: '/online-stores',
+    ),
   ];
 
   @override
@@ -638,11 +568,13 @@ class _PromoCarouselState extends State<_PromoCarousel> {
             itemBuilder: (context, index) {
               final promo = _promos[index];
               return GestureDetector(
-                onTap: promo.categoryId == null
-                    ? null
-                    : () => context.push(
-                          '/search?categoryId=${Uri.encodeQueryComponent(promo.categoryId!)}',
-                        ),
+                onTap: promo.route != null
+                    ? () => context.push(promo.route!)
+                    : promo.categoryId != null
+                        ? () => context.push(
+                              '/search?categoryId=${Uri.encodeQueryComponent(promo.categoryId!)}',
+                            )
+                        : null,
                 child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 14),
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
@@ -731,6 +663,7 @@ class _PromoData {
     required this.background,
     required this.accent,
     this.categoryId,
+    this.route,
   });
 
   final String title;
@@ -739,6 +672,7 @@ class _PromoData {
   final Color background;
   final Color accent;
   final String? categoryId;
+  final String? route;
 }
 
 class _HomeProductCard extends StatelessWidget {
