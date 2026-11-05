@@ -35,14 +35,6 @@ class SellerDirectoryService {
     return row == null ? null : Map<String, dynamic>.from(row);
   }
 
-  Future<String?> loadPublicAgencyAddress(String sellerProfileId) async {
-    final result = await _client.rpc(
-      'get_public_agency_shop_address',
-      params: {'p_seller_profile_id': sellerProfileId},
-    );
-    return result as String?;
-  }
-
   Future<List<Product>> loadStoreProducts(String sellerProfileId) {
     return _products.fetchProductsForStore(sellerProfileId);
   }
