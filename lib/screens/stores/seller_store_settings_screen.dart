@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SellerStoreSettingsScreen extends StatefulWidget {
@@ -10,6 +11,7 @@ class SellerStoreSettingsScreen extends StatefulWidget {
 
 class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
   final _client = Supabase.instance.client;
+  final _imagePicker = ImagePicker();
   final _displayName = TextEditingController();
   final _businessName = TextEditingController();
   final _bio = TextEditingController();
@@ -24,6 +26,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
 
   bool _loading = true;
   bool _saving = false;
+  bool _uploadingImage = false;
   bool _showStorefront = false;
   bool _isOwner = false;
   bool _agency = false;
@@ -108,6 +111,57 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
         _error = error.toString();
         _loading = false;
       });
+    }
+  }
+
+  Future<void> _pickStoreImage({required bool cover}) async {
+    if (!_isOwner || _profileId == null || _uploadingImage) return;
+    try {
+      final image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85,
+        maxWidth: 1600,
+      );
+      if (image == null) return;
+
+      setState(() => _uploadingImage = true);
+      var extension = image.path.split('.').last.toLowerCase();
+      if (!const ['jpg', 'jpeg', 'png', 'webp'].contains(extension)) {
+        extension = 'jpg';
+      }
+      final mimeType = extension == 'png'
+          ? 'image/png'
+          : extension == 'webp'
+              ? 'image/webp'
+              : 'image/jpeg';
+      final fileName =
+          '${cover ? 'cover' : 'logo'}_${DateTime.now().millisecondsSinceEpoch}.$extension';
+      final objectPath = '$_profileId/$fileName';
+      await _client.storage.from('seller-store-media').uploadBinary(
+            objectPath,
+            await image.readAsBytes(),
+            fileOptions: FileOptions(contentType: mimeType),
+          );
+      final publicUrl =
+          _client.storage.from('seller-store-media').getPublicUrl(objectPath);
+      if (!mounted) return;
+      setState(() {
+        if (cover) {
+          _cover.text = publicUrl;
+        } else {
+          _avatar.text = publicUrl;
+        }
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تم رفع الصورة، احفظ البيانات لتثبيتها في صفحة المتجر')),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('تعذر رفع الصورة: $error')),
+      );
+    } finally {
+      if (mounted) setState(() => _uploadingImage = false);
     }
   }
 
@@ -248,6 +302,13 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
             ),
           ),
           _field(_avatar, 'رابط صورة الشعار أو صورة المتجر', hint: 'https://...'),
+          OutlinedButton.icon(
+            onPressed: _isOwner && !_saving && !_uploadingImage
+                ? () => _pickStoreImage(cover: false)
+                : null,
+            icon: const Icon(Icons.upload_outlined),
+            label: const Text('اختيار صورة الشعار من الجهاز'),
+          ),
           if (_agency) ...[
             _field(_area, 'المنطقة أو الحي', hint: 'مثال: وكالة البلح - بولاق'),
             _field(_address, 'عنوان المحل', hint: 'العنوان الفعلي للمحل'),
@@ -262,6 +323,13 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
             const Text('لا نطلب عنوان محل من المتاجر الأونلاين.'),
           const SizedBox(height: 8),
           _field(_cover, 'رابط صورة الغلاف', hint: 'https://...'),
+          OutlinedButton.icon(
+            onPressed: _isOwner && !_saving && !_uploadingImage
+                ? () => _pickStoreImage(cover: true)
+                : null,
+            icon: const Icon(Icons.upload_outlined),
+            label: const Text('اختيار صورة الغلاف من الجهاز'),
+          ),
           const SizedBox(height: 8),
           Text('روابط التواصل الاختيارية',
               style: Theme.of(context).textTheme.titleMedium),
@@ -272,7 +340,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
           _field(_whatsapp, 'رابط WhatsApp', hint: 'https://wa.me/...'),
           const SizedBox(height: 20),
           ElevatedButton.icon(
-            onPressed: _isOwner && !_saving ? _save : null,
+            onPressed: _isOwner && !_saving && !_uploadingImage ? _save : null,
             icon: _saving
                 ? const SizedBox(width: 18, height: 18,
                     child: CircularProgressIndicator(strokeWidth: 2))
