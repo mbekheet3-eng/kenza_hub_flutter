@@ -31,10 +31,10 @@ class _SellerDirectoryScreenState extends State<SellerDirectoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.agency ? 'ركن الوكالة' : 'Online Stores';
+    final title = widget.agency ? 'Wekala Corner' : 'Social Corner';
     final subtitle = widget.agency
-        ? 'محلات فعلية لها عناوين على أرض الواقع'
-        : 'متاجر وصفحات البيع أونلاين';
+        ? 'محلات فعلية في وكالة البلح'
+        : 'متاجر وصفحات البيع على السوشيال ميديا';
 
     return Scaffold(
       appBar: AppBar(title: Text(title)),
