@@ -72,41 +72,38 @@ class _StepDetailsState extends State<StepDetails> {
   Widget build(BuildContext context) {
     final isHomeCategory = widget.skipVariantFields;
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Condition
-          Text(
-            'حالة المنتج',
-            style: Theme.of(context).textTheme.titleMedium,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'حالة المنتج',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        _buildConditionOptions(),
+        if (!isHomeCategory)
+          ExpansionTile(
+            tilePadding: EdgeInsets.zero,
+            title: const Text('اللون والمقاس (اختياري)'),
+            children: [
+              Align(
+                alignment: Alignment.centerRight,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('اللون'),
+                    const SizedBox(height: 8),
+                    _buildColorOptions(),
+                    const SizedBox(height: 16),
+                    const Text('المقاس'),
+                    const SizedBox(height: 8),
+                    _buildSizeOptions(),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          _buildConditionOptions(),
-          const SizedBox(height: 16),
-
-          // Color (if not home category)
-          if (!isHomeCategory) ...[
-            Text(
-              'اللون',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            _buildColorOptions(),
-            const SizedBox(height: 16),
-          ],
-
-          // Size (if not home category)
-          if (!isHomeCategory) ...[
-            Text(
-              'المقاس',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            _buildSizeOptions(),
-          ],
-        ],
-      ),
+      ],
     );
   }
 
