@@ -225,7 +225,7 @@ class _StepDetailsState extends State<StepDetails> {
     final categoryColors = {
       'clothes': AppTheme.primaryColor,
       'shoes': AppTheme.secondaryColor,
-      'kids': AppTheme.accentColor,
+      'kids-supplies': AppTheme.accentColor,
     };
     final categoryColor =
         categoryColors[widget.category] ?? AppTheme.primaryColor;

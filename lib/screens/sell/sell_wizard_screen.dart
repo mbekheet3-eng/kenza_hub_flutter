@@ -147,7 +147,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
       }
       if (!mounted || requestId != _categoryRulesRequestId) return;
       setState(() {
-        _skipVariantFields = rootSlug == 'kids' || rootSlug == 'home';
+        _skipVariantFields = rootSlug == 'kids-supplies' || rootSlug == 'home-supplies';
         _categoryRulesResolved = true;
         _isResolvingCategoryRules = false;
       });

@@ -27,7 +27,7 @@ class MarketplaceProductService {
     color:product_colors!products_color_id_fkey(name_ar,name_en,hex_code),
     size:product_sizes!products_size_id_fkey(name_ar,name_en,size_group),
     status:product_statuses!products_status_id_fkey(name_ar,name_en,slug),
-    seller:seller_profiles!products_seller_id_fkey(owner_user_id,display_name,avatar_url,seller_type),
+    seller:seller_profiles!products_seller_id_fkey(display_name,avatar_url,seller_type),
     images:product_images!product_images_product_id_fkey(image_path,storage_bucket,display_order,created_at)
   ''';
 
@@ -149,17 +149,6 @@ class MarketplaceProductService {
       }
       sellerProfileId = membership['seller_profile_id'] as String?;
     } else {
-      final existingProfile = await _client
-          .from('seller_profiles')
-          .select('id')
-          .eq('owner_user_id', userId)
-          .maybeSingle();
-      if (existingProfile != null) {
-        throw StateError(
-          'يوجد ملف متجر لهذا الحساب دون عضوية مالك سليمة؛ يلزم فحصه قبل النشر.',
-        );
-      }
-
       final username = (userProfile['username'] as String?)?.trim() ?? '';
       final fullName = [
         (userProfile['first_name'] as String?)?.trim() ?? '',
@@ -307,14 +296,9 @@ class MarketplaceProductService {
     String sellerProfileId, {
     int limit = 60,
   }) async {
-    // Public store pages must never request seller_profiles.owner_user_id.
-    final publicSelect = _productSelect.replaceFirst(
-      'seller:seller_profiles!products_seller_id_fkey(owner_user_id,display_name,avatar_url,seller_type)',
-      'seller:seller_profiles!products_seller_id_fkey(display_name,avatar_url,seller_type)',
-    );
     final rows = await _client
         .from('products')
-        .select(publicSelect)
+        .select(_productSelect)
         .eq('seller_id', sellerProfileId)
         .eq('status.slug', 'available')
         .order('created_at', ascending: false)
@@ -386,18 +370,8 @@ class MarketplaceProductService {
     }
 
     String? sellerProfileId;
-    if (membershipRows.isNotEmpty) {
-      sellerProfileId = membershipRows.single['seller_profile_id'] as String?;
-    } else {
-      final ownedProfile = await _client
-          .from('seller_profiles')
-          .select('id')
-          .eq('owner_user_id', userId)
-          .eq('is_active', true)
-          .maybeSingle();
-      sellerProfileId = ownedProfile?['id'] as String?;
-    }
-
+    if (membershipRows.isEmpty) return const [];
+    sellerProfileId = membershipRows.single['seller_profile_id'] as String?;
     if (sellerProfileId == null) return const [];
 
     final rows = await _client
@@ -407,9 +381,8 @@ class MarketplaceProductService {
         .order('created_at', ascending: false)
         .limit(limit);
 
-    return (rows as List)
-        .map((row) => Product.fromJson(Map<String, dynamic>.from(row as Map)))
-        .toList(growable: false);
+    return await Future.wait((rows as List).map((row) =>
+        _parseProductRow(Map<String, dynamic>.from(row as Map))));
   }
 
   Future<void> _requireOwnerMembership() async {

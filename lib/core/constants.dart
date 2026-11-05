@@ -44,20 +44,20 @@ abstract class AppConstants {
 
 // Category Constants
 abstract class CategoryConstants {
-  static const List<String> categories = ['clothes', 'shoes', 'kids', 'home'];
+  static const List<String> categories = ['clothes', 'shoes', 'kids-supplies', 'home-supplies'];
   
   static const Map<String, String> categoryLabels = {
     'clothes': 'ملابس',
     'shoes': 'أحذية',
-    'kids': 'مستلزمات أطفال',
-    'home': 'مستلزمات المنزل',
+    'kids-supplies': 'مستلزمات أطفال',
+    'home-supplies': 'مستلزمات المنزل',
   };
 
   static const Map<String, bool> categorySkipFields = {
     'clothes': false,
     'shoes': false,
-    'kids': true,
-    'home': true,
+    'kids-supplies': true,
+    'home-supplies': true,
   };
 }
 

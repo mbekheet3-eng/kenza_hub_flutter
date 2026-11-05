@@ -85,9 +85,9 @@ class _StepCategoryState extends State<StepCategory> {
         return Icons.checkroom_outlined;
       case 'shoes':
         return Icons.shopping_bag_outlined;
-      case 'kids':
+      case 'kids-supplies':
         return Icons.child_care_outlined;
-      case 'home':
+      case 'home-supplies':
         return Icons.home_outlined;
       default:
         return Icons.category_outlined;

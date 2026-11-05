@@ -345,13 +345,13 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildCategoryFilter() {
-    final categories = ['all', 'clothes', 'shoes', 'kids', 'home'];
+    final categories = ['all', 'clothes', 'shoes', 'kids-supplies', 'home-supplies'];
     final categoryLabels = {
       'all': 'الكل',
       'clothes': 'ملابس',
       'shoes': 'أحذية',
-      'kids': 'مستلزمات أطفال',
-      'home': 'مستلزمات المنزل',
+      'kids-supplies': 'مستلزمات أطفال',
+      'home-supplies': 'مستلزمات المنزل',
     };
 
     return SingleChildScrollView(

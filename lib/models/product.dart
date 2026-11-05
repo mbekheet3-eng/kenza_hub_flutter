@@ -76,7 +76,7 @@ class Product {
   });
 
   // Check if category is "home" (furniture & home items)
-  bool get isHomeCategory => category.toLowerCase() == 'home';
+  bool get isHomeCategory => category.toLowerCase() == 'home-supplies';
 
   // Get primary image
   String get primaryImage => imageUrls.isNotEmpty ? imageUrls[0] : '';
@@ -373,13 +373,13 @@ const List<String> conditionOptions = [
 const Map<String, String> categoryTranslations = {
   'clothes': 'ملابس',
   'shoes': 'أحذية',
-  'kids': 'مستلزمات أطفال',
-  'home': 'مستلزمات المنزل',
+  'kids-supplies': 'مستلزمات أطفال',
+  'home-supplies': 'مستلزمات المنزل',
 };
 
 const Map<String, bool> categorySkipFields = {
   'clothes': false,
   'shoes': false,
-  'kids': true,
-  'home': true, // Skip size, color, brand for home category
+  'kids-supplies': true,
+  'home-supplies': true, // Skip size, color, brand for home category
 };
