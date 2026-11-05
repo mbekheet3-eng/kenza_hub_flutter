@@ -37,11 +37,7 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
     );
     if (profile == null) throw StateError('المتجر غير متاح');
     final products = await _service.loadStoreProducts(widget.sellerProfileId);
-    String? address;
-    if (widget.agency && profile['show_storefront'] == true) {
-      address = await _service.loadPublicAgencyAddress(widget.sellerProfileId);
-    }
-    return _StorePageData(profile: profile, products: products, address: address);
+    return _StorePageData(profile: profile, products: products);
   }
 
   Future<void> _refresh() async {
@@ -83,6 +79,7 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
           final name = (profile['business_name'] ?? profile['display_name'] ?? 'متجر')
               .toString();
           final cover = profile['cover_image_url'] as String?;
+          final canShowCover = !widget.agency || profile['show_storefront'] == true;
           final avatar = profile['avatar_url'] as String?;
           final links = profile['social_links'] is Map
               ? Map<String, dynamic>.from(profile['social_links'] as Map)
@@ -96,7 +93,7 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (cover != null && cover.isNotEmpty)
+                      if (canShowCover && cover != null && cover.isNotEmpty)
                         CachedNetworkImage(
                           imageUrl: cover,
                           height: 180,
@@ -153,9 +150,6 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
                       if (widget.agency && (profile['shop_area'] as String?)?.isNotEmpty == true)
                         _InfoLine(icon: Icons.location_on_outlined,
                             text: 'المنطقة: ${profile['shop_area']}'),
-                      if (widget.agency && data.address != null)
-                        _InfoLine(icon: Icons.store_mall_directory_outlined,
-                            text: data.address!),
                       if (links.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
@@ -237,12 +231,10 @@ class _StorePageData {
   const _StorePageData({
     required this.profile,
     required this.products,
-    required this.address,
   });
 
   final Map<String, dynamic> profile;
   final List<Product> products;
-  final String? address;
 }
 
 class _InfoLine extends StatelessWidget {
