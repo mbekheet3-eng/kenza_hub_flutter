@@ -98,12 +98,12 @@ class AppLocalizations {
   String get welcomeTitle {
     switch (locale.languageCode) {
       case 'en':
-        return 'Join us and sell\\nwith no fees';
+        return 'Join us and sell\nwith no fees';
       case 'fr':
-        return 'Rejoignez-nous et vendez\\nsans frais';
+        return 'Rejoignez-nous et vendez\nsans frais';
       case 'ar':
       default:
-        return 'لو مش محتاجها...\\nغيرك محتاجها';
+        return 'لو مش محتاجها...\nغيرك محتاجها';
     }
   }
 
