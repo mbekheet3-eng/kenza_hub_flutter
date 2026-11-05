@@ -127,8 +127,11 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
 
           final profile = data.profile;
           final sellerType = profile['seller_type'] as String?;
+          final businessType = profile['business_type'] as String?;
           final request = data.latestUpgradeRequest;
           final isOwner = data.memberRole == 'owner';
+          final isAgency = businessType == 'agency';
+          final isOnlineStore = businessType == 'online_store';
 
           return RefreshIndicator(
             onRefresh: _refresh,
@@ -177,6 +180,43 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                     ),
                   ),
                 ),
+                if (isAgency || isOnlineStore) ...[
+                  const SizedBox(height: 12),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isAgency ? 'ركن الوكالة' : 'Online Store',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            isAgency
+                                ? 'أضف منطقة المحل وعنوانه، واختَر إذا كنت تريد إظهار واجهته للزوار.'
+                                : 'أكمل هوية متجرك وروابط صفحات التواصل الخاصة بك.',
+                          ),
+                          const SizedBox(height: 12),
+                          if (isOwner)
+                            OutlinedButton.icon(
+                              onPressed: () => context.push('/seller-store-settings'),
+                              icon: const Icon(Icons.edit_outlined),
+                              label: const Text('إعدادات واجهة المتجر'),
+                            ),
+                          OutlinedButton.icon(
+                            onPressed: () => context.push(
+                              '/store/${profile['id']}?type=${isAgency ? 'agency' : 'online_store'}',
+                            ),
+                            icon: const Icon(Icons.open_in_new),
+                            label: const Text('معاينة صفحة المتجر'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 12),
                 Row(
                   children: [
