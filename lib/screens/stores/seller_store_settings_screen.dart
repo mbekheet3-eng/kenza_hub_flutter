@@ -180,7 +180,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
     if (!_isOwner || _profileId == null) return;
     if (_agency && _showStorefront && _address.text.trim().length < 5) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('اكتب عنوان المحل قبل إظهار واجهته للعامة')),
+        const SnackBar(content: Text('أدخل عنوان المحل الفعلي لتفعيل عرض واجهته')),
       );
       return;
     }
@@ -323,18 +323,18 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
               value: _showStorefront,
               onChanged: _isOwner ? (value) => setState(() => _showStorefront = value) : null,
               title: const Text('إظهار واجهة المحل'),
-              subtitle: const Text('عند التفعيل سيظهر عنوان المحل للزوار. عند الإيقاف يظل العنوان خاصًا.'),
+              subtitle: const Text('عند التفعيل تظهر صورة واجهة المحل للزوار. عنوان المحل الكامل يظل خاصًا في كل الأحوال.'),
             ),
           ] else
             const Text('لا نطلب عنوان محل من المتاجر الأونلاين.'),
           const SizedBox(height: 8),
-          _field(_cover, 'رابط صورة الغلاف', hint: 'https://...'),
+          _field(_cover, _agency ? 'رابط صورة واجهة المحل' : 'رابط صورة غلاف المتجر', hint: 'https://...'),
           OutlinedButton.icon(
             onPressed: _isOwner && !_saving && !_uploadingImage
                 ? () => _pickStoreImage(cover: true)
                 : null,
             icon: const Icon(Icons.upload_outlined),
-            label: const Text('اختيار صورة الغلاف من الجهاز'),
+            label: Text(_agency ? 'اختيار صورة واجهة المحل' : 'اختيار صورة الغلاف'),
           ),
           const SizedBox(height: 8),
           Text('روابط التواصل الاختيارية',
