@@ -302,6 +302,23 @@ class MarketplaceProductService {
     });
   }
 
+  /// Loads the public, available listings belonging to one store profile.
+  Future<List<Product>> fetchProductsForStore(
+    String sellerProfileId, {
+    int limit = 60,
+  }) async {
+    final rows = await _client
+        .from('products')
+        .select(_productSelect)
+        .eq('seller_id', sellerProfileId)
+        .eq('status.slug', 'available')
+        .order('created_at', ascending: false)
+        .limit(limit);
+
+    return await Future.wait((rows as List).map((row) =>
+        _parseProductRow(Map<String, dynamic>.from(row as Map))));
+  }
+
   Future<List<Product>> fetchActiveProducts({int limit = 40}) async {
     final rows = await _client
         .from('products')
