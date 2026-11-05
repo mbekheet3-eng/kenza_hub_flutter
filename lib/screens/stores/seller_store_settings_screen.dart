@@ -75,14 +75,15 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
           .eq('id', profileId)
           .single();
 
-      final addressRow = profile['business_type'] == 'agency'
+      final isOwner = membership['member_role'] == 'owner';
+      final addressRow = profile['business_type'] == 'agency' && isOwner
           ? await _client
               .from('seller_shop_addresses')
               .select('address_line')
               .eq('seller_profile_id', profileId)
               .maybeSingle()
           : null;
-      final canReadMedia = membership['member_role'] == 'owner' ||
+      final canReadMedia = isOwner ||
           profile['business_type'] == 'online_store' ||
           profile['show_storefront'] == true;
       final mediaRow = canReadMedia
@@ -104,7 +105,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
         _bio.text = profile['bio'] as String? ?? '';
         _avatar.text = profile['avatar_url'] as String? ?? '';
         _agency = profile['business_type'] == 'agency';
-        _isOwner = membership['member_role'] == 'owner';
+        _isOwner = isOwner;
         _area.text = profile['shop_area'] as String? ?? '';
         _address.text = addressRow?['address_line'] as String? ?? '';
         _cover.text = mediaRow?['cover_image_url'] as String? ?? '';
