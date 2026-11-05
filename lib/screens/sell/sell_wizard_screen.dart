@@ -648,7 +648,8 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         child: Stepper(
           currentStep: _currentStep,
           onStepTapped: (step) {
-            if (step < _currentStep || _canContinue()) {
+            if (step <= _currentStep ||
+                (step == _currentStep + 1 && _canContinue())) {
               setState(() => _currentStep = step);
             }
           },
