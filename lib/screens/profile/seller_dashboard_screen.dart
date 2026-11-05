@@ -132,6 +132,8 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
           final isOwner = data.memberRole == 'owner';
           final isAgency = businessType == 'agency';
           final isOnlineStore = businessType == 'online_store';
+          final storeId = profile['id'].toString();
+          final storeType = isAgency ? 'agency' : 'online_store';
 
           return RefreshIndicator(
             onRefresh: _refresh,
@@ -207,7 +209,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                             ),
                           OutlinedButton.icon(
                             onPressed: () => context.push(
-                              '/store/${profile['id']}?type=${isAgency ? 'agency' : 'online_store'}',
+                              '/store/$storeId?type=$storeType',
                             ),
                             icon: const Icon(Icons.open_in_new),
                             label: const Text('معاينة صفحة المتجر'),
