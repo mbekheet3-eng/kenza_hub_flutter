@@ -752,8 +752,8 @@ class _StepDescriptionAndTitleState extends State<StepDescriptionAndTitle> {
         TextField(
           controller: _descriptionController,
           decoration: const InputDecoration(
-            labelText: 'وصف المنتج',
-            hintText: 'صف المنتج بالتفصيل',
+            labelText: 'وصف المنتج (اختياري)',
+            hintText: 'أضف تفاصيل لو حابب، أو اتركه فارغًا',
           ),
           maxLines: 4,
           onChanged: (_) => _onChanged(),
