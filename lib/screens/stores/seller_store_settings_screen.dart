@@ -134,8 +134,9 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
           : extension == 'webp'
               ? 'image/webp'
               : 'image/jpeg';
+      final imageKind = cover ? 'cover' : 'logo';
       final fileName =
-          '${cover ? 'cover' : 'logo'}_${DateTime.now().millisecondsSinceEpoch}.$extension';
+          "${imageKind}_${DateTime.now().millisecondsSinceEpoch}.$extension";
       final objectPath = '$_profileId/$fileName';
       await _client.storage.from('seller-store-media').uploadBinary(
             objectPath,
