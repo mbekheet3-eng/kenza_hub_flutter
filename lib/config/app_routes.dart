@@ -25,6 +25,9 @@ import '../screens/search/search_screen.dart';
 import '../screens/categories/categories_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/sell/sell_wizard_screen.dart';
+import '../screens/stores/seller_directory_screen.dart';
+import '../screens/stores/seller_store_screen.dart';
+import '../screens/stores/seller_store_settings_screen.dart';
 
 // GoRouter configuration
 final goRouter = GoRouter(
@@ -50,6 +53,7 @@ final goRouter = GoRouter(
       '/my-products',
       '/settings',
       '/sell-wizard',
+      '/seller-store-settings',
     };
     final requiresAuthentication = protectedPaths.contains(currentPath) ||
         currentPath.startsWith('/order-confirmation/') ||
@@ -149,6 +153,25 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/seller-dashboard',
       builder: (context, state) => const SellerDashboardScreen(),
+    ),
+    GoRoute(
+      path: '/agency-corner',
+      builder: (context, state) => const SellerDirectoryScreen(agency: true),
+    ),
+    GoRoute(
+      path: '/online-stores',
+      builder: (context, state) => const SellerDirectoryScreen(agency: false),
+    ),
+    GoRoute(
+      path: '/store/:id',
+      builder: (context, state) => SellerStoreScreen(
+        sellerProfileId: state.pathParameters['id'] ?? '',
+        agency: state.uri.queryParameters['type'] == 'agency',
+      ),
+    ),
+    GoRoute(
+      path: '/seller-store-settings',
+      builder: (context, state) => const SellerStoreSettingsScreen(),
     ),
     GoRoute(
       path: '/about-kenza',
