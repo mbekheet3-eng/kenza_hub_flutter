@@ -76,13 +76,15 @@ class _SellerDirectoryScreenState extends State<SellerDirectoryScreen> {
                       ),
                 ),
                 const SizedBox(height: 14),
-                ...stores.map((store) => _StoreDirectoryCard(
-                      store: store,
-                      agency: widget.agency,
-                      onTap: () => context.push(
-                        '/store/${store['id']}?type=${widget.agency ? 'agency' : 'online_store'}',
-                      ),
-                    )),
+                ...stores.map((store) {
+                  final storeId = store['id'].toString();
+                  final storeType = widget.agency ? 'agency' : 'online_store';
+                  return _StoreDirectoryCard(
+                    store: store,
+                    agency: widget.agency,
+                    onTap: () => context.push('/store/$storeId?type=$storeType'),
+                  );
+                }),
               ],
             ),
           );
