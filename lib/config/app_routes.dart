@@ -14,6 +14,7 @@ import '../screens/checkout/checkout_screen.dart';
 import '../screens/checkout/order_confirmation_screen.dart';
 import '../screens/orders/order_tracking_screen.dart';
 import '../screens/orders/order_history_screen.dart';
+import '../screens/orders/dispute_evidence_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/profile/seller_dashboard_screen.dart';
 import '../screens/profile/about_kenza_screen.dart';
@@ -42,6 +43,7 @@ final goRouter = GoRouter(
       '/cart',
       '/checkout',
       '/orders',
+      '/dispute-evidence',
       '/seller-dashboard',
       '/profile',
       '/edit-profile',
@@ -136,6 +138,12 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/orders',
       builder: (context, state) => const OrderHistoryScreen(),
+    ),
+    GoRoute(
+      path: '/dispute-evidence/:orderId',
+      builder: (context, state) => DisputeEvidenceScreen(
+        orderId: state.pathParameters['orderId'] ?? '',
+      ),
     ),
     GoRoute(
       path: '/seller-dashboard',
