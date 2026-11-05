@@ -68,18 +68,25 @@ class WelcomeScreen extends StatelessWidget {
                           Text(
                             strings.welcomeTitle,
                             textAlign: TextAlign.center,
+                            textDirection: strings.isArabic
+                                ? TextDirection.rtl
+                                : TextDirection.ltr,
                             style: TextStyle(
                               fontSize: isSmallScreen ? 23 : 27,
                               fontWeight: FontWeight.w800,
                               color: const Color(0xFF0F172A),
                               height: 1.3,
-                              letterSpacing: -0.3,
+                              letterSpacing: 0,
+
                             ),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             strings.welcomeSubtitle,
                             textAlign: TextAlign.center,
+                            textDirection: strings.isArabic
+                                ? TextDirection.rtl
+                                : TextDirection.ltr,
                             style: TextStyle(
                               fontSize: isSmallScreen ? 14 : 15,
                               color: const Color(0xFF64748B),
