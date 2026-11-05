@@ -98,6 +98,11 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
                 initialTitle: _title,
                 initialDescription: _description,
               ),
+              const SizedBox(height: 20),
+              StepPrice(
+                onPriceChanged: _onPriceChanged,
+                initialPrice: _price,
+              ),
             ] else
               const Text('اختر القسم أولاً لعرض بيانات المنتج.'),
           ],
@@ -105,18 +110,8 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         isActive: _currentStep >= 1,
       ),
       Step(
-        title: const Text('السعر والمراجعة'),
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            StepPrice(
-              onPriceChanged: _onPriceChanged,
-              initialPrice: _price,
-            ),
-            const SizedBox(height: 20),
-            _buildReviewStep(),
-          ],
-        ),
+        title: const Text('مراجعة ونشر'),
+        content: _buildReviewStep(),
         isActive: _currentStep >= 2,
       ),
     ];
@@ -201,7 +196,8 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
             _categoryRulesResolved &&
             !_isResolvingCategoryRules &&
             _condition != null &&
-            _title.trim().isNotEmpty;
+            _title.trim().isNotEmpty &&
+            _price > 0;
       case 2:
         return _price > 0;
       default:
