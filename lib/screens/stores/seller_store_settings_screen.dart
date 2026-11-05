@@ -10,6 +10,10 @@ class SellerStoreSettingsScreen extends StatefulWidget {
 
 class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
   final _client = Supabase.instance.client;
+  final _displayName = TextEditingController();
+  final _businessName = TextEditingController();
+  final _bio = TextEditingController();
+  final _avatar = TextEditingController();
   final _area = TextEditingController();
   final _address = TextEditingController();
   final _cover = TextEditingController();
@@ -34,6 +38,10 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
 
   @override
   void dispose() {
+    _displayName.dispose();
+    _businessName.dispose();
+    _bio.dispose();
+    _avatar.dispose();
     _area.dispose();
     _address.dispose();
     _cover.dispose();
@@ -60,7 +68,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
       final profileId = membership['seller_profile_id'] as String;
       final profile = await _client
           .from('seller_profiles')
-          .select('id,business_type,shop_area,show_storefront,cover_image_url,social_links')
+          .select('id,display_name,business_name,bio,avatar_url,business_type,shop_area,show_storefront,cover_image_url,social_links')
           .eq('id', profileId)
           .single();
 
@@ -78,6 +86,10 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
       if (!mounted) return;
       setState(() {
         _profileId = profileId;
+        _displayName.text = profile['display_name'] as String? ?? '';
+        _businessName.text = profile['business_name'] as String? ?? '';
+        _bio.text = profile['bio'] as String? ?? '';
+        _avatar.text = profile['avatar_url'] as String? ?? '';
         _agency = profile['business_type'] == 'agency';
         _isOwner = membership['member_role'] == 'owner';
         _area.text = profile['shop_area'] as String? ?? '';
@@ -118,6 +130,12 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
       return;
     }
 
+    if (_displayName.text.trim().length < 3 || _displayName.text.trim().length > 60) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('اسم العرض لازم يكون من 3 إلى 60 حرفًا')),
+      );
+      return;
+    }
     setState(() => _saving = true);
     try {
       final links = <String, String>{};
@@ -130,8 +148,13 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
       if (website != null) links['website'] = website;
       if (whatsapp != null) links['whatsapp'] = whatsapp;
 
+      final avatar = _validatedHttps(_avatar.text, 'صورة المتجر');
       final cover = _validatedHttps(_cover.text, 'صورة الغلاف');
       final update = <String, dynamic>{
+        'display_name': _displayName.text.trim(),
+        'business_name': _businessName.text.trim().isEmpty ? null : _businessName.text.trim(),
+        'bio': _bio.text.trim().isEmpty ? null : _bio.text.trim(),
+        'avatar_url': avatar,
         'cover_image_url': cover,
         'social_links': links,
         if (_agency) ...{
@@ -209,6 +232,22 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 12),
+          _field(_displayName, 'اسم العرض'),
+          _field(_businessName, 'اسم النشاط أو المتجر'),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: TextField(
+              controller: _bio,
+              enabled: _isOwner && !_saving,
+              maxLines: 3,
+              maxLength: 500,
+              decoration: const InputDecoration(
+                labelText: 'نبذة عن المتجر',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+          _field(_avatar, 'رابط صورة الشعار أو صورة المتجر', hint: 'https://...'),
           if (_agency) ...[
             _field(_area, 'المنطقة أو الحي', hint: 'مثال: وكالة البلح - بولاق'),
             _field(_address, 'عنوان المحل', hint: 'العنوان الفعلي للمحل'),
