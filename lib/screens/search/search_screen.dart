@@ -186,6 +186,9 @@ class _SearchScreenState extends State<SearchScreen> {
             // Search Bar
             _buildSearchBar(),
 
+            // Featured dress shortcuts
+            _buildDressQuickFilters(),
+
             // Category Filter
             _buildCategoryFilter(),
 
@@ -285,6 +288,58 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           contentPadding: const EdgeInsets.symmetric(vertical: 12),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDressQuickFilters() {
+    const dressCategories = [
+      ('فساتين', '6731ec75-9d3c-4c2b-be6b-eee1a8a32cef'),
+      ('فساتين سواريه', '73b3408f-a6ec-4225-95f2-e8cc155cc02c'),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Text(
+              'اكتشفي الفساتين',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+            ),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: dressCategories.map((item) {
+                final selected = _selectedCategoryId == item.$2;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: FilterChip(
+                    avatar: const Icon(Icons.checkroom_outlined, size: 18),
+                    label: Text(item.$1),
+                    selected: selected,
+                    onSelected: (value) {
+                      setState(() {
+                        _selectedCategoryId = value ? item.$2 : null;
+                        _selectedCategory = 'all';
+                      });
+                    },
+                    selectedColor: AppTheme.primaryColor.withOpacity(0.18),
+                    side: BorderSide(
+                      color: selected
+                          ? AppTheme.primaryColor
+                          : Colors.grey.withOpacity(0.3),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
       ),
     );
   }
