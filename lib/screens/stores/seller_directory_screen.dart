@@ -112,6 +112,7 @@ class _StoreDirectoryCard extends StatelessWidget {
     final cover = store['cover_image_url'] as String?;
     final avatar = store['avatar_url'] as String?;
     final area = store['shop_area'] as String?;
+    final canShowCover = !agency || store['show_storefront'] == true;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -121,7 +122,7 @@ class _StoreDirectoryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (cover != null && cover.isNotEmpty)
+            if (canShowCover && cover != null && cover.isNotEmpty)
               CachedNetworkImage(
                 imageUrl: cover,
                 height: 132,
