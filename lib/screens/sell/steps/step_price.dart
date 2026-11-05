@@ -5,14 +5,10 @@ import '../../../config/theme.dart';
 class StepPrice extends StatefulWidget {
   final Function(double) onPriceChanged;
   final double initialPrice;
-  final Function(double) onWeightChanged;
-  final double initialWeight;
 
   const StepPrice({
     required this.onPriceChanged,
     required this.initialPrice,
-    required this.onWeightChanged,
-    required this.initialWeight,
   });
 
   @override
@@ -22,7 +18,6 @@ class StepPrice extends StatefulWidget {
 class _StepPriceState extends State<StepPrice> {
   late TextEditingController _priceController;
   late double _currentPrice;
-  late TextEditingController _weightController;
 
   @override
   void initState() {
@@ -31,15 +26,11 @@ class _StepPriceState extends State<StepPrice> {
     _priceController = TextEditingController(
       text: _currentPrice > 0 ? _currentPrice.toString() : '',
     );
-    _weightController = TextEditingController(
-      text: widget.initialWeight > 0 ? widget.initialWeight.toString() : '',
-    );
   }
 
   @override
   void dispose() {
     _priceController.dispose();
-    _weightController.dispose();
     super.dispose();
   }
 
@@ -81,33 +72,6 @@ class _StepPriceState extends State<StepPrice> {
               _updatePrice(
                 parsedPrice != null && parsedPrice.isFinite && parsedPrice > 0
                     ? parsedPrice
-                    : 0,
-              );
-            },
-          ),
-
-          const SizedBox(height: 20),
-          TextField(
-            controller: _weightController,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-            ],
-            decoration: InputDecoration(
-              labelText: 'وزن المنتج بالكيلو (إلزامي)',
-              hintText: 'مثال: 2.5',
-              prefixIcon: const Icon(Icons.scale_outlined),
-              suffixText: 'كجم',
-              helperText: 'الحد الأقصى المسموح به 10 كجم',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            onChanged: (value) {
-              final weight = double.tryParse(value.trim());
-              widget.onWeightChanged(
-                weight != null && weight.isFinite && weight > 0 && weight <= 10
-                    ? weight
                     : 0,
               );
             },
