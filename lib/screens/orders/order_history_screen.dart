@@ -33,10 +33,18 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     if (!force && _loadedUserId == userId && _ordersFuture != null) return;
 
     _loadedUserId = userId;
-    _ordersFuture = _supabaseService.getUserOrders(
-      userId,
-      asBuyer: true,
-    );
+    _ordersFuture = Future.wait([
+      _supabaseService.getUserOrders(userId, asBuyer: true),
+      _supabaseService.getUserOrders(userId, asBuyer: false),
+    ]).then((groups) {
+      final byId = <String, Order>{};
+      for (final order in groups.expand((group) => group)) {
+        byId[order.id] = order;
+      }
+      final combined = byId.values.toList()
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return combined;
+    });
   }
 
   @override
