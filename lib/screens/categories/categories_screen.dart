@@ -341,13 +341,13 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   Widget _buildCornerCard({
     required String title,
-    required String subtitle,
     required IconData icon,
     required Color accent,
     required VoidCallback onTap,
   }) {
+    // Corner destinations use the exact same tile language as categories.
     return Material(
-      color: accent.withOpacity(0.09),
+      color: _card,
       borderRadius: BorderRadius.circular(14),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -357,54 +357,40 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             Positioned(
               top: 13,
               right: 13,
-              left: 10,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: accent,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    subtitle,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Color(0xFF475569),
-                      fontSize: 11,
-                      height: 1.2,
-                    ),
-                  ),
-                ],
+              left: 12,
+              child: Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.start,
+                style: const TextStyle(
+                  color: Color(0xFF20272B),
+                  fontSize: 16,
+                  height: 1.15,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
             Positioned(
               right: 12,
               bottom: 10,
               child: Container(
-                width: 48,
-                height: 48,
+                width: 62,
+                height: 62,
                 decoration: BoxDecoration(
                   color: accent.withOpacity(0.14),
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(17),
                 ),
                 alignment: Alignment.center,
-                child: Icon(icon, size: 29, color: accent),
+                child: Icon(icon, size: 37, color: accent),
               ),
             ),
-            const Positioned(
+            Positioned(
               left: 9,
               bottom: 9,
               child: Icon(
                 Icons.chevron_left_rounded,
-                color: Color(0xFF64748B),
+                color: accent.withOpacity(0.85),
                 size: 22,
               ),
             ),
@@ -537,16 +523,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             if (_path.isEmpty && index == 0) {
                               return _buildCornerCard(
                                 title: 'Wekala Corner',
-                                subtitle: 'محلات فعلية في وكالة البلح',
-                                icon: Icons.storefront_outlined,
+                                                icon: Icons.storefront_outlined,
                                 accent: const Color(0xFF9A5B2A),
                                 onTap: () => context.push('/agency-corner'),
                               );
                             }
                             if (_path.isEmpty && index == 1) {
                               return _buildCornerCard(
-                                title: 'Social Corner',
-                                subtitle: 'متاجر وصفحات البيع أونلاين',
+                                title: 'متاجر أونلاين',
                                 icon: Icons.shopping_bag_outlined,
                                 accent: const Color(0xFF5367A5),
                                 onTap: () => context.push('/online-stores'),
