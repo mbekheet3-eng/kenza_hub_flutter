@@ -307,9 +307,14 @@ class MarketplaceProductService {
     String sellerProfileId, {
     int limit = 60,
   }) async {
+    // Public store pages must never request seller_profiles.owner_user_id.
+    final publicSelect = _productSelect.replaceFirst(
+      'seller:seller_profiles!products_seller_id_fkey(owner_user_id,display_name,avatar_url,seller_type)',
+      'seller:seller_profiles!products_seller_id_fkey(display_name,avatar_url,seller_type)',
+    );
     final rows = await _client
         .from('products')
-        .select(_productSelect)
+        .select(publicSelect)
         .eq('seller_id', sellerProfileId)
         .eq('status.slug', 'available')
         .order('created_at', ascending: false)
