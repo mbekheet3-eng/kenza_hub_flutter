@@ -45,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final rows = await Supabase.instance.client
           .from('categories')
-          .select('id,name_ar,name_en,slug,icon,parent_id')
+          .select('id,name_ar,name_en,slug,icon,icon_url,parent_id')
           .eq('is_active', true)
           .order('name_ar');
       final categories = (rows as List)
@@ -480,28 +480,27 @@ class _StoreSections extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 4),
-      child: Row(
-        children: [
-          Expanded(
-            child: _StoreSectionCard(
+    return SizedBox(
+      height: 112,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        itemCount: 2,
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return _StoreSectionCard(
               title: 'ركن الوكالة',
-              subtitle: 'محلات فعلية',
               icon: Icons.storefront_outlined,
               onTap: () => context.push('/agency-corner'),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: _StoreSectionCard(
-              title: 'Online Stores',
-              subtitle: 'متاجر أونلاين',
-              icon: Icons.shopping_bag_outlined,
-              onTap: () => context.push('/online-stores'),
-            ),
-          ),
-        ],
+            );
+          }
+          return _StoreSectionCard(
+            title: 'متاجر أونلاين',
+            icon: Icons.shopping_bag_outlined,
+            onTap: () => context.push('/online-stores'),
+          );
+        },
       ),
     );
   }
@@ -510,50 +509,50 @@ class _StoreSections extends StatelessWidget {
 class _StoreSectionCard extends StatelessWidget {
   const _StoreSectionCard({
     required this.title,
-    required this.subtitle,
     required this.icon,
     required this.onTap,
   });
 
   final String title;
-  final String subtitle;
   final IconData icon;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.zero,
-      clipBehavior: Clip.antiAlias,
+    return SizedBox(
+      width: 82,
       child: InkWell(
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-          child: Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: const Color(0xFFFCEBEC),
-                child: Icon(icon, color: const Color(0xFFC62828)),
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          children: [
+            Container(
+              height: 70,
+              width: 78,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F2F6),
+                borderRadius: BorderRadius.circular(18),
               ),
-              const SizedBox(width: 9),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 3),
-                    Text(subtitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 11, color: Colors.black54)),
-                  ],
-                ),
+              alignment: Alignment.center,
+              child: Icon(
+                icon,
+                color: const Color(0xFF0F172A),
+                size: 32,
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Color(0xFF0F172A),
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
         ),
       ),
     );
