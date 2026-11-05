@@ -208,7 +208,7 @@ class MarketplaceProductService {
     required String title,
     required String description,
     required double price,
-    required double weightKg,
+    double? weightKg,
     required String conditionLabel,
     String? colorLabel,
     String? sizeLabel,
