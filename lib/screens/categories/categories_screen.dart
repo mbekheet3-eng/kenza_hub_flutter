@@ -339,6 +339,81 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     );
   }
 
+  Widget _buildCornerCard({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color accent,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: accent.withOpacity(0.09),
+      borderRadius: BorderRadius.circular(14),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Stack(
+          children: [
+            Positioned(
+              top: 13,
+              right: 13,
+              left: 10,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: accent,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    subtitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Color(0xFF475569),
+                      fontSize: 11,
+                      height: 1.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              right: 12,
+              bottom: 10,
+              child: Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: accent.withOpacity(0.14),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                alignment: Alignment.center,
+                child: Icon(icon, size: 29, color: accent),
+              ),
+            ),
+            const Positioned(
+              left: 9,
+              bottom: 9,
+              child: Icon(
+                Icons.chevron_left_rounded,
+                color: Color(0xFF64748B),
+                size: 22,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildBottomNavigation() {
     return SafeArea(
       top: false,
@@ -456,14 +531,37 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             mainAxisSpacing: 12,
                             childAspectRatio: 1.3,
                           ),
-                          itemCount: visibleCategories.length,
-                          itemBuilder: (context, index) =>
-                              _buildCategoryCard(
-                            visibleCategories[index],
-                            categories,
-                            index,
-                            languageCode,
-                          ),
+                          itemCount: visibleCategories.length +
+                              (_path.isEmpty ? 2 : 0),
+                          itemBuilder: (context, index) {
+                            if (_path.isEmpty && index == 0) {
+                              return _buildCornerCard(
+                                title: 'Wekala Corner',
+                                subtitle: 'محلات فعلية في وكالة البلح',
+                                icon: Icons.storefront_outlined,
+                                accent: const Color(0xFF9A5B2A),
+                                onTap: () => context.push('/agency-corner'),
+                              );
+                            }
+                            if (_path.isEmpty && index == 1) {
+                              return _buildCornerCard(
+                                title: 'Social Corner',
+                                subtitle: 'متاجر وصفحات البيع أونلاين',
+                                icon: Icons.shopping_bag_outlined,
+                                accent: const Color(0xFF5367A5),
+                                onTap: () => context.push('/online-stores'),
+                              );
+                            }
+
+                            final categoryIndex =
+                                index - (_path.isEmpty ? 2 : 0);
+                            return _buildCategoryCard(
+                              visibleCategories[categoryIndex],
+                              categories,
+                              categoryIndex,
+                              languageCode,
+                            );
+                          },
                         ),
                       ),
                     ],
