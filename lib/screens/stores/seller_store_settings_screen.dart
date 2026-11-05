@@ -82,11 +82,16 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
               .eq('seller_profile_id', profileId)
               .maybeSingle()
           : null;
-      final mediaRow = await _client
-          .from('seller_store_media')
-          .select('cover_image_url')
-          .eq('seller_profile_id', profileId)
-          .maybeSingle();
+      final canReadMedia = membership['member_role'] == 'owner' ||
+          profile['business_type'] == 'online_store' ||
+          profile['show_storefront'] == true;
+      final mediaRow = canReadMedia
+          ? await _client
+              .from('seller_store_media')
+              .select('cover_image_url')
+              .eq('seller_profile_id', profileId)
+              .maybeSingle()
+          : null;
       final links = profile['social_links'] is Map
           ? Map<String, dynamic>.from(profile['social_links'] as Map)
           : <String, dynamic>{};
