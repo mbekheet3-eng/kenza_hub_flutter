@@ -523,7 +523,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             if (_path.isEmpty && index == 0) {
                               return _buildCornerCard(
                                 title: 'Wekala Corner',
-                                                icon: Icons.storefront_outlined,
+                                icon: Icons.storefront_outlined,
                                 accent: const Color(0xFF9A5B2A),
                                 onTap: () => context.push('/agency-corner'),
                               );
