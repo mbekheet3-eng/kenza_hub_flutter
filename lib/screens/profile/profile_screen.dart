@@ -197,8 +197,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.storefront_outlined),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.receipt_long_outlined),
+                        title: const Text('سجل الطلبات'),
+                        subtitle: const Text('متابعة مشترياتك وحالة الطلبات'),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => context.push('/orders'),
+                      ),
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      ListTile(
+                        leading: const Icon(Icons.storefront_outlined),
                     title: const Text('لوحة البائع'),
                     subtitle: const Text('ملف المتجر والمبيعات وحالة الترقية'),
                     trailing: const Icon(Icons.chevron_right),
