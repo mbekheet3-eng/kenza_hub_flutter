@@ -254,6 +254,29 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     );
   }
 
+  String? _categoryImageUrl(
+    DatabaseCategory category,
+    List<DatabaseCategory> categories,
+  ) {
+    if (category.iconUrl != null && category.iconUrl!.trim().isNotEmpty) {
+      return category.iconUrl;
+    }
+
+    // Child categories inherit the representative photo of their main category
+    // until a dedicated image is assigned to them.
+    var current = category;
+    final visited = <String>{};
+    while (current.parentId != null && visited.add(current.id)) {
+      final parent = categories.where((item) => item.id == current.parentId);
+      if (parent.isEmpty) break;
+      current = parent.first;
+      if (current.iconUrl != null && current.iconUrl!.trim().isNotEmpty) {
+        return current.iconUrl;
+      }
+    }
+    return null;
+  }
+
   Widget _buildCategoryCard(
     DatabaseCategory category,
     List<DatabaseCategory> categories,
@@ -263,6 +286,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     final accent = _accentFor(category, index);
     final hasChildren = categories.any((item) => item.parentId == category.id);
     final title = category.labelFor(languageCode).trim();
+    final imageUrl = _categoryImageUrl(category, categories);
 
     return Material(
       color: _card,
@@ -300,12 +324,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   borderRadius: BorderRadius.circular(17),
                 ),
                 alignment: Alignment.center,
-                child: category.iconUrl != null &&
-                        category.iconUrl!.trim().isNotEmpty
+                child: imageUrl != null
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(17),
                         child: Image.network(
-                          category.iconUrl!,
+                          imageUrl,
                           width: 62,
                           height: 62,
                           fit: BoxFit.cover,
