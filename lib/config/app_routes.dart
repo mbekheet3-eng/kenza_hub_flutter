@@ -53,7 +53,8 @@ final goRouter = GoRouter(
     };
     final requiresAuthentication = protectedPaths.contains(currentPath) ||
         currentPath.startsWith('/order-confirmation/') ||
-        currentPath.startsWith('/order-tracking/');
+        currentPath.startsWith('/order-tracking/') ||
+        currentPath.startsWith('/dispute-evidence/');
 
     if (currentPath == '/splash') return null;
     if (currentPath == '/auth-callback') {
