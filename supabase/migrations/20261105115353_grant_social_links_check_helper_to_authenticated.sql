@@ -1,0 +1,1 @@
+grant execute on function private.valid_seller_social_links(jsonb) to authenticated;
