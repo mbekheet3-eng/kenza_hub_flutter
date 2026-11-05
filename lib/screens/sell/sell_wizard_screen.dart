@@ -197,8 +197,6 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
       case 0:
         return _selectedImages.isNotEmpty;
       case 1:
-        return _category != null;
-      case 2:
         return _category != null &&
             _categoryRulesResolved &&
             !_isResolvingCategoryRules &&
@@ -207,7 +205,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
       case 2:
         return _price > 0;
       default:
-        return true;
+        return false;
     }
   }
 
@@ -507,8 +505,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         _condition != null &&
         _categoryRulesResolved &&
         !_isResolvingCategoryRules &&
-        _title.isNotEmpty &&
-        _description.isNotEmpty &&
+        _title.trim().isNotEmpty &&
         _price > 0;
   }
 
