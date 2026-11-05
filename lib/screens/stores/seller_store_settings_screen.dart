@@ -185,6 +185,13 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
       return;
     }
 
+    if (_agency && _showStorefront && _cover.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('اختَر صورة واجهة المحل قبل تفعيل عرضها')),
+      );
+      return;
+    }
+
     if (_displayName.text.trim().length < 3 || _displayName.text.trim().length > 60) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('اسم العرض لازم يكون من 3 إلى 60 حرفًا')),
