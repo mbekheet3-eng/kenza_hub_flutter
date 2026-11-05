@@ -54,7 +54,19 @@ class _HomeScreenState extends State<HomeScreen> {
               ))
           // The strip is for product types below the four main categories.
           .where((category) => category.parentId != null)
-          .toList(growable: false);
+          .toList()
+        ..sort((a, b) {
+          int priority(String slug) {
+            if (slug == 'clothes-women-dresses') return 0;
+            if (slug == 'clothes-women-evening-dresses') return 1;
+            return 2;
+          }
+
+          final priorityCompare = priority(a.slug).compareTo(priority(b.slug));
+          return priorityCompare != 0
+              ? priorityCompare
+              : a.nameAr.compareTo(b.nameAr);
+        });
       if (!mounted) return;
       setState(() {
         _categories = categories;
@@ -562,6 +574,14 @@ class _PromoCarouselState extends State<_PromoCarousel> {
 
   static const _promos = [
     _PromoData(
+      title: 'فساتين لكل مناسبة',
+      subtitle: 'اكتشفي فساتين جديدة للبيع على كنزة هب',
+      icon: Icons.checkroom_outlined,
+      background: Color(0xFFF7E9E7),
+      accent: Color(0xFFC62828),
+      categoryId: '6731ec75-9d3c-4c2b-be6b-eee1a8a32cef',
+    ),
+    _PromoData(
       title: 'لو مش محتاجها... غيرك محتاجها',
       subtitle: 'بيع واشتري بسهولة من غير عمولة',
       icon: Icons.shopping_bag_outlined,
@@ -617,7 +637,13 @@ class _PromoCarouselState extends State<_PromoCarousel> {
             onPageChanged: (index) => setState(() => _index = index),
             itemBuilder: (context, index) {
               final promo = _promos[index];
-              return Container(
+              return GestureDetector(
+                onTap: promo.categoryId == null
+                    ? null
+                    : () => context.push(
+                          '/search?categoryId=${Uri.encodeQueryComponent(promo.categoryId!)}',
+                        ),
+                child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 14),
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                 decoration: BoxDecoration(
@@ -668,6 +694,7 @@ class _PromoCarouselState extends State<_PromoCarousel> {
                     ),
                   ],
                 ),
+                ),
               );
             },
           ),
@@ -703,6 +730,7 @@ class _PromoData {
     required this.icon,
     required this.background,
     required this.accent,
+    this.categoryId,
   });
 
   final String title;
@@ -710,6 +738,7 @@ class _PromoData {
   final IconData icon;
   final Color background;
   final Color accent;
+  final String? categoryId;
 }
 
 class _HomeProductCard extends StatelessWidget {
