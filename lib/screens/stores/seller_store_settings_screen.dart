@@ -325,6 +325,13 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
           if (_agency) ...[
             _field(_area, 'المنطقة أو الحي', hint: 'مثال: وكالة البلح - بولاق'),
             _field(_address, 'عنوان المحل', hint: 'العنوان الفعلي للمحل'),
+            const Padding(
+              padding: EdgeInsets.only(bottom: 10),
+              child: Text(
+                'يظهر المحل في دليل ركن الوكالة بعد حفظ عنوانه الفعلي. العنوان الكامل لا يظهر للزوار.',
+                style: TextStyle(fontSize: 12, color: Colors.black54),
+              ),
+            ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               value: _showStorefront,
