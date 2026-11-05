@@ -44,8 +44,15 @@ class DisputeEvidenceService {
     final userId = _client.auth.currentUser?.id;
     if (userId == null) throw StateError('يجب تسجيل الدخول أولاً');
 
-    final safeExtension = extension.toLowerCase() == 'png' ? 'png' : 'jpg';
-    final contentType = safeExtension == 'png' ? 'image/png' : 'image/jpeg';
+    final normalizedExtension = extension.toLowerCase();
+    final safeExtension = normalizedExtension == 'png' || normalizedExtension == 'webp'
+        ? normalizedExtension
+        : 'jpg';
+    final contentType = safeExtension == 'png'
+        ? 'image/png'
+        : safeExtension == 'webp'
+            ? 'image/webp'
+            : 'image/jpeg';
     final path = '$disputeId/$userId/${_uuid.v4()}.$safeExtension';
 
     await _client.storage.from(_bucket).uploadBinary(
