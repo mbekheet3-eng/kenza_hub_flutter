@@ -827,11 +827,6 @@ class _HomeBottomNavigation extends StatelessWidget {
               onTap: () => context.push('/chats'),
             ),
             _NavItem(
-              icon: Icons.receipt_long_outlined,
-              label: 'طلباتي',
-              onTap: () => context.push('/orders'),
-            ),
-            _NavItem(
               icon: Icons.person_outline_rounded,
               label: 'حسابي',
               onTap: () => context.push('/profile'),
