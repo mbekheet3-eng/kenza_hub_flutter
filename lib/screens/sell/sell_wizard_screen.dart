@@ -35,7 +35,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
   String _title = '';
   String _description = '';
   double _price = 0;
-  double _weightKg = 0;
+  double? _weightKg;
   bool _skipVariantFields = false;
   bool _isResolvingCategoryRules = false;
   bool _categoryRulesResolved = false;
@@ -58,58 +58,66 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         isActive: _currentStep >= 0,
       ),
       Step(
-        title: const Text('الفئة'),
-        content: StepCategory(
-          onCategorySelected: _onCategorySelected,
-          selectedCategory: _category,
+        title: const Text('معلومات المنتج'),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            StepCategory(
+              onCategorySelected: _onCategorySelected,
+              selectedCategory: _category,
+            ),
+            const SizedBox(height: 20),
+            if (_isResolvingCategoryRules)
+              const Center(child: CircularProgressIndicator())
+            else if (_categoryRulesResolved) ...[
+              StepDetails(
+                onDataChanged: _onDetailsChanged,
+                category: _category,
+                initialCondition: _condition,
+                initialColor: _color,
+                initialSize: _size,
+                skipVariantFields: _skipVariantFields,
+              ),
+              if (!_skipVariantFields)
+                ExpansionTile(
+                  tilePadding: EdgeInsets.zero,
+                  title: const Text('تفاصيل إضافية (اختياري)'),
+                  subtitle: const Text('اللون والمقاس والعلامة التجارية'),
+                  children: [
+                    StepBrand(
+                      onBrandSelected: _onBrandSelected,
+                      selectedBrand: _brand,
+                      category: _category,
+                      skipVariantFields: _skipVariantFields,
+                    ),
+                  ],
+                ),
+              const SizedBox(height: 16),
+              StepDescriptionAndTitle(
+                onDataChanged: _onDescriptionChanged,
+                initialTitle: _title,
+                initialDescription: _description,
+              ),
+            ] else
+              const Text('اختر القسم أولاً لعرض بيانات المنتج.'),
+          ],
         ),
         isActive: _currentStep >= 1,
       ),
       Step(
-        title: const Text('البيانات'),
-        content: StepDetails(
-          onDataChanged: _onDetailsChanged,
-          category: _category,
-          initialCondition: _condition,
-          initialColor: _color,
-          initialSize: _size,
-          skipVariantFields: _skipVariantFields,
+        title: const Text('السعر والمراجعة'),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            StepPrice(
+              onPriceChanged: _onPriceChanged,
+              initialPrice: _price,
+            ),
+            const SizedBox(height: 20),
+            _buildReviewStep(),
+          ],
         ),
         isActive: _currentStep >= 2,
-      ),
-      Step(
-        title: const Text('العلامة التجارية'),
-        content: StepBrand(
-          onBrandSelected: _onBrandSelected,
-          selectedBrand: _brand,
-          category: _category,
-          skipVariantFields: _skipVariantFields,
-        ),
-        isActive: _currentStep >= 3,
-      ),
-      Step(
-        title: const Text('الوصف'),
-        content: StepDescriptionAndTitle(
-          onDataChanged: _onDescriptionChanged,
-          initialTitle: _title,
-          initialDescription: _description,
-        ),
-        isActive: _currentStep >= 4,
-      ),
-      Step(
-        title: const Text('السعر'),
-        content: StepPrice(
-          onPriceChanged: _onPriceChanged,
-          initialPrice: _price,
-          onWeightChanged: (value) => setState(() => _weightKg = value),
-          initialWeight: _weightKg,
-        ),
-        isActive: _currentStep >= 5,
-      ),
-      Step(
-        title: const Text('التحقق'),
-        content: _buildReviewStep(),
-        isActive: _currentStep >= 6,
       ),
     ];
   }
@@ -191,15 +199,13 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
       case 1:
         return _category != null;
       case 2:
-        return _categoryRulesResolved &&
+        return _category != null &&
+            _categoryRulesResolved &&
             !_isResolvingCategoryRules &&
-            _condition != null;
-      case 3:
-        return _category != null; // Brand is optional.
-      case 4:
-        return _title.isNotEmpty && _description.isNotEmpty;
-      case 5:
-        return _price > 0 && _weightKg > 0 && _weightKg <= 10;
+            _condition != null &&
+            _title.trim().isNotEmpty;
+      case 2:
+        return _price > 0;
       default:
         return true;
     }
@@ -503,9 +509,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         !_isResolvingCategoryRules &&
         _title.isNotEmpty &&
         _description.isNotEmpty &&
-        _price > 0 &&
-        _weightKg > 0 &&
-        _weightKg <= 10;
+        _price > 0;
   }
 
   void _showError(String message) {
@@ -526,13 +530,15 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
           _buildReviewSection('الصور', _buildImagePreview()),
           _buildReviewSection('الفئة', Text(_category ?? '-')),
           _buildReviewSection('الحالة', Text(_condition ?? '-')),
-          if (!_skipVariantFields) ...[
-            _buildReviewSection('اللون', Text(_color ?? '-')),
-            _buildReviewSection('المقاس', Text(_size ?? '-')),
-            _buildReviewSection('العلامة التجارية', Text(_brand ?? '-')),
-          ],
+          if (!_skipVariantFields && _color != null)
+            _buildReviewSection('اللون', Text(_color!)),
+          if (!_skipVariantFields && _size != null)
+            _buildReviewSection('المقاس', Text(_size!)),
+          if (_brand != null)
+            _buildReviewSection('العلامة التجارية', Text(_brand!)),
           _buildReviewSection('العنوان', Text(_title)),
-          _buildReviewSection('الوصف', Text(_description)),
+          if (_description.trim().isNotEmpty)
+            _buildReviewSection('الوصف', Text(_description)),
           _buildReviewSection('السعر', Text('$_price ج.م', 
             style: TextStyle(
               color: AppTheme.primaryColor,
