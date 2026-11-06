@@ -45,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final rows = await Supabase.instance.client
           .from('categories')
-          .select('id,name_ar,name_en,slug,icon,parent_id')
+          .select('id,name_ar,name_en,slug,icon,icon_url,parent_id')
           .eq('is_active', true)
           .order('name_ar');
       final categories = (rows as List)
