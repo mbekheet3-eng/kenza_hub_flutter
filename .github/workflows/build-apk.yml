@@ -64,6 +64,12 @@ jobs:
           test -n "$ANDROID_KEY_PASSWORD" || (echo "Missing GitHub secret ANDROID_KEY_PASSWORD" && exit 1)
           printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/upload-keystore.jks
           test -s android/upload-keystore.jks
+          echo "Validating Android signing keystore..."
+          keytool -list -keystore android/upload-keystore.jks \
+            -storetype JKS \
+            -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+            -alias "$ANDROID_KEY_ALIAS" > /dev/null
+          echo "Android signing keystore is valid and the alias exists."
 
       - name: Build signed release APK
         run: |
