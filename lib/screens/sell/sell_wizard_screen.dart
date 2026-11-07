@@ -236,7 +236,10 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         brandName: _brand,
       );
 
-      // V2 image paths must be scoped to product UUID + authenticated user.
+      // Upload and register every image before starting AI moderation.
+      // This prevents the first approved image from publishing a product
+      // before the remaining images have even been registered.
+      final imageIds = <String>[];
       for (var index = 0; index < _selectedImages.length; index++) {
         final imagePath = await _uploadService.uploadProductImage(
           _selectedImages[index],
@@ -248,21 +251,29 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
           imagePath: imagePath,
           displayOrder: index,
         );
+        imageIds.add(imageId);
+      }
 
-        // Run server-side AI moderation when its provider key is configured.
-        // A provider outage leaves the listing pending review; it never marks
-        // an unreviewed image as approved.
+      // Ask Gemini to review each registered image.
+      var allModerationRequestsSucceeded = true;
+      for (final imageId in imageIds) {
         try {
           final moderation = await Supabase.instance.client.functions.invoke(
             'moderate-product-image',
             body: {'image_id': imageId},
           );
           if (moderation.status < 200 || moderation.status >= 300) {
-            debugPrint('Image moderation remains pending: ${moderation.status}');
+            allModerationRequestsSucceeded = false;
+            debugPrint('Gemini moderation failed: ${moderation.status} ${moderation.data}');
           }
         } catch (moderationError) {
-          debugPrint('Image moderation remains pending: $moderationError');
+          allModerationRequestsSucceeded = false;
+          debugPrint('Gemini moderation request failed: $moderationError');
         }
+      }
+
+      if (!allModerationRequestsSucceeded) {
+        debugPrint('Product remains pending until Gemini moderation succeeds.');
       }
 
       try {
