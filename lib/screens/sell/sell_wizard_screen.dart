@@ -217,6 +217,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
     final uploadedImagePaths = <String>[];
     String? createdProductId;
     var retryAfterPhoneVerification = false;
+    var allModerationRequestsSucceeded = true;
 
     try {
       final sellerProfileId = await _productService.ensureSellerProfile();
@@ -255,7 +256,6 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
       }
 
       // Ask Gemini to review each registered image.
-      var allModerationRequestsSucceeded = true;
       for (final imageId in imageIds) {
         try {
           final moderation = await Supabase.instance.client.functions.invoke(
@@ -284,7 +284,13 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم إرسال المنتج للمراجعة بنجاح')),
+          SnackBar(
+            content: Text(
+              allModerationRequestsSucceeded
+                  ? 'تم إرسال الصور إلى Gemini للمراجعة. سيظهر المنتج بعد اجتياز الفحص.'
+                  : 'تم حفظ المنتج، لكن فحص Gemini لم يكتمل؛ سيظل قيد المراجعة حتى اكتمال الفحص.',
+            ),
+          ),
         );
         context.pushReplacement('/home');
       }
