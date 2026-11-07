@@ -65,7 +65,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
             if (_filterStatus == 'pending') return p.isPendingReview;
             if (_filterStatus == 'active') return p.isActive == true && p.isSold != true;
             if (_filterStatus == 'sold') return p.isSold == true;
-            if (_filterStatus == 'inactive') => p.isActive != true && !p.isPendingReview;
+            if (_filterStatus == 'inactive') return p.isActive != true && !p.isPendingReview;
             return true;
           })
           .toList();
