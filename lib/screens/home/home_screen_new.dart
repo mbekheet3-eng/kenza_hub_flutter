@@ -206,6 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
           return CustomScrollView(
             slivers: [
               SliverToBoxAdapter(child: _buildSearchBar(strings, homeProvider)),
+              SliverToBoxAdapter(child: _buildProductStrip(homeProvider)),
               SliverToBoxAdapter(child: _buildCategoryStrip()),
               const SliverToBoxAdapter(child: SizedBox(height: 8)),
               const SliverToBoxAdapter(child: _PromoCarousel()),
@@ -296,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
     HomeProvider provider,
   ) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: Row(
         children: [
           Expanded(
@@ -315,7 +316,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 prefixIcon: const Icon(
                   Icons.search_rounded,
                   color: Color(0xFF0F172A),
-                  size: 27,
+                  size: 23,
                 ),
                 suffixIcon: IconButton(
                   tooltip: 'البحث بالصورة',
@@ -323,14 +324,27 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: const Icon(
                     Icons.camera_alt_outlined,
                     color: Color(0xFF0F172A),
-                    size: 25,
+                    size: 22,
                   ),
                 ),
+                isDense: true,
                 filled: true,
                 fillColor: Colors.white,
+                prefixIconConstraints: const BoxConstraints(
+                  minWidth: 44,
+                  maxWidth: 44,
+                  minHeight: 42,
+                  maxHeight: 42,
+                ),
+                suffixIconConstraints: const BoxConstraints(
+                  minWidth: 44,
+                  maxWidth: 44,
+                  minHeight: 42,
+                  maxHeight: 42,
+                ),
                 contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 15,
+                  horizontal: 12,
+                  vertical: 8,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(22),
@@ -348,6 +362,66 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductStrip(HomeProvider provider) {
+    final products = provider.filteredProducts;
+    if (provider.isLoading && products.isEmpty) {
+      return const SizedBox(
+        height: 190,
+        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      );
+    }
+    if (products.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 4, bottom: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'منتجات السوق',
+                    style: TextStyle(
+                      color: Color(0xFF0F172A),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => context.push('/search'),
+                  child: const Text('عرض الكل'),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 224,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              itemCount: products.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (context, index) {
+                final product = products[index];
+                return SizedBox(
+                  width: 156,
+                  child: _HomeProductCard(
+                    product: product,
+                    onTap: () => context.push('/product/${product.id}'),
+                  ),
+                );
+              },
             ),
           ),
         ],
