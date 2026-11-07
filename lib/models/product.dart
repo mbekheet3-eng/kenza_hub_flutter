@@ -29,6 +29,8 @@ class Product {
   final String? categoryId;
   final String? conditionId;
   final String? statusId;
+  final String statusSlug;
+  final String moderationStatus;
   final String? currencyId;
   final String? colorId;
   final String? sizeId;
@@ -67,6 +69,8 @@ class Product {
     this.categoryId,
     this.conditionId,
     this.statusId,
+    this.statusSlug = 'active',
+    this.moderationStatus = 'approved',
     this.currencyId,
     this.colorId,
     this.sizeId,
@@ -92,6 +96,9 @@ class Product {
 
   // Check if product is available (not sold and is active)
   bool get isAvailable => !isSold && isActive;
+
+  bool get isPendingReview =>
+      statusSlug == 'pending_review' || moderationStatus == 'pending';
 
   // Rating display
   String get ratingDisplay => rating != null ? rating!.toStringAsFixed(1) : 'بدون تقييم';
@@ -206,6 +213,8 @@ class Product {
       categoryId: json['category_id'] as String?,
       conditionId: json['condition_id'] as String?,
       statusId: json['status_id'] as String?,
+      statusSlug: statusSlug,
+      moderationStatus: json['moderation_status'] as String? ?? 'approved',
       currencyId: json['currency_id'] as String?,
       colorId: json['color_id'] as String?,
       sizeId: json['size_id'] as String?,
@@ -304,6 +313,8 @@ class Product {
       categoryId: categoryId ?? this.categoryId,
       conditionId: conditionId ?? this.conditionId,
       statusId: statusId ?? this.statusId,
+      statusSlug: statusSlug,
+      moderationStatus: moderationStatus,
       currencyId: currencyId ?? this.currencyId,
       colorId: colorId ?? this.colorId,
       sizeId: sizeId ?? this.sizeId,
