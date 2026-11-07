@@ -14,7 +14,7 @@ class MyProductsScreen extends StatefulWidget {
 }
 
 class _MyProductsScreenState extends State<MyProductsScreen> {
-  late String _filterStatus; // all, active, sold, inactive
+  late String _filterStatus; // all, pending, active, sold, inactive
 
   @override
   void initState() {
@@ -62,9 +62,10 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
     if (_filterStatus != 'all') {
       products = products
           .where((p) {
+            if (_filterStatus == 'pending') return p.isPendingReview;
             if (_filterStatus == 'active') return p.isActive == true && p.isSold != true;
             if (_filterStatus == 'sold') return p.isSold == true;
-            if (_filterStatus == 'inactive') return p.isActive != true;
+            if (_filterStatus == 'inactive') => p.isActive != true && !p.isPendingReview;
             return true;
           })
           .toList();
@@ -121,6 +122,8 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
       child: Row(
         children: [
           _buildFilterChip('الكل', 'all'),
+          const SizedBox(width: 8),
+          _buildFilterChip('قيد المراجعة', 'pending'),
           const SizedBox(width: 8),
           _buildFilterChip('نشط', 'active'),
           const SizedBox(width: 8),
@@ -212,7 +215,23 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                       : Icon(Icons.image, color: AppTheme.textTertiary),
                 ),
                 // Status Badge
-                if (product.isSold == true)
+                if (product.isPendingReview)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade700,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text(
+                        'قيد المراجعة',
+                        style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  )
+                else if (product.isSold == true)
                   Positioned(
                     top: 8,
                     right: 8,
