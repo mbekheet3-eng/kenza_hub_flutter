@@ -102,12 +102,56 @@ class _AdminProductModerationScreenState extends State<AdminProductModerationScr
     if (!_isAdmin) return Scaffold(appBar: AppBar(title: Text(title)), body: Center(child: Text(tr('هذه الصفحة للمشرفين فقط', 'Administrators only'))));
     return Scaffold(
       appBar: AppBar(title: Text(title), actions: [IconButton(onPressed: _loadQueue, icon: const Icon(Icons.refresh))]),
-      body: _loading && _products.isEmpty ? const Center(child: CircularProgressIndicator())
-        : _error != null && _products.isEmpty ? Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(_error!, textAlign: TextAlign.center)))
-        : _products.isEmpty ? Center(child: Text(tr('لا توجد منتجات تنتظر المراجعة البشرية', 'No products are waiting for human review')))
-        : RefreshIndicator(onRefresh: _loadQueue, child: ListView.builder(
-            padding: const EdgeInsets.all(12), itemCount: _products.length,
-            itemBuilder: (context, index) => _buildProduct(_products[index]))),
+      body: RefreshIndicator(
+        onRefresh: _loadQueue,
+        child: _loading && _products.isEmpty
+            ? ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.65,
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+                ],
+              )
+            : _error != null && _products.isEmpty
+                ? ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.65,
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Text(_error!, textAlign: TextAlign.center),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : _products.isEmpty
+                    ? ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.65,
+                            child: Center(
+                              child: Text(tr(
+                                'لا توجد منتجات تنتظر المراجعة البشرية',
+                                'No products are waiting for human review',
+                              )),
+                            ),
+                          ),
+                        ],
+                      )
+                    : ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(12),
+                        itemCount: _products.length,
+                        itemBuilder: (context, index) =>
+                            _buildProduct(_products[index]),
+                      ),
+      ),
     );
   }
 
