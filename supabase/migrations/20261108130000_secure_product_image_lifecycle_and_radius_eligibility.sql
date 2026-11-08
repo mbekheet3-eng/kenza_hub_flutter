@@ -34,6 +34,10 @@ begin
     raise exception 'ACTIVE_USER_REQUIRED';
   end if;
 
+  -- Serialize claims per requester so parallel requests cannot exceed the
+  -- rolling rate limit.
+  perform pg_advisory_xact_lock(hashtextextended(p_requester_user_id::text, 0));
+
   select * into v_image
   from public.product_images
   where id=p_image_id
