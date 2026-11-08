@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../services/seller_directory_service.dart';
@@ -166,12 +167,12 @@ class _StoreDirectoryCard extends StatelessWidget {
                         ),
                         if (agency && area != null && area.isNotEmpty) ...[
                           const SizedBox(height: 4),
-                          Text('المنطقة: $area',
+                          Text('${AppLocalizations.of(context).areaLabel}: $area',
                               style: const TextStyle(color: Colors.black54)),
                         ],
                         if (agency && store['show_storefront'] == true) ...[
                           const SizedBox(height: 4),
-                          const Text('واجهة المحل معروضة',
+                          Text(AppLocalizations.of(context).storefrontDisplayed,
                               style: TextStyle(color: Color(0xFF2E7D32), fontSize: 12)),
                         ],
                       ],
