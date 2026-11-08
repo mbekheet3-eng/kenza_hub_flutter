@@ -226,6 +226,8 @@ class AppLocalizations {
   String get notes => _strings.notes;
   String get somethingWentWrong => _strings.somethingWentWrong;
   String get tryAgain => _strings.tryAgain;
+  String get initializationError => _strings.initializationError;
+  String get initializationRetryHint => _strings.initializationRetryHint;
   String get currentLanguage => _strings.languageName;
 }
 
