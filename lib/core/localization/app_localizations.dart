@@ -409,7 +409,6 @@ class AppLocalizations {
   String get requestRejected => _strings.requestRejected;
   String get noUpgradeRequest => _strings.noUpgradeRequest;
   String get sellerProfileNotCreated => _strings.sellerProfileNotCreated;
-  String get backToHome => _strings.backToHome;
   String get myStore => _strings.myStore;
   String get storeStatusActive => _strings.storeStatusActive;
   String get storeStatusInactive => _strings.storeStatusInactive;
