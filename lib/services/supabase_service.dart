@@ -159,15 +159,11 @@ class SupabaseService {
       final path = row['image_path'] as String?;
       final bucket = row['storage_bucket'] as String?;
       if (path != null && bucket != null) {
-        if (bucket == 'product-images') {
-          row['image_url'] = _client.storage.from(bucket).getPublicUrl(path);
-        } else {
-          try {
-            row['image_url'] =
-                await _client.storage.from(bucket).createSignedUrl(path, 3600);
-          } catch (_) {
-            row['image_url'] = null;
-          }
+        try {
+          row['image_url'] =
+              await _client.storage.from(bucket).createSignedUrl(path, 3600);
+        } catch (_) {
+          row['image_url'] = null;
         }
       }
       result.add(row);
