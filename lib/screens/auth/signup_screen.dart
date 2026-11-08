@@ -378,14 +378,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                   const SizedBox(height: AppSpacing.lg),
 
-                  const Row(
+                  Row(
                     children: [
-                      Expanded(child: Divider()),
+                      const Expanded(child: Divider()),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                        child: Text(AppLocalizations.of(context).orCreateAccountWith),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                        child: Text(strings.orCreateAccountWith),
                       ),
-                      Expanded(child: Divider()),
+                      const Expanded(child: Divider()),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.md),
