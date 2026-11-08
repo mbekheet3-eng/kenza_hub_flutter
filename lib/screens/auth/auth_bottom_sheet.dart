@@ -329,7 +329,7 @@ class _AuthSheetContentState extends State<_AuthSheetContent> {
                         contentPadding: EdgeInsets.zero,
                         controlAffinity: ListTileControlAffinity.leading,
                         activeColor: _red,
-                        title: const Text(
+                        title: Text(
                           AppLocalizations.of(context).signupAgreeTerms,
                           style: TextStyle(fontSize: 12, color: Color(0xFF475569)),
                         ),
