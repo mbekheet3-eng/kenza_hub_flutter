@@ -97,41 +97,89 @@ Deno.serve(async (req: Request) => {
       return json({ error: "PRODUCT_IMAGE_PERMISSION_REQUIRED" }, 403);
     }
 
-    // TEMPORARY MODE: pause Gemini and queue this image for human review.
-    // This response is intentionally fast and never publishes the product.
-    const manualReviewResult = {
-      decision: "manual_review",
-      quality: "uncertain",
+    // TEMPORARY LAUNCH MODE: Gemini moderation is paused.
+    // Keep authentication, active-account, seller ownership/permission, and
+    // product-pending checks above. Mark uploaded images approved immediately.
+    const temporaryApprovalResult = {
+      decision: "approved",
+      quality: "not_checked",
       quality_issues: [],
       unsafe_content: false,
       adult_or_sexual_content: false,
       violence_or_gore: false,
       irrelevant_or_misleading: false,
       prohibited_item: false,
-      product_visible: false,
-      reason_ar: "بانتظار مراجعة فريق كنزة هب",
+      product_visible: true,
+      reason_ar: "تم النشر مؤقتًا مع إيقاف مراجعة الصور الآلية",
       confidence: 0,
-      temporary_manual_review: true,
+      temporary_auto_approval: true,
+      moderation_skipped: "gemini_paused_for_launch",
     };
-    const { error: manualReviewSaveError } = await supabase
+    const { error: approvalSaveError } = await supabase
       .from("product_images")
       .update({
-        ai_review_status: "pending",
-        ai_review_result: manualReviewResult,
-        ai_reviewed_at: null,
-        ai_review_model: "temporary-manual-review",
+        ai_review_status: "approved",
+        ai_review_result: temporaryApprovalResult,
+        ai_reviewed_at: new Date().toISOString(),
+        ai_review_model: "temporary-auto-publish",
       })
       .eq("id", image.id);
-    if (manualReviewSaveError) {
-      console.error("Manual review status persistence failed", manualReviewSaveError.message);
-      return json({ error: "MANUAL_REVIEW_SAVE_FAILED" }, 500);
+    if (approvalSaveError) {
+      console.error("Temporary image approval failed", approvalSaveError.message);
+      return json({ error: "IMAGE_APPROVAL_SAVE_FAILED" }, 500);
     }
+
+    const { data: imageRows, error: rowsError } = await supabase
+      .from("product_images")
+      .select("ai_review_status")
+      .eq("product_id", product.id);
+    if (rowsError || !imageRows?.length) {
+      console.error("Could not evaluate product images", rowsError?.message);
+      return json({ error: "PRODUCT_IMAGE_STATUS_FAILED" }, 500);
+    }
+
+    if (!imageRows.every((row: any) => row.ai_review_status === "approved")) {
+      return json({
+        image_id: image.id,
+        status: "approved",
+        decision: "approved",
+        product_status: "pending_images",
+        moderation_mode: "temporary_auto_publish",
+      });
+    }
+
+    const { data: availableStatus, error: statusError } = await supabase
+      .from("product_statuses")
+      .select("id")
+      .eq("slug", "available")
+      .eq("is_active", true)
+      .maybeSingle();
+    if (statusError || !availableStatus?.id) {
+      console.error("Available product status is missing", statusError?.message);
+      return json({ error: "AVAILABLE_STATUS_NOT_CONFIGURED" }, 500);
+    }
+
+    const { error: publishError } = await supabase
+      .from("products")
+      .update({
+        moderation_status: "approved",
+        status_id: availableStatus.id,
+        published_at: new Date().toISOString(),
+      })
+      .eq("id", product.id)
+      .eq("moderation_status", "pending");
+    if (publishError) {
+      console.error("Temporary product publication failed", publishError.message);
+      return json({ error: "PRODUCT_PUBLICATION_FAILED" }, 500);
+    }
+
     return json({
       image_id: image.id,
-      status: "pending",
-      decision: "manual_review",
-      product_status: "pending_review",
-      moderation_mode: "temporary_manual_review",
+      status: "approved",
+      decision: "approved",
+      product_status: "available",
+      moderation_mode: "temporary_auto_publish",
+      warning: "Gemini image safety and quality checks are temporarily disabled.",
     });
 
     // PostgreSQL atomically claims the image and enforces the per-user limit.
