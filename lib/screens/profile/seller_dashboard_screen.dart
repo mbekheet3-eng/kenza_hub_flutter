@@ -52,7 +52,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
       case 'rejected':
         return 'لم يتم التحقق';
       default:
-        return 'غير محدد';
+        return AppLocalizations.of(context).unspecified;
     }
   }
 
@@ -99,7 +99,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('لوحة البائع')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context).sellerDashboard)),
       body: FutureBuilder<SellerDashboardData?>(
         future: _dashboardFuture,
         builder: (context, snapshot) {
