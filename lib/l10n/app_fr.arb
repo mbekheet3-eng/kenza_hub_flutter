@@ -290,5 +290,17 @@
   "ok": "OK",
   "signupAgreeTerms": "J’accepte les conditions générales et la politique de confidentialité",
   "orCreateAccountWith": "Ou créez votre compte avec",
-  "invalidResetLink": "Le lien de réinitialisation du mot de passe est invalide ou a expiré."
+  "invalidResetLink": "Le lien de réinitialisation du mot de passe est invalide ou a expiré.",
+  "evidenceUploaded": "La preuve a été téléversée et son empreinte enregistrée avec succès.",
+  "evidenceUploadError": "Impossible de téléverser la preuve",
+  "evidenceLinkError": "Impossible d’ouvrir le lien de preuve sur cet appareil.",
+  "evidenceOpenError": "Impossible d’ouvrir la preuve",
+  "evidenceInstructions": "Téléversez des photos qui expliquent le problème. Les preuves sont stockées dans un espace privé, leur empreinte numérique est enregistrée et chaque demande de consultation ou de téléchargement est journalisée.",
+  "chooseImage": "Choisir une image",
+  "uploadingEvidence": "Téléversement de l’image et vérification de son empreinte...",
+  "registeredEvidence": "Preuves enregistrées",
+  "noEvidenceYet": "Aucune preuve n’a encore été enregistrée pour ce litige.",
+  "evidenceHash": "Empreinte SHA-256",
+  "viewEvidence": "Voir",
+  "downloadEvidence": "Télécharger"
 }
