@@ -57,8 +57,9 @@ class SupabaseInitializationErrorApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Center(
+      home: Builder(
+        builder: (context) => Scaffold(
+          body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
@@ -80,6 +81,7 @@ class SupabaseInitializationErrorApp extends StatelessWidget {
                 ),
               ],
             ),
+          ),
           ),
         ),
       ),
