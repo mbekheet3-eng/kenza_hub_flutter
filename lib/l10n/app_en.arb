@@ -113,5 +113,20 @@
   "hideProduct": "Hide product",
   "confirmHideProduct": "Are you sure you want to hide this product from the marketplace?",
   "hide": "Hide",
-  "notificationsTooltip": "Notifications"
+  "notificationsTooltip": "Notifications",
+  "cartTitle": "Cart",
+  "cartEmpty": "Your cart is empty",
+  "searchProducts": "Browse products",
+  "singleItem": "1 item",
+  "subtotal": "Subtotal",
+  "shippingLabel": "Delivery",
+  "shippingCalculated": "Calculated later",
+  "itemsTotal": "Items total",
+  "shippingDisclaimer": "The amount excludes delivery; it will be determined when order agreement is enabled.",
+  "checkout": "Proceed to checkout",
+  "continueShopping": "Continue shopping",
+  "clearCart": "Clear cart",
+  "confirmClearCart": "Are you sure you want to clear your cart?",
+  "cartCleared": "Cart cleared",
+  "clear": "Clear"
 }
