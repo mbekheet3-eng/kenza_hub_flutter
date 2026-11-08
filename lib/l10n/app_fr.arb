@@ -113,5 +113,20 @@
   "hideProduct": "Masquer le produit",
   "confirmHideProduct": "Voulez-vous vraiment masquer ce produit du marché ?",
   "hide": "Masquer",
-  "notificationsTooltip": "Notifications"
+  "notificationsTooltip": "Notifications",
+  "cartTitle": "Panier",
+  "cartEmpty": "Votre panier est vide",
+  "searchProducts": "Parcourir les produits",
+  "singleItem": "1 article",
+  "subtotal": "Sous-total",
+  "shippingLabel": "Livraison",
+  "shippingCalculated": "Calculée ultérieurement",
+  "itemsTotal": "Total des produits",
+  "shippingDisclaimer": "Le montant n’inclut pas la livraison ; celle-ci sera déterminée lorsque la confirmation de commande sera activée.",
+  "checkout": "Passer à la commande",
+  "continueShopping": "Continuer vos achats",
+  "clearCart": "Vider le panier",
+  "confirmClearCart": "Voulez-vous vraiment vider votre panier ?",
+  "cartCleared": "Panier vidé",
+  "clear": "Effacer"
 }
