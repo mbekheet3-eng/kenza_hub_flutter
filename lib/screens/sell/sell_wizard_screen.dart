@@ -217,14 +217,14 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
     setState(() => _isLoading = true);
     final uploadedImagePaths = <String>[];
     String? createdProductId;
-    var retryAfterPhoneVerification = false;
     var allModerationRequestsSucceeded = true;
 
     try {
       final sellerProfileId = await _productService.ensureSellerProfile();
 
       // The V2 RPC creates the listing as pending_review and enforces
-      // verified-phone, seller permission, service coverage and weight rules.
+      // seller permission, valid catalog data and weight rules. Phone
+      // verification and Kenza delivery-zone selection are currently optional.
       createdProductId = await _productService.createProduct(
         sellerProfileId: sellerProfileId,
         categorySlug: _category!,
@@ -311,209 +311,12 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         }
       }
 
-      final errorText = e.toString();
-      if (errorText.contains('PHONE_VERIFICATION_REQUIRED')) {
-        retryAfterPhoneVerification = await _showPhoneVerificationDialog();
-      } else if (errorText.contains('DEFAULT_REGION_REQUIRED')) {
-        try {
-          final regionId = await _showDeliveryRegionDialog();
-          if (regionId != null) {
-            await _productService.setDefaultDeliveryRegion(regionId);
-            retryAfterPhoneVerification = true;
-          }
-        } catch (regionError) {
-          _showError('${AppLocalizations.of(context).saveDeliveryRegionError}: $regionError');
-        }
-      } else if (errorText.contains('OUTSIDE_DELIVERY_COVERAGE')) {
-        _showError(AppLocalizations.of(context).outsideDeliveryCoverage);
-      } else {
-        _showError('${AppLocalizations.of(context).moderationSubmitError}: $e');
-      }
+      _showError('${AppLocalizations.of(context).moderationSubmitError}: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
 
-    if (retryAfterPhoneVerification && mounted) {
-      await _publishProduct();
-    }
-  }
 
-  Future<String?> _showDeliveryRegionDialog() async {
-    final regions = await _productService.fetchDeliveryRegions();
-    if (regions.isEmpty) {
-      _showError(AppLocalizations.of(context).noDeliveryRegions);
-      return null;
-    }
-
-    return showDialog<String>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(AppLocalizations.of(context).chooseDeliveryArea),
-        content: SizedBox(
-          width: double.maxFinite,
-          height: 300,
-          child: ListView.separated(
-            shrinkWrap: true,
-            itemCount: regions.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final region = regions[index];
-              return ListTile(
-                title: Text(region['name_ar'] as String? ?? ''),
-                subtitle: Text(region['city_ar'] as String? ?? ''),
-                onTap: () => Navigator.of(dialogContext)
-                    .pop(region['id'] as String),
-              );
-            },
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(AppLocalizations.of(context).cancel),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _normalizeEgyptianPhone(String input) {
-    final compact = input.replaceAll(RegExp(r'[\s()-]'), '');
-    if (compact.startsWith('+')) return compact;
-    if (compact.startsWith('00')) return '+${compact.substring(2)}';
-    if (compact.startsWith('0')) return '+20${compact.substring(1)}';
-    if (compact.startsWith('20')) return '+$compact';
-    return '+20$compact';
-  }
-
-  Future<bool> _showPhoneVerificationDialog() async {
-    final client = Supabase.instance.client;
-    final phoneController = TextEditingController(
-      text: client.auth.currentUser?.phone ?? '',
-    );
-    final otpController = TextEditingController();
-    var otpSent = false;
-    var busy = false;
-    String? dialogError;
-
-    final verified = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(AppLocalizations.of(context).verifyPhone),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  AppLocalizations.of(context).phoneVerificationRequired,
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: phoneController,
-                  keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context).phoneNumber,
-                    hintText: '01xxxxxxxxx',
-                  ),
-                ),
-                if (otpSent) ...[
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: otpController,
-                    keyboardType: TextInputType.number,
-                    maxLength: 6,
-                    decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context).smsCode,
-                      hintText: AppLocalizations.of(context).enterSixDigitCode,
-                    ),
-                  ),
-                ],
-                if (dialogError != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    dialogError!,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: busy
-                  ? null
-                  : () => Navigator.of(dialogContext).pop(false),
-              child: Text(AppLocalizations.of(context).cancel),
-            ),
-            ElevatedButton(
-              onPressed: busy
-                  ? null
-                  : () async {
-                      setDialogState(() {
-                        busy = true;
-                        dialogError = null;
-                      });
-                      try {
-                        final phone =
-                            _normalizeEgyptianPhone(phoneController.text.trim());
-                        if (!RegExp(r'^\+[1-9]\d{7,14}$').hasMatch(phone)) {
-                          throw const FormatException(
-                            AppLocalizations.of(context).enterValidPhone,
-                          );
-                        }
-
-                        if (!otpSent) {
-                          await client.auth.updateUser(
-                            UserAttributes(phone: phone),
-                          );
-                          setDialogState(() {
-                            otpSent = true;
-                            dialogError =
-                                AppLocalizations.of(context).otpSent;
-                          });
-                        } else {
-                          await client.auth.verifyOTP(
-                            phone: phone,
-                            token: otpController.text.trim(),
-                            type: OtpType.phoneChange,
-                          );
-                          if (dialogContext.mounted) {
-                            Navigator.of(dialogContext).pop(true);
-                          }
-                        }
-                      } catch (error) {
-                        if (dialogContext.mounted) {
-                          setDialogState(() {
-                            dialogError = error is FormatException
-                                ? error.message
-                                : '${AppLocalizations.of(context).otpVerificationFailed}: ' + error.toString();
-                          });
-                        }
-                      } finally {
-                        if (dialogContext.mounted) {
-                          setDialogState(() => busy = false);
-                        }
-                      }
-                    },
-              child: busy
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(otpSent ? AppLocalizations.of(context).verifyCode : AppLocalizations.of(context).sendCode),
-            ),
-          ],
-        ),
-      ),
-    );
-
-    phoneController.dispose();
-    otpController.dispose();
-    return verified ?? false;
-  }
 
   bool _validateAllData() {
     return _selectedImages.isNotEmpty &&
