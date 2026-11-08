@@ -59,7 +59,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
   Future<void> _load() async {
     try {
       final userId = _client.auth.currentUser?.id;
-      if (userId == null) throw StateError('يجب تسجيل الدخول أولاً');
+      if (userId == null) throw StateError(AppLocalizations.of(context).loginRequired);
 
       final membership = await _client
           .from('seller_profile_members')
@@ -67,7 +67,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
           .eq('user_id', userId)
           .isFilter('revoked_at', null)
           .maybeSingle();
-      if (membership == null) throw StateError('لا توجد عضوية متجر نشطة');
+      if (membership == null) throw StateError(AppLocalizations.of(context).noActiveStoreMembership);
 
       final profileId = membership['seller_profile_id'] as String;
       final profile = await _client
@@ -183,7 +183,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
     if (trimmed.isEmpty) return null;
     final uri = Uri.tryParse(trimmed);
     if (uri == null || uri.scheme != 'https' || uri.host.isEmpty) {
-      throw FormatException('رابط $label لازم يبدأ بـ https://');
+      throw FormatException('$label ${AppLocalizations.of(context).urlMustStartHttps}');
     }
     return trimmed;
   }
@@ -215,15 +215,15 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
       final links = <String, String>{};
       final facebook = _validatedHttps(_facebook.text, 'Facebook');
       final instagram = _validatedHttps(_instagram.text, 'Instagram');
-      final website = _validatedHttps(_website.text, 'الموقع');
+      final website = _validatedHttps(_website.text, AppLocalizations.of(context).locationLabel);
       final whatsapp = _validatedHttps(_whatsapp.text, 'WhatsApp');
       if (facebook != null) links['facebook'] = facebook;
       if (instagram != null) links['instagram'] = instagram;
       if (website != null) links['website'] = website;
       if (whatsapp != null) links['whatsapp'] = whatsapp;
 
-      final avatar = _validatedHttps(_avatar.text, 'صورة المتجر');
-      final cover = _validatedHttps(_cover.text, 'صورة الغلاف');
+      final avatar = _validatedHttps(_avatar.text, AppLocalizations.of(context).storeImage);
+      final cover = _validatedHttps(_cover.text, AppLocalizations.of(context).coverImage);
       final update = <String, dynamic>{
         'display_name': _displayName.text.trim(),
         'business_name': _businessName.text.trim().isEmpty ? null : _businessName.text.trim(),
@@ -318,12 +318,12 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
               ),
             ),
           Text(
-            _agency ? 'بيانات المحل الفعلي' : 'بيانات المتجر الأونلاين',
+            _agency ? AppLocalizations.of(context).physicalStoreDetails : AppLocalizations.of(context).onlineStoreDetails,
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 12),
-          _field(_displayName, 'اسم العرض'),
-          _field(_businessName, 'اسم النشاط أو المتجر'),
+          _field(_displayName, AppLocalizations.of(context).displayName),
+          _field(_businessName, AppLocalizations.of(context).businessOrStoreName),
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: TextField(
@@ -331,13 +331,13 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
               enabled: _isOwner && !_saving,
               maxLines: 3,
               maxLength: 500,
-              decoration: const InputDecoration(
-                labelText: 'نبذة عن المتجر',
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context).storeBio,
                 border: OutlineInputBorder(),
               ),
             ),
           ),
-          _field(_avatar, 'رابط صورة الشعار أو صورة المتجر', hint: 'https://...'),
+          _field(_avatar, AppLocalizations.of(context).logoImageUrl, hint: 'https://...'),
           OutlinedButton.icon(
             onPressed: _isOwner && !_saving && !_uploadingImage
                 ? () => _pickStoreImage(cover: false)
@@ -346,8 +346,8 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
             label: Text(AppLocalizations.of(context).chooseLogoImage),
           ),
           if (_agency) ...[
-            _field(_area, 'المنطقة أو الحي', hint: 'مثال: وكالة البلح - بولاق'),
-            _field(_address, 'عنوان المحل', hint: 'العنوان الفعلي للمحل'),
+            _field(_area, AppLocalizations.of(context).areaOrNeighborhood, hint: AppLocalizations.of(context).addressExample),
+            _field(_address, AppLocalizations.of(context).shopAddress, hint: AppLocalizations.of(context).physicalShopAddress),
             Padding(
               padding: EdgeInsets.only(bottom: 10),
               child: Text(
@@ -365,7 +365,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
           ] else
             Text(AppLocalizations.of(context).noOnlineStoreAddress),
           const SizedBox(height: 8),
-          _field(_cover, _agency ? 'رابط صورة واجهة المحل' : 'رابط صورة غلاف المتجر', hint: 'https://...'),
+          _field(_cover, _agency ? AppLocalizations.of(context).storefrontImageUrl : AppLocalizations.of(context).storeCoverImageUrl, hint: 'https://...'),
           OutlinedButton.icon(
             onPressed: _isOwner && !_saving && !_uploadingImage
                 ? () => _pickStoreImage(cover: true)
@@ -379,8 +379,8 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
           const SizedBox(height: 8),
           _field(_facebook, 'Facebook', hint: 'https://facebook.com/...'),
           _field(_instagram, 'Instagram', hint: 'https://instagram.com/...'),
-          _field(_website, 'الموقع الإلكتروني', hint: 'https://...'),
-          _field(_whatsapp, 'رابط WhatsApp', hint: 'https://wa.me/...'),
+          _field(_website, AppLocalizations.of(context).website, hint: 'https://...'),
+          _field(_whatsapp, AppLocalizations.of(context).whatsappLink, hint: 'https://wa.me/...'),
           const SizedBox(height: 20),
           ElevatedButton.icon(
             onPressed: _isOwner && !_saving && !_uploadingImage ? _save : null,
@@ -388,7 +388,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
                 ? const SizedBox(width: 18, height: 18,
                     child: CircularProgressIndicator(strokeWidth: 2))
                 : const Icon(Icons.save_outlined),
-            label: Text(_saving ? 'جارٍ الحفظ...' : 'حفظ البيانات'),
+            label: Text(_saving ? AppLocalizations.of(context).saving : AppLocalizations.of(context).saveData),
           ),
         ],
       ),
