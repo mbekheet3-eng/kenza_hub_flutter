@@ -51,17 +51,31 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(widget.agency ? AppLocalizations.of(context).agencyCorner : 'Online Store')),
-      body: FutureBuilder<_StorePageData>(
-        future: _future,
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        child: FutureBuilder<_StorePageData>(
+          future: _future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.65,
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+              ],
+            );
           }
           if (snapshot.hasError || !snapshot.hasData) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.65,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.store_mall_directory_outlined, size: 52),
@@ -69,9 +83,11 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
                     Text(AppLocalizations.of(context).sellerStoreLoadError),
                     const SizedBox(height: 12),
                     OutlinedButton(onPressed: _refresh, child: Text(AppLocalizations.of(context).retry)),
-                  ],
+                    ],
+                    ),
+                  ),
                 ),
-              ),
+              ],
             );
           }
 
@@ -86,9 +102,8 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
               ? Map<String, dynamic>.from(profile['social_links'] as Map)
               : <String, dynamic>{};
 
-          return RefreshIndicator(
-            onRefresh: _refresh,
-            child: CustomScrollView(
+          return CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverToBoxAdapter(
                   child: Column(
@@ -196,9 +211,9 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
                     ),
                   ),
               ],
-            ),
           );
         },
+      ),
       ),
     );
   }
