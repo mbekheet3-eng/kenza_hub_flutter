@@ -311,7 +311,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           if (!_isOwner)
-            const Card(
+            Card(
               child: Padding(
                 padding: EdgeInsets.all(14),
                 child: Text(AppLocalizations.of(context).ownerOnlyStoreEdit),
@@ -348,7 +348,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
           if (_agency) ...[
             _field(_area, 'المنطقة أو الحي', hint: 'مثال: وكالة البلح - بولاق'),
             _field(_address, 'عنوان المحل', hint: 'العنوان الفعلي للمحل'),
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(bottom: 10),
               child: Text(
                 AppLocalizations.of(context).storeDirectoryPrivacy,
@@ -371,7 +371,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
                 ? () => _pickStoreImage(cover: true)
                 : null,
             icon: const Icon(Icons.upload_outlined),
-            label: Text(_agency ? 'اختيار صورة واجهة المحل' : 'اختيار صورة الغلاف'),
+            label: Text(_agency ? AppLocalizations.of(context).chooseStorefrontPhoto : AppLocalizations.of(context).chooseCoverPhoto),
           ),
           const SizedBox(height: 8),
           Text(AppLocalizations.of(context).optionalSocialLinks,
