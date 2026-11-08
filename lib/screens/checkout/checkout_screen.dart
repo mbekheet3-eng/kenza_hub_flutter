@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:kenza_hub_flutter/config/app_colors.dart';
@@ -28,7 +29,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget build(BuildContext context) {
     if (!context.watch<AuthProvider>().isSignedIn) {
       return Scaffold(
-        appBar: AppBar(title: const Text('إتمام الطلب')),
+        appBar: AppBar(title: Text(AppLocalizations.of(context).checkoutTitle)),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
@@ -37,14 +38,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               children: [
                 const Icon(Icons.lock_outline, size: 48),
                 const SizedBox(height: AppSpacing.md),
-                const Text(
-                  'سجّل الدخول أولاً لمتابعة الشراء',
+                Text(
+                  AppLocalizations.of(context).loginToContinuePurchase,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.md),
                 ElevatedButton(
                   onPressed: () => context.push('/login'),
-                  child: const Text('تسجيل الدخول'),
+                  child: Text(AppLocalizations.of(context).login),
                 ),
               ],
             ),
@@ -55,7 +56,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('إتمام الطلب'),
+        title: Text(AppLocalizations.of(context).checkoutTitle),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
@@ -101,8 +102,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           color: Colors.orange.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(AppSpacing.md),
                         ),
-                        child: const Text(
-                          'تأكيد الطلب متوقف مؤقتًا لحين اكتمال الاتفاقية الآمنة على الخادم. لن يتم إنشاء طلب أو تحصيل مبلغ من هذه الشاشة حاليًا.',
+                        child: Text(
+                          AppLocalizations.of(context).secureOrderNotice,
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -128,8 +129,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                       Colors.white),
                                 ),
                               )
-                            : const Text(
-                                'تأكيد الطلب غير متاح حاليًا',
+                            : Text(
+                                AppLocalizations.of(context).orderConfirmUnavailable,
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -151,8 +152,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           ),
                           side: BorderSide(color: Colors.grey[400]!),
                         ),
-                        child: const Text(
-                          'العودة للسلة',
+                        child: Text(
+                          AppLocalizations.of(context).backToCart,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -177,8 +178,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'ملخص الطلب',
+          Text(
+            AppLocalizations.of(context).orderSummary,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -188,16 +189,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('السعر الفرعي'),
-              Text('${cartProvider.subtotal.toStringAsFixed(2)} ج.م'),
+              Text(AppLocalizations.of(context).subtotal),
+              Text('${cartProvider.subtotal.toStringAsFixed(2)} ${AppLocalizations.of(context).currency}'),
             ],
           ),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('الشحن'),
-              const Text('يُحدد عند تأكيد الاتفاقية'),
+              Text(AppLocalizations.of(context).shippingLabel),
+              Text(AppLocalizations.of(context).shippingOnAgreement),
             ],
           ),
           const SizedBox(height: 12),
@@ -210,12 +211,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'المجموع',
+                Text(
+                  AppLocalizations.of(context).total,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  '${cartProvider.total.toStringAsFixed(2)} ج.م',
+                  '${cartProvider.total.toStringAsFixed(2)} ${AppLocalizations.of(context).currency}',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: AppColors.primary,
@@ -236,8 +237,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'عنوان التوصيل',
+          Text(
+            AppLocalizations.of(context).deliveryAddress,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -252,7 +253,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           else if (checkoutProvider.addresses.isEmpty)
             Center(
               child: Text(
-                'لا توجد عناوين مسجلة لهذا الحساب',
+                AppLocalizations.of(context).noSavedAddresses,
                 style: TextStyle(color: Colors.grey[600]),
               ),
             )
@@ -301,7 +302,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
-                                  'افتراضي',
+                                  AppLocalizations.of(context).defaultAddress,
                                   style: TextStyle(
                                     fontSize: 10,
                                     color: Colors.green[700],
@@ -344,8 +345,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'طريقة الدفع',
+          Text(
+            AppLocalizations.of(context).paymentMethod,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -353,7 +354,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
           const SizedBox(height: AppSpacing.md),
           RadioListTile<String>(
-            title: const Text('الدفع عند الاستلام'),
+            title: Text(AppLocalizations.of(context).cashOnDelivery),
             value: 'cash',
             groupValue: checkoutProvider.paymentMethod,
             onChanged: (value) {
