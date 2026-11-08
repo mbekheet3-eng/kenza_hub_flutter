@@ -334,5 +334,5 @@ as $$
       end
   )
 $$;
-revoke all on function private.is_seller_in_service_area(uuid) from public,anon;
-grant execute on function private.is_seller_in_service_area(uuid) to authenticated,service_role;
+revoke all on function private.is_seller_in_service_area(uuid) from public,anon,authenticated;
+grant execute on function private.is_seller_in_service_area(uuid) to service_role;
