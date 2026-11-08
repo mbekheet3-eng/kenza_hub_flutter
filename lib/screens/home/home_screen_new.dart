@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final fullName = (metadata['full_name'] ?? metadata['name'] ?? '').toString().trim();
     if (fullName.isNotEmpty) return fullName.split(RegExp(r'\s+')).first;
     final email = user?.email ?? '';
-    return email.contains('@') ? email.split('@').first : 'عضو كنزة';
+    return email.contains('@') ? email.split('@').first : AppLocalizations(AppLocalizations.currentLocale).memberFallback;
   }
 
   Future<void> _openVisualSearchPicker() async {
@@ -246,8 +246,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   hasScrollBody: false,
                   child: _HomeMessage(
                     icon: Icons.cloud_off_outlined,
-                    message: 'تعذر تحميل المنتجات',
-                    actionLabel: 'إعادة المحاولة',
+                    message: strings.homeProductsLoadError,
+                    actionLabel: strings.retry,
                     onAction: homeProvider.retry,
                   ),
                 )
@@ -319,7 +319,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   size: 23,
                 ),
                 suffixIcon: IconButton(
-                  tooltip: 'البحث بالصورة',
+                  tooltip: AppLocalizations.of(context).imageSearchTooltip,
                   onPressed: _openVisualSearchPicker,
                   icon: const Icon(
                     Icons.camera_alt_outlined,
@@ -560,60 +560,63 @@ class _PromoCarouselState extends State<_PromoCarousel> {
   Timer? _timer;
   int _index = 0;
 
-  static const _promos = [
+  static const int _promoCount = 6;
+
+  List<_PromoData> _buildPromos(AppLocalizations strings) => [
     _PromoData(
-      title: 'فساتين لكل مناسبة',
-      subtitle: 'اكتشفي فساتين جديدة للبيع على كنزة هب',
+      title: strings.promoDressesTitle,
+      subtitle: strings.promoDressesSubtitle,
       icon: Icons.checkroom_outlined,
-      background: Color(0xFFF7E9E7),
-      accent: Color(0xFFC62828),
+      background: const Color(0xFFF7E9E7),
+      accent: const Color(0xFFC62828),
       categoryId: '6731ec75-9d3c-4c2b-be6b-eee1a8a32cef',
     ),
     _PromoData(
-      title: 'لو مش محتاجها... غيرك محتاجها',
-      subtitle: 'بيع واشتري بسهولة من غير عمولة',
+      title: strings.promoReuseTitle,
+      subtitle: strings.promoReuseSubtitle,
       icon: Icons.shopping_bag_outlined,
-      background: Color(0xFFF7E9E7),
-      accent: Color(0xFFC62828),
+      background: const Color(0xFFF7E9E7),
+      accent: const Color(0xFFC62828),
     ),
     _PromoData(
-      title: 'اختيارات كتير في مكان واحد',
-      subtitle: 'اكتشف منتجات جديدة كل يوم',
+      title: strings.promoChoicesTitle,
+      subtitle: strings.promoChoicesSubtitle,
       icon: Icons.auto_awesome_outlined,
-      background: Color(0xFFE8EEF8),
-      accent: Color(0xFF0F2B55),
+      background: const Color(0xFFE8EEF8),
+      accent: const Color(0xFF0F2B55),
     ),
     _PromoData(
-      title: 'كل اللي محتاجه تلاقيه هنا',
-      subtitle: 'تصفح الأصناف واختار اللي يناسبك',
+      title: strings.promoEverythingTitle,
+      subtitle: strings.promoEverythingSubtitle,
       icon: Icons.storefront_outlined,
-      background: Color(0xFFF4EEE3),
-      accent: Color(0xFFC62828),
+      background: const Color(0xFFF4EEE3),
+      accent: const Color(0xFFC62828),
     ),
     _PromoData(
-      title: 'ركن الوكالة',
-      subtitle: 'محلات فعلية وأسواق وكالة البلح',
+      title: strings.agencyCorner,
+      subtitle: strings.physicalShopsInWekala,
       icon: Icons.storefront_outlined,
-      background: Color(0xFFF4EEE3),
-      accent: Color(0xFF9A5B2A),
+      background: const Color(0xFFF4EEE3),
+      accent: const Color(0xFF9A5B2A),
       route: '/agency-corner',
     ),
     _PromoData(
-      title: 'Social Corner',
-      subtitle: 'متاجر وصفحات البيع أونلاين',
+      title: strings.socialCorner,
+      subtitle: strings.socialStoresAndPages,
       icon: Icons.shopping_bag_outlined,
-      background: Color(0xFFE8EEF8),
-      accent: Color(0xFF5367A5),
+      background: const Color(0xFFE8EEF8),
+      accent: const Color(0xFF5367A5),
       route: '/online-stores',
     ),
   ];
+
 
   @override
   void initState() {
     super.initState();
     _timer = Timer.periodic(const Duration(seconds: 5), (_) {
       if (!mounted || !_controller.hasClients) return;
-      _index = (_index + 1) % _promos.length;
+      _index = (_index + 1) % _promoCount;
       _controller.animateToPage(
         _index,
         duration: const Duration(milliseconds: 400),
@@ -631,16 +634,17 @@ class _PromoCarouselState extends State<_PromoCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    final promos = _buildPromos(AppLocalizations.of(context));
     return Column(
       children: [
         SizedBox(
           height: 142,
           child: PageView.builder(
             controller: _controller,
-            itemCount: _promos.length,
+            itemCount: promos.length,
             onPageChanged: (index) => setState(() => _index = index),
             itemBuilder: (context, index) {
-              final promo = _promos[index];
+              final promo = promos[index];
               return GestureDetector(
                 onTap: promo.route != null
                     ? () => context.push(promo.route!)
@@ -709,7 +713,7 @@ class _PromoCarouselState extends State<_PromoCarousel> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
-            _promos.length,
+            promos.length,
             (index) => AnimatedContainer(
               duration: const Duration(milliseconds: 180),
               margin: const EdgeInsets.symmetric(horizontal: 3),
@@ -834,12 +838,14 @@ class _HomeProductCard extends StatelessWidget {
                   const SizedBox(height: 3),
                   Text(
                     [
-                      if ((product.size ?? '').isNotEmpty) 'مقاس ${product.size}',
+                      if ((product.size ?? '').isNotEmpty)
+                        '${AppLocalizations.of(context).sizeLabel}: ${product.size}',
                       if (product.condition.isNotEmpty) product.condition,
                     ].join(' • ').isEmpty
-                        ? 'متاح'
+                        ? AppLocalizations.of(context).availableLabel
                         : [
-                            if ((product.size ?? '').isNotEmpty) 'مقاس ${product.size}',
+                            if ((product.size ?? '').isNotEmpty)
+                              '${AppLocalizations.of(context).sizeLabel}: ${product.size}',
                             if (product.condition.isNotEmpty) product.condition,
                           ].join(' • '),
                     maxLines: 1,
@@ -929,29 +935,29 @@ class _HomeBottomNavigation extends StatelessWidget {
           children: [
             _NavItem(
               icon: Icons.home_rounded,
-              label: 'الرئيسية',
+              label: AppLocalizations.of(context).home,
               selected: true,
               onTap: () => context.go('/home'),
             ),
             _NavItem(
               icon: Icons.search_rounded,
-              label: 'اكتشف',
+              label: AppLocalizations.of(context).discover,
               onTap: () => context.push('/categories'),
             ),
             _NavItem(
               icon: Icons.add_circle_rounded,
-              label: 'بيع منتج',
+              label: AppLocalizations.of(context).sellProduct,
               emphasized: true,
               onTap: () => context.push('/sell-wizard'),
             ),
             _NavItem(
               icon: Icons.chat_bubble_outline_rounded,
-              label: 'الرسائل',
+              label: AppLocalizations.of(context).chatsTitle,
               onTap: () => context.push('/chats'),
             ),
             _NavItem(
               icon: Icons.person_outline_rounded,
-              label: 'حسابي',
+              label: AppLocalizations.of(context).profileTitle,
               onTap: () => context.push('/profile'),
             ),
           ],
