@@ -98,7 +98,9 @@ class Product {
   bool get isAvailable => !isSold && isActive;
 
   bool get isPendingReview =>
-      statusSlug == 'pending_review' || moderationStatus == 'pending';
+      statusSlug == 'pending_review' ||
+      moderationStatus == 'pending' ||
+      moderationStatus == 'pending_review';
 
   // Rating display
   String get ratingDisplay => rating != null ? rating!.toStringAsFixed(1) : 'بدون تقييم';
