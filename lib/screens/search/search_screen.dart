@@ -181,8 +181,11 @@ class _SearchScreenState extends State<SearchScreen> {
         title: Text(AppLocalizations.of(context).discover),
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        child: Column(
+      body: RefreshIndicator(
+        onRefresh: _loadAllProducts,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
           children: [
             // Search Bar
             _buildSearchBar(),
@@ -263,6 +266,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
             const SizedBox(height: 24),
           ],
+          ),
         ),
       ),
     );
