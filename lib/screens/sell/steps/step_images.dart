@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import "../../../services/upload_service.dart";
 import '../../../config/theme.dart';
@@ -89,7 +90,7 @@ class _StepImagesState extends State<StepImages> {
           children: [
             ListTile(
               leading: const Icon(Icons.image),
-              title: const Text('من المعرض'),
+              title: Text(AppLocalizations.of(context).fromGallery),
               onTap: () {
                 Navigator.pop(context);
                 _pickImages();
@@ -97,7 +98,7 @@ class _StepImagesState extends State<StepImages> {
             ),
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('التقط صورة'),
+              title: Text(AppLocalizations.of(context).takePhoto),
               onTap: () {
                 Navigator.pop(context);
                 _pickFromCamera();
@@ -116,7 +117,7 @@ class _StepImagesState extends State<StepImages> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'أضف صور للمنتج (حد أقصى 8 صور)',
+            AppLocalizations.of(context).addProductPhotosLimit,
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 16),
@@ -171,11 +172,11 @@ class _StepImagesState extends State<StepImages> {
                         ElevatedButton.icon(
                           onPressed: _showImageSourceBottomSheet,
                           icon: const Icon(Icons.image),
-                          label: const Text('إضافة صور'),
+                          label: Text(AppLocalizations.of(context).addPhotos),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '${_selectedImages.length} من 8 صور مضافة',
+                          '${_selectedImages.length} ${AppLocalizations.of(context).of8ImagesAdded}',
                           style: TextStyle(
                             color: AppTheme.textTertiary,
                             fontSize: 12,
@@ -212,11 +213,11 @@ class _StepImagesState extends State<StepImages> {
                         ElevatedButton.icon(
                           onPressed: _showImageSourceBottomSheet,
                           icon: const Icon(Icons.image),
-                          label: const Text('إضافة صور'),
+                          label: Text(AppLocalizations.of(context).addPhotos),
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'أضف صوراً واضحة وجذابة لمنتجك',
+                          AppLocalizations.of(context).clearPhotoTips,
                           style: TextStyle(
                             color: AppTheme.textTertiary,
                           ),
@@ -235,8 +236,8 @@ class _StepImagesState extends State<StepImages> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'نصائح لصور جيدة:',
+                Text(
+                  AppLocalizations.of(context).photoTipsTitle,
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 8),
