@@ -485,6 +485,9 @@ class AppLocalizations {
   String get enterValidPhone => _strings.enterValidPhone;
   String get otpSent => _strings.otpSent;
   String get otpVerificationFailed => _strings.otpVerificationFailed;
+  String get languageSettingsTitle => _strings.languageSettingsTitle;
+  String get languageSettingsSubtitle => _strings.languageSettingsSubtitle;
+  String get chooseLanguage => _strings.chooseLanguage;
   String get currentLanguage => _strings.languageName;
 }
 
