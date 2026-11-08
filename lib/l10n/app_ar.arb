@@ -113,5 +113,20 @@
   "hideProduct": "إخفاء المنتج",
   "confirmHideProduct": "هل أنت متأكد من إخفاء هذا المنتج من العرض؟",
   "hide": "إخفاء",
-  "notificationsTooltip": "الإشعارات"
+  "notificationsTooltip": "الإشعارات",
+  "cartTitle": "السلة",
+  "cartEmpty": "السلة فارغة",
+  "searchProducts": "البحث عن منتجات",
+  "singleItem": "قطعة واحدة",
+  "subtotal": "المجموع الفرعي",
+  "shippingLabel": "الشحن",
+  "shippingCalculated": "سيتم حسابه",
+  "itemsTotal": "إجمالي المنتجات",
+  "shippingDisclaimer": "المبلغ لا يشمل الشحن؛ سيتم تحديده عند تفعيل الاتفاق على الطلب.",
+  "checkout": "الذهاب إلى الدفع",
+  "continueShopping": "متابعة التسوق",
+  "clearCart": "مسح السلة",
+  "confirmClearCart": "هل أنت متأكد من رغبتك في مسح السلة؟",
+  "cartCleared": "تم مسح السلة",
+  "clear": "مسح"
 }
