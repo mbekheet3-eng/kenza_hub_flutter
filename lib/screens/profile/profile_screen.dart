@@ -91,7 +91,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('خطأ في تسجيل الخروج: $e'),
+            content: Text('${AppLocalizations.of(context).error}: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -158,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _loadUserData,
-                child: Text('إعادة المحاولة'),
+                child: Text(AppLocalizations.of(context).retry),
               ),
             ],
           ),
@@ -530,7 +530,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${product.price} ج.م',
+                                  '${product.price} ${AppLocalizations.of(context).currency}',
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodySmall
