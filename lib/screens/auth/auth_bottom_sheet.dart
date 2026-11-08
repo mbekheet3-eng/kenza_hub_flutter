@@ -330,7 +330,7 @@ class _AuthSheetContentState extends State<_AuthSheetContent> {
                         controlAffinity: ListTileControlAffinity.leading,
                         activeColor: _red,
                         title: const Text(
-                          'أوافق على الشروط والأحكام وسياسة الخصوصية',
+                          AppLocalizations.of(context).signupAgreeTerms,
                           style: TextStyle(fontSize: 12, color: Color(0xFF475569)),
                         ),
                       ),
