@@ -103,12 +103,12 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_library_outlined),
-              title: const Text(AppLocalizations.of(context).imagePickGallery),
+              title: Text(AppLocalizations.of(context).imagePickGallery),
               onTap: () => Navigator.pop(sheetContext, ImageSource.gallery),
             ),
             ListTile(
               leading: const Icon(Icons.camera_alt_outlined),
-              title: const Text(AppLocalizations.of(context).imageTakeCamera),
+              title: Text(AppLocalizations.of(context).imageTakeCamera),
               onTap: () => Navigator.pop(sheetContext, ImageSource.camera),
             ),
           ],
@@ -123,14 +123,14 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       if (image == null || !mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(AppLocalizations.of(context).imageSearchComingSoon),
         ),
       );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(AppLocalizations.of(context).imageOpenError),
         ),
       );
@@ -166,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
+                  Text(
                     AppLocalizations.of(context).welcomeGreeting,
                     style: TextStyle(
                       color: Color(0xFF0F172A),
@@ -190,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
             IconButton(
               tooltip: 'الإشعارات',
               onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text(AppLocalizations.of(context).notificationsComingSoon)),
+                SnackBar(content: Text(AppLocalizations.of(context).notificationsComingSoon)),
               ),
               icon: const Icon(
                 Icons.notifications_none_rounded,
@@ -215,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                   child: Row(
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           AppLocalizations.of(context).latestProducts,
                           style: TextStyle(
@@ -388,7 +388,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
             child: Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Text(
                     AppLocalizations.of(context).marketplaceProducts,
                     style: TextStyle(
@@ -400,7 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 TextButton(
                   onPressed: () => context.push('/search'),
-                  child: const Text(AppLocalizations.of(context).viewAll),
+                  child: Text(AppLocalizations.of(context).viewAll),
                 ),
               ],
             ),
@@ -444,7 +444,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: TextButton.icon(
             onPressed: _loadCategories,
             icon: const Icon(Icons.refresh),
-            label: const Text(AppLocalizations.of(context).categoriesLoadError),
+            label: Text(AppLocalizations.of(context).categoriesLoadError),
           ),
         ),
       );

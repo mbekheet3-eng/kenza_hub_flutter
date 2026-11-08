@@ -57,20 +57,5 @@
   "welcomeGreeting": "Hello",
   "notificationsComingSoon": "The notifications center is coming soon.",
   "productCountLabel": "products",
-  "categoriesLoadError": "Could not load categories — retry",
-  "myProductsTitle": "My products",
-  "loginToManageProducts": "Log in to view and manage your products",
-  "addFirstProduct": "Add your first product",
-  "pendingReview": "Under review",
-  "sold": "Sold",
-  "inactive": "Inactive",
-  "editProduct": "Edit",
-  "deleteProduct": "Delete",
-  "editProductInfo": "Edit product details",
-  "cancel": "Cancel",
-  "invalidProductInput": "Enter a name, description and a valid price greater than zero.",
-  "saveChanges": "Save changes",
-  "hideProduct": "Hide product",
-  "confirmHideProduct": "Are you sure you want to hide this product from the marketplace?",
-  "hide": "Hide"
+  "categoriesLoadError": "Could not load categories — retry"
 }

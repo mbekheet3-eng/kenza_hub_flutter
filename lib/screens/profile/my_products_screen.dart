@@ -343,7 +343,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 6),
                           ),
-                          child: const Text(AppLocalizations.of(context).editProduct, style: TextStyle(fontSize: 12)),
+                          child: Text(AppLocalizations.of(context).editProduct, style: TextStyle(fontSize: 12)),
                         ),
                       ),
                       const SizedBox(width: 4),
@@ -354,7 +354,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 6),
                             side: const BorderSide(color: Colors.red),
                           ),
-                          child: const Text(
+                          child: Text(
                             AppLocalizations.of(context).deleteProduct,
                             style: TextStyle(fontSize: 12, color: Colors.red),
                           ),
@@ -389,7 +389,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text(AppLocalizations.of(context).deleteProduct, style: TextStyle(color: Colors.red)),
+              title: Text(AppLocalizations.of(context).deleteProduct, style: TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(context);
                 _deleteProduct(product.id);
@@ -455,7 +455,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                   !price.isFinite ||
                   price <= 0) {
                 ScaffoldMessenger.of(dialogContext).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Text(AppLocalizations.of(context).invalidProductInput),
                   ),
                 );
@@ -525,7 +525,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                 ),
               );
             },
-            child: const Text(AppLocalizations.of(context).hide, style: TextStyle(color: Colors.red)),
+            child: Text(AppLocalizations.of(context).hide, style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

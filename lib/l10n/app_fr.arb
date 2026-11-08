@@ -57,20 +57,5 @@
   "welcomeGreeting": "Bonjour",
   "notificationsComingSoon": "Le centre de notifications sera bientôt disponible.",
   "productCountLabel": "produits",
-  "categoriesLoadError": "Impossible de charger les catégories — réessayer",
-  "myProductsTitle": "Mes produits",
-  "loginToManageProducts": "Connectez-vous pour voir et gérer vos produits",
-  "addFirstProduct": "Ajouter votre premier produit",
-  "pendingReview": "En cours de vérification",
-  "sold": "Vendu",
-  "inactive": "Inactif",
-  "editProduct": "Modifier",
-  "deleteProduct": "Supprimer",
-  "editProductInfo": "Modifier les détails du produit",
-  "cancel": "Annuler",
-  "invalidProductInput": "Saisissez un nom, une description et un prix valide supérieur à zéro.",
-  "saveChanges": "Enregistrer les modifications",
-  "hideProduct": "Masquer le produit",
-  "confirmHideProduct": "Voulez-vous vraiment masquer ce produit du marché ?",
-  "hide": "Masquer"
+  "categoriesLoadError": "Impossible de charger les catégories — réessayer"
 }
