@@ -82,24 +82,21 @@ Deno.serve(async (req: Request) => {
       return json({ error: "PRODUCT_IMAGE_PERMISSION_REQUIRED" }, 403);
     }
 
-    if (image.ai_review_status !== "pending") {
-      return json({ error: "IMAGE_REVIEW_ALREADY_STARTED_OR_COMPLETED" }, 409);
-    }
-
-    // Claim the pending image atomically so concurrent/replayed requests
-    // cannot send the same image to Gemini more than once.
-    const { data: claimedImage, error: claimError } = await supabase
-      .from("product_images")
-      .update({
-        ai_review_status: "error",
-        ai_review_result: { state: "processing", started_at: new Date().toISOString() },
-      })
-      .eq("id", image.id)
-      .eq("ai_review_status", "pending")
-      .select("id")
-      .maybeSingle();
-    if (claimError || !claimedImage) {
-      return json({ error: "IMAGE_REVIEW_ALREADY_STARTED_OR_COMPLETED" }, 409);
+    // PostgreSQL atomically claims the image and enforces the per-user limit.
+    // It also recovers a processing lease abandoned for more than five minutes.
+    const { data: claimed, error: claimError } = await supabase.rpc(
+      "claim_product_image_review",
+      { p_image_id: image.id, p_requester_user_id: user.id },
+    );
+    if (claimError || claimed !== true) {
+      const message = claimError?.message ?? "";
+      if (message.includes("IMAGE_REVIEW_RATE_LIMITED")) {
+        return json({ error: "IMAGE_REVIEW_RATE_LIMITED" }, 429);
+      }
+      if (message.includes("IMAGE_REVIEW_ALREADY_STARTED_OR_COMPLETED")) {
+        return json({ error: "IMAGE_REVIEW_ALREADY_STARTED_OR_COMPLETED" }, 409);
+      }
+      return json({ error: "IMAGE_REVIEW_CLAIM_FAILED" }, 500);
     }
 
     const { data: signed, error: signedError } = await supabase.storage
@@ -210,26 +207,22 @@ rules:
         return json({ error: "PRODUCT_REVIEW_SAVE_FAILED" }, 500);
       }
     } else if (imageRows.every((row: any) => row.ai_review_status === "approved")) {
-      const { data: availableStatus, error: statusError } = await supabase
-        .from("product_statuses")
-        .select("id")
-        .eq("slug", "available")
-        .single();
-      if (statusError || !availableStatus) {
-        console.error("Available product status is missing", statusError?.message);
-        return json({ error: "AVAILABLE_STATUS_NOT_FOUND" }, 500);
+      const { data: published, error: publishError } = await supabase.rpc(
+        "publish_product_after_ai_review",
+        { p_product_id: product.id },
+      );
+      if (publishError) {
+        console.error("Product publication gate failed", publishError.message);
+        return json({ error: "PRODUCT_PUBLICATION_GATE_FAILED" }, 500);
       }
-
-      const { error: productUpdateError } = await supabase
-        .from("products")
-        .update({
-          moderation_status: "approved",
-          status_id: availableStatus.id,
-        })
-        .eq("id", product.id);
-      if (productUpdateError) {
-        console.error("Product approval persistence failed", productUpdateError.message);
-        return json({ error: "PRODUCT_APPROVAL_SAVE_FAILED" }, 500);
+      if (published !== true) {
+        return json({
+          image_id: image.id,
+          status,
+          review: result,
+          product_status: "pending_review",
+          publication_blocked: true,
+        });
       }
     }
 
