@@ -1,0 +1,48 @@
+-- TEMPORARY launch mode: images are marked approved without Gemini review.
+-- Authentication, active account, seller ownership/permissions, and required
+-- product/image creation validations remain in place. Re-enable moderation later.
+do $$
+declare
+  v_available uuid;
+begin
+  select id into v_available
+  from public.product_statuses
+  where slug = 'available' and is_active
+  limit 1;
+
+  if v_available is null then
+    raise exception 'AVAILABLE_STATUS_NOT_CONFIGURED';
+  end if;
+
+  update public.product_images pi
+  set ai_review_status = 'approved',
+      ai_review_result = coalesce(pi.ai_review_result, '{}'::jsonb) || jsonb_build_object(
+        'decision', 'approved',
+        'temporary_auto_approval', true,
+        'moderation_skipped', 'gemini_paused_for_launch',
+        'approved_at', now()
+      ),
+      ai_reviewed_at = now(),
+      ai_review_model = 'temporary-auto-publish'
+  from public.products p
+  where p.id = pi.product_id
+    and p.moderation_status = 'pending'
+    and pi.ai_review_status = 'pending'
+    and pi.ai_review_result->>'decision' = 'manual_review';
+
+  update public.products p
+  set moderation_status = 'approved',
+      status_id = v_available,
+      published_at = now()
+  where p.moderation_status = 'pending'
+    and exists (
+      select 1 from public.product_images pi
+      where pi.product_id = p.id
+    )
+    and not exists (
+      select 1 from public.product_images pi
+      where pi.product_id = p.id
+        and pi.ai_review_status <> 'approved'
+    );
+end;
+$$;
