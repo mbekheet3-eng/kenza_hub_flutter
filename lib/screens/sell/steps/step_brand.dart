@@ -61,7 +61,7 @@ class _StepBrandState extends State<StepBrand> {
   @override
   Widget build(BuildContext context) {
     if (widget.category == null || widget.skipVariantFields) {
-      return const Center(
+      return Center(
         child: Padding(
           padding: EdgeInsets.all(16),
           child: Text(
@@ -76,7 +76,7 @@ class _StepBrandState extends State<StepBrand> {
       future: _brandsFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
+          return Center(
             child: Padding(
               padding: EdgeInsets.all(24),
               child: CircularProgressIndicator(),
