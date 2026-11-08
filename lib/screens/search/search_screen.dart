@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -65,12 +66,12 @@ class _SearchScreenState extends State<SearchScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('اختيار صورة من المعرض'),
+              title: Text(AppLocalizations.of(context).imagePickGallery),
               onTap: () => Navigator.pop(sheetContext, ImageSource.gallery),
             ),
             ListTile(
               leading: const Icon(Icons.camera_alt_outlined),
-              title: const Text('التقاط صورة بالكاميرا'),
+              title: Text(AppLocalizations.of(context).imageTakeCamera),
               onTap: () => Navigator.pop(sheetContext, ImageSource.camera),
             ),
           ],
@@ -85,15 +86,15 @@ class _SearchScreenState extends State<SearchScreen> {
       );
       if (image == null || !mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('تم اختيار الصورة. البحث بالصورة سيتاح بعد ربط خدمة البحث البصري.'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).imageSearchComingSoon),
         ),
       );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('تعذر فتح الصورة. تحقق من صلاحية الكاميرا أو المعرض.'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).imageOpenError),
         ),
       );
     }
@@ -177,7 +178,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('اكتشف'),
+        title: Text(AppLocalizations.of(context).discover),
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -208,7 +209,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '${products.length} منتج',
+                    '${products.length} ${AppLocalizations.of(context).productsCount}',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppTheme.textSecondary,
                     ),
@@ -220,7 +221,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     GestureDetector(
                       onTap: _clearFilters,
                       child: Text(
-                        'مسح الفلاتر',
+                        AppLocalizations.of(context).clearFilters,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: AppTheme.primaryColor,
                           fontWeight: FontWeight.bold,
@@ -306,7 +307,7 @@ class _SearchScreenState extends State<SearchScreen> {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Text(
-              'اكتشفي الفساتين',
+              AppLocalizations.of(context).discoverDresses,
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
             ),
           ),
@@ -429,7 +430,7 @@ class _SearchScreenState extends State<SearchScreen> {
         width: double.infinity,
         child: OutlinedButton.icon(
           icon: const Icon(Icons.tune),
-          label: const Text('فلاتر متقدمة'),
+          label: Text(AppLocalizations.of(context).advancedFilters),
           onPressed: () => _showAdvancedFilters(context),
           style: OutlinedButton.styleFrom(
             side: BorderSide(color: AppTheme.primaryColor),
@@ -448,19 +449,19 @@ class _SearchScreenState extends State<SearchScreen> {
         items: [
           DropdownMenuItem(
             value: 'newest',
-            child: const Text('الأحدث'),
+            child: Text(AppLocalizations.of(context).newest),
           ),
           DropdownMenuItem(
             value: 'price_low',
-            child: const Text('السعر: من الأقل للأعلى'),
+            child: Text(AppLocalizations.of(context).priceLowToHigh),
           ),
           DropdownMenuItem(
             value: 'price_high',
-            child: const Text('السعر: من الأعلى للأقل'),
+            child: Text(AppLocalizations.of(context).priceHighToLow),
           ),
           DropdownMenuItem(
             value: 'most_viewed',
-            child: const Text('الأكثر مشاهدة'),
+            child: Text(AppLocalizations.of(context).mostViewed),
           ),
         ],
         onChanged: (value) {
@@ -479,7 +480,7 @@ class _SearchScreenState extends State<SearchScreen> {
             const Icon(Icons.error_outline, size: 56),
             const SizedBox(height: 12),
             Text(
-              'تعذر تحميل نتائج البحث',
+              AppLocalizations.of(context).searchLoadError,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -487,7 +488,7 @@ class _SearchScreenState extends State<SearchScreen> {
             const SizedBox(height: 12),
             ElevatedButton(
               onPressed: _loadAllProducts,
-              child: const Text('إعادة المحاولة'),
+              child: Text(AppLocalizations.of(context).retry),
             ),
           ],
         ),
@@ -504,14 +505,14 @@ class _SearchScreenState extends State<SearchScreen> {
             Icon(Icons.search_off, size: 64, color: AppTheme.textTertiary),
             const SizedBox(height: 16),
             Text(
-              'لم نعثر على نتائج',
+              AppLocalizations.of(context).noSearchResults,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: AppTheme.textSecondary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'جرب تغيير الفلاتر أو البحث',
+              AppLocalizations.of(context).changeFilters,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: AppTheme.textTertiary,
               ),
@@ -563,7 +564,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${product.price} ج.م',
+                    '${product.price} ${AppLocalizations.of(context).currency}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: AppTheme.primaryColor,
                       fontWeight: FontWeight.bold,
@@ -603,7 +604,7 @@ class _SearchScreenState extends State<SearchScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'فلاتر متقدمة',
+                  AppLocalizations.of(context).advancedFilters,
                   style: Theme.of(sheetContext).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -638,7 +639,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           draftPriceFilterEnabled = false;
                         });
                       },
-                      child: const Text('إلغاء فلتر السعر'),
+                      child: Text(AppLocalizations.of(context).clearPriceFilter),
                     ),
                     const Spacer(),
                     ElevatedButton(
@@ -653,7 +654,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryColor,
                       ),
-                      child: const Text('تطبيق الفلاتر'),
+                      child: Text(AppLocalizations.of(context).applyFilters),
                     ),
                   ],
                 ),
