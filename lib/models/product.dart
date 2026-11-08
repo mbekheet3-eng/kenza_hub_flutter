@@ -347,8 +347,15 @@ class Product {
 class ProductImage {
   final String id;
   final String productId;
+
+  /// Signed URL for display when one has already been generated.
   final String imageUrl;
+
+  /// Legacy local path, or the Supabase object path for DB-backed rows.
   final String localPath;
+
+  /// Supabase Storage bucket for DB-backed image rows.
+  final String? storageBucket;
   final int order;
   final DateTime createdAt;
 
@@ -357,6 +364,7 @@ class ProductImage {
     required this.productId,
     required this.imageUrl,
     required this.localPath,
+    this.storageBucket,
     required this.order,
     required this.createdAt,
   });
@@ -364,17 +372,23 @@ class ProductImage {
   factory ProductImage.fromJson(Map<String, dynamic> json) {
     return ProductImage(
       id: json['id'] as String,
-      productId: json['product_id'] as String, // ✅ FIXED: snake_case
-      imageUrl: json['image_url'] as String, // ✅ FIXED: snake_case
-      localPath: json['local_path'] as String? ?? '',
+      productId: json['product_id'] as String,
+      imageUrl: json['image_url'] as String? ?? '',
+      localPath: json['local_path'] as String? ??
+          json['image_path'] as String? ??
+          '',
+      storageBucket: json['storage_bucket'] as String?,
       order: (json['display_order'] as num?)?.toInt() ?? 0,
-      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ?? DateTime.now(),
+      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ??
+          DateTime.now(),
     );
   }
 
+  /// Matches the current product_images table; image_url is a runtime signed URL.
   Map<String, dynamic> toJson() => {
         'product_id': productId,
-        'image_url': imageUrl,
+        'image_path': localPath,
+        if (storageBucket != null) 'storage_bucket': storageBucket,
         'display_order': order,
       };
 }
