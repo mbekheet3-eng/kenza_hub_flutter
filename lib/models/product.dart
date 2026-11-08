@@ -11,7 +11,7 @@ class Product {
   final String? size;
   final String? brand;
   final List<String> imageUrls;
-  final List<String> imagePaths; // Local cache paths
+  final List<String> imagePaths; // Supabase object paths used for image retrieval
   final int views;
   final int likes;
   final double? rating;
@@ -37,6 +37,7 @@ class Product {
   final String? brandId;
   final String audience;
   final String sellerType;
+  final double? weightKg;
 
   Product({
     required this.id,
@@ -77,6 +78,7 @@ class Product {
     this.brandId,
     this.audience = 'public',
     this.sellerType = 'seller',
+    this.weightKg,
   });
 
   // Check if category is "home" (furniture & home items)
@@ -229,6 +231,7 @@ class Product {
       sizeId: json['size_id'] as String?,
       brandId: json['brand_id'] as String?,
       audience: json['audience'] as String? ?? 'public',
+      weightKg: (json['weight_kg'] as num?)?.toDouble(),
     );
   }
 
@@ -251,6 +254,7 @@ class Product {
       if (colorId != null) 'color_id': colorId,
       if (sizeId != null) 'size_id': sizeId,
       'audience': audience,
+      if (weightKg != null) 'weight_kg': weightKg,
     };
   }
 
@@ -291,6 +295,10 @@ class Product {
     String? sizeId,
     String? brandId,
     String? audience,
+    String? statusSlug,
+    String? moderationStatus,
+    String? sellerType,
+    double? weightKg,
   }) {
     return Product(
       id: id ?? this.id,
@@ -323,13 +331,15 @@ class Product {
       categoryId: categoryId ?? this.categoryId,
       conditionId: conditionId ?? this.conditionId,
       statusId: statusId ?? this.statusId,
-      statusSlug: statusSlug,
-      moderationStatus: moderationStatus,
+      statusSlug: statusSlug ?? this.statusSlug,
+      moderationStatus: moderationStatus ?? this.moderationStatus,
       currencyId: currencyId ?? this.currencyId,
       colorId: colorId ?? this.colorId,
       sizeId: sizeId ?? this.sizeId,
       brandId: brandId ?? this.brandId,
       audience: audience ?? this.audience,
+      sellerType: sellerType ?? this.sellerType,
+      weightKg: weightKg ?? this.weightKg,
     );
   }
 }
