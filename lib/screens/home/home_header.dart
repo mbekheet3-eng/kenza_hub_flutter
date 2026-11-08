@@ -62,7 +62,7 @@ class HomeHeader extends StatelessWidget implements PreferredSizeWidget {
               tooltip: AppLocalizations.of(context).notificationsTooltip,
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Text(AppLocalizations.of(context).notificationsComingSoon),
                   ),
                 );
