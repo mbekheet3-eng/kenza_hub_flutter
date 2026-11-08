@@ -36,7 +36,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (userId == null) {
         setState(() {
-          _error = 'User not authenticated';
+          _error = AppLocalizations.of(context).loginRequired;
           _isLoadingProfile = false;
         });
         return;
@@ -56,7 +56,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = 'فشل تحميل الملف الشخصي: $e';
+          _error = '${AppLocalizations.of(context).profileLoadFailed}: $e';
           _isLoadingProfile = false;
         });
       }
@@ -126,7 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              authProvider.error ?? 'تعذر تسجيل الخروج. حاول مرة أخرى.',
+              authProvider.error ?? AppLocalizations.of(context).logoutFailed,
             ),
             backgroundColor: Colors.red,
           ),
@@ -199,7 +199,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                _error ?? 'فشل تحميل البيانات',
+                _error ?? AppLocalizations.of(context).userDataUnavailable,
                 style: Theme.of(context).textTheme.titleMedium,
                 textAlign: TextAlign.center,
               ),
@@ -249,8 +249,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: ListTile(
                     leading: const Icon(Icons.language),
                     title: Text(AppLocalizations.of(context).languageSettingsTitle),
-                    subtitle: Text(AppLocalizations.of(context).currentLanguage),
-                    trailing: const Icon(Icons.chevron_right),
+                    subtitle: Text(AppLocalizations.of(context).languageSettingsSubtitle),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(AppLocalizations.of(context).currentLanguage),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.chevron_right),
+                      ],
+                    ),
                     onTap: () => _showLanguagePicker(context),
                   ),
                 ),
@@ -294,12 +301,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 leading: const Icon(Icons.fact_check_outlined),
                                 title: Text(
                                   Localizations.localeOf(context).languageCode == 'ar'
-                                      ? 'مراجعة المنتجات'
+                                      ? AppLocalizations.of(context).productModerationTitle
                                       : 'Product moderation',
                                 ),
                                 subtitle: Text(
                                   Localizations.localeOf(context).languageCode == 'ar'
-                                      ? 'فحص الصور التي تحتاج إلى مراجعة بشرية'
+                                      ? AppLocalizations.of(context).productModerationSubtitle
                                       : 'Review images flagged for human review',
                                 ),
                                 trailing: const Icon(Icons.chevron_right),
