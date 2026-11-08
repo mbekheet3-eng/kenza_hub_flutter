@@ -189,5 +189,19 @@
   "newCondition": "Neuf",
   "sellerOnKenza": "Vendeur sur Kenza Hub",
   "productAddedToCart": "Produit ajouté au panier",
-  "alreadyInCart": "Ce produit est déjà dans le panier"
+  "alreadyInCart": "Ce produit est déjà dans le panier",
+  "discover": "Découvrir",
+  "productsCount": "produits",
+  "clearFilters": "Effacer les filtres",
+  "discoverDresses": "Découvrez les robes",
+  "advancedFilters": "Filtres avancés",
+  "newest": "Les plus récents",
+  "priceLowToHigh": "Prix : croissant",
+  "priceHighToLow": "Prix : décroissant",
+  "mostViewed": "Les plus consultés",
+  "searchLoadError": "Impossible de charger les résultats de recherche",
+  "noSearchResults": "Aucun résultat trouvé",
+  "changeFilters": "Essayez de modifier les filtres ou la recherche",
+  "clearPriceFilter": "Effacer le filtre de prix",
+  "applyFilters": "Appliquer les filtres"
 }
