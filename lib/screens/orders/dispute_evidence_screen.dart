@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -85,12 +86,12 @@ class _DisputeEvidenceScreenState extends State<DisputeEvidenceScreen> {
       await _load();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم رفع الدليل وتسجيل بصمته بنجاح.')),
+        SnackBar(content: Text(AppLocalizations.of(context).evidenceUploaded)),
       );
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تعذر رفع الدليل: $error')),
+        SnackBar(content: Text('${AppLocalizations.of(context).evidenceUploadError}: $error')),
       );
     } finally {
       if (mounted) setState(() => _uploading = false);
@@ -106,13 +107,13 @@ class _DisputeEvidenceScreenState extends State<DisputeEvidenceScreen> {
       final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
       if (!opened && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تعذر فتح رابط الدليل على الجهاز.')),
+          SnackBar(content: Text(AppLocalizations.of(context).evidenceLinkError)),
         );
       }
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تعذر فتح الدليل: $error')),
+        SnackBar(content: Text('${AppLocalizations.of(context).evidenceOpenError}: $error')),
       );
     }
   }
@@ -120,7 +121,7 @@ class _DisputeEvidenceScreenState extends State<DisputeEvidenceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('أدلة النزاع')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context).disputeEvidenceLabel)),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
@@ -134,7 +135,7 @@ class _DisputeEvidenceScreenState extends State<DisputeEvidenceScreen> {
                         const SizedBox(height: 12),
                         OutlinedButton(
                           onPressed: _load,
-                          child: const Text('إعادة المحاولة'),
+                          child: Text(AppLocalizations.of(context).retry),
                         ),
                       ],
                     ),
@@ -145,15 +146,15 @@ class _DisputeEvidenceScreenState extends State<DisputeEvidenceScreen> {
                   child: ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
-                      const Text(
-                        'ارفع صورًا توضح المشكلة. تُحفظ الأدلة في مساحة خاصة، وتُسجل بصمتها الرقمية، ويُسجل كل طلب مشاهدة أو تحميل.',
+                      Text(
+                        AppLocalizations.of(context).evidenceInstructions,
                         style: TextStyle(height: 1.5),
                       ),
                       const SizedBox(height: 16),
                       TextField(
                         controller: _captionController,
                         maxLength: 500,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'ملاحظة على الدليل (اختياري)',
                           border: OutlineInputBorder(),
                         ),
@@ -167,7 +168,7 @@ class _DisputeEvidenceScreenState extends State<DisputeEvidenceScreen> {
                                   ? null
                                   : () => _pickAndUpload(ImageSource.gallery),
                               icon: const Icon(Icons.photo_library_outlined),
-                              label: const Text('اختيار صورة'),
+                              label: Text(AppLocalizations.of(context).chooseImage),
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -177,7 +178,7 @@ class _DisputeEvidenceScreenState extends State<DisputeEvidenceScreen> {
                                   ? null
                                   : () => _pickAndUpload(ImageSource.camera),
                               icon: const Icon(Icons.camera_alt_outlined),
-                              label: const Text('التقاط صورة'),
+                              label: Text(AppLocalizations.of(context).takePhoto),
                             ),
                           ),
                         ],
@@ -186,18 +187,18 @@ class _DisputeEvidenceScreenState extends State<DisputeEvidenceScreen> {
                         const SizedBox(height: 12),
                         const LinearProgressIndicator(),
                         const SizedBox(height: 6),
-                        const Text('جارٍ رفع الصورة وفحص بصمتها...'),
+                        Text(AppLocalizations.of(context).uploadingEvidence),
                       ],
                       const SizedBox(height: 24),
                       Text(
-                        'الأدلة المسجلة (${_evidence.length})',
+                        '${AppLocalizations.of(context).registeredEvidence} (${_evidence.length})',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 8),
                       if (_evidence.isEmpty)
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.symmetric(vertical: 24),
-                          child: Text('لم يتم تسجيل أدلة لهذا النزاع بعد.'),
+                          child: Text(AppLocalizations.of(context).noEvidenceYet),
                         ),
                       for (final item in _evidence)
                         Card(
@@ -206,10 +207,10 @@ class _DisputeEvidenceScreenState extends State<DisputeEvidenceScreen> {
                             title: Text(
                               (item['caption'] as String?)?.isNotEmpty == true
                                   ? item['caption'] as String
-                                  : 'دليل مرفق',
+                                  : AppLocalizations.of(context).attachedEvidence,
                             ),
                             subtitle: Text(
-                              'بصمة SHA-256: ${(item['file_sha256'] as String? ?? '').isEmpty ? 'غير متاحة' : (item['file_sha256'] as String).substring(0, 12) + '…'}\n${item['created_at'] ?? ''}',
+                              '${AppLocalizations.of(context).evidenceHash}: ${(item['file_sha256'] as String? ?? '').isEmpty ? AppLocalizations.of(context).notAvailable : (item['file_sha256'] as String).substring(0, 12) + '…'}\n${item['created_at'] ?? ''}',
                             ),
                             isThreeLine: true,
                             trailing: PopupMenuButton<String>(
@@ -217,14 +218,14 @@ class _DisputeEvidenceScreenState extends State<DisputeEvidenceScreen> {
                                 item['id'] as String,
                                 download: value == 'download',
                               ),
-                              itemBuilder: (_) => const [
+                              itemBuilder: (_) => [
                                 PopupMenuItem(
                                   value: 'view',
-                                  child: Text('مشاهدة'),
+                                  child: Text(AppLocalizations.of(context).viewEvidence),
                                 ),
                                 PopupMenuItem(
                                   value: 'download',
-                                  child: Text('تحميل'),
+                                  child: Text(AppLocalizations.of(context).downloadEvidence),
                                 ),
                               ],
                             ),
