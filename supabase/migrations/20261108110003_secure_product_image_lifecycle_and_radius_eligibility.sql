@@ -47,7 +47,7 @@ begin
     raise exception 'IMAGE_NOT_FOUND';
   end if;
 
-  -- Recover an abandoned claim after five minutes. A live request keeps the
+  -- Recover an abandoned claim after ten minutes. A live request keeps the
   -- processing lease fresh only until its final status update.
   if v_image.ai_review_status='error'
      and v_image.ai_review_result->>'state'='processing'
