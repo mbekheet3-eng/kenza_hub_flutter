@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -65,9 +66,9 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
                   children: [
                     const Icon(Icons.store_mall_directory_outlined, size: 52),
                     const SizedBox(height: 12),
-                    const Text('تعذر عرض صفحة المتجر'),
+                    Text(AppLocalizations.of(context).sellerStoreLoadError),
                     const SizedBox(height: 12),
-                    OutlinedButton(onPressed: _refresh, child: const Text('إعادة المحاولة')),
+                    OutlinedButton(onPressed: _refresh, child: Text(AppLocalizations.of(context).retry)),
                   ],
                 ),
               ),
@@ -164,7 +165,7 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
                         ),
                       const Padding(
                         padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
-                        child: Text('منتجات المتجر',
+                        child: Text(AppLocalizations.of(context).storeProducts,
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       ),
                     ],
@@ -173,7 +174,7 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
                 if (data.products.isEmpty)
                   const SliverFillRemaining(
                     hasScrollBody: false,
-                    child: Center(child: Text('لا توجد منتجات متاحة حاليًا')),
+                    child: Center(child: Text(AppLocalizations.of(context).noStoreProducts)),
                   )
                 else
                   SliverPadding(
