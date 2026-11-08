@@ -63,6 +63,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _showLanguagePicker(BuildContext context) async {
+    const languageNames = <String, String>{
+      'ar': 'العربية',
+      'en': 'English',
+      'fr': 'Français',
+    };
+
+    await showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) {
+        final strings = AppLocalizations.of(sheetContext);
+        final selectedLanguage =
+            AppLocalizations.currentLocale.languageCode;
+
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+                child: Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                    strings.chooseLanguage,
+                    style: Theme.of(sheetContext).textTheme.titleMedium,
+                  ),
+                ),
+              ),
+              for (final locale in AppLocalizations.supportedLocales)
+                ListTile(
+                  title: Text(
+                    languageNames[locale.languageCode] ?? locale.languageCode,
+                  ),
+                  trailing: selectedLanguage == locale.languageCode
+                      ? const Icon(Icons.check_circle, color: Color(0xFFC85A32))
+                      : null,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    AppLocalizations.setLocale(locale.languageCode);
+                  },
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _openEditProfile() async {
     await context.push('/edit-profile');
     if (mounted) await _loadUserData();
@@ -194,6 +242,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               // Quick Actions
               _buildQuickActions(context, user),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.language),
+                    title: Text(AppLocalizations.of(context).languageSettingsTitle),
+                    subtitle: Text(AppLocalizations.of(context).currentLanguage),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => _showLanguagePicker(context),
+                  ),
+                ),
+              ),
               const SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
