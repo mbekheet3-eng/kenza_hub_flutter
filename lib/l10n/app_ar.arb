@@ -165,5 +165,7 @@
   "updatedDate": "تاريخ التحديث",
   "notes": "ملاحظات",
   "somethingWentWrong": "حدث خطأ",
-  "tryAgain": "حاول مجدداً"
+  "tryAgain": "حاول مجدداً",
+  "initializationError": "تعذر الاتصال بإعدادات الخدمة",
+  "initializationRetryHint": "أغلق التطبيق وافتحه مرة أخرى. إذا استمرت المشكلة، راجع إعدادات Supabase."
 }
