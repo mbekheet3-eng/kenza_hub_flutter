@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 
 class OrderConfirmationScreen extends StatelessWidget {
@@ -12,7 +13,7 @@ class OrderConfirmationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('تأكيد الطلب')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context).confirmOrder)),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -25,14 +26,14 @@ class OrderConfirmationScreen extends StatelessWidget {
                 color: Colors.orange.shade700,
               ),
               const SizedBox(height: 20),
-              const Text(
-                'تأكيد الطلب غير متاح حاليًا',
+              Text(
+                AppLocalizations.of(context).orderConfirmUnavailable,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              const Text(
-                'لم يتم إنشاء طلب أو تحصيل أي مبلغ. سيُتاح إتمام الشراء بعد تجهيز اتفاقية الطرفين وتأكيدها من خلال المسار الآمن على الخادم.',
+              Text(
+                AppLocalizations.of(context).noOrderCreatedNotice,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
@@ -40,7 +41,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () => context.go('/home'),
-                  child: const Text('العودة إلى الرئيسية'),
+                  child: Text(AppLocalizations.of(context).backToHome),
                 ),
               ),
             ],
