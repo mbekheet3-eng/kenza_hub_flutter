@@ -258,7 +258,7 @@ class _AuthSheetContentState extends State<_AuthSheetContent> {
                     ),
                   ),
                   IconButton(
-                    tooltip: 'إغلاق',
+                    tooltip: AppLocalizations.of(context).close,
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.close_rounded),
                   ),
@@ -395,7 +395,7 @@ class _AuthSheetContentState extends State<_AuthSheetContent> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(_isSignUp ? 'لديك حساب بالفعل؟' : strings.noAccount),
+                        Text(_isSignUp ? AppLocalizations.of(context).haveAccount : strings.noAccount),
                         TextButton(
                           onPressed: () => _switchMode(_isSignUp ? AuthSheetMode.login : AuthSheetMode.signUp),
                           child: Text(
