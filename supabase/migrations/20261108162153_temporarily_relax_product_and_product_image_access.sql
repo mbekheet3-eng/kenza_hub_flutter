@@ -1,0 +1,42 @@
+-- Temporary troubleshooting override for product visibility and product-image flow.
+-- Original security policies are intentionally preserved for one-by-one reactivation.
+-- Scope is limited to products, product_images, and product-image Storage buckets.
+
+create policy "temp_product_read_all"
+on public.products
+for select
+to anon, authenticated
+using (true);
+
+create policy "temp_product_images_read_all"
+on public.product_images
+for select
+to anon, authenticated
+using (true);
+
+grant select on table public.product_images to anon, authenticated;
+
+create policy "temp_product_image_storage_read"
+on storage.objects
+for select
+to anon, authenticated
+using (bucket_id in ('product-images', 'restricted-product-images'));
+
+create policy "temp_product_image_storage_insert"
+on storage.objects
+for insert
+to authenticated
+with check (bucket_id in ('product-images', 'restricted-product-images'));
+
+create policy "temp_product_image_storage_update"
+on storage.objects
+for update
+to authenticated
+using (bucket_id in ('product-images', 'restricted-product-images'))
+with check (bucket_id in ('product-images', 'restricted-product-images'));
+
+create policy "temp_product_image_storage_delete"
+on storage.objects
+for delete
+to authenticated
+using (bucket_id in ('product-images', 'restricted-product-images'));
