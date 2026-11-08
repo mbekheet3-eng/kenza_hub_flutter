@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -80,16 +81,16 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
 
     if (!authProvider.isSignedIn) {
       return Scaffold(
-        appBar: AppBar(title: const Text('لوحة البائع')),
+        appBar: AppBar(title: Text('لوحة البائع')),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('سجّل الدخول لعرض لوحة البائع'),
+              Text(AppLocalizations.of(context).loginToViewSellerDashboard),
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () => context.push('/login'),
-                child: const Text('تسجيل الدخول'),
+                child: Text('تسجيل الدخول'),
               ),
             ],
           ),
@@ -98,7 +99,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('لوحة البائع')),
+      appBar: AppBar(title: Text('لوحة البائع')),
       body: FutureBuilder<SellerDashboardData?>(
         future: _dashboardFuture,
         builder: (context, snapshot) {
@@ -168,7 +169,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                         Text(_sellerTypeLabel(sellerType)),
                         const SizedBox(height: 6),
                         Text(
-                          'حالة التحقق: ${_verificationLabel(profile['verification_status'] as String?)}',
+                          '${AppLocalizations.of(context).verificationStatus}: ${_verificationLabel(profile['verification_status'] as String?)}',
                         ),
                         const SizedBox(height: 6),
                         Text(
@@ -205,14 +206,14 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                             OutlinedButton.icon(
                               onPressed: () => context.push('/seller-store-settings'),
                               icon: const Icon(Icons.edit_outlined),
-                              label: const Text('إعدادات واجهة المتجر'),
+                              label: Text(AppLocalizations.of(context).storeAppearanceSettings),
                             ),
                           OutlinedButton.icon(
                             onPressed: () => context.push(
                               '/store/$storeId?type=$storeType',
                             ),
                             icon: const Icon(Icons.open_in_new),
-                            label: const Text('معاينة صفحة المتجر'),
+                            label: Text(AppLocalizations.of(context).previewStorePage),
                           ),
                         ],
                       ),
@@ -247,7 +248,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'ترقية Pro Seller',
+                          AppLocalizations.of(context).upgradeProSeller,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const SizedBox(height: 8),
@@ -257,16 +258,16 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                         if (request != null) ...[
                           const SizedBox(height: 6),
                           Text(
-                            'نوع النشاط المطلوب: ${request['requested_business_type'] ?? 'غير محدد'}',
+                            '${AppLocalizations.of(context).businessTypeRequested}: ${request['requested_business_type'] ?? 'غير محدد'}',
                           ),
                           if (request['review_note'] != null) ...[
                             const SizedBox(height: 6),
-                            Text('ملاحظة المراجعة: ${request['review_note']}'),
+                            Text('${AppLocalizations.of(context).reviewNote}: ${request['review_note']}'),
                           ],
                         ],
                         const SizedBox(height: 10),
-                        const Text(
-                          'تقديم طلبات الترقية واعتمادها غير متاحين من التطبيق حتى اكتمال مسار الاعتماد الإداري وحفظ نوع النشاط المعتمد.',
+                        Text(
+                          AppLocalizations.of(context).upgradeApprovalUnavailable,
                           style: TextStyle(fontSize: 12),
                         ),
                       ],
@@ -281,7 +282,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'إدارة الفريق',
+                          AppLocalizations.of(context).teamManagement,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const SizedBox(height: 8),
@@ -298,7 +299,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                 ElevatedButton.icon(
                   onPressed: () => context.push('/my-products'),
                   icon: const Icon(Icons.inventory_2_outlined),
-                  label: const Text('إدارة منتجاتي'),
+                  label: Text(AppLocalizations.of(context).manageMyProducts),
                 ),
               ],
             ),
