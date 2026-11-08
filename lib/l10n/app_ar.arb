@@ -324,5 +324,10 @@
   "priceInEgp": "السعر بالجنيه المصري",
   "priceExample": "مثال: 150.00",
   "productName": "اسم المنتج",
-  "productDescription": "الوصف"
+  "productDescription": "الوصف",
+  "productTitleLabel": "عنوان المنتج",
+  "catchyTitleHint": "أدخل عنوان جذاب",
+  "optionalProductDescription": "وصف المنتج (اختياري)",
+  "optionalDescriptionHint": "أضف تفاصيل لو حابب، أو اتركه فارغًا",
+  "searchAvailableBrands": "ابحث في العلامات التجارية المتاحة..."
 }
