@@ -308,5 +308,7 @@
   "chooseStorefrontPhoto": "اختيار صورة واجهة المحل",
   "chooseCoverPhoto": "اختيار صورة الغلاف",
   "passwordsDoNotMatch": "كلمتا المرور غير متطابقتين",
-  "termsRequired": "يجب الموافقة على الشروط والأحكام وسياسة الخصوصية للمتابعة"
+  "termsRequired": "يجب الموافقة على الشروط والأحكام وسياسة الخصوصية للمتابعة",
+  "passwordRequired": "كلمة المرور مطلوبة",
+  "passwordMinLength": "يجب ألا تقل كلمة المرور عن 6 أحرف"
 }
