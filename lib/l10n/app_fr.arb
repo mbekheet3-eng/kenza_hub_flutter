@@ -304,5 +304,7 @@
   "viewEvidence": "Voir",
   "downloadEvidence": "Télécharger",
   "evidenceCaptionOptional": "Note sur la preuve (facultatif)",
-  "attachedEvidence": "Preuve jointe"
+  "attachedEvidence": "Preuve jointe",
+  "chooseStorefrontPhoto": "Choisir une photo de vitrine",
+  "chooseCoverPhoto": "Choisir une photo de couverture"
 }
