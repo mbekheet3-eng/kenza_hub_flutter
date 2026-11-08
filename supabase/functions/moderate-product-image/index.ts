@@ -163,20 +163,51 @@ rules:
     try { review = JSON.parse(textPart); } catch { return json({ error: "GEMINI_INVALID_RESPONSE" }, 502); }
 
     const allowed = ["approved", "rejected", "manual_review"];
-    const decision = allowed.includes(review.decision) ? review.decision : "manual_review";
+    const quality = ["good", "poor", "uncertain"].includes(review.quality)
+      ? review.quality
+      : "uncertain";
+    const qualityIssues = Array.isArray(review.quality_issues)
+      ? review.quality_issues.filter((item: unknown) =>
+          ["blur", "dark", "overexposed", "low_resolution", "obstructed"].includes(String(item)))
+      : [];
+    const confidenceValue = Number(review.confidence);
+    const confidence = Number.isFinite(confidenceValue)
+      ? Math.max(0, Math.min(1, confidenceValue))
+      : 0;
+    const flags = {
+      unsafe_content: review.unsafe_content === true,
+      adult_or_sexual_content: review.adult_or_sexual_content === true,
+      violence_or_gore: review.violence_or_gore === true,
+      irrelevant_or_misleading: review.irrelevant_or_misleading === true,
+      prohibited_item: review.prohibited_item === true,
+    };
+    const clearViolation = Object.values(flags).some(Boolean);
+    const safeForAutoApproval =
+      review.decision === "approved" &&
+      confidence >= 0.85 &&
+      quality === "good" &&
+      review.product_visible === true &&
+      qualityIssues.length === 0 &&
+      !clearViolation;
+    const clearForAutoRejection =
+      allowed.includes(review.decision) &&
+      review.decision === "rejected" &&
+      confidence >= 0.90 &&
+      clearViolation;
+    const decision = clearForAutoRejection
+      ? "rejected"
+      : safeForAutoApproval
+        ? "approved"
+        : "manual_review";
     const status = decision === "approved" ? "approved" : decision === "rejected" ? "rejected" : "pending";
     const result = {
       decision,
-      quality: review.quality ?? "uncertain",
-      quality_issues: Array.isArray(review.quality_issues) ? review.quality_issues : [],
-      unsafe_content: Boolean(review.unsafe_content),
-      adult_or_sexual_content: Boolean(review.adult_or_sexual_content),
-      violence_or_gore: Boolean(review.violence_or_gore),
-      irrelevant_or_misleading: Boolean(review.irrelevant_or_misleading),
-      prohibited_item: Boolean(review.prohibited_item),
-      product_visible: Boolean(review.product_visible),
+      quality,
+      quality_issues: qualityIssues,
+      ...flags,
+      product_visible: review.product_visible === true,
       reason_ar: String(review.reason_ar ?? "الصورة تحتاج إلى مراجعة"),
-      confidence: Math.max(0, Math.min(1, Number(review.confidence) || 0)),
+      confidence,
     };
 
     const { error: updateError } = await supabase.from("product_images").update({
