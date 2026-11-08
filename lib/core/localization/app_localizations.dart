@@ -306,6 +306,25 @@ class AppLocalizations {
   String get competitivePriceTip => _strings.competitivePriceTip;
   String get quickOptions => _strings.quickOptions;
   String get selectedPrice => _strings.selectedPrice;
+  String get profileSaved => _strings.profileSaved;
+  String get editProfileTitle => _strings.editProfileTitle;
+  String get loginToEditProfile => _strings.loginToEditProfile;
+  String get changePhoto => _strings.changePhoto;
+  String get loginToViewSellerDashboard => _strings.loginToViewSellerDashboard;
+  String get verificationStatus => _strings.verificationStatus;
+  String get storeAppearanceSettings => _strings.storeAppearanceSettings;
+  String get previewStorePage => _strings.previewStorePage;
+  String get upgradeProSeller => _strings.upgradeProSeller;
+  String get businessTypeRequested => _strings.businessTypeRequested;
+  String get reviewNote => _strings.reviewNote;
+  String get upgradeApprovalUnavailable => _strings.upgradeApprovalUnavailable;
+  String get teamManagement => _strings.teamManagement;
+  String get manageMyProducts => _strings.manageMyProducts;
+  String get sellerStoreLoadError => _strings.sellerStoreLoadError;
+  String get storeProducts => _strings.storeProducts;
+  String get noStoreProducts => _strings.noStoreProducts;
+  String get areaLabel => _strings.areaLabel;
+  String get storefrontDisplayed => _strings.storefrontDisplayed;
   String get currentLanguage => _strings.languageName;
 }
 
