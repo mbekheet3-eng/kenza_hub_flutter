@@ -120,8 +120,9 @@ reason_ar: جملة عربية قصيرة للمستخدم
 confidence: رقم بين 0 و1
 rules:
 - ارفض فقط عند وجود مخالفة واضحة مؤكدة مثل العري/المحتوى الجنسي الصريح أو العنف الدموي أو منتج محظور بوضوح.
-- إذا كانت الصورة مشوشة/مظلمة جدًا أو المنتج غير ظاهر، اجعل القرار manual_review أو quality poor ولا ترفض تلقائيًا.
-- إذا لم تكن متأكدًا، اختر manual_review.
+- إذا كانت الجودة سيئة بوضوح (مثل تشويش شديد أو إضاءة تمنع رؤية السلعة أو حجبها)، اختر decision="rejected" وquality="poor" وحدد quality_issues؛ لا تحل هذه الحالات الواضحة إلى مراجعة بشرية.
+- إذا كان المنتج غير ظاهر أو تعذر تحديد مدى صلاحية الصورة بثقة، اختر manual_review.
+- إذا لم تكن متأكدًا من وجود مخالفة أو من جودة الصورة، اختر manual_review.
 - لا ترفض صورة لمجرد ظهور شخص أو طفل بملابس عادية.
 - الصورة يجب أن تعرض سلعة مناسبة للبيع ضمن الملابس والأحذية ومستلزمات الأطفال والمنزل.
 - لا تحكم على حالة المنتج (جديد/سبق استخدامه) من الصورة وحدها.`;
@@ -170,9 +171,19 @@ rules:
       typeof confidence === "number" && Number.isFinite(confidence) &&
       confidence >= 0 && confidence <= 1;
     const hasHardViolation = flagKeys.some((key) => review[key] === true);
+    const hasClearQualityFailure =
+      review.decision === "rejected" &&
+      qualityIsValid &&
+      review.quality === "poor" &&
+      issuesAreValid &&
+      review.quality_issues.length > 0 &&
+      confidenceIsValid &&
+      confidence >= 0.85 &&
+      typeof review.reason_ar === "string" &&
+      review.reason_ar.trim().length > 0;
 
-    // Gemini can approve only a complete, internally consistent, high-confidence result.
-    // Any explicit safety/prohibited-content flag rejects; ambiguity fails closed to manual review.
+    // Gemini approves clear passes, rejects clear policy/quality failures,
+    // and sends only uncertain or inconsistent results to a human reviewer.
     const canApprove =
       review.decision === "approved" &&
       flagsAreValid &&
@@ -187,7 +198,7 @@ rules:
       typeof review.reason_ar === "string" &&
       review.reason_ar.trim().length > 0;
 
-    const decision = hasHardViolation
+    const decision = hasHardViolation || hasClearQualityFailure
       ? "rejected"
       : canApprove
       ? "approved"
