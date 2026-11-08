@@ -128,5 +128,21 @@
   "clearCart": "Vider le panier",
   "confirmClearCart": "Voulez-vous vraiment vider votre panier ?",
   "cartCleared": "Panier vidé",
-  "clear": "Effacer"
+  "clear": "Effacer",
+  "checkoutTitle": "Finaliser la commande",
+  "loginToContinuePurchase": "Veuillez d’abord vous connecter pour poursuivre l’achat",
+  "confirmOrder": "Confirmer la commande",
+  "orderConfirmUnavailable": "La confirmation de commande est actuellement indisponible",
+  "secureOrderNotice": "La confirmation de commande est temporairement suspendue jusqu’à la finalisation de l’accord sécurisé côté serveur. Aucun commande ne sera créée et aucun paiement ne sera prélevé depuis cet écran pour le moment.",
+  "backToCart": "Retour au panier",
+  "orderSummary": "Récapitulatif de la commande",
+  "shippingOnAgreement": "Définie lors de la confirmation de l’accord",
+  "total": "Total",
+  "deliveryAddress": "Adresse de livraison",
+  "noSavedAddresses": "Aucune adresse enregistrée pour ce compte",
+  "defaultAddress": "Par défaut",
+  "paymentMethod": "Mode de paiement",
+  "cashOnDelivery": "Paiement à la livraison",
+  "noOrderCreatedNotice": "Aucune commande n’a été créée et aucun paiement n’a été prélevé. L’achat sera disponible lorsque l’accord des deux parties sera prêt et confirmé via le processus sécurisé côté serveur.",
+  "backToHome": "Retour à l’accueil"
 }
