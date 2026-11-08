@@ -308,5 +308,7 @@
   "chooseStorefrontPhoto": "Choose storefront photo",
   "chooseCoverPhoto": "Choose cover photo",
   "passwordsDoNotMatch": "Passwords do not match",
-  "termsRequired": "You must agree to the Terms and Conditions and Privacy Policy to continue"
+  "termsRequired": "You must agree to the Terms and Conditions and Privacy Policy to continue",
+  "passwordRequired": "Password is required",
+  "passwordMinLength": "Password must be at least 6 characters"
 }
