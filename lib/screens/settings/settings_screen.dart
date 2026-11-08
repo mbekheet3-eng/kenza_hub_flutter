@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
 
@@ -14,7 +15,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('الإعدادات'),
+        title: Text(AppLocalizations.of(context).settingsTitle),
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -45,7 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildSettingsTile(
               icon: Icons.notifications_outlined,
               title: 'تفضيلات الإشعارات',
-              trailing: const Text('غير متاحة حالياً'),
+              trailing: Text(AppLocalizations.of(context).notAvailable),
             ),
             const Divider(),
 
@@ -73,7 +74,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildSettingsTile(
               icon: Icons.info_outline,
               title: 'حول التطبيق',
-              trailing: const Text('الإصدار 1.0.0'),
+              trailing: Text(AppLocalizations.of(context).appVersion),
             ),
             _buildSettingsTile(
               icon: Icons.rate_review_outlined,
@@ -147,7 +148,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _showUnavailableFeature(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$feature غير متاح حالياً وسيتم تفعيله بعد اكتمال تنفيذه.')),
+      SnackBar(content: Text('$feature ${AppLocalizations.of(context).featureUnavailable}')),
     );
   }
 
@@ -155,14 +156,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('إيقاف أو حذف الحساب'),
-        content: const Text(
-          'إدارة إيقاف الحساب وحذفه غير متاحة حالياً. لن يتم تنفيذ أي حذف من هذه الشاشة.',
+        title: Text(AppLocalizations.of(context).accountDeactivateDelete),
+        content: Text(
+          AppLocalizations.of(context).accountDeletionUnavailable,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('حسناً'),
+            child: Text(AppLocalizations.of(context).ok),
           ),
         ],
       ),
