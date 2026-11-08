@@ -424,5 +424,8 @@
   "continueWithApple": "Continuer avec Apple",
   "passwordUpdated": "Mot de passe mis à jour avec succès",
   "newPasswordTitle": "Définir un nouveau mot de passe",
-  "updatePassword": "Mettre à jour le mot de passe"
+  "updatePassword": "Mettre à jour le mot de passe",
+  "languageSettingsTitle": "Langue de l’application",
+  "languageSettingsSubtitle": "Choisissez la langue utilisée dans Kenza Hub",
+  "chooseLanguage": "Choisir une langue"
 }
