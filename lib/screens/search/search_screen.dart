@@ -234,7 +234,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
             // Products Grid
             productProvider.isLoading
-                ? const Padding(
+                ? Padding(
                     padding: EdgeInsets.all(40),
                     child: Center(child: CircularProgressIndicator()),
                   )
@@ -304,7 +304,7 @@ class _SearchScreenState extends State<SearchScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Text(
               AppLocalizations.of(context).discoverDresses,
