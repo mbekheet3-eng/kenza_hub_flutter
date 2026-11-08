@@ -133,7 +133,7 @@
   "loginToContinuePurchase": "Veuillez d’abord vous connecter pour poursuivre l’achat",
   "confirmOrder": "Confirmer la commande",
   "orderConfirmUnavailable": "La confirmation de commande est actuellement indisponible",
-  "secureOrderNotice": "La confirmation de commande est temporairement suspendue jusqu’à la finalisation de l’accord sécurisé côté serveur. Aucun commande ne sera créée et aucun paiement ne sera prélevé depuis cet écran pour le moment.",
+  "secureOrderNotice": "La confirmation de commande est temporairement suspendue jusqu’à la finalisation de l’accord sécurisé côté serveur. Aucune commande ne sera créée et aucun paiement ne sera prélevé depuis cet écran pour le moment.",
   "backToCart": "Retour au panier",
   "orderSummary": "Récapitulatif de la commande",
   "shippingOnAgreement": "Définie lors de la confirmation de l’accord",
