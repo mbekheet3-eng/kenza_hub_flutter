@@ -228,6 +228,18 @@ class AppLocalizations {
   String get tryAgain => _strings.tryAgain;
   String get initializationError => _strings.initializationError;
   String get initializationRetryHint => _strings.initializationRetryHint;
+  String get loginToFavorite => _strings.loginToFavorite;
+  String get favoriteUpdateError => _strings.favoriteUpdateError;
+  String get loginToBuy => _strings.loginToBuy;
+  String get productUnavailable => _strings.productUnavailable;
+  String get ownProductCannotBuy => _strings.ownProductCannotBuy;
+  String get proSellerCartOnly => _strings.proSellerCartOnly;
+  String get productDetailsTitle => _strings.productDetailsTitle;
+  String get addToCart => _strings.addToCart;
+  String get buyNow => _strings.buyNow;
+  String get description => _strings.description;
+  String get details => _strings.details;
+  String get seller => _strings.seller;
   String get currentLanguage => _strings.languageName;
 }
 
