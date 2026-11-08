@@ -128,5 +128,21 @@
   "clearCart": "مسح السلة",
   "confirmClearCart": "هل أنت متأكد من رغبتك في مسح السلة؟",
   "cartCleared": "تم مسح السلة",
-  "clear": "مسح"
+  "clear": "مسح",
+  "checkoutTitle": "إتمام الطلب",
+  "loginToContinuePurchase": "سجّل الدخول أولاً لمتابعة الشراء",
+  "confirmOrder": "تأكيد الطلب",
+  "orderConfirmUnavailable": "تأكيد الطلب غير متاح حاليًا",
+  "secureOrderNotice": "تأكيد الطلب متوقف مؤقتًا لحين اكتمال الاتفاقية الآمنة على الخادم. لن يتم إنشاء طلب أو تحصيل مبلغ من هذه الشاشة حاليًا.",
+  "backToCart": "العودة للسلة",
+  "orderSummary": "ملخص الطلب",
+  "shippingOnAgreement": "يُحدد عند تأكيد الاتفاقية",
+  "total": "المجموع",
+  "deliveryAddress": "عنوان التوصيل",
+  "noSavedAddresses": "لا توجد عناوين مسجلة لهذا الحساب",
+  "defaultAddress": "افتراضي",
+  "paymentMethod": "طريقة الدفع",
+  "cashOnDelivery": "الدفع عند الاستلام",
+  "noOrderCreatedNotice": "لم يتم إنشاء طلب أو تحصيل أي مبلغ. سيُتاح إتمام الشراء بعد تجهيز اتفاقية الطرفين وتأكيدها من خلال المسار الآمن على الخادم.",
+  "backToHome": "العودة إلى الرئيسية"
 }
