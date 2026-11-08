@@ -329,7 +329,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             });
                           },
                           child: Text(
-                            'أوافق على الشروط والأحكام و سياسة الخصوصية',
+                            AppLocalizations.of(context).signupAgreeTerms,
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.grey[700],
@@ -383,7 +383,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Expanded(child: Divider()),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                        child: Text('أو أنشئ حسابك باستخدام'),
+                        child: Text(AppLocalizations.of(context).orCreateAccountWith),
                       ),
                       Expanded(child: Divider()),
                     ],
