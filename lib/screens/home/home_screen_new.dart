@@ -103,12 +103,12 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('اختيار صورة من المعرض'),
+              title: const Text(AppLocalizations.of(context).imagePickGallery),
               onTap: () => Navigator.pop(sheetContext, ImageSource.gallery),
             ),
             ListTile(
               leading: const Icon(Icons.camera_alt_outlined),
-              title: const Text('التقاط صورة بالكاميرا'),
+              title: const Text(AppLocalizations.of(context).imageTakeCamera),
               onTap: () => Navigator.pop(sheetContext, ImageSource.camera),
             ),
           ],
@@ -124,14 +124,14 @@ class _HomeScreenState extends State<HomeScreen> {
       if (image == null || !mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('تم اختيار الصورة. البحث بالصورة سيتاح بعد ربط خدمة البحث البصري.'),
+          content: Text(AppLocalizations.of(context).imageSearchComingSoon),
         ),
       );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('تعذر فتح الصورة. تحقق من صلاحية الكاميرا أو المعرض.'),
+          content: Text(AppLocalizations.of(context).imageOpenError),
         ),
       );
     }
@@ -167,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text(
-                    'أهلاً',
+                    AppLocalizations.of(context).welcomeGreeting,
                     style: TextStyle(
                       color: Color(0xFF0F172A),
                       fontSize: 14,
@@ -190,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
             IconButton(
               tooltip: 'الإشعارات',
               onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('مركز الإشعارات قيد التجهيز.')),
+                const SnackBar(content: Text(AppLocalizations.of(context).notificationsComingSoon)),
               ),
               icon: const Icon(
                 Icons.notifications_none_rounded,
@@ -217,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       const Expanded(
                         child: Text(
-                          'أحدث المنتجات',
+                          AppLocalizations.of(context).latestProducts,
                           style: TextStyle(
                             color: Color(0xFF0F172A),
                             fontSize: 18,
@@ -257,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: _HomeMessage(
                     icon: Icons.shopping_bag_outlined,
                     message: strings.noProducts,
-                    actionLabel: 'عرض الكل',
+                    actionLabel: AppLocalizations.of(context).viewAll,
                     onAction: homeProvider.clearFilters,
                   ),
                 )
@@ -390,7 +390,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 const Expanded(
                   child: Text(
-                    'منتجات السوق',
+                    AppLocalizations.of(context).marketplaceProducts,
                     style: TextStyle(
                       color: Color(0xFF0F172A),
                       fontSize: 16,
@@ -400,7 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 TextButton(
                   onPressed: () => context.push('/search'),
-                  child: const Text('عرض الكل'),
+                  child: const Text(AppLocalizations.of(context).viewAll),
                 ),
               ],
             ),
@@ -444,7 +444,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: TextButton.icon(
             onPressed: _loadCategories,
             icon: const Icon(Icons.refresh),
-            label: const Text('تعذر تحميل الأصناف — إعادة المحاولة'),
+            label: const Text(AppLocalizations.of(context).categoriesLoadError),
           ),
         ),
       );
