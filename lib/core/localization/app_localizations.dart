@@ -2,25 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:kenza_hub_flutter/l10n/app_strings.dart';
 
-/// Backwards-compatible facade over Flutter's generated ARB localizations.
-/// Keep locale persistence and existing call sites stable while screens migrate.
+/// Compatibility facade backed by Flutter gen_l10n and ARB resources.
 class AppLocalizations {
   final Locale locale;
   late final AppStrings _strings = AppStrings(locale);
-
   AppLocalizations(this.locale);
 
-  static const supportedLocales = [
-    Locale('ar'),
-    Locale('en'),
-    Locale('fr'),
-  ];
-
+  static const supportedLocales = [Locale('ar'), Locale('en'), Locale('fr')];
   static final ValueNotifier<Locale> localeNotifier =
       ValueNotifier<Locale>(const Locale('ar'));
-
   static const String _localePreferenceKey = 'kenza_hub_locale';
-
   static Locale get currentLocale => localeNotifier.value;
 
   static Future<void> initialize() async {
@@ -37,20 +28,15 @@ class AppLocalizations {
 
   static void setLocale(String languageCode, {bool persist = true}) {
     final locale = supportedLocales.firstWhere(
-      (supportedLocale) => supportedLocale.languageCode == languageCode,
+      (item) => item.languageCode == languageCode,
       orElse: () => const Locale('ar'),
     );
-
     if (localeNotifier.value.languageCode != locale.languageCode) {
       localeNotifier.value = locale;
     }
     if (persist) {
-      SharedPreferences.getInstance().then(
-        (preferences) => preferences.setString(
-          _localePreferenceKey,
-          locale.languageCode,
-        ),
-      );
+      SharedPreferences.getInstance().then((preferences) =>
+          preferences.setString(_localePreferenceKey, locale.languageCode));
     }
   }
 
@@ -58,14 +44,11 @@ class AppLocalizations {
       _AppLocalizationsDelegate();
 
   static AppLocalizations of(BuildContext context) {
-    final localizations =
-        Localizations.of<AppLocalizations>(context, AppLocalizations);
-    if (localizations == null) {
-      throw FlutterError(
-        'AppLocalizations could not be found in the widget tree.',
-      );
+    final value = Localizations.of<AppLocalizations>(context, AppLocalizations);
+    if (value == null) {
+      throw FlutterError('AppLocalizations could not be found in the widget tree.');
     }
-    return localizations;
+    return value;
   }
 
   static AppLocalizations safeOf(BuildContext context) {
@@ -123,21 +106,6 @@ class AppLocalizations {
   String get backToLogin => _strings.backToLogin;
   String get invalidEmail => _strings.invalidEmail;
   String get emailRequired => _strings.emailRequired;
-  String get myProductsTitle => _strings.myProductsTitle;
-  String get loginToManageProducts => _strings.loginToManageProducts;
-  String get addFirstProduct => _strings.addFirstProduct;
-  String get pendingReview => _strings.pendingReview;
-  String get sold => _strings.sold;
-  String get inactive => _strings.inactive;
-  String get editProduct => _strings.editProduct;
-  String get deleteProduct => _strings.deleteProduct;
-  String get editProductInfo => _strings.editProductInfo;
-  String get cancel => _strings.cancel;
-  String get invalidProductInput => _strings.invalidProductInput;
-  String get saveChanges => _strings.saveChanges;
-  String get hideProduct => _strings.hideProduct;
-  String get confirmHideProduct => _strings.confirmHideProduct;
-  String get hide => _strings.hide;
   String get marketplaceProducts => _strings.marketplaceProducts;
   String get latestProducts => _strings.latestProducts;
   String get agencyCorner => _strings.agencyCorner;
@@ -150,6 +118,23 @@ class AppLocalizations {
   String get notificationsComingSoon => _strings.notificationsComingSoon;
   String get productCountLabel => _strings.productCountLabel;
   String get categoriesLoadError => _strings.categoriesLoadError;
+  String get aboutTitle => _strings.aboutTitle;
+  String get brandTagline => _strings.brandTagline;
+  String get brandSubtitle => _strings.brandSubtitle;
+  String get ideaTitle => _strings.ideaTitle;
+  String get ideaBody => _strings.ideaBody;
+  String get whatYouFindTitle => _strings.whatYouFindTitle;
+  String get whatYouFindBody => _strings.whatYouFindBody;
+  String get howItWorksTitle => _strings.howItWorksTitle;
+  String get howItWorksBody => _strings.howItWorksBody;
+  String get missionTitle => _strings.missionTitle;
+  String get missionBody => _strings.missionBody;
+  String get aboutThanks => _strings.aboutThanks;
+  String get copyright => _strings.copyright;
+  String get policiesTitle => _strings.policiesTitle;
+  String get policiesIntroTitle => _strings.policiesIntroTitle;
+  String get policiesIntro => _strings.policiesIntro;
+  String get policiesDraftNotice => _strings.policiesDraftNotice;
   String get retry => _strings.retry;
   String get categoriesTitle => _strings.categoriesTitle;
   String get categoriesLoadFailed => _strings.categoriesLoadFailed;
@@ -173,39 +158,34 @@ class AppLocalizations {
   String get ratings => _strings.ratings;
   String get edit => _strings.edit;
   String get aboutMe => _strings.aboutMe;
-  String get aboutTitle => _strings.aboutTitle;
-  String get brandTagline => _strings.brandTagline;
-  String get brandSubtitle => _strings.brandSubtitle;
-  String get ideaTitle => _strings.ideaTitle;
-  String get ideaBody => _strings.ideaBody;
-  String get whatYouFindTitle => _strings.whatYouFindTitle;
-  String get whatYouFindBody => _strings.whatYouFindBody;
-  String get howItWorksTitle => _strings.howItWorksTitle;
-  String get howItWorksBody => _strings.howItWorksBody;
-  String get missionTitle => _strings.missionTitle;
-  String get missionBody => _strings.missionBody;
-  String get aboutThanks => _strings.aboutThanks;
-  String get copyright => _strings.copyright;
-  String get policiesTitle => _strings.policiesTitle;
-  String get policiesIntroTitle => _strings.policiesIntroTitle;
-  String get policiesIntro => _strings.policiesIntro;
-  String get policiesDraftNotice => _strings.policiesDraftNotice;
+  String get myProductsTitle => _strings.myProductsTitle;
+  String get loginToManageProducts => _strings.loginToManageProducts;
+  String get addFirstProduct => _strings.addFirstProduct;
+  String get pendingReview => _strings.pendingReview;
+  String get sold => _strings.sold;
+  String get inactive => _strings.inactive;
+  String get editProduct => _strings.editProduct;
+  String get deleteProduct => _strings.deleteProduct;
+  String get editProductInfo => _strings.editProductInfo;
+  String get cancel => _strings.cancel;
+  String get invalidProductInput => _strings.invalidProductInput;
+  String get saveChanges => _strings.saveChanges;
+  String get hideProduct => _strings.hideProduct;
+  String get confirmHideProduct => _strings.confirmHideProduct;
+  String get hide => _strings.hide;
+  String get notificationsTooltip => _strings.notificationsTooltip;
   String get currentLanguage => _strings.languageName;
 }
 
 class _AppLocalizationsDelegate
     extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
-
   @override
   bool isSupported(Locale locale) => AppLocalizations.supportedLocales.any(
-        (supportedLocale) => supportedLocale.languageCode == locale.languageCode,
+        (item) => item.languageCode == locale.languageCode,
       );
-
   @override
-  Future<AppLocalizations> load(Locale locale) async =>
-      AppLocalizations(locale);
-
+  Future<AppLocalizations> load(Locale locale) async => AppLocalizations(locale);
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
