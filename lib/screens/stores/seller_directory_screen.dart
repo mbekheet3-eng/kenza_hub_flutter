@@ -39,35 +39,60 @@ class _SellerDirectoryScreenState extends State<SellerDirectoryScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(title)),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _future,
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        child: FutureBuilder<List<Map<String, dynamic>>>(
+          future: _future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.65,
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+              ],
+            );
           }
           if (snapshot.hasError) {
-            return _DirectoryMessage(
-              icon: Icons.cloud_off_outlined,
-              message: AppLocalizations.of(context).storesLoadError,
-              action: AppLocalizations.of(context).retry,
-              onPressed: _refresh,
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.65,
+                  child: _DirectoryMessage(
+                    icon: Icons.cloud_off_outlined,
+                    message: AppLocalizations.of(context).storesLoadError,
+                    action: AppLocalizations.of(context).retry,
+                    onPressed: _refresh,
+                  ),
+                ),
+              ],
             );
           }
           final stores = snapshot.data ?? const [];
           if (stores.isEmpty) {
-            return _DirectoryMessage(
-              icon: Icons.storefront_outlined,
-              message: widget.agency
-                  ? AppLocalizations.of(context).noPhysicalShops
-                  : AppLocalizations.of(context).noOnlineStores,
-              action: AppLocalizations.of(context).refresh,
-              onPressed: _refresh,
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.65,
+                  child: _DirectoryMessage(
+                    icon: Icons.storefront_outlined,
+                    message: widget.agency
+                        ? AppLocalizations.of(context).noPhysicalShops
+                        : AppLocalizations.of(context).noOnlineStores,
+                    action: AppLocalizations.of(context).refresh,
+                    onPressed: _refresh,
+                  ),
+                ),
+              ],
             );
           }
 
-          return RefreshIndicator(
-            onRefresh: _refresh,
-            child: ListView(
+          return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               children: [
                 Text(
@@ -87,9 +112,9 @@ class _SellerDirectoryScreenState extends State<SellerDirectoryScreen> {
                   );
                 }),
               ],
-            ),
           );
-        },
+          },
+        ),
       ),
     );
   }
