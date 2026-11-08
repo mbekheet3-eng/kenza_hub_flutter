@@ -78,8 +78,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   children: [
                     const Icon(Icons.lock_clock_outlined, size: 48),
                     const SizedBox(height: AppSpacing.md),
-                    const Text(
-                      'رابط استعادة كلمة المرور غير صالح أو انتهت صلاحيته.',
+                    Text(
+                      AppLocalizations.of(context).invalidResetLink,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.md),
