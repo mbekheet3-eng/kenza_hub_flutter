@@ -5,7 +5,7 @@ import 'package:kenza_hub_flutter/l10n/app_strings.dart';
 /// Compatibility facade backed by Flutter gen_l10n and ARB resources.
 class AppLocalizations {
   final Locale locale;
-  late final AppStrings _strings = AppStrings(locale.languageCode);
+  late final AppStrings _strings = lookupAppStrings(locale);
   AppLocalizations(this.locale);
 
   static const supportedLocales = [Locale('ar'), Locale('en'), Locale('fr')];
@@ -106,6 +106,14 @@ class AppLocalizations {
   String get backToLogin => _strings.backToLogin;
   String get invalidEmail => _strings.invalidEmail;
   String get emailRequired => _strings.emailRequired;
+  String get nameRequired => _strings.nameRequired;
+  String get confirmPasswordRequired => _strings.confirmPasswordRequired;
+  String get or => _strings.or;
+  String get continueWithGoogle => _strings.continueWithGoogle;
+  String get continueWithApple => _strings.continueWithApple;
+  String get passwordUpdated => _strings.passwordUpdated;
+  String get newPasswordTitle => _strings.newPasswordTitle;
+  String get updatePassword => _strings.updatePassword;
   String get marketplaceProducts => _strings.marketplaceProducts;
   String get latestProducts => _strings.latestProducts;
   String get agencyCorner => _strings.agencyCorner;
