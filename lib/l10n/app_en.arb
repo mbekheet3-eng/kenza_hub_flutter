@@ -302,5 +302,7 @@
   "noEvidenceYet": "No evidence has been recorded for this dispute yet.",
   "evidenceHash": "SHA-256 fingerprint",
   "viewEvidence": "View",
-  "downloadEvidence": "Download"
+  "downloadEvidence": "Download",
+  "evidenceCaptionOptional": "Evidence note (optional)",
+  "attachedEvidence": "Attached evidence"
 }
