@@ -9,6 +9,7 @@ class UploadService {
   late final SupabaseClient _client;
   final ImagePicker _imagePicker = ImagePicker();
   static const String bucketName = 'product-images';
+  static const String privateProductImagesBucketName = 'restricted-product-images';
   static const String cacheFolder = 'kenza_hub_cache';
   static const int maxImages = 8;
 
@@ -264,7 +265,7 @@ class UploadService {
     final objectPath =
         'products/$productId/$userId/${const Uuid().v4()}${_getFileExtension(imageFile.path)}';
 
-    await _client.storage.from(bucketName).uploadBinary(
+    await _client.storage.from(privateProductImagesBucketName).uploadBinary(
           objectPath,
           fileBytes,
           fileOptions: FileOptions(contentType: mimeType, upsert: false),
@@ -283,7 +284,7 @@ class UploadService {
         objectPath.contains('\\\\')) {
       throw StateError('مسار حذف الصورة غير صالح لهذا الحساب');
     }
-    await _client.storage.from(bucketName).remove([objectPath]);
+    await _client.storage.from(privateProductImagesBucketName).remove([objectPath]);
   }
 
   /// Upload multiple images
