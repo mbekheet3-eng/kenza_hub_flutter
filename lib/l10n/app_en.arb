@@ -304,5 +304,7 @@
   "viewEvidence": "View",
   "downloadEvidence": "Download",
   "evidenceCaptionOptional": "Evidence note (optional)",
-  "attachedEvidence": "Attached evidence"
+  "attachedEvidence": "Attached evidence",
+  "chooseStorefrontPhoto": "Choose storefront photo",
+  "chooseCoverPhoto": "Choose cover photo"
 }
