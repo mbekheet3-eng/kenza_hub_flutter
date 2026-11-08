@@ -17,7 +17,13 @@ import 'package:kenza_hub_flutter/providers/order_tracking_provider.dart';
 // ✅ FIXED D1: Initialize Supabase before runApp
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
+  try {
+    await AppLocalizations.initialize();
+  } catch (e) {
+    debugPrint('Could not restore saved language: $e');
+  }
+
   // Initialize Supabase
   try {
     await Supabase.initialize(
@@ -31,11 +37,6 @@ void main() async {
     return;
   }
 
-  try {
-    await AppLocalizations.initialize();
-  } catch (e) {
-    debugPrint('Could not restore saved language: $e');
-  }
   runApp(const MyApp());
 }
 
@@ -47,6 +48,14 @@ class SupabaseInitializationErrorApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      locale: AppLocalizations.currentLocale,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Center(
@@ -57,16 +66,16 @@ class SupabaseInitializationErrorApp extends StatelessWidget {
               children: [
                 const Icon(Icons.cloud_off_outlined, size: 52),
                 const SizedBox(height: 16),
-                const Text(
-                  'تعذر الاتصال بإعدادات الخدمة',
+                Text(
+                  AppLocalizations.of(context).initializationError,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 Text(message, textAlign: TextAlign.center),
                 const SizedBox(height: 16),
-                const Text(
-                  'أغلق التطبيق وافتحه مرة أخرى. إذا استمرت المشكلة، راجع إعدادات Supabase.',
+                Text(
+                  AppLocalizations.of(context).initializationRetryHint,
                   textAlign: TextAlign.center,
                 ),
               ],
