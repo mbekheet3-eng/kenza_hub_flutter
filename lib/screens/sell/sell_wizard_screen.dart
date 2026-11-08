@@ -760,8 +760,8 @@ class _StepDescriptionAndTitleState extends State<StepDescriptionAndTitle> {
         TextField(
           controller: _titleController,
           decoration: InputDecoration(
-            labelText: 'عنوان المنتج',
-            hintText: 'أدخل عنوان جذاب',
+            labelText: AppLocalizations.of(context).productTitleLabel,
+            hintText: AppLocalizations.of(context).catchyTitleHint,
           ),
           onChanged: (_) => _onChanged(),
         ),
@@ -769,8 +769,8 @@ class _StepDescriptionAndTitleState extends State<StepDescriptionAndTitle> {
         TextField(
           controller: _descriptionController,
           decoration: InputDecoration(
-            labelText: 'وصف المنتج (اختياري)',
-            hintText: 'أضف تفاصيل لو حابب، أو اتركه فارغًا',
+            labelText: AppLocalizations.of(context).optionalProductDescription,
+            hintText: AppLocalizations.of(context).optionalDescriptionHint,
           ),
           maxLines: 4,
           onChanged: (_) => _onChanged(),
