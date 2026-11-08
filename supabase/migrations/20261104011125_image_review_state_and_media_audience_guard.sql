@@ -1,3 +1,4 @@
+
 create or replace function private.edit_product(
  p_product_id uuid,p_category_id uuid,p_title_ar text,p_title_en text,p_description_ar text,p_description_en text,
  p_price numeric,p_condition_id uuid,p_color_id uuid,p_size_id uuid,p_brand_name text,p_weight_kg numeric,p_audience text
@@ -38,4 +39,3 @@ end $$;
 revoke all on function private.record_product_image_ai_review(uuid,text,jsonb,text) from public,anon,authenticated;
 grant usage on schema private to service_role;
 grant execute on function private.record_product_image_ai_review(uuid,text,jsonb,text) to service_role;
-

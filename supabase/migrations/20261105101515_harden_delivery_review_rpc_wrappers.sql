@@ -22,6 +22,7 @@ begin
   order by o.delivery_review_required_at asc;
 end;
 $$;
+
 create or replace function public.admin_get_delivery_review_queue()
 returns table (
   order_id uuid, order_number text, order_status text,
@@ -69,9 +70,11 @@ begin
   end if;
 end;
 $$;
+
 create or replace function public.admin_decide_delivery_review(p_order_id uuid,p_action text,p_reason text)
 returns uuid language sql security invoker set search_path = ''
 as $$ select private.admin_decide_delivery_review($1,$2,$3) $$;
+
 revoke all on function public.admin_get_delivery_review_queue() from public,anon;
 revoke all on function public.admin_decide_delivery_review(uuid,text,text) from public,anon;
 grant execute on function public.admin_get_delivery_review_queue() to authenticated;

@@ -1,3 +1,4 @@
+
 alter table public.regions
   add column center_latitude numeric(10,7),
   add column center_longitude numeric(10,7),

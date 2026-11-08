@@ -1,3 +1,4 @@
+
 -- Cover every foreign key with a leading index where one does not already exist.
 do $$
 declare r record; idx_name text;
@@ -40,4 +41,3 @@ create policy product_images_read on public.product_images for select to anon,au
     or ((select auth.uid()) is not null and private.has_seller_permission(p.seller_id,'products:read'))
   ))
 );
-

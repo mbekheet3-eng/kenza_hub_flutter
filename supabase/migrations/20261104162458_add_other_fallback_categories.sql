@@ -1,3 +1,4 @@
+
 insert into public.categories (
   parent_id,
   name_ar,

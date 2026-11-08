@@ -1,4 +1,3 @@
--- Reject seller responses to pending offers whose expiry time has passed.
 CREATE OR REPLACE FUNCTION private.respond_offer(p_offer_id uuid, p_decision text)
 RETURNS void
 LANGUAGE plpgsql

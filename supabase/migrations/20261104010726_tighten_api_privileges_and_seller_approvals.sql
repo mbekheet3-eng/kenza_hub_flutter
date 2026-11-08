@@ -1,3 +1,4 @@
+
 -- Public seller profile data must not expose the owner's auth-linked UUID.
 revoke select on public.seller_profiles from anon,authenticated;
 grant select (id,seller_type,business_type,display_name,business_name,bio,avatar_url,verification_status,is_active,created_at,updated_at)
@@ -126,4 +127,3 @@ create policy products_public_or_owner_read on public.products for select to ano
   or ((select auth.uid()) is not null and private.has_seller_permission(seller_id,'products:read'))
   or ((select auth.uid()) is not null and private.is_admin())
 );
-

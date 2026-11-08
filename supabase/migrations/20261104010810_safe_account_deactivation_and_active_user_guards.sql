@@ -1,3 +1,4 @@
+
 alter table public.users add column deactivated_at timestamptz;
 
 create or replace function private.is_admin()
@@ -122,4 +123,3 @@ using (
   and (storage.foldername(name))[1]='products'
   and (storage.foldername(name))[2]=auth.uid()::text
 );
-

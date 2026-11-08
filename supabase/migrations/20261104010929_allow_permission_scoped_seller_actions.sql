@@ -1,3 +1,4 @@
+
 drop function public.create_product(uuid,text,text,text,text,numeric,uuid,uuid,uuid,text,numeric,text);
 drop function private.create_product(uuid,text,text,text,text,numeric,uuid,uuid,uuid,text,numeric,text);
 
@@ -64,4 +65,3 @@ returns uuid language sql set search_path=''
 as $$ select private.create_exchange_offer($1,$2,$3,$4) $$;
 revoke all on function public.create_exchange_offer(uuid,uuid,uuid,uuid) from public,anon;
 grant execute on function public.create_exchange_offer(uuid,uuid,uuid,uuid) to authenticated;
-

@@ -1,4 +1,3 @@
--- Require both products in an exchange offer to be approved and actively available.
 CREATE OR REPLACE FUNCTION private.create_exchange_offer(
   p_source_seller_profile_id uuid,
   p_target_seller_profile_id uuid,

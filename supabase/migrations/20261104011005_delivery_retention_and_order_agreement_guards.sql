@@ -1,3 +1,4 @@
+
 -- Delivery retention starts seven days after delivery and closure, not at order creation.
 alter table public.order_delivery_details alter column retention_expires_at drop not null;
 alter table public.order_delivery_details alter column retention_expires_at drop default;
@@ -130,4 +131,3 @@ begin
  values(p_product_id,v_seller,auth.uid(),p_offered_price,p_expires_at) returning id into v_id;
  return v_id;
 end $$;
-

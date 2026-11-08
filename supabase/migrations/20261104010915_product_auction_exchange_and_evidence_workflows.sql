@@ -1,3 +1,4 @@
+
 create or replace function private.increment_product_views(p_product_id uuid)
 returns bigint language plpgsql security definer set search_path=''
 as $$
@@ -145,4 +146,3 @@ grant select on public.agency_directory,public.online_store_directory to anon,au
 
 create index if not exists product_view_events_viewer_idx on public.product_view_events(viewer_user_id);
 create index if not exists product_view_events_product_date_idx on public.product_view_events(product_id,viewed_on desc);
-

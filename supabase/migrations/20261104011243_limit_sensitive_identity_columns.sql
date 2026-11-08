@@ -1,3 +1,4 @@
+
 -- Column-level least privilege: keep identifiers for policy evaluation, not client disclosure.
 revoke select on public.orders from authenticated;
 grant select (
@@ -44,4 +45,3 @@ on public.order_status_history to authenticated;
 
 revoke select on public.dispute_status_consents from authenticated;
 grant select(id,dispute_id,proposed_status,consented_at) on public.dispute_status_consents to authenticated;
-

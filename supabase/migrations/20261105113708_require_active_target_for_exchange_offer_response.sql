@@ -1,4 +1,3 @@
--- Prevent responding to exchange offers when the target Pro Seller store is inactive.
 CREATE OR REPLACE FUNCTION private.respond_exchange_offer(p_offer_id uuid, p_decision text)
 RETURNS void
 LANGUAGE plpgsql

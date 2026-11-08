@@ -17,7 +17,8 @@ on storage.objects for insert to authenticated
 with check (
   bucket_id = 'seller-store-media'
   and exists (
-    select 1 from public.seller_profile_members m
+    select 1
+    from public.seller_profile_members m
     where m.seller_profile_id::text = (storage.foldername(name))[1]
       and m.user_id = (select auth.uid())
       and m.member_role = 'owner'
@@ -31,7 +32,8 @@ on storage.objects for update to authenticated
 using (
   bucket_id = 'seller-store-media'
   and exists (
-    select 1 from public.seller_profile_members m
+    select 1
+    from public.seller_profile_members m
     where m.seller_profile_id::text = (storage.foldername(name))[1]
       and m.user_id = (select auth.uid())
       and m.member_role = 'owner'
@@ -41,7 +43,8 @@ using (
 with check (
   bucket_id = 'seller-store-media'
   and exists (
-    select 1 from public.seller_profile_members m
+    select 1
+    from public.seller_profile_members m
     where m.seller_profile_id::text = (storage.foldername(name))[1]
       and m.user_id = (select auth.uid())
       and m.member_role = 'owner'
@@ -55,7 +58,8 @@ on storage.objects for delete to authenticated
 using (
   bucket_id = 'seller-store-media'
   and exists (
-    select 1 from public.seller_profile_members m
+    select 1
+    from public.seller_profile_members m
     where m.seller_profile_id::text = (storage.foldername(name))[1]
       and m.user_id = (select auth.uid())
       and m.member_role = 'owner'

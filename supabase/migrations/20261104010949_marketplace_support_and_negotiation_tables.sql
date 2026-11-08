@@ -1,3 +1,4 @@
+
 -- A recipient Pro Seller is not required to be a member of the sender's profile.
 create or replace function private.create_exchange_offer(
  p_source_seller_profile_id uuid,p_target_seller_profile_id uuid,p_offered_product_id uuid,p_requested_product_id uuid
@@ -212,4 +213,3 @@ for each row execute function private.touch_user_preferences();
 
 -- Add the new tables' foreign-key indexes; keep intentionally unused workload indexes.
 create index if not exists product_view_events_viewer_fk_idx on public.product_view_events(viewer_user_id);
-

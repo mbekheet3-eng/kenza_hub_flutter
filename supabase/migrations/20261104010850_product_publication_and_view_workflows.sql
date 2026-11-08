@@ -1,3 +1,4 @@
+
 -- Complete order agreement snapshot fields without enabling checkout/order creation.
 alter table public.orders
   add column platform_fee numeric(12,2) not null default 0 check(platform_fee>=0),
@@ -153,4 +154,3 @@ grant execute on function public.increment_product_views(uuid) to authenticated;
 revoke insert,update,delete on public.products,public.product_images from anon,authenticated;
 grant select on public.product_view_events to authenticated;
 revoke all on public.product_view_events from anon,authenticated;
-

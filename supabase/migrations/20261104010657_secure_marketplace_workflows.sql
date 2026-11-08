@@ -1,3 +1,4 @@
+
 create table public.user_blocks (
   blocker_user_id uuid not null references public.users(id) on delete cascade,
   blocked_user_id uuid not null references public.users(id) on delete cascade,
@@ -285,4 +286,3 @@ with check (
   and (storage.foldername(name))[2]=auth.uid()::text
   and private.is_dispute_participant(((storage.foldername(name))[1])::uuid)
 );
-

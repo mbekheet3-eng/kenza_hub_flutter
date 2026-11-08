@@ -1,3 +1,4 @@
+
 create or replace function private.can_upload_product_image_path(p_name text,p_bucket text)
 returns boolean language plpgsql stable security definer set search_path=''
 as $$
@@ -58,4 +59,3 @@ begin
  values(p_product_id,p_image_path,v_bucket,p_display_order) returning id into v_id;
  return v_id;
 end $$;
-

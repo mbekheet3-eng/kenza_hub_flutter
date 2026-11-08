@@ -1,17 +1,1 @@
-update public.categories o
-set display_order = (
-  select coalesce(max(c.display_order),0)+1
-  from public.categories c
-  where c.parent_id=o.parent_id
-    and c.id<>o.id
-    and c.is_active
-)
-where o.is_active
-  and o.name_ar='أخرى'
-  and exists (
-    select 1
-    from public.categories c
-    where c.parent_id=o.parent_id
-      and c.is_active
-      and c.id<>o.id
-  );
+update public.categories o set display_order = (select coalesce(max(c.display_order),0)+1 from public.categories c where c.parent_id=o.parent_id and c.id<>o.id and c.is_active) where o.is_active and o.name_ar='أخرى' and exists (select 1 from public.categories c where c.parent_id=o.parent_id and c.is_active and c.id<>o.id);

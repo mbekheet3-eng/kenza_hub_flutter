@@ -1,6 +1,3 @@
--- Validate product title and active reference data before creating a listing.
--- Align optional weight validation with products_weight_max_10kg_check.
-
 CREATE OR REPLACE FUNCTION private.create_product(
   p_seller_profile_id uuid,
   p_category_id uuid,

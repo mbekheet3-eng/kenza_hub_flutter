@@ -1,5 +1,4 @@
--- Expose only the public seller directory fields through invoker-secured views.
--- The base-table RLS policy continues to restrict results to active seller profiles.
+
 grant select (
   id,
   business_type,

@@ -1,6 +1,12 @@
+
 create policy "dispute_evidence_object_admin_read"
-on storage.objects for select to authenticated
-using (bucket_id = 'dispute-evidence' and private.is_admin());
+on storage.objects
+for select
+to authenticated
+using (
+  bucket_id = 'dispute-evidence'
+  and private.is_admin()
+);
 
 create or replace function public.dispute_evidence_existing_storage_paths(p_paths text[])
 returns text[]

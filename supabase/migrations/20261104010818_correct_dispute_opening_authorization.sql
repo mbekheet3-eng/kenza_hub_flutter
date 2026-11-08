@@ -1,3 +1,4 @@
+
 drop policy if exists disputes_participant_insert on public.disputes;
 create policy disputes_participant_insert on public.disputes for insert to authenticated with check (
   private.is_active_user()
@@ -8,4 +9,3 @@ create policy disputes_participant_insert on public.disputes for insert to authe
     where o.id=order_id and (o.buyer_id=(select auth.uid()) or private.is_seller_owner(o.seller_profile_id))
   )
 );
-

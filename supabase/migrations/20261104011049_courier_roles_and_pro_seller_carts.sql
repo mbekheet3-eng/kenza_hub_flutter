@@ -1,3 +1,4 @@
+
 -- Explicit deny policies document that these tables are RPC/service-only.
 create policy product_view_events_no_direct_access on public.product_view_events
 for all to anon,authenticated using(false) with check(false);
@@ -196,4 +197,3 @@ grant execute on function public.remove_from_cart(uuid) to authenticated;
 
 create trigger carts_touch_updated before update on public.carts
 for each row execute function private.touch_updated_at();
-

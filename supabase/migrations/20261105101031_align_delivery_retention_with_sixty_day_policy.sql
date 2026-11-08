@@ -7,8 +7,10 @@ as $$
 declare v_open_dispute boolean;
 begin
   if new.status is distinct from old.status and new.status in ('delivered','closed') then
-    select exists(select 1 from public.disputes d
-      where d.order_id=new.id and d.status in ('open','under_review','awaiting_response')) into v_open_dispute;
+    select exists(
+      select 1 from public.disputes d
+      where d.order_id=new.id and d.status in ('open','under_review','awaiting_response')
+    ) into v_open_dispute;
     update public.order_delivery_details
       set legal_hold=v_open_dispute,
           retention_expires_at=case when v_open_dispute then null else now()+interval '60 days' end

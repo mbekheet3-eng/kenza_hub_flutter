@@ -24,9 +24,11 @@ begin
   update public.seller_profiles
      set has_shop_address = true
    where id = new.seller_profile_id;
+
   return new;
 end;
 $function$;
+
 revoke all on function private.sync_seller_shop_address_flag() from public, anon, authenticated;
 
 drop trigger if exists trg_sync_seller_shop_address_flag on public.seller_shop_addresses;

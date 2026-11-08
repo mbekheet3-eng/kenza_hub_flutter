@@ -1,3 +1,4 @@
+
 alter table public.product_images
  add column storage_bucket text not null default 'product-images'
    check(storage_bucket in ('product-images','restricted-product-images')),
@@ -106,4 +107,3 @@ begin
   jsonb_build_object('moderation_status',v_product.moderation_status),
   jsonb_build_object('moderation_status',p_decision));
 end $$;
-

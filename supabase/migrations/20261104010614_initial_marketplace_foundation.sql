@@ -1,3 +1,4 @@
+
 create schema if not exists private;
 revoke all on schema private from public, anon;
 grant usage on schema private to authenticated;
@@ -601,4 +602,3 @@ insert into public.product_conditions(name_ar,name_en,slug,display_order) values
 insert into public.product_statuses(name_ar,name_en,slug) values
 ('مسودة','Draft','draft'),('قيد المراجعة','Pending review','pending_review'),('متاح','Available','available'),('مباع','Sold','sold'),('مخفي','Hidden','hidden');
 insert into public.currencies(code,name_ar,name_en,symbol,is_active) values ('EGP','جنيه مصري','Egyptian Pound','ج.م',true);
-

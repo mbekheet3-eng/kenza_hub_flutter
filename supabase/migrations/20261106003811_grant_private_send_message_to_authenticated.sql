@@ -1,0 +1,1 @@
+grant execute on function private.send_message(uuid, text) to authenticated;
