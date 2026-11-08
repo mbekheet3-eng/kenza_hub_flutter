@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 
 import '../../../config/theme.dart';
 import '../../../models/database_category.dart';
@@ -119,7 +120,7 @@ class _StepCategoryState extends State<StepCategory> {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(24),
-              child: Text('لا توجد أقسام متاحة حالياً'),
+              child: Text(AppLocalizations.of(context).noActiveCategories),
             ),
           );
         }
@@ -253,7 +254,7 @@ class _StepCategoryState extends State<StepCategory> {
                       SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'تم اختيار القسم. يمكنك متابعة إضافة بيانات المنتج.',
+                          AppLocalizations.of(context).categorySelected,
                           style: TextStyle(fontSize: 13),
                         ),
                       ),
@@ -276,12 +277,12 @@ class _StepCategoryState extends State<StepCategory> {
         children: [
           const Icon(Icons.cloud_off_outlined, size: 36),
           const SizedBox(height: 8),
-          const Text('تعذر تحميل الأقسام من قاعدة البيانات'),
+          Text(AppLocalizations.of(context).categoryLoadDatabaseError),
           const SizedBox(height: 12),
           OutlinedButton.icon(
             onPressed: _retry,
             icon: const Icon(Icons.refresh),
-            label: const Text('إعادة المحاولة'),
+            label: Text(AppLocalizations.of(context).retry),
           ),
         ],
       ),
