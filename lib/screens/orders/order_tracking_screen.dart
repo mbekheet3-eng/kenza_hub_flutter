@@ -49,7 +49,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
           final order = provider.order;
           if (order == null) {
-            return const Center(child: Text(AppLocalizations.of(context).orderNotFound));
+            return Center(child: Text(AppLocalizations.of(context).orderNotFound));
           }
 
           return SingleChildScrollView(
