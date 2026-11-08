@@ -34,8 +34,58 @@ begin
  end if;
 
  if p_decision='approved' then
-   -- Admin approval must pass the exact same seller, phone, category,
-   -- delivery-coverage and all-images-approved gate as automatic publication.
+   -- A human administrator may resolve Gemini's explicit manual_review result
+   -- after inspecting the images. Never let admin approval bypass a rejected
+   -- image or approve an image that has not completed AI review.
+   if not exists (
+     select 1 from public.product_images
+     where product_id=p_product_id
+   ) then
+     raise exception 'PRODUCT_IMAGES_REQUIRED';
+   end if;
+
+   if exists (
+     select 1 from public.product_images
+     where product_id=p_product_id
+       and ai_review_status='rejected'
+   ) then
+     raise exception 'PRODUCT_HAS_REJECTED_IMAGE';
+   end if;
+
+   if exists (
+     select 1 from public.product_images
+     where product_id=p_product_id
+       and ai_review_status not in ('approved','pending')
+   ) then
+     raise exception 'PRODUCT_IMAGE_REVIEW_NOT_READY';
+   end if;
+
+   if exists (
+     select 1 from public.product_images
+     where product_id=p_product_id
+       and ai_review_status='pending'
+       and coalesce(ai_review_result->>'decision','') <> 'manual_review'
+   ) then
+     raise exception 'PRODUCT_IMAGE_MANUAL_REVIEW_REQUIRED';
+   end if;
+
+   update public.product_images
+   set ai_review_status='approved',
+       ai_review_result=coalesce(ai_review_result,'{}'::jsonb) ||
+         jsonb_build_object(
+           'decision','approved',
+           'admin_override',true,
+           'admin_user_id',auth.uid(),
+           'admin_reviewed_at',now()
+         ),
+       ai_reviewed_at=now(),
+       ai_review_model='human-admin-review'
+   where product_id=p_product_id
+     and ai_review_status='pending'
+     and ai_review_result->>'decision'='manual_review';
+
+   -- The same publication gate still validates active seller/account,
+   -- category, pending status, and every image before publication.
    if not private.publish_product_after_ai_review(p_product_id) then
      raise exception 'PRODUCT_PUBLICATION_REQUIREMENTS_NOT_MET';
    end if;
