@@ -167,5 +167,17 @@
   "somethingWentWrong": "Something went wrong",
   "tryAgain": "Try again",
   "initializationError": "Could not connect to the service configuration",
-  "initializationRetryHint": "Close and reopen the app. If the problem continues, check the Supabase configuration."
+  "initializationRetryHint": "Close and reopen the app. If the problem continues, check the Supabase configuration.",
+  "loginToFavorite": "Log in to add products to your favorites",
+  "favoriteUpdateError": "Could not update favorites. Please try again.",
+  "loginToBuy": "Log in first to buy and add products to your cart",
+  "productUnavailable": "This product is currently unavailable",
+  "ownProductCannotBuy": "You cannot buy a product you listed yourself",
+  "proSellerCartOnly": "The cart is currently available only for Pro Seller products.",
+  "productDetailsTitle": "Product details",
+  "addToCart": "Add to cart",
+  "buyNow": "Buy now",
+  "description": "Description",
+  "details": "Details",
+  "seller": "Seller"
 }
