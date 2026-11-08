@@ -122,28 +122,45 @@ class _DisputeEvidenceScreenState extends State<DisputeEvidenceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context).disputeEvidenceLabel)),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : _error != null
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(_error!, textAlign: TextAlign.center),
-                        const SizedBox(height: 12),
-                        OutlinedButton(
-                          onPressed: _load,
-                          child: Text(AppLocalizations.of(context).retry),
-                        ),
-                      ],
-                    ),
+      body: RefreshIndicator(
+        onRefresh: _load,
+        child: _loading
+            ? ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.65,
+                    child: const Center(child: CircularProgressIndicator()),
                   ),
-                )
-              : RefreshIndicator(
-                  onRefresh: _load,
-                  child: ListView(
+                ],
+              )
+            : _error != null
+                ? ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.65,
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(_error!, textAlign: TextAlign.center),
+                                const SizedBox(height: 12),
+                                OutlinedButton(
+                                  onPressed: _load,
+                                  child: Text(AppLocalizations.of(context).retry),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(16),
                     children: [
                       Text(
@@ -233,7 +250,7 @@ class _DisputeEvidenceScreenState extends State<DisputeEvidenceScreen> {
                         ),
                     ],
                   ),
-                ),
+      ),
     );
   }
 }
