@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 
 class PoliciesScreen extends StatelessWidget {
   const PoliciesScreen({super.key});
@@ -92,7 +93,7 @@ class PoliciesScreen extends StatelessWidget {
               color: _navy,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(Icons.policy_outlined, color: Colors.white, size: 30),
@@ -121,7 +122,7 @@ class PoliciesScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: const Color(0xFFFED7AA)),
             ),
-            child: const Row(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(Icons.info_outline, color: Color(0xFF9A3412)),
@@ -173,7 +174,7 @@ class PoliciesScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          const Center(
+          Center(
             child: Text(
               AppLocalizations.of(context).copyright,
               style: TextStyle(color: Colors.grey, fontSize: 12),
