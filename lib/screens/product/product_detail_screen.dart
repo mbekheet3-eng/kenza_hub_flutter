@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/product.dart';
@@ -60,7 +61,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final userId = context.read<AuthProvider>().userId;
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('سجّل الدخول لإضافة المنتجات إلى المفضلة')),
+        SnackBar(content: Text(AppLocalizations.of(context).loginToFavorite)),
       );
       context.push('/login');
       return;
@@ -80,7 +81,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     if (!succeeded) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تعذر تحديث المفضلة. حاول مرة أخرى.')),
+        SnackBar(content: Text(AppLocalizations.of(context).favoriteUpdateError)),
       );
     }
   }
@@ -89,8 +90,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final authProvider = context.read<AuthProvider>();
     if (!authProvider.isSignedIn) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('سجّل الدخول أولاً للشراء وإضافة المنتجات إلى السلة'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).loginToBuy),
         ),
       );
       context.push('/login');
@@ -99,22 +100,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     if (!product.isAvailable) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('هذا المنتج غير متاح حالياً')),
+        SnackBar(content: Text(AppLocalizations.of(context).productUnavailable)),
       );
       return false;
     }
 
     if (product.userId == authProvider.userId) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('لا يمكنك شراء منتج قمت بعرضه بنفسك')),
+        SnackBar(content: Text(AppLocalizations.of(context).ownProductCannotBuy)),
       );
       return false;
     }
 
     if (product.sellerType != 'pro_seller') {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('السلة متاحة حاليًا لمنتجات البائع المحترف فقط.'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).proSellerCartOnly),
         ),
       );
       return false;
@@ -130,7 +131,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     if (product == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('تفاصيل المنتج')),
+        appBar: AppBar(title: Text(AppLocalizations.of(context).productDetailsTitle)),
         body: Center(
           child: productProvider.isLoading
               ? CircularProgressIndicator(color: AppTheme.primaryColor)
@@ -142,13 +143,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       const Icon(Icons.error_outline, size: 48),
                       const SizedBox(height: 12),
                       Text(
-                        productProvider.error ?? 'تعذر تحميل بيانات المنتج',
+                        productProvider.error ?? AppLocalizations.of(context).productLoadError,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 12),
                       ElevatedButton(
                         onPressed: _loadProduct,
-                        child: const Text('إعادة المحاولة'),
+                        child: Text(AppLocalizations.of(context).retry),
                       ),
                     ],
                   ),
@@ -159,7 +160,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('تفاصيل المنتج'),
+        title: Text(AppLocalizations.of(context).productDetailsTitle),
         actions: [
           IconButton(
             icon: Icon(
@@ -220,8 +221,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         backgroundColor: AppTheme.primaryColor,
                       ),
-                      child: const Text(
-                        'إضافة إلى السلة',
+                      child: Text(
+                        AppLocalizations.of(context).addToCart,
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -239,8 +240,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         side: BorderSide(color: AppTheme.primaryColor),
                       ),
-                      child: const Text(
-                        'اشتري الآن',
+                      child: Text(
+                        AppLocalizations.of(context).buyNow,
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -319,7 +320,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          '${product.price} ج.م',
+          '${product.price} ${AppLocalizations.of(context).currency}',
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
             color: AppTheme.primaryColor,
             fontWeight: FontWeight.bold,
@@ -360,7 +361,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'الوصف',
+          AppLocalizations.of(context).description,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -379,18 +380,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'التفاصيل',
+          AppLocalizations.of(context).details,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 12),
-        _buildDetailRow('العلامة التجارية', product.brand ?? 'غير محدد'),
+        _buildDetailRow(AppLocalizations.of(context).brandLabel, product.brand ?? AppLocalizations.of(context).unspecified),
         if (product.color?.isNotEmpty == true)
-          _buildDetailRow('اللون', product.color!),
+          _buildDetailRow(AppLocalizations.of(context).colorLabel, product.color!),
         if (product.size?.isNotEmpty == true)
-          _buildDetailRow('المقاس', product.size!),
-        _buildDetailRow('الحالة', product.condition ?? 'جديد'),
+          _buildDetailRow(AppLocalizations.of(context).sizeLabel, product.size!),
+        _buildDetailRow(AppLocalizations.of(context).conditionLabel, product.condition ?? AppLocalizations.of(context).newCondition),
       ],
     );
   }
@@ -419,7 +420,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'البائع',
+            AppLocalizations.of(context).seller,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -447,7 +448,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Text(
                       product.sellerName?.trim().isNotEmpty == true
                           ? product.sellerName!
-                          : 'بائع على كنزة هب',
+                          : AppLocalizations.of(context).sellerOnKenza,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -486,7 +487,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          added ? 'تمت إضافة المنتج إلى السلة' : 'هذا المنتج موجود بالفعل في السلة',
+          added ? AppLocalizations.of(context).productAddedToCart : AppLocalizations.of(context).alreadyInCart,
         ),
         backgroundColor: added ? Colors.green : Colors.blueGrey,
         duration: const Duration(seconds: 2),
