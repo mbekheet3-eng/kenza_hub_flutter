@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -50,7 +51,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
   void _initializeSteps() {
     steps = [
       Step(
-        title: const Text('الصور'),
+        title: Text(AppLocalizations.of(context).photos),
         content: StepImages(
           onImagesSelected: _onImagesSelected,
           initialImages: _selectedImages,
@@ -58,7 +59,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         isActive: _currentStep >= 0,
       ),
       Step(
-        title: const Text('معلومات المنتج'),
+        title: Text(AppLocalizations.of(context).productInfo),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -81,8 +82,8 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
               if (!_skipVariantFields)
                 ExpansionTile(
                   tilePadding: EdgeInsets.zero,
-                  title: const Text('تفاصيل إضافية (اختياري)'),
-                  subtitle: const Text('اللون والمقاس والعلامة التجارية'),
+                  title: Text(AppLocalizations.of(context).optionalDetails),
+                  subtitle: Text(AppLocalizations.of(context).colorSizeBrand),
                   children: [
                     StepBrand(
                       onBrandSelected: _onBrandSelected,
@@ -99,7 +100,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
                 initialDescription: _description,
               ),
             ] else
-              const Text('اختر القسم أولاً لعرض بيانات المنتج.'),
+              Text(AppLocalizations.of(context).chooseCategoryFirst),
             if (_category != null) ...[
               const SizedBox(height: 20),
               StepPrice(
@@ -112,7 +113,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         isActive: _currentStep >= 1,
       ),
       Step(
-        title: const Text('مراجعة ونشر'),
+        title: Text(AppLocalizations.of(context).reviewAndPublish),
         content: _buildReviewStep(),
         isActive: _currentStep >= 2,
       ),
@@ -347,7 +348,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
     return showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('اختيار منطقة التوصيل'),
+        title: Text(AppLocalizations.of(context).chooseDeliveryArea),
         content: SizedBox(
           width: double.maxFinite,
           height: 300,
@@ -369,7 +370,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('إلغاء'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
         ],
       ),
@@ -400,13 +401,13 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
       barrierDismissible: false,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('توثيق رقم الهاتف'),
+          title: Text(AppLocalizations.of(context).verifyPhone),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'نطلب توثيق الهاتف مرة واحدة فقط قبل أول عملية بيع أو شراء.',
+                Text(
+                  AppLocalizations.of(context).phoneVerificationRequired,
                 ),
                 const SizedBox(height: 16),
                 TextField(
@@ -444,7 +445,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
               onPressed: busy
                   ? null
                   : () => Navigator.of(dialogContext).pop(false),
-              child: const Text('إلغاء'),
+              child: Text(AppLocalizations.of(context).cancel),
             ),
             ElevatedButton(
               onPressed: busy
@@ -539,7 +540,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildReviewSection('الصور', _buildImagePreview()),
+          _buildReviewSection(AppLocalizations.of(context).photos, _buildImagePreview()),
           _buildReviewSection('الفئة', Text(_category ?? '-')),
           _buildReviewSection('الحالة', Text(_condition ?? '-')),
           if (!_skipVariantFields && _color != null)
@@ -551,7 +552,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
           _buildReviewSection('العنوان', Text(_title)),
           if (_description.trim().isNotEmpty)
             _buildReviewSection('الوصف', Text(_description)),
-          _buildReviewSection('السعر', Text('$_price ج.م', 
+          _buildReviewSection('السعر', Text('$_price ${AppLocalizations.of(context).currency}', 
             style: TextStyle(
               color: AppTheme.primaryColor,
               fontWeight: FontWeight.bold,
@@ -569,7 +570,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
                       width: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('نشر المنتج'),
+                  : Text(AppLocalizations.of(context).publishProduct),
             ),
           ),
         ],
@@ -626,7 +627,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
 
     if (!context.watch<AuthProvider>().isSignedIn) {
       return Scaffold(
-        appBar: AppBar(title: const Text('بيع منتج')),
+        appBar: AppBar(title: Text(AppLocalizations.of(context).sellProduct)),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -635,14 +636,14 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
               children: [
                 const Icon(Icons.lock_outline, size: 48),
                 const SizedBox(height: 12),
-                const Text(
-                  'سجّل الدخول أولاً حتى تتمكن من عرض منتجاتك للبيع',
+                Text(
+                  AppLocalizations.of(context).loginToSell,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
                 ElevatedButton(
                   onPressed: () => context.push('/login'),
-                  child: const Text('تسجيل الدخول'),
+                  child: Text(AppLocalizations.of(context).login),
                 ),
               ],
             ),
@@ -653,7 +654,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('بيع منتج'),
+        title: Text(AppLocalizations.of(context).sellProduct),
         elevation: 0,
       ),
       body: Theme(
@@ -691,7 +692,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
                   if (_currentStep < steps.length - 1)
                     ElevatedButton(
                       onPressed: _canContinue() ? details.onStepContinue : null,
-                      child: const Text('التالي'),
+                      child: Text(AppLocalizations.of(context).next),
                     ),
                   if (_currentStep == steps.length - 1)
                     ElevatedButton(
@@ -702,12 +703,12 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
                               width: 20,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('نشر'),
+                          : Text(AppLocalizations.of(context).publish),
                     ),
                   const SizedBox(width: 8),
                   OutlinedButton(
                     onPressed: details.onStepCancel,
-                    child: const Text('السابق'),
+                    child: Text(AppLocalizations.of(context).previous),
                   ),
                 ],
               ),
