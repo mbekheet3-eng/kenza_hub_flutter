@@ -215,6 +215,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => context.push('/seller-dashboard'),
                       ),
+                      FutureBuilder<Map<String, dynamic>?>(
+                        future: SupabaseService.client
+                            .from('users')
+                            .select('role,is_active')
+                            .eq('id', SupabaseService.client.auth.currentUser!.id)
+                            .maybeSingle(),
+                        builder: (context, snapshot) {
+                          final row = snapshot.data;
+                          if (row?['role'] != 'admin' || row?['is_active'] != true) {
+                            return const SizedBox.shrink();
+                          }
+                          return Column(
+                            children: [
+                              const Divider(height: 1, indent: 16, endIndent: 16),
+                              ListTile(
+                                leading: const Icon(Icons.fact_check_outlined),
+                                title: Text(
+                                  Localizations.localeOf(context).languageCode == 'ar'
+                                      ? 'مراجعة المنتجات'
+                                      : 'Product moderation',
+                                ),
+                                subtitle: Text(
+                                  Localizations.localeOf(context).languageCode == 'ar'
+                                      ? 'فحص الصور التي تحتاج إلى مراجعة بشرية'
+                                      : 'Review images flagged for human review',
+                                ),
+                                trailing: const Icon(Icons.chevron_right),
+                                onTap: () => context.push('/admin-product-moderation'),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),
