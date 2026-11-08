@@ -57,5 +57,20 @@
   "welcomeGreeting": "أهلاً",
   "notificationsComingSoon": "مركز الإشعارات قيد التجهيز.",
   "productCountLabel": "منتج",
-  "categoriesLoadError": "تعذر تحميل الأصناف — إعادة المحاولة"
+  "categoriesLoadError": "تعذر تحميل الأصناف — إعادة المحاولة",
+  "myProductsTitle": "منتجاتي",
+  "loginToManageProducts": "سجّل الدخول لعرض منتجاتك وإدارتها",
+  "addFirstProduct": "إضافة منتج أول",
+  "pendingReview": "قيد المراجعة",
+  "sold": "مباع",
+  "inactive": "غير نشط",
+  "editProduct": "تعديل",
+  "deleteProduct": "حذف",
+  "editProductInfo": "تعديل بيانات المنتج",
+  "cancel": "إلغاء",
+  "invalidProductInput": "أدخل الاسم والوصف وسعراً صحيحاً أكبر من صفر.",
+  "saveChanges": "حفظ التعديلات",
+  "hideProduct": "إخفاء المنتج",
+  "confirmHideProduct": "هل أنت متأكد من إخفاء هذا المنتج من العرض؟",
+  "hide": "إخفاء"
 }

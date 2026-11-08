@@ -8,23 +8,23 @@ class ChatsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context).chatsTitle)),
+      appBar: AppBar(title: const Text('الرسائل')),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.chat_bubble_outline_rounded, size: 56),
+            children: const [
+              Icon(Icons.chat_bubble_outline_rounded, size: 56),
               SizedBox(height: 16),
               Text(
-                AppLocalizations.of(context).chatsComingSoon,
+                'المحادثات قيد التجهيز',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
               ),
               SizedBox(height: 8),
               Text(
-                AppLocalizations.of(context).chatsDescription,
+                'قريبًا ستتمكن من التواصل مع البائعين والمشترين من هنا.',
                 textAlign: TextAlign.center,
               ),
             ],

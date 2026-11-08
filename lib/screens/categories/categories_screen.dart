@@ -71,12 +71,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_library_outlined),
-              title: Text(AppLocalizations.of(context).imagePickGallery),
+              title: const Text('اختيار صورة من المعرض'),
               onTap: () => Navigator.pop(sheetContext, ImageSource.gallery),
             ),
             ListTile(
               leading: const Icon(Icons.camera_alt_outlined),
-              title: Text(AppLocalizations.of(context).imageTakeCamera),
+              title: const Text('التقاط صورة بالكاميرا'),
               onTap: () => Navigator.pop(sheetContext, ImageSource.camera),
             ),
           ],
@@ -92,17 +92,17 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       );
       if (image == null || !mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text(
-            AppLocalizations.of(context).imageSearchComingSoon,
+            'تم اختيار الصورة. البحث بالصورة سيتاح بعد ربط خدمة البحث البصري.',
           ),
         ),
       );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context).imageOpenError),
+        const SnackBar(
+          content: Text('تعذر فتح الصورة. تحقق من صلاحية الكاميرا أو المعرض.'),
         ),
       );
     }
@@ -216,7 +216,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         child: Align(
           alignment: Alignment.centerRight,
           child: Text(
-            AppLocalizations.of(context).categoriesTitle,
+            'تصفح الأقسام',
             style: TextStyle(
               color: _navy,
               fontSize: 17,
@@ -509,12 +509,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           children: [
                             const Icon(Icons.cloud_off_outlined, size: 42),
                             const SizedBox(height: 12),
-                            Text(AppLocalizations.of(context).categoriesLoadFailed),
+                            const Text('تعذر تحميل الأقسام'),
                             const SizedBox(height: 12),
                             OutlinedButton.icon(
                               onPressed: _retry,
                               icon: const Icon(Icons.refresh),
-                              label: Text(AppLocalizations.of(context).retry),
+                              label: const Text('إعادة المحاولة'),
                             ),
                           ],
                         ),
@@ -535,8 +535,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   });
 
                 if (categories.isEmpty) {
-                  return Expanded(
-                    child: Center(child: Text(AppLocalizations.of(context).noCategories)),
+                  return const Expanded(
+                    child: Center(child: Text('لا توجد أقسام متاحة حاليًا')),
                   );
                 }
 

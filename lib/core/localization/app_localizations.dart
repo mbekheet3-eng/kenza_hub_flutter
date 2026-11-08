@@ -123,6 +123,21 @@ class AppLocalizations {
   String get backToLogin => _strings.backToLogin;
   String get invalidEmail => _strings.invalidEmail;
   String get emailRequired => _strings.emailRequired;
+  String get myProductsTitle => _strings.myProductsTitle;
+  String get loginToManageProducts => _strings.loginToManageProducts;
+  String get addFirstProduct => _strings.addFirstProduct;
+  String get pendingReview => _strings.pendingReview;
+  String get sold => _strings.sold;
+  String get inactive => _strings.inactive;
+  String get editProduct => _strings.editProduct;
+  String get deleteProduct => _strings.deleteProduct;
+  String get editProductInfo => _strings.editProductInfo;
+  String get cancel => _strings.cancel;
+  String get invalidProductInput => _strings.invalidProductInput;
+  String get saveChanges => _strings.saveChanges;
+  String get hideProduct => _strings.hideProduct;
+  String get confirmHideProduct => _strings.confirmHideProduct;
+  String get hide => _strings.hide;
   String get currentLanguage => _strings.languageName;
 }
 
