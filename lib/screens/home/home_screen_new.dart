@@ -400,7 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 TextButton(
                   onPressed: () => context.push('/search'),
-                  child: const Text(AppLocalizations.of(context).viewAll),
+                  child: Text(AppLocalizations.of(context).viewAll),
                 ),
               ],
             ),

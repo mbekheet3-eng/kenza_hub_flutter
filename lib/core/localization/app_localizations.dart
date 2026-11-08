@@ -123,6 +123,18 @@ class AppLocalizations {
   String get backToLogin => _strings.backToLogin;
   String get invalidEmail => _strings.invalidEmail;
   String get emailRequired => _strings.emailRequired;
+  String get marketplaceProducts => _strings.marketplaceProducts;
+  String get latestProducts => _strings.latestProducts;
+  String get agencyCorner => _strings.agencyCorner;
+  String get onlineStores => _strings.onlineStores;
+  String get imagePickGallery => _strings.imagePickGallery;
+  String get imageTakeCamera => _strings.imageTakeCamera;
+  String get imageSearchComingSoon => _strings.imageSearchComingSoon;
+  String get imageOpenError => _strings.imageOpenError;
+  String get welcomeGreeting => _strings.welcomeGreeting;
+  String get notificationsComingSoon => _strings.notificationsComingSoon;
+  String get productCountLabel => _strings.productCountLabel;
+  String get categoriesLoadError => _strings.categoriesLoadError;
   String get currentLanguage => _strings.languageName;
 }
 
