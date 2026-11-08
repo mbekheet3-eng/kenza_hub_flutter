@@ -128,5 +128,21 @@
   "clearCart": "Clear cart",
   "confirmClearCart": "Are you sure you want to clear your cart?",
   "cartCleared": "Cart cleared",
-  "clear": "Clear"
+  "clear": "Clear",
+  "checkoutTitle": "Checkout",
+  "loginToContinuePurchase": "Please log in first to continue shopping",
+  "confirmOrder": "Confirm order",
+  "orderConfirmUnavailable": "Order confirmation is currently unavailable",
+  "secureOrderNotice": "Order confirmation is temporarily paused until the secure server-side agreement is complete. No order will be created and no payment will be collected from this screen right now.",
+  "backToCart": "Back to cart",
+  "orderSummary": "Order summary",
+  "shippingOnAgreement": "Set when the agreement is confirmed",
+  "total": "Total",
+  "deliveryAddress": "Delivery address",
+  "noSavedAddresses": "No saved addresses for this account",
+  "defaultAddress": "Default",
+  "paymentMethod": "Payment method",
+  "cashOnDelivery": "Cash on delivery",
+  "noOrderCreatedNotice": "No order was created and no payment was collected. Checkout will be available after both parties’ agreement is prepared and confirmed through the secure server-side flow.",
+  "backToHome": "Back to home"
 }
