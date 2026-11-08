@@ -36,7 +36,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (userId == null) {
         setState(() {
-          _error = AppLocalizations.of(context).loginRequired;
+          _error = AppLocalizations(AppLocalizations.currentLocale).loginRequired;
           _isLoadingProfile = false;
         });
         return;
@@ -61,6 +61,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
       }
     }
+  }
+
+  Widget _buildLanguageSettingsTile(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Card(
+        child: ListTile(
+          leading: const Icon(Icons.language),
+          title: Text(AppLocalizations.of(context).languageSettingsTitle),
+          subtitle: Text(AppLocalizations.of(context).languageSettingsSubtitle),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(AppLocalizations.of(context).currentLanguage),
+              const SizedBox(width: 8),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+          onTap: () => _showLanguagePicker(context),
+        ),
+      ),
+    );
   }
 
   Future<void> _showLanguagePicker(BuildContext context) async {
@@ -170,6 +192,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onPressed: () => context.go('/login'),
                 child: Text(AppLocalizations.of(context).login),
               ),
+              const SizedBox(height: 24),
+              _buildLanguageSettingsTile(context),
             ],
           ),
         ),
@@ -243,25 +267,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // Quick Actions
               _buildQuickActions(context, user),
               const SizedBox(height: 12),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.language),
-                    title: Text(AppLocalizations.of(context).languageSettingsTitle),
-                    subtitle: Text(AppLocalizations.of(context).languageSettingsSubtitle),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(AppLocalizations.of(context).currentLanguage),
-                        const SizedBox(width: 8),
-                        const Icon(Icons.chevron_right),
-                      ],
-                    ),
-                    onTap: () => _showLanguagePicker(context),
-                  ),
-                ),
-              ),
+              _buildLanguageSettingsTile(context),
               const SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
