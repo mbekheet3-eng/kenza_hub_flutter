@@ -306,5 +306,7 @@
   "evidenceCaptionOptional": "ملاحظة على الدليل (اختياري)",
   "attachedEvidence": "دليل مرفق",
   "chooseStorefrontPhoto": "اختيار صورة واجهة المحل",
-  "chooseCoverPhoto": "اختيار صورة الغلاف"
+  "chooseCoverPhoto": "اختيار صورة الغلاف",
+  "passwordsDoNotMatch": "كلمتا المرور غير متطابقتين",
+  "termsRequired": "يجب الموافقة على الشروط والأحكام وسياسة الخصوصية للمتابعة"
 }
