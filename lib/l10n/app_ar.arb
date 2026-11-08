@@ -424,5 +424,8 @@
   "continueWithApple": "المتابعة باستخدام Apple",
   "passwordUpdated": "تم تحديث كلمة المرور بنجاح",
   "newPasswordTitle": "تعيين كلمة مرور جديدة",
-  "updatePassword": "تحديث كلمة المرور"
+  "updatePassword": "تحديث كلمة المرور",
+  "languageSettingsTitle": "لغة التطبيق",
+  "languageSettingsSubtitle": "اختر اللغة المستخدمة في جميع أجزاء كنزة هب",
+  "chooseLanguage": "اختر اللغة"
 }
