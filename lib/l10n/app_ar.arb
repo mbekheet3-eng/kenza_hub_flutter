@@ -203,5 +203,20 @@
   "noSearchResults": "لم نعثر على نتائج",
   "changeFilters": "جرب تغيير الفلاتر أو البحث",
   "clearPriceFilter": "إلغاء فلتر السعر",
-  "applyFilters": "تطبيق الفلاتر"
+  "applyFilters": "تطبيق الفلاتر",
+  "photos": "الصور",
+  "productInfo": "معلومات المنتج",
+  "optionalDetails": "تفاصيل إضافية (اختياري)",
+  "colorSizeBrand": "اللون والمقاس والعلامة التجارية",
+  "chooseCategoryFirst": "اختر القسم أولاً لعرض بيانات المنتج.",
+  "reviewAndPublish": "مراجعة ونشر",
+  "chooseDeliveryArea": "اختيار منطقة التوصيل",
+  "verifyPhone": "توثيق رقم الهاتف",
+  "phoneVerificationRequired": "نطلب توثيق الهاتف مرة واحدة فقط قبل أول عملية بيع أو شراء.",
+  "publishProduct": "نشر المنتج",
+  "sellProduct": "بيع منتج",
+  "loginToSell": "سجّل الدخول أولاً حتى تتمكن من عرض منتجاتك للبيع",
+  "next": "التالي",
+  "publish": "نشر",
+  "previous": "السابق"
 }
