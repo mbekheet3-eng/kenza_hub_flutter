@@ -539,7 +539,7 @@ class MarketplaceProductService {
       'p_color_id': product.colorId ?? current['color_id'],
       'p_size_id': product.sizeId ?? current['size_id'],
       'p_brand_name': product.brand ?? current['brand_name'],
-      'p_weight_kg': current['weight_kg'],
+      'p_weight_kg': product.weightKg ?? current['weight_kg'],
       'p_audience': product.audience,
     });
   }
