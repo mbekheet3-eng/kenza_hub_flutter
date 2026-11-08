@@ -103,7 +103,7 @@ class _StepCategoryState extends State<StepCategory> {
       future: _categoriesFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
+          return Center(
             child: Padding(
               padding: EdgeInsets.all(32),
               child: CircularProgressIndicator(),
@@ -117,7 +117,7 @@ class _StepCategoryState extends State<StepCategory> {
 
         final categories = snapshot.data ?? const <DatabaseCategory>[];
         if (categories.isEmpty) {
-          return const Center(
+          return Center(
             child: Padding(
               padding: EdgeInsets.all(24),
               child: Text(AppLocalizations.of(context).noActiveCategories),
