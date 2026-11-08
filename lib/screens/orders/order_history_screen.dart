@@ -49,7 +49,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   }
 
   Future<void> _refreshOrders() async {
-    _loadOrders(force: true);
+    if (!mounted) return;
+    setState(() => _loadOrders(force: true));
     final future = _ordersFuture;
     if (future != null) {
       try {
