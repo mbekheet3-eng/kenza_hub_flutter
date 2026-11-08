@@ -366,6 +366,8 @@ class AppLocalizations {
   String get downloadEvidence => _strings.downloadEvidence;
   String get evidenceCaptionOptional => _strings.evidenceCaptionOptional;
   String get attachedEvidence => _strings.attachedEvidence;
+  String get chooseStorefrontPhoto => _strings.chooseStorefrontPhoto;
+  String get chooseCoverPhoto => _strings.chooseCoverPhoto;
   String get currentLanguage => _strings.languageName;
 }
 
