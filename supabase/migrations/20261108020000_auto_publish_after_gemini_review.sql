@@ -168,6 +168,117 @@ $function$;
 revoke all on function public.finalize_product_ai_review(uuid) from public, anon, authenticated;
 grant execute on function public.finalize_product_ai_review(uuid) to service_role;
 
+-- Record one image decision and attempt product finalization under the same product-row lock.
+-- This prevents a late duplicate/stale Gemini response from changing image state after publication.
+create or replace function private.record_product_image_ai_review(
+  p_product_image_id uuid,
+  p_status text,
+  p_result jsonb,
+  p_model text
+)
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $function$
+declare
+  v_product_id uuid;
+  v_product public.products%rowtype;
+  v_pending uuid;
+begin
+  if p_status is null or p_status not in ('pending', 'approved', 'rejected', 'error') then
+    raise exception 'INVALID_REVIEW_STATUS';
+  end if;
+
+  if p_result is null or pg_catalog.jsonb_typeof(p_result) <> 'object' then
+    raise exception 'INVALID_REVIEW_RESULT';
+  end if;
+
+  select product_id
+    into v_product_id
+    from public.product_images
+   where id = p_product_image_id;
+
+  if not found then
+    raise exception 'PRODUCT_IMAGE_NOT_FOUND';
+  end if;
+
+  -- All Gemini result writes for a product serialize on the same parent row.
+  select *
+    into v_product
+    from public.products
+   where id = v_product_id
+   for update;
+
+  if not found then
+    raise exception 'PRODUCT_NOT_FOUND';
+  end if;
+
+  select id into v_pending
+    from public.product_statuses
+   where slug = 'pending_review'
+     and is_active;
+
+  if v_pending is null then
+    raise exception 'PENDING_REVIEW_STATUS_NOT_CONFIGURED';
+  end if;
+
+  if v_product.moderation_status is distinct from 'pending'
+     or v_product.status_id is distinct from v_pending then
+    raise exception 'PRODUCT_NOT_PENDING_REVIEW';
+  end if;
+
+  update public.product_images
+     set ai_review_status = p_status,
+         ai_review_result = p_result,
+         ai_reviewed_at = pg_catalog.now(),
+         ai_review_model = nullif(pg_catalog.trim(p_model), '')
+   where id = p_product_image_id
+     and product_id = v_product_id;
+
+  if not found then
+    raise exception 'PRODUCT_IMAGE_NOT_FOUND';
+  end if;
+
+  return private.finalize_product_ai_review(v_product_id);
+end;
+$function$;
+
+revoke all on function private.record_product_image_ai_review(uuid, text, jsonb, text)
+  from public, anon, authenticated, service_role;
+grant execute on function private.record_product_image_ai_review(uuid, text, jsonb, text)
+  to service_role;
+
+create or replace function public.record_product_image_ai_review(
+  p_product_image_id uuid,
+  p_status text,
+  p_result jsonb,
+  p_model text
+)
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $function$
+begin
+  if current_setting('request.jwt.claim.role', true) is distinct from 'service_role' then
+    raise exception 'SERVICE_ROLE_REQUIRED';
+  end if;
+
+  return private.record_product_image_ai_review(
+    p_product_image_id,
+    p_status,
+    p_result,
+    p_model
+  );
+end;
+$function$;
+
+revoke all on function public.record_product_image_ai_review(uuid, text, jsonb, text)
+  from public, anon, authenticated;
+grant execute on function public.record_product_image_ai_review(uuid, text, jsonb, text)
+  to service_role;
+
 -- Human review is an exception path. An administrator may approve pending/error
 -- AI outcomes after inspecting them, but may not override a clear Gemini rejection.
 create or replace function private.moderate_product(
