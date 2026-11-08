@@ -148,26 +148,7 @@ $function$;
 revoke all on function private.finalize_product_ai_review(uuid)
   from public, anon, authenticated, service_role;
 
--- PostgREST-facing wrapper is callable only with the server's service-role credential.
--- The Edge Function never exposes that credential to the Flutter client.
-create or replace function public.finalize_product_ai_review(p_product_id uuid)
-returns text
-language plpgsql
-security definer
-set search_path = ''
-as $function$
-begin
-  if current_setting('request.jwt.claim.role', true) is distinct from 'service_role' then
-    raise exception 'SERVICE_ROLE_REQUIRED';
-  end if;
-
-  return private.finalize_product_ai_review(p_product_id);
-end;
-$function$;
-
-revoke all on function public.finalize_product_ai_review(uuid) from public, anon, authenticated;
-grant execute on function public.finalize_product_ai_review(uuid) to service_role;
-
+-- The internal finalizer is intentionally not exposed directly through PostgREST.
 -- Record one image decision and attempt product finalization under the same product-row lock.
 -- This prevents a late duplicate/stale Gemini response from changing image state after publication.
 create or replace function private.record_product_image_ai_review(
@@ -249,6 +230,7 @@ revoke all on function private.record_product_image_ai_review(uuid, text, jsonb,
 grant execute on function private.record_product_image_ai_review(uuid, text, jsonb, text)
   to service_role;
 
+-- Invoker wrapper: only service_role has EXECUTE, and it calls the guarded private RPC.
 create or replace function public.record_product_image_ai_review(
   p_product_image_id uuid,
   p_status text,
@@ -256,22 +238,11 @@ create or replace function public.record_product_image_ai_review(
   p_model text
 )
 returns text
-language plpgsql
-security definer
+language sql
+security invoker
 set search_path = ''
 as $function$
-begin
-  if current_setting('request.jwt.claim.role', true) is distinct from 'service_role' then
-    raise exception 'SERVICE_ROLE_REQUIRED';
-  end if;
-
-  return private.record_product_image_ai_review(
-    p_product_image_id,
-    p_status,
-    p_result,
-    p_model
-  );
-end;
+  select private.record_product_image_ai_review($1, $2, $3, $4);
 $function$;
 
 revoke all on function public.record_product_image_ai_review(uuid, text, jsonb, text)
@@ -408,5 +379,5 @@ $function$;
 -- public.moderate_product continues to delegate to this admin-guarded function.
 comment on function private.finalize_product_ai_review(uuid) is
   'Service-role-only finalizer: publishes after every image is Gemini-approved, rejects clear image violations, and leaves uncertain/error results pending for human review.';
-comment on function public.finalize_product_ai_review(uuid) is
-  'Service-role-only PostgREST wrapper for atomic Gemini product publication finalization.';
+comment on function public.record_product_image_ai_review(uuid, text, jsonb, text) is
+  'Service-role-only PostgREST wrapper for atomically recording a Gemini image result and finalizing the product.';
