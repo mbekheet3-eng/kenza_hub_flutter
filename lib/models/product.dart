@@ -95,7 +95,12 @@ class Product {
   String get priceDisplay => '${price.toStringAsFixed(2)} ج.م';
 
   // Check if product is available (not sold and is active)
-  bool get isAvailable => !isSold && isActive;
+  bool get isAvailable =>
+      !isSold &&
+      !isDeleted &&
+      isActive &&
+      statusSlug == 'available' &&
+      moderationStatus == 'approved';
 
   bool get isPendingReview =>
       statusSlug == 'pending_review' ||
@@ -159,14 +164,16 @@ class Product {
         .whereType<String>()
         .toList();
 
-    final statusSlug = statusData?['slug'] as String? ?? 'active';
+    // Missing status metadata must fail closed rather than making a product
+    // look active when its lifecycle relation could not be loaded.
+    final statusSlug = statusData?['slug'] as String? ?? 'unknown';
     final sellerProfileId = json['seller_id'] as String?;
 
     return Product(
       id: json['id'] as String,
-      userId: sellerData?['owner_user_id'] as String? ??
-          sellerProfileId ??
-          '',
+      // seller_id is a seller_profiles ID, never an auth.users ID.
+      // Do not substitute it when the owner relation is unavailable.
+      userId: sellerData?['owner_user_id'] as String? ?? '',
       title: json['title_ar'] as String? ??
           json['title_en'] as String? ??
           json['title'] as String? ??
@@ -216,7 +223,7 @@ class Product {
       conditionId: json['condition_id'] as String?,
       statusId: json['status_id'] as String?,
       statusSlug: statusSlug,
-      moderationStatus: json['moderation_status'] as String? ?? 'approved',
+      moderationStatus: json['moderation_status'] as String? ?? 'pending',
       currencyId: json['currency_id'] as String?,
       colorId: json['color_id'] as String?,
       sizeId: json['size_id'] as String?,
@@ -240,6 +247,7 @@ class Product {
       if (statusId != null) 'status_id': statusId,
       if (currencyId != null) 'currency_id': currencyId,
       if (brandId != null) 'brand_id': brandId,
+      if (brand != null) 'brand_name': brand,
       if (colorId != null) 'color_id': colorId,
       if (sizeId != null) 'size_id': sizeId,
       'audience': audience,
