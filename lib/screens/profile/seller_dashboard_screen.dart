@@ -100,29 +100,54 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context).sellerDashboard)),
-      body: FutureBuilder<SellerDashboardData?>(
-        future: _dashboardFuture,
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        child: FutureBuilder<SellerDashboardData?>(
+          future: _dashboardFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.65,
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+              ],
+            );
           }
           if (snapshot.hasError) {
-            return _message(
-              icon: Icons.error_outline,
-              message: AppLocalizations.of(context).storeDataLoadError,
-              actionLabel: AppLocalizations.of(context).retry,
-              onAction: _refresh,
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.65,
+                  child: _message(
+                    icon: Icons.error_outline,
+                    message: AppLocalizations.of(context).storeDataLoadError,
+                    actionLabel: AppLocalizations.of(context).retry,
+                    onAction: _refresh,
+                  ),
+                ),
+              ],
             );
           }
 
           final data = snapshot.data;
           if (data == null) {
-            return _message(
-              icon: Icons.storefront_outlined,
-              message:
-                  AppLocalizations.of(context).sellerProfileNotCreated,
-              actionLabel: AppLocalizations.of(context).backToHome,
-              onAction: () => context.go('/home'),
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.65,
+                  child: _message(
+                    icon: Icons.storefront_outlined,
+                    message: AppLocalizations.of(context).sellerProfileNotCreated,
+                    actionLabel: AppLocalizations.of(context).backToHome,
+                    onAction: () => context.go('/home'),
+                  ),
+                ),
+              ],
             );
           }
 
@@ -136,9 +161,8 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
           final storeId = profile['id'].toString();
           final storeType = isAgency ? 'agency' : 'online_store';
 
-          return RefreshIndicator(
-            onRefresh: _refresh,
-            child: ListView(
+          return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(16),
               children: [
                 Card(
@@ -302,9 +326,9 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                   label: Text(AppLocalizations.of(context).manageMyProducts),
                 ),
               ],
-            ),
           );
         },
+        ),
       ),
     );
   }
