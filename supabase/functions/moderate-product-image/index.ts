@@ -55,10 +55,13 @@ Deno.serve(async (req: Request) => {
 
     const { data: product, error: productError } = await supabase
       .from("products")
-      .select("id, seller_id")
+      .select("id, seller_id, moderation_status")
       .eq("id", image.product_id)
       .maybeSingle();
     if (productError || !product) return json({ error: "PRODUCT_NOT_FOUND" }, 404);
+    if (product.moderation_status !== "pending") {
+      return json({ error: "PRODUCT_NOT_PENDING_REVIEW" }, 409);
+    }
 
     const { data: activeUser, error: activeUserError } = await supabase
       .from("users")
@@ -69,21 +72,36 @@ Deno.serve(async (req: Request) => {
       return json({ error: "ACTIVE_USER_REQUIRED" }, 403);
     }
 
-    const { data: membership, error: membershipError } = await supabase
-      .from("seller_profile_members")
-      .select("member_role, permissions")
-      .eq("seller_profile_id", product.seller_id)
-      .eq("user_id", user.id)
-      .is("revoked_at", null)
+    const { data: sellerProfile, error: sellerProfileError } = await supabase
+      .from("seller_profiles")
+      .select("owner_user_id, is_active")
+      .eq("id", product.seller_id)
       .maybeSingle();
-    const canManageImages = membership?.member_role === "owner" ||
-      membership?.permissions?.["products:update"] === true;
-    if (membershipError || !membership || !canManageImages) {
+    if (sellerProfileError || !sellerProfile?.is_active) {
+      return json({ error: "ACTIVE_SELLER_PROFILE_REQUIRED" }, 403);
+    }
+
+    let canManageImages = sellerProfile.owner_user_id === user.id;
+    if (!canManageImages) {
+      const { data: membership, error: membershipError } = await supabase
+        .from("seller_profile_members")
+        .select("permissions")
+        .eq("seller_profile_id", product.seller_id)
+        .eq("user_id", user.id)
+        .is("revoked_at", null)
+        .maybeSingle();
+      if (membershipError) {
+        console.error("Seller membership lookup failed", membershipError.message);
+        return json({ error: "PRODUCT_IMAGE_PERMISSION_CHECK_FAILED" }, 500);
+      }
+      canManageImages = membership?.permissions?.["products:update"] === true;
+    }
+    if (!canManageImages) {
       return json({ error: "PRODUCT_IMAGE_PERMISSION_REQUIRED" }, 403);
     }
 
     // PostgreSQL atomically claims the image and enforces the per-user limit.
-    // It also recovers a processing lease abandoned for more than five minutes.
+    // It also recovers a processing lease abandoned for more than ten minutes.
     const { data: claimed, error: claimError } = await supabase.rpc(
       "claim_product_image_review",
       { p_image_id: image.id, p_requester_user_id: user.id },
@@ -229,9 +247,23 @@ rules:
     }
 
     if (imageRows.some((row: any) => row.ai_review_status === "rejected")) {
+      const { data: hiddenStatus, error: hiddenStatusError } = await supabase
+        .from("product_statuses")
+        .select("id")
+        .eq("slug", "hidden")
+        .eq("is_active", true)
+        .maybeSingle();
+      if (hiddenStatusError || !hiddenStatus?.id) {
+        console.error("Hidden product status is not configured", hiddenStatusError?.message);
+        return json({ error: "PRODUCT_STATUS_CONFIGURATION_ERROR" }, 500);
+      }
       const { error: productUpdateError } = await supabase
         .from("products")
-        .update({ moderation_status: "rejected" })
+        .update({
+          moderation_status: "rejected",
+          status_id: hiddenStatus.id,
+          published_at: null,
+        })
         .eq("id", product.id);
       if (productUpdateError) {
         console.error("Product rejection persistence failed", productUpdateError.message);
