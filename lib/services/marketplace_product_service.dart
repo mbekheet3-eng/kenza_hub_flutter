@@ -109,7 +109,7 @@ class MarketplaceProductService {
 
     final memberships = await _client
         .from('seller_profile_members')
-        .select('seller_profile_id,member_role,revoked_at')
+        .select('seller_profile_id,member_role,permissions,revoked_at')
         .eq('user_id', userId)
         .isFilter('revoked_at', null)
         .limit(2);
@@ -128,9 +128,15 @@ class MarketplaceProductService {
       }
 
       final membership = activeMemberships.single;
-      if (membership['member_role'] != 'owner') {
+      final permissions = membership['permissions'];
+      final canCreateProducts =
+          permissions is Map && permissions['products:create'] == true;
+      final canManageProductImages =
+          permissions is Map && permissions['products:update'] == true;
+      if (!canCreateProducts || !canManageProductImages) {
         throw StateError(
-          'نشر المنتجات للموظفين سيُفعّل بعد اكتمال صلاحيات الموظفين المعتمدة.',
+          'لا تملك صلاحيات إنشاء المنتجات وإدارة صورها في هذا المتجر. '
+          'اطلب من صاحب المتجر تفعيل صلاحية إنشاء المنتجات وتعديلها.',
         );
       }
       sellerProfileId = membership['seller_profile_id'] as String?;
