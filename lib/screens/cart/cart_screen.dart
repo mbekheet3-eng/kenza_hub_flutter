@@ -215,7 +215,7 @@ class _CartScreenState extends State<CartScreen> {
                 ),
               ),
               Text(
-                '$totalPrice ج.م',
+                '$totalPrice ${AppLocalizations.of(context).currency}',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: AppTheme.primaryColor,
                   fontWeight: FontWeight.bold,
