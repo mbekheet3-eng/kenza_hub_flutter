@@ -100,6 +100,43 @@ Deno.serve(async (req: Request) => {
       return json({ error: "PRODUCT_IMAGE_PERMISSION_REQUIRED" }, 403);
     }
 
+    // TEMPORARY MODE: pause Gemini and queue this image for human review.
+    // This response is intentionally fast and never publishes the product.
+    const manualReviewResult = {
+      decision: "manual_review",
+      quality: "uncertain",
+      quality_issues: [],
+      unsafe_content: false,
+      adult_or_sexual_content: false,
+      violence_or_gore: false,
+      irrelevant_or_misleading: false,
+      prohibited_item: false,
+      product_visible: false,
+      reason_ar: "بانتظار مراجعة فريق كنزة هب",
+      confidence: 0,
+      temporary_manual_review: true,
+    };
+    const { error: manualReviewSaveError } = await supabase
+      .from("product_images")
+      .update({
+        ai_review_status: "pending",
+        ai_review_result: manualReviewResult,
+        ai_reviewed_at: null,
+        ai_review_model: "temporary-manual-review",
+      })
+      .eq("id", image.id);
+    if (manualReviewSaveError) {
+      console.error("Manual review status persistence failed", manualReviewSaveError.message);
+      return json({ error: "MANUAL_REVIEW_SAVE_FAILED" }, 500);
+    }
+    return json({
+      image_id: image.id,
+      status: "pending",
+      decision: "manual_review",
+      product_status: "pending_review",
+      moderation_mode: "temporary_manual_review",
+    });
+
     // PostgreSQL atomically claims the image and enforces the per-user limit.
     // It also recovers a processing lease abandoned for more than ten minutes.
     const { data: claimed, error: claimError } = await supabase.rpc(
