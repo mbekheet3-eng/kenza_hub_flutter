@@ -250,6 +250,20 @@ class AppLocalizations {
   String get sellerOnKenza => _strings.sellerOnKenza;
   String get productAddedToCart => _strings.productAddedToCart;
   String get alreadyInCart => _strings.alreadyInCart;
+  String get discover => _strings.discover;
+  String get productsCount => _strings.productsCount;
+  String get clearFilters => _strings.clearFilters;
+  String get discoverDresses => _strings.discoverDresses;
+  String get advancedFilters => _strings.advancedFilters;
+  String get newest => _strings.newest;
+  String get priceLowToHigh => _strings.priceLowToHigh;
+  String get priceHighToLow => _strings.priceHighToLow;
+  String get mostViewed => _strings.mostViewed;
+  String get searchLoadError => _strings.searchLoadError;
+  String get noSearchResults => _strings.noSearchResults;
+  String get changeFilters => _strings.changeFilters;
+  String get clearPriceFilter => _strings.clearPriceFilter;
+  String get applyFilters => _strings.applyFilters;
   String get currentLanguage => _strings.languageName;
 }
 
