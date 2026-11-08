@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 
 class AboutKenzaScreen extends StatelessWidget {
   const AboutKenzaScreen({super.key});
