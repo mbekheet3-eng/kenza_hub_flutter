@@ -88,28 +88,61 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
           // Filter Tabs
           _buildFilterTabs(),
 
-          // Products Grid or Empty State
+          // Keep the list refreshable even when it has no products.
           Expanded(
-            child: products.isEmpty
-                ? _buildEmptyState()
-                : RefreshIndicator(
-                    onRefresh: _loadProducts,
-                    child: GridView.builder(
-                      padding: const EdgeInsets.all(12),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 0.75,
+            child: RefreshIndicator(
+              onRefresh: _loadProducts,
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  if (productProvider.isLoading)
+                    const SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  else if (productProvider.error != null)
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(AppLocalizations.of(context).homeProductsLoadError),
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: _loadProducts,
+                              child: Text(AppLocalizations.of(context).retry),
+                            ),
+                          ],
+                        ),
                       ),
-                      itemCount: products.length,
-                      itemBuilder: (context, index) {
-                        final product = products[index];
-                        return _buildProductCard(context, product);
-                      },
+                    )
+                  else if (products.isEmpty)
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: _buildEmptyState(),
+                    )
+                  else
+                    SliverPadding(
+                      padding: const EdgeInsets.all(12),
+                      sliver: SliverGrid(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.75,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) =>
+                              _buildProductCard(context, products[index]),
+                          childCount: products.length,
+                        ),
+                      ),
                     ),
-                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
