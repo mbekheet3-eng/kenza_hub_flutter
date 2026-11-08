@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../config/app_colors.dart';
@@ -50,7 +51,7 @@ class HomeHeader extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  const Text(
+                  Text(
                     'كنزة هب',
                     style: AppTextStyles.titleMedium,
                   ),
@@ -62,7 +63,7 @@ class HomeHeader extends StatelessWidget implements PreferredSizeWidget {
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('الإشعارات غير متاحة حالياً.'),
+                    content: Text(AppLocalizations.of(context).notificationsComingSoon),
                   ),
                 );
               },
