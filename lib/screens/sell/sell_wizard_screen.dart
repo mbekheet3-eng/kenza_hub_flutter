@@ -158,7 +158,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
           _categoryRulesResolved = false;
           _isResolvingCategoryRules = false;
         });
-        _showError('تعذر تحديد قواعد القسم. حاول اختيار القسم مرة أخرى.');
+        _showError(AppLocalizations.of(context).categoryRulesError);
       }
     }
   }
@@ -210,7 +210,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
 
   Future<void> _publishProduct() async {
     if (!_validateAllData()) {
-      _showError('يرجى ملء البيانات المطلوبة وإضافة صورة واحدة على الأقل');
+      _showError(AppLocalizations.of(context).completeRequiredFields);
       return;
     }
 
@@ -288,8 +288,8 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
           SnackBar(
             content: Text(
               allModerationRequestsSucceeded
-                  ? 'تم إرسال الصور إلى Gemini للمراجعة. سيظهر المنتج بعد اجتياز الفحص.'
-                  : 'تم حفظ المنتج، لكن فحص Gemini لم يكتمل؛ سيظل قيد المراجعة حتى اكتمال الفحص.',
+                  ? AppLocalizations.of(context).geminiSubmitted
+                  : AppLocalizations.of(context).geminiPending,
             ),
           ),
         );
@@ -322,12 +322,12 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
             retryAfterPhoneVerification = true;
           }
         } catch (regionError) {
-          _showError('تعذر حفظ منطقة التوصيل: $regionError');
+          _showError('${AppLocalizations.of(context).saveDeliveryRegionError}: $regionError');
         }
       } else if (errorText.contains('OUTSIDE_DELIVERY_COVERAGE')) {
-        _showError('منطقتك خارج نطاق التوصيل الداخلي الحالي؛ يمكنك التصفح فقط.');
+        _showError(AppLocalizations.of(context).outsideDeliveryCoverage);
       } else {
-        _showError('فشل إرسال المنتج للمراجعة: $e');
+        _showError('${AppLocalizations.of(context).moderationSubmitError}: $e');
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -341,7 +341,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
   Future<String?> _showDeliveryRegionDialog() async {
     final regions = await _productService.fetchDeliveryRegions();
     if (regions.isEmpty) {
-      _showError('لا توجد مناطق توصيل مفعّلة حاليًا.');
+      _showError(AppLocalizations.of(context).noDeliveryRegions);
       return null;
     }
 
@@ -460,7 +460,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
                             _normalizeEgyptianPhone(phoneController.text.trim());
                         if (!RegExp(r'^\+[1-9]\d{7,14}$').hasMatch(phone)) {
                           throw const FormatException(
-                            'أدخل رقم هاتف صحيحًا مع كود الدولة.',
+                            AppLocalizations.of(context).enterValidPhone,
                           );
                         }
 
@@ -471,7 +471,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
                           setDialogState(() {
                             otpSent = true;
                             dialogError =
-                                'تم إرسال الرمز. أدخل رمز SMS للتحقق.';
+                                AppLocalizations.of(context).otpSent;
                           });
                         } else {
                           await client.auth.verifyOTP(
@@ -488,7 +488,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
                           setDialogState(() {
                             dialogError = error is FormatException
                                 ? error.message
-                                : 'تعذر إتمام التوثيق: ' + error.toString();
+                                : '${AppLocalizations.of(context).otpVerificationFailed}: ' + error.toString();
                           });
                         }
                       } finally {
