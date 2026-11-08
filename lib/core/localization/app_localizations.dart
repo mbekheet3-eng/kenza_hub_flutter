@@ -370,6 +370,8 @@ class AppLocalizations {
   String get chooseCoverPhoto => _strings.chooseCoverPhoto;
   String get passwordsDoNotMatch => _strings.passwordsDoNotMatch;
   String get termsRequired => _strings.termsRequired;
+  String get passwordRequired => _strings.passwordRequired;
+  String get passwordMinLength => _strings.passwordMinLength;
   String get currentLanguage => _strings.languageName;
 }
 
