@@ -59,7 +59,7 @@ class HomeHeader extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
             IconButton(
-              tooltip: 'الإشعارات',
+              tooltip: AppLocalizations.of(context).notificationsTooltip,
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -78,7 +78,7 @@ class HomeHeader extends StatelessWidget implements PreferredSizeWidget {
                 borderRadius: AppRadius.pill,
               ),
               child: IconButton(
-                tooltip: 'الملف الشخصي',
+                tooltip: AppLocalizations.of(context).profileTitle,
                 onPressed: () => context.push('/profile'),
                 icon: const Icon(
                   Icons.person_outline_rounded,
