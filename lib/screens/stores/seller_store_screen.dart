@@ -163,7 +163,7 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
                             )).toList(),
                           ),
                         ),
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
                         child: Text(AppLocalizations.of(context).storeProducts,
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -172,7 +172,7 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
                   ),
                 ),
                 if (data.products.isEmpty)
-                  const SliverFillRemaining(
+                  SliverFillRemaining(
                     hasScrollBody: false,
                     child: Center(child: Text(AppLocalizations.of(context).noStoreProducts)),
                   )
