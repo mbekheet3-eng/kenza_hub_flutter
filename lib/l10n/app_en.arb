@@ -165,5 +165,7 @@
   "updatedDate": "Updated",
   "notes": "Notes",
   "somethingWentWrong": "Something went wrong",
-  "tryAgain": "Try again"
+  "tryAgain": "Try again",
+  "initializationError": "Could not connect to the service configuration",
+  "initializationRetryHint": "Close and reopen the app. If the problem continues, check the Supabase configuration."
 }
