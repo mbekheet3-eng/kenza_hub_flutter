@@ -35,22 +35,22 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
   String _sellerTypeLabel(String? type) {
     switch (type) {
       case 'pro_seller':
-        return 'بائع محترف Pro Seller';
+        return AppLocalizations.of(context).proSellerLabel;
       case 'seller':
-        return 'بائع';
+        return AppLocalizations.of(context).sellerLabel;
       default:
-        return type ?? 'بائع';
+        return type ?? AppLocalizations.of(context).sellerLabel;
     }
   }
 
   String _verificationLabel(String? status) {
     switch (status) {
       case 'verified':
-        return 'تم التحقق';
+        return AppLocalizations.of(context).verified;
       case 'pending':
-        return 'قيد المراجعة';
+        return AppLocalizations.of(context).pendingReview;
       case 'rejected':
-        return 'لم يتم التحقق';
+        return AppLocalizations.of(context).notVerified;
       default:
         return AppLocalizations.of(context).unspecified;
     }
@@ -59,13 +59,13 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
   String _requestStatusLabel(String? status) {
     switch (status) {
       case 'pending':
-        return 'طلب الترقية قيد المراجعة';
+        return AppLocalizations.of(context).upgradeRequestPending;
       case 'approved':
-        return 'تمت الموافقة على الطلب';
+        return AppLocalizations.of(context).requestApproved;
       case 'rejected':
-        return 'تم رفض الطلب';
+        return AppLocalizations.of(context).requestRejected;
       default:
-        return 'لا يوجد طلب ترقية';
+        return AppLocalizations.of(context).noUpgradeRequest;
     }
   }
 
@@ -109,8 +109,8 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
           if (snapshot.hasError) {
             return _message(
               icon: Icons.error_outline,
-              message: 'تعذر تحميل بيانات المتجر',
-              actionLabel: 'إعادة المحاولة',
+              message: AppLocalizations.of(context).storeDataLoadError,
+              actionLabel: AppLocalizations.of(context).retry,
               onAction: _refresh,
             );
           }
@@ -120,8 +120,8 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
             return _message(
               icon: Icons.storefront_outlined,
               message:
-                  'لم يتم إنشاء ملف بائع لهذا الحساب بعد. ينشأ تلقائيًا عند أول نشر، لكن نشر المنتجات متوقف حاليًا لحين تحديد منطقة الحساب ومراجعة نطاق الشحن المعتمد.',
-              actionLabel: 'العودة إلى الرئيسية',
+                  AppLocalizations.of(context).sellerProfileNotCreated,
+              actionLabel: AppLocalizations.of(context).backToHome,
               onAction: () => context.go('/home'),
             );
           }
@@ -156,7 +156,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                             Expanded(
                               child: Text(
                                 profile['display_name'] as String? ??
-                                    'متجري',
+                                    AppLocalizations.of(context).myStore,
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleLarge
@@ -174,11 +174,11 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                         const SizedBox(height: 6),
                         Text(
                           profile['is_active'] == true
-                              ? 'حالة المتجر: نشط'
-                              : 'حالة المتجر: غير نشط',
+                              ? AppLocalizations.of(context).storeStatusActive
+                              : AppLocalizations.of(context).storeStatusInactive,
                         ),
                         const SizedBox(height: 6),
-                        Text(isOwner ? 'صلاحية الحساب: مالك المتجر' : 'صلاحية الحساب: عضو فريق'),
+                        Text(isOwner ? AppLocalizations.of(context).storeRoleOwner : AppLocalizations.of(context).storeRoleTeamMember),
                       ],
                     ),
                   ),
@@ -192,14 +192,14 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            isAgency ? 'ركن الوكالة' : 'Online Store',
+                            isAgency ? AppLocalizations.of(context).agencyCorner : 'Online Store',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const SizedBox(height: 6),
                           Text(
                             isAgency
-                                ? 'أضف منطقة المحل وعنوانه، واختَر إذا كنت تريد إظهار واجهته للزوار.'
-                                : 'أكمل هوية متجرك وروابط صفحات التواصل الخاصة بك.',
+                                ? AppLocalizations.of(context).storefrontSetupHelp
+                                : AppLocalizations.of(context).onlineStoreSetupHelp,
                           ),
                           const SizedBox(height: 12),
                           if (isOwner)
@@ -225,7 +225,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                   children: [
                     Expanded(
                       child: _statCard(
-                        'المنتجات',
+                        AppLocalizations.of(context).productsLabel,
                         data.productCount.toString(),
                         Icons.inventory_2_outlined,
                       ),
@@ -233,7 +233,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: _statCard(
-                        'إجمالي المبيعات',
+                        AppLocalizations.of(context).totalSales,
                         (profile['total_sales'] as num? ?? 0).toString(),
                         Icons.shopping_bag_outlined,
                       ),
@@ -288,8 +288,8 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                         const SizedBox(height: 8),
                         Text(
                           isOwner
-                              ? 'إدارة الموظفين وتعديل صلاحياتهم ستظهر بعد اكتمال فرض الصلاحيات على مستوى قاعدة البيانات.'
-                              : 'حسابك عضو فريق. بعض عمليات الكتابة مقفولة مؤقتًا حتى تكتمل صلاحيات الموظفين المعتمدة.',
+                              ? AppLocalizations.of(context).teamPermissionsPending
+                              : AppLocalizations.of(context).teamMemberWriteRestricted,
                         ),
                       ],
                     ),
