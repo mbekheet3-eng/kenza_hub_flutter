@@ -357,7 +357,6 @@ class AppLocalizations {
   String get evidenceOpenError => _strings.evidenceOpenError;
   String get evidenceInstructions => _strings.evidenceInstructions;
   String get chooseImage => _strings.chooseImage;
-  String get takePhoto => _strings.takePhoto;
   String get uploadingEvidence => _strings.uploadingEvidence;
   String get registeredEvidence => _strings.registeredEvidence;
   String get noEvidenceYet => _strings.noEvidenceYet;
