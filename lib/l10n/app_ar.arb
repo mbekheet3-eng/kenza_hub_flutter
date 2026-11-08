@@ -302,5 +302,7 @@
   "noEvidenceYet": "لم يتم تسجيل أدلة لهذا النزاع بعد.",
   "evidenceHash": "بصمة SHA-256",
   "viewEvidence": "مشاهدة",
-  "downloadEvidence": "تحميل"
+  "downloadEvidence": "تحميل",
+  "evidenceCaptionOptional": "ملاحظة على الدليل (اختياري)",
+  "attachedEvidence": "دليل مرفق"
 }
