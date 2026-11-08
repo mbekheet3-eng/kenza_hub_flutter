@@ -212,7 +212,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   Widget _buildBreadcrumb(String languageCode) {
     if (_path.isEmpty) {
-      return const Padding(
+      return Padding(
         padding: EdgeInsets.fromLTRB(16, 2, 16, 10),
         child: Align(
           alignment: Alignment.centerRight,
