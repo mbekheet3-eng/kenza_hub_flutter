@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -165,12 +166,12 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
         }
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم رفع الصورة، احفظ البيانات لتثبيتها في صفحة المتجر')),
+        SnackBar(content: Text(AppLocalizations.of(context).uploadImageSuccess)),
       );
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تعذر رفع الصورة: $error')),
+        SnackBar(content: Text('${AppLocalizations.of(context).uploadImageError}: $error')),
       );
     } finally {
       if (mounted) setState(() => _uploadingImage = false);
@@ -191,21 +192,21 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
     if (!_isOwner || _profileId == null) return;
     if (_agency && _showStorefront && _address.text.trim().length < 5) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('أدخل عنوان المحل الفعلي لتفعيل عرض واجهته')),
+        SnackBar(content: Text(AppLocalizations.of(context).enterStoreAddress)),
       );
       return;
     }
 
     if (_agency && _showStorefront && _cover.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('اختَر صورة واجهة المحل قبل تفعيل عرضها')),
+        SnackBar(content: Text(AppLocalizations.of(context).chooseStorefrontImage)),
       );
       return;
     }
 
     if (_displayName.text.trim().length < 3 || _displayName.text.trim().length > 60) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('اسم العرض لازم يكون من 3 إلى 60 حرفًا')),
+        SnackBar(content: Text(AppLocalizations.of(context).displayNameLength)),
       );
       return;
     }
@@ -274,12 +275,12 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم حفظ بيانات المتجر')),
+        SnackBar(content: Text(AppLocalizations.of(context).storeSaved)),
       );
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تعذر الحفظ: $error')),
+        SnackBar(content: Text('${AppLocalizations.of(context).saveError}: $error')),
       );
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -290,22 +291,22 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
   Widget build(BuildContext context) {
     if (_loading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('إعدادات المتجر')),
+        appBar: AppBar(title: Text(AppLocalizations.of(context).storeSettingsTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
     if (_error != null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('إعدادات المتجر')),
+        appBar: AppBar(title: Text(AppLocalizations.of(context).storeSettingsTitle)),
         body: Center(child: Padding(
           padding: const EdgeInsets.all(24),
-          child: Text('تعذر تحميل بيانات المتجر: $_error', textAlign: TextAlign.center),
+          child: Text('${AppLocalizations.of(context).storeDataLoadError}: $_error', textAlign: TextAlign.center),
         )),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('إعدادات المتجر')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context).storeSettingsTitle)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -313,7 +314,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
             const Card(
               child: Padding(
                 padding: EdgeInsets.all(14),
-                child: Text('تعديل بيانات المتجر متاح لصاحب المتجر فقط حاليًا.'),
+                child: Text(AppLocalizations.of(context).ownerOnlyStoreEdit),
               ),
             ),
           Text(
@@ -342,7 +343,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
                 ? () => _pickStoreImage(cover: false)
                 : null,
             icon: const Icon(Icons.upload_outlined),
-            label: const Text('اختيار صورة الشعار من الجهاز'),
+            label: Text(AppLocalizations.of(context).chooseLogoImage),
           ),
           if (_agency) ...[
             _field(_area, 'المنطقة أو الحي', hint: 'مثال: وكالة البلح - بولاق'),
@@ -350,7 +351,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
             const Padding(
               padding: EdgeInsets.only(bottom: 10),
               child: Text(
-                'يظهر المحل في دليل ركن الوكالة بعد حفظ عنوانه الفعلي. العنوان الكامل لا يظهر للزوار.',
+                AppLocalizations.of(context).storeDirectoryPrivacy,
                 style: TextStyle(fontSize: 12, color: Colors.black54),
               ),
             ),
@@ -358,11 +359,11 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
               contentPadding: EdgeInsets.zero,
               value: _showStorefront,
               onChanged: _isOwner ? (value) => setState(() => _showStorefront = value) : null,
-              title: const Text('إظهار واجهة المحل'),
-              subtitle: const Text('عند التفعيل تظهر صورة واجهة المحل للزوار. عنوان المحل الكامل يظل خاصًا في كل الأحوال.'),
+              title: Text(AppLocalizations.of(context).showStorefront),
+              subtitle: Text(AppLocalizations.of(context).storefrontPrivacy),
             ),
           ] else
-            const Text('لا نطلب عنوان محل من المتاجر الأونلاين.'),
+            Text(AppLocalizations.of(context).noOnlineStoreAddress),
           const SizedBox(height: 8),
           _field(_cover, _agency ? 'رابط صورة واجهة المحل' : 'رابط صورة غلاف المتجر', hint: 'https://...'),
           OutlinedButton.icon(
@@ -373,7 +374,7 @@ class _SellerStoreSettingsScreenState extends State<SellerStoreSettingsScreen> {
             label: Text(_agency ? 'اختيار صورة واجهة المحل' : 'اختيار صورة الغلاف'),
           ),
           const SizedBox(height: 8),
-          Text('روابط التواصل الاختيارية',
+          Text(AppLocalizations.of(context).optionalSocialLinks,
               style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           _field(_facebook, 'Facebook', hint: 'https://facebook.com/...'),
