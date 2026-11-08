@@ -385,6 +385,11 @@ class AppLocalizations {
   String get priceExample => _strings.priceExample;
   String get productName => _strings.productName;
   String get productDescription => _strings.productDescription;
+  String get productTitleLabel => _strings.productTitleLabel;
+  String get catchyTitleHint => _strings.catchyTitleHint;
+  String get optionalProductDescription => _strings.optionalProductDescription;
+  String get optionalDescriptionHint => _strings.optionalDescriptionHint;
+  String get searchAvailableBrands => _strings.searchAvailableBrands;
   String get currentLanguage => _strings.languageName;
 }
 
