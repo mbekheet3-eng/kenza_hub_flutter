@@ -235,7 +235,7 @@
   "sizesLoadError": "تعذر تحميل المقاسات من قاعدة البيانات",
   "noSizesForCategory": "لا توجد مقاسات مسجلة لهذا القسم",
   "fromGallery": "من المعرض",
-  "takePhoto": "التقط صورة",
+  "takePhoto": "التقاط صورة",
   "addProductPhotosLimit": "أضف صور للمنتج (حد أقصى 8 صور)",
   "addPhotos": "إضافة صور",
   "of8ImagesAdded": "من 8 صور مضافة",
@@ -290,5 +290,17 @@
   "ok": "حسناً",
   "signupAgreeTerms": "أوافق على الشروط والأحكام وسياسة الخصوصية",
   "orCreateAccountWith": "أو أنشئ حسابك باستخدام",
-  "invalidResetLink": "رابط استعادة كلمة المرور غير صالح أو انتهت صلاحيته."
+  "invalidResetLink": "رابط استعادة كلمة المرور غير صالح أو انتهت صلاحيته.",
+  "evidenceUploaded": "تم رفع الدليل وتسجيل بصمته بنجاح.",
+  "evidenceUploadError": "تعذر رفع الدليل",
+  "evidenceLinkError": "تعذر فتح رابط الدليل على الجهاز.",
+  "evidenceOpenError": "تعذر فتح الدليل",
+  "evidenceInstructions": "ارفع صورًا توضح المشكلة. تُحفظ الأدلة في مساحة خاصة، وتُسجل بصمتها الرقمية، ويُسجل كل طلب مشاهدة أو تحميل.",
+  "chooseImage": "اختيار صورة",
+  "uploadingEvidence": "جارٍ رفع الصورة وفحص بصمتها...",
+  "registeredEvidence": "الأدلة المسجلة",
+  "noEvidenceYet": "لم يتم تسجيل أدلة لهذا النزاع بعد.",
+  "evidenceHash": "بصمة SHA-256",
+  "viewEvidence": "مشاهدة",
+  "downloadEvidence": "تحميل"
 }
