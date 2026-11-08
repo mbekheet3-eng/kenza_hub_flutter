@@ -279,6 +279,33 @@ class AppLocalizations {
   String get next => _strings.next;
   String get publish => _strings.publish;
   String get previous => _strings.previous;
+  String get brandOptionalNote => _strings.brandOptionalNote;
+  String get brandLoadError => _strings.brandLoadError;
+  String get chooseBrandOptional => _strings.chooseBrandOptional;
+  String get noBrand => _strings.noBrand;
+  String get noActiveCategories => _strings.noActiveCategories;
+  String get categorySelected => _strings.categorySelected;
+  String get categoryLoadDatabaseError => _strings.categoryLoadDatabaseError;
+  String get productCondition => _strings.productCondition;
+  String get optionalColorSize => _strings.optionalColorSize;
+  String get productConditionsLoadError => _strings.productConditionsLoadError;
+  String get noActiveProductConditions => _strings.noActiveProductConditions;
+  String get colorsLoadError => _strings.colorsLoadError;
+  String get noColorsForCategory => _strings.noColorsForCategory;
+  String get sizesLoadError => _strings.sizesLoadError;
+  String get noSizesForCategory => _strings.noSizesForCategory;
+  String get fromGallery => _strings.fromGallery;
+  String get takePhoto => _strings.takePhoto;
+  String get addProductPhotosLimit => _strings.addProductPhotosLimit;
+  String get addPhotos => _strings.addPhotos;
+  String get of8ImagesAdded => _strings.of8ImagesAdded;
+  String get clearPhotoTips => _strings.clearPhotoTips;
+  String get photoTipsTitle => _strings.photoTipsTitle;
+  String get setProductPrice => _strings.setProductPrice;
+  String get pricingTip => _strings.pricingTip;
+  String get competitivePriceTip => _strings.competitivePriceTip;
+  String get quickOptions => _strings.quickOptions;
+  String get selectedPrice => _strings.selectedPrice;
   String get currentLanguage => _strings.languageName;
 }
 
