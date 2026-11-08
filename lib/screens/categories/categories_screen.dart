@@ -175,11 +175,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         textInputAction: TextInputAction.search,
         onSubmitted: (_) => _submitSearch(),
         decoration: InputDecoration(
-          hintText: 'ابحث عن منتجات أو أعضاء',
+          hintText: AppLocalizations.of(context).searchProductsOrMembers,
           hintStyle: const TextStyle(color: Color(0xFF8A949B), fontSize: 14),
           prefixIcon: const Icon(Icons.search_rounded, color: _navy, size: 25),
           suffixIcon: IconButton(
-            tooltip: 'البحث بالصورة',
+            tooltip: AppLocalizations.of(context).imageSearchTooltip,
             onPressed: _openVisualSearchPicker,
             icon: const Icon(
               Icons.camera_alt_outlined,
@@ -233,7 +233,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       child: Row(
         children: [
           IconButton(
-            tooltip: 'رجوع للقسم السابق',
+            tooltip: AppLocalizations.of(context).backToPreviousCategory,
             onPressed: () => setState(() => _path.removeLast()),
             icon: const Icon(Icons.arrow_back_rounded, color: _navy),
           ),
@@ -451,28 +451,28 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           children: [
             _BrowseNavItem(
               icon: Icons.home_outlined,
-              label: 'الرئيسية',
+              label: AppLocalizations.of(context).home,
               onTap: () => context.go('/home'),
             ),
             _BrowseNavItem(
               icon: Icons.search_rounded,
-              label: 'اكتشف',
+              label: AppLocalizations.of(context).discover,
               selected: true,
               onTap: () => context.go('/categories'),
             ),
             _BrowseNavItem(
               icon: Icons.add_circle_outline_rounded,
-              label: 'بيع منتج',
+              label: AppLocalizations.of(context).sellProduct,
               onTap: () => context.push('/sell-wizard'),
             ),
             _BrowseNavItem(
               icon: Icons.shopping_cart_outlined,
-              label: 'سلة المشتريات',
+              label: AppLocalizations.of(context).cartTitle,
               onTap: () => context.push('/cart'),
             ),
             _BrowseNavItem(
               icon: Icons.person_outline_rounded,
-              label: 'حسابي',
+              label: AppLocalizations.of(context).profileTitle,
               onTap: () => context.push('/profile'),
             ),
           ],
@@ -560,8 +560,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           itemBuilder: (context, index) {
                             if (_path.isEmpty && index == 0) {
                               return _buildCornerCard(
-                                title: 'Wekala Corner',
-                                subtitle: 'محلات فعلية في وكالة البلح',
+                                title: AppLocalizations.of(context).agencyCorner,
+                                subtitle: AppLocalizations.of(context).physicalShopsInWekala,
                                 icon: Icons.storefront_outlined,
                                 accent: const Color(0xFF9A5B2A),
                                 onTap: () => context.push('/agency-corner'),
@@ -569,8 +569,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             }
                             if (_path.isEmpty && index == 1) {
                               return _buildCornerCard(
-                                title: 'Social Corner',
-                                subtitle: 'متاجر وصفحات البيع أونلاين',
+                                title: AppLocalizations.of(context).socialCorner,
+                                subtitle: AppLocalizations.of(context).socialStoresAndPages,
                                 icon: Icons.shopping_bag_outlined,
                                 accent: const Color(0xFF5367A5),
                                 onTap: () => context.push('/online-stores'),
