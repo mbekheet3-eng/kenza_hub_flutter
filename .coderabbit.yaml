@@ -1,0 +1,31 @@
+# Kenza Hub - CodeRabbit review-only configuration
+# This file controls review behavior; it does not grant write access or enable auto-fixes.
+language: ar
+reviews:
+  profile: assertive
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  commit_status: true
+  auto_apply_labels: false
+  auto_assign_reviewers: false
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    drafts: true
+  finishing_touches:
+    docstrings:
+      enabled: false
+  instructions: |
+    Review only. Do not edit files, commit changes, push commits, merge pull requests,
+    deploy services, run database migrations, or change Supabase settings.
+    Find and explain bugs, runtime failures, security and privacy risks, data integrity
+    problems, performance issues, accessibility problems, and meaningful maintainability
+    improvements. Focus on Flutter/Dart, Supabase SQL and RLS policies, Edge Functions,
+    authentication, storage, and marketplace transaction flows.
+    For every finding, state severity, affected file and location, why it is a real
+    problem, likely impact, and a concrete suggested fix. Include tests or verification
+    steps where useful. Distinguish confirmed defects from hypotheses. Avoid cosmetic
+    nitpicks and do not suggest broad rewrites without evidence.
+    Suggestions must remain proposals for a human to review and explicitly apply.
