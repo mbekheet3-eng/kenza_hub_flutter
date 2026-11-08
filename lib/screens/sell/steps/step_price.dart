@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:flutter/services.dart';
 import '../../../config/theme.dart';
 
@@ -46,7 +47,7 @@ class _StepPriceState extends State<StepPrice> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'حدد سعر المنتج',
+            AppLocalizations.of(context).setProductPrice,
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 24),
@@ -95,8 +96,8 @@ class _StepPriceState extends State<StepPrice> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'نصيحة التسعير:',
+                        Text(
+                          AppLocalizations.of(context).pricingTip,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
@@ -104,7 +105,7 @@ class _StepPriceState extends State<StepPrice> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'اختر سعراً تنافسياً ومعقولاً للحصول على مشترين أسرع',
+                          AppLocalizations.of(context).competitivePriceTip,
                           style: TextStyle(
                             fontSize: 12,
                             color: AppTheme.textSecondary,
@@ -121,7 +122,7 @@ class _StepPriceState extends State<StepPrice> {
 
           // Price Presets
           Text(
-            'خيارات سريعة:',
+            AppLocalizations.of(context).quickOptions,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 12),
@@ -155,9 +156,9 @@ class _StepPriceState extends State<StepPrice> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('السعر المحدد:'),
+                      Text(AppLocalizations.of(context).selectedPrice),
                       Text(
-                        '${_currentPrice.toStringAsFixed(2)} ج.م',
+                        '${_currentPrice.toStringAsFixed(2)} ${AppLocalizations.of(context).currency}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
