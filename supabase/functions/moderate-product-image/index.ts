@@ -237,9 +237,25 @@ rules:
       return json({ error: "REVIEW_SAVE_FAILED" }, 500);
     }
 
-    // AI image review never publishes, rejects, hides, or changes product lifecycle.
-    // The product remains pending until the existing admin moderation workflow decides.
-    return json({ image_id: image.id, status, review: result });
+    // Finalize the product in a separate, atomic database operation.
+    // The database publishes only when every image is approved and product-level
+    // eligibility checks still pass. Rejected images reject the listing; uncertain
+    // images remain pending for the human-review exception path.
+    const { data: productOutcome, error: finalizationError } = await supabase.rpc(
+      "finalize_product_ai_review",
+      { p_product_id: product.id },
+    );
+    if (finalizationError) {
+      console.error("Product review finalization failed", finalizationError.message);
+      return json({ error: "PRODUCT_FINALIZATION_FAILED" }, 500);
+    }
+
+    return json({
+      image_id: image.id,
+      status,
+      product_status: productOutcome,
+      review: result,
+    });
   } catch (error) {
     console.error("Image moderation error", error instanceof Error ? error.message : "unknown");
     return json({ error: "INTERNAL_ERROR" }, 500);
