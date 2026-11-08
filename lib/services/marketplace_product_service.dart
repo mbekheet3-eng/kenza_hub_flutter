@@ -97,25 +97,15 @@ class MarketplaceProductService {
       throw StateError('يجب تسجيل الدخول قبل البيع');
     }
 
+    // Phone verification and Kenza delivery-zone selection are currently
+    // optional product requirements. Members may list from anywhere in Egypt
+    // and arrange delivery directly with the buyer when Kenza delivery is
+    // unavailable or not selected.
     final userProfile = await _client
         .from('users')
-        .select('default_region_id,first_name,last_name,username')
+        .select('first_name,last_name,username')
         .eq('id', userId)
         .single();
-    final defaultRegionId = userProfile['default_region_id'] as String?;
-    if (defaultRegionId == null) {
-      throw StateError('DEFAULT_REGION_REQUIRED');
-    }
-    final region = await _client
-        .from('regions')
-        .select('name_ar,is_delivery_active')
-        .eq('id', defaultRegionId)
-        .single();
-    if (region['is_delivery_active'] != true) {
-      throw StateError(
-        'منطقتك (${region['name_ar'] ?? ''}) خارج نطاق الشحن الداخلي الحالي؛ يمكنك التصفح، لكن نشر المنتجات غير متاح لهذه المنطقة الآن.',
-      );
-    }
 
     final memberships = await _client
         .from('seller_profile_members')
