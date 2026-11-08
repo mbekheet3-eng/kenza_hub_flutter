@@ -60,10 +60,10 @@ class _StepPriceState extends State<StepPrice> {
               FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
             ],
             decoration: InputDecoration(
-              labelText: 'السعر بالجنيه المصري',
-              hintText: 'مثال: 150.00',
+              labelText: AppLocalizations.of(context).priceInEgp,
+              hintText: AppLocalizations.of(context).priceExample,
               prefixIcon: const Icon(Icons.attach_money),
-              suffixText: 'ج.م',
+              suffixText: AppLocalizations.of(context).currency,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -130,11 +130,11 @@ class _StepPriceState extends State<StepPrice> {
             spacing: 8,
             runSpacing: 8,
             children: [
-              _buildQuickPriceButton('50 ج.م', 50),
-              _buildQuickPriceButton('100 ج.م', 100),
-              _buildQuickPriceButton('200 ج.م', 200),
-              _buildQuickPriceButton('500 ج.م', 500),
-              _buildQuickPriceButton('1000 ج.م', 1000),
+              _buildQuickPriceButton('50 ${AppLocalizations.of(context).currency}', 50),
+              _buildQuickPriceButton('100 ${AppLocalizations.of(context).currency}', 100),
+              _buildQuickPriceButton('200 ${AppLocalizations.of(context).currency}', 200),
+              _buildQuickPriceButton('500 ${AppLocalizations.of(context).currency}', 500),
+              _buildQuickPriceButton('1000 ${AppLocalizations.of(context).currency}', 1000),
             ],
           ),
 
