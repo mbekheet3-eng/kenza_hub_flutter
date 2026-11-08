@@ -424,5 +424,8 @@
   "continueWithApple": "Continue with Apple",
   "passwordUpdated": "Password updated successfully",
   "newPasswordTitle": "Set a new password",
-  "updatePassword": "Update password"
+  "updatePassword": "Update password",
+  "languageSettingsTitle": "App language",
+  "languageSettingsSubtitle": "Choose the language used throughout Kenza Hub",
+  "chooseLanguage": "Choose a language"
 }
