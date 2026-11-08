@@ -371,6 +371,20 @@ class AppLocalizations {
   String get termsRequired => _strings.termsRequired;
   String get passwordRequired => _strings.passwordRequired;
   String get passwordMinLength => _strings.passwordMinLength;
+  String get allConditions => _strings.allConditions;
+  String get priceRange => _strings.priceRange;
+  String get phoneNumber => _strings.phoneNumber;
+  String get smsCode => _strings.smsCode;
+  String get enterSixDigitCode => _strings.enterSixDigitCode;
+  String get verifyCode => _strings.verifyCode;
+  String get sendCode => _strings.sendCode;
+  String get categoryLabel => _strings.categoryLabel;
+  String get addressLabel => _strings.addressLabel;
+  String get priceLabel => _strings.priceLabel;
+  String get priceInEgp => _strings.priceInEgp;
+  String get priceExample => _strings.priceExample;
+  String get productName => _strings.productName;
+  String get productDescription => _strings.productDescription;
   String get currentLanguage => _strings.languageName;
 }
 
