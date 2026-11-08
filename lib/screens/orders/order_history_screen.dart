@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:kenza_hub_flutter/providers/auth_provider.dart';
@@ -54,18 +55,18 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     if (authProvider.userId == null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('سجل الطلبات'),
+          title: Text(AppLocalizations.of(context).ordersHistory),
           centerTitle: true,
         ),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('يرجى تسجيل الدخول لعرض طلباتك'),
+              Text(AppLocalizations.of(context).loginToViewOrders),
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () => context.push('/login'),
-                child: const Text('تسجيل الدخول'),
+                child: Text(AppLocalizations.of(context).login),
               ),
             ],
           ),
@@ -77,14 +78,14 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('سجل الطلبات'),
+        title: Text(AppLocalizations.of(context).ordersHistory),
         centerTitle: true,
       ),
       body: FutureBuilder<List<Order>>(
         future: _ordersFuture!,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
@@ -92,13 +93,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('خطأ: ${snapshot.error}'),
+                  Text('${AppLocalizations.of(context).error}: ${snapshot.error}'),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
                       setState(() => _loadOrders(force: true));
                     },
-                    child: const Text('إعادة محاولة'),
+                    child: Text(AppLocalizations.of(context).retry),
                   ),
                 ],
               ),
@@ -106,8 +107,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('لا توجد طلبات بعد'),
+            return Center(
+              child: Text(AppLocalizations.of(context).noOrders),
             );
           }
 
@@ -143,7 +144,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'الطلب #${order.id.substring(0, 8)}',
+                        '${AppLocalizations.of(context).orderPrefix} #${order.id.substring(0, 8)}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -151,7 +152,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'تاريخ: ${order.createdAt.toString().split(' ')[0]}',
+                        '${AppLocalizations.of(context).dateLabel}: ${order.createdAt.toString().split(' ')[0]}',
                         style: const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                     ],
@@ -201,12 +202,12 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'المبلغ:',
+                Text(
+                  AppLocalizations.of(context).amountLabel,
                   style: TextStyle(color: Colors.grey),
                 ),
                 Text(
-                  '${order.amount.toStringAsFixed(2)} ج.م',
+                  '${order.amount.toStringAsFixed(2)} ${AppLocalizations.of(context).currency}',
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -223,7 +224,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 onPressed: () {
                   context.push('/order-tracking/${order.id}');
                 },
-                child: const Text('تفاصيل الطلب'),
+                child: Text(AppLocalizations.of(context).orderDetails),
               ),
             ),
             if (order.status == OrderStatus.disputed) ...[
@@ -233,7 +234,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 child: OutlinedButton.icon(
                   onPressed: () => context.push('/dispute-evidence/${order.id}'),
                   icon: const Icon(Icons.attach_file),
-                  label: const Text('أدلة النزاع'),
+                  label: Text(AppLocalizations.of(context).disputeEvidenceLabel),
                 ),
               ),
             ],
