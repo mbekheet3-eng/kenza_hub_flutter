@@ -413,8 +413,8 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
                 TextField(
                   controller: phoneController,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    labelText: 'رقم الهاتف',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context).phoneNumber,
                     hintText: '01xxxxxxxxx',
                   ),
                 ),
@@ -424,9 +424,9 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
                     controller: otpController,
                     keyboardType: TextInputType.number,
                     maxLength: 6,
-                    decoration: const InputDecoration(
-                      labelText: 'رمز SMS',
-                      hintText: 'أدخل الرمز المكوّن من 6 أرقام',
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context).smsCode,
+                      hintText: AppLocalizations.of(context).enterSixDigitCode,
                     ),
                   ),
                 ],
@@ -503,7 +503,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
                       height: 18,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text(otpSent ? 'تحقق من الرمز' : 'إرسال الرمز'),
+                  : Text(otpSent ? AppLocalizations.of(context).verifyCode : AppLocalizations.of(context).sendCode),
             ),
           ],
         ),
@@ -541,18 +541,18 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildReviewSection(AppLocalizations.of(context).photos, _buildImagePreview()),
-          _buildReviewSection('الفئة', Text(_category ?? '-')),
-          _buildReviewSection('الحالة', Text(_condition ?? '-')),
+          _buildReviewSection(AppLocalizations.of(context).categoryLabel, Text(_category ?? '-')),
+          _buildReviewSection(AppLocalizations.of(context).conditionLabel, Text(_condition ?? '-')),
           if (!_skipVariantFields && _color != null)
-            _buildReviewSection('اللون', Text(_color!)),
+            _buildReviewSection(AppLocalizations.of(context).colorLabel, Text(_color!)),
           if (!_skipVariantFields && _size != null)
-            _buildReviewSection('المقاس', Text(_size!)),
+            _buildReviewSection(AppLocalizations.of(context).sizeLabel, Text(_size!)),
           if (_brand != null)
-            _buildReviewSection('العلامة التجارية', Text(_brand!)),
-          _buildReviewSection('العنوان', Text(_title)),
+            _buildReviewSection(AppLocalizations.of(context).brandLabel, Text(_brand!)),
+          _buildReviewSection(AppLocalizations.of(context).addressLabel, Text(_title)),
           if (_description.trim().isNotEmpty)
-            _buildReviewSection('الوصف', Text(_description)),
-          _buildReviewSection('السعر', Text('$_price ${AppLocalizations.of(context).currency}', 
+            _buildReviewSection(AppLocalizations.of(context).description, Text(_description)),
+          _buildReviewSection(AppLocalizations.of(context).priceLabel, Text('$_price ${AppLocalizations.of(context).currency}', 
             style: TextStyle(
               color: AppTheme.primaryColor,
               fontWeight: FontWeight.bold,
@@ -759,7 +759,7 @@ class _StepDescriptionAndTitleState extends State<StepDescriptionAndTitle> {
       children: [
         TextField(
           controller: _titleController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'عنوان المنتج',
             hintText: 'أدخل عنوان جذاب',
           ),
@@ -768,7 +768,7 @@ class _StepDescriptionAndTitleState extends State<StepDescriptionAndTitle> {
         const SizedBox(height: 16),
         TextField(
           controller: _descriptionController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'وصف المنتج (اختياري)',
             hintText: 'أضف تفاصيل لو حابب، أو اتركه فارغًا',
           ),
