@@ -36,7 +36,7 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
       id: widget.sellerProfileId,
       agency: widget.agency,
     );
-    if (profile == null) throw StateError('المتجر غير متاح');
+    if (profile == null) throw StateError(AppLocalizations.of(context).storeUnavailable);
     final products = await _service.loadStoreProducts(widget.sellerProfileId);
     return _StorePageData(profile: profile, products: products);
   }
@@ -50,7 +50,7 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.agency ? 'ركن الوكالة' : 'Online Store')),
+      appBar: AppBar(title: Text(widget.agency ? AppLocalizations.of(context).agencyCorner : 'Online Store')),
       body: FutureBuilder<_StorePageData>(
         future: _future,
         builder: (context, snapshot) {
@@ -77,7 +77,7 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
 
           final data = snapshot.data!;
           final profile = data.profile;
-          final name = (profile['business_name'] ?? profile['display_name'] ?? 'متجر')
+          final name = (profile['business_name'] ?? profile['display_name'] ?? AppLocalizations.of(context).storeLabel)
               .toString();
           final cover = profile['cover_image_url'] as String?;
           final canShowCover = !widget.agency || profile['show_storefront'] == true;
@@ -150,7 +150,7 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
                         ),
                       if (widget.agency && (profile['shop_area'] as String?)?.isNotEmpty == true)
                         _InfoLine(icon: Icons.location_on_outlined,
-                            text: 'المنطقة: ${profile['shop_area']}'),
+                            text: '${AppLocalizations.of(context).areaLabel}: ${profile['shop_area']}'),
                       if (links.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
@@ -223,7 +223,7 @@ class _SellerStoreScreenState extends State<SellerStoreScreen> {
       case 'facebook': return 'Facebook';
       case 'instagram': return 'Instagram';
       case 'whatsapp': return 'WhatsApp';
-      default: return 'الموقع';
+      default: return AppLocalizations.of(context).locationLabel;
     }
   }
 }
