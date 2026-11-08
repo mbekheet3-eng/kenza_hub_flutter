@@ -302,5 +302,7 @@
   "noEvidenceYet": "Aucune preuve n’a encore été enregistrée pour ce litige.",
   "evidenceHash": "Empreinte SHA-256",
   "viewEvidence": "Voir",
-  "downloadEvidence": "Télécharger"
+  "downloadEvidence": "Télécharger",
+  "evidenceCaptionOptional": "Note sur la preuve (facultatif)",
+  "attachedEvidence": "Preuve jointe"
 }
