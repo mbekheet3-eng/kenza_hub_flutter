@@ -310,5 +310,19 @@
   "passwordsDoNotMatch": "Passwords do not match",
   "termsRequired": "You must agree to the Terms and Conditions and Privacy Policy to continue",
   "passwordRequired": "Password is required",
-  "passwordMinLength": "Password must be at least 6 characters"
+  "passwordMinLength": "Password must be at least 6 characters",
+  "allConditions": "All conditions",
+  "priceRange": "Price range",
+  "phoneNumber": "Phone number",
+  "smsCode": "SMS code",
+  "enterSixDigitCode": "Enter the 6-digit code",
+  "verifyCode": "Verify code",
+  "sendCode": "Send code",
+  "categoryLabel": "Category",
+  "addressLabel": "Address",
+  "priceLabel": "Price",
+  "priceInEgp": "Price in EGP",
+  "priceExample": "Example: 150.00",
+  "productName": "Product name",
+  "productDescription": "Description"
 }
