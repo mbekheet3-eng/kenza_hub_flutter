@@ -324,5 +324,10 @@
   "priceInEgp": "Price in EGP",
   "priceExample": "Example: 150.00",
   "productName": "Product name",
-  "productDescription": "Description"
+  "productDescription": "Description",
+  "productTitleLabel": "Product title",
+  "catchyTitleHint": "Enter an attractive title",
+  "optionalProductDescription": "Product description (optional)",
+  "optionalDescriptionHint": "Add details if you like, or leave it blank",
+  "searchAvailableBrands": "Search available brands..."
 }
