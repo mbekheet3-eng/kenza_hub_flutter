@@ -36,6 +36,33 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     super.dispose();
   }
 
+  Future<void> _refreshCategories() async {
+    final future = _catalogService.fetchCategories();
+    setState(() => _categoriesFuture = future);
+    try {
+      await future;
+    } catch (_) {
+      // FutureBuilder presents the load error and retry action.
+    }
+  }
+
+  Widget _refreshableState(Widget child) {
+    return Expanded(
+      child: RefreshIndicator(
+        onRefresh: _refreshCategories,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.65,
+              child: child,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _retry() {
     setState(() {
       _path.clear();
@@ -495,14 +522,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               future: _categoriesFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Expanded(
-                    child: Center(child: CircularProgressIndicator()),
+                  return _refreshableState(
+                    const Center(child: CircularProgressIndicator()),
                   );
                 }
 
                 if (snapshot.hasError) {
-                  return Expanded(
-                    child: Center(
+                  return _refreshableState(
+                    Center(
                       child: Padding(
                         padding: const EdgeInsets.all(24),
                         child: Column(
@@ -536,8 +563,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   });
 
                 if (categories.isEmpty) {
-                  return Expanded(
-                    child: Center(child: Text(AppLocalizations.of(context).noCategories)),
+                  return _refreshableState(
+                    Center(child: Text(AppLocalizations.of(context).noCategories)),
                   );
                 }
 
@@ -546,8 +573,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     children: [
                       _buildBreadcrumb(languageCode),
                       Expanded(
-                        child: GridView.builder(
-                          padding: const EdgeInsets.fromLTRB(16, 2, 16, 18),
+                        child: RefreshIndicator(
+                          onRefresh: _refreshCategories,
+                          child: GridView.builder(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.fromLTRB(16, 2, 16, 18),
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
@@ -585,7 +615,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               categoryIndex,
                               languageCode,
                             );
-                          },
+                            },
+                          ),
                         ),
                       ),
                     ],
