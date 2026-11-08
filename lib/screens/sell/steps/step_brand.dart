@@ -118,7 +118,7 @@ class _StepBrandState extends State<StepBrand> {
               TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'ابحث في العلامات التجارية المتاحة...',
+                  hintText: AppLocalizations.of(context).searchAvailableBrands,
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
