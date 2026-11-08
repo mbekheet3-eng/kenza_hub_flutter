@@ -264,6 +264,21 @@ class AppLocalizations {
   String get changeFilters => _strings.changeFilters;
   String get clearPriceFilter => _strings.clearPriceFilter;
   String get applyFilters => _strings.applyFilters;
+  String get photos => _strings.photos;
+  String get productInfo => _strings.productInfo;
+  String get optionalDetails => _strings.optionalDetails;
+  String get colorSizeBrand => _strings.colorSizeBrand;
+  String get chooseCategoryFirst => _strings.chooseCategoryFirst;
+  String get reviewAndPublish => _strings.reviewAndPublish;
+  String get chooseDeliveryArea => _strings.chooseDeliveryArea;
+  String get verifyPhone => _strings.verifyPhone;
+  String get phoneVerificationRequired => _strings.phoneVerificationRequired;
+  String get publishProduct => _strings.publishProduct;
+  String get sellProduct => _strings.sellProduct;
+  String get loginToSell => _strings.loginToSell;
+  String get next => _strings.next;
+  String get publish => _strings.publish;
+  String get previous => _strings.previous;
   String get currentLanguage => _strings.languageName;
 }
 
