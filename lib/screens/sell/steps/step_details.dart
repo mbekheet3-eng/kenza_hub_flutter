@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import '../../../config/theme.dart';
 import '../../../services/catalog_service.dart';
 
@@ -76,7 +77,7 @@ class _StepDetailsState extends State<StepDetails> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'حالة المنتج',
+          AppLocalizations.of(context).productCondition,
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 8),
@@ -84,18 +85,18 @@ class _StepDetailsState extends State<StepDetails> {
         if (!isHomeCategory)
           ExpansionTile(
             tilePadding: EdgeInsets.zero,
-            title: const Text('اللون والمقاس (اختياري)'),
+            title: Text(AppLocalizations.of(context).optionalColorSize),
             children: [
               Align(
                 alignment: Alignment.centerRight,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('اللون'),
+                    Text(AppLocalizations.of(context).colorLabel),
                     const SizedBox(height: 8),
                     _buildColorOptions(),
                     const SizedBox(height: 16),
-                    const Text('المقاس'),
+                    Text(AppLocalizations.of(context).sizeLabel),
                     const SizedBox(height: 8),
                     _buildSizeOptions(),
                   ],
@@ -121,12 +122,12 @@ class _StepDetailsState extends State<StepDetails> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('تعذر تحميل حالات المنتجات'),
+              Text(AppLocalizations.of(context).productConditionsLoadError),
               TextButton(
                 onPressed: () => setState(
                   () => _conditionsFuture = _catalogService.fetchConditions(),
                 ),
-                child: const Text('إعادة المحاولة'),
+                child: Text(AppLocalizations.of(context).retry),
               ),
             ],
           );
@@ -134,7 +135,7 @@ class _StepDetailsState extends State<StepDetails> {
 
         final conditions = snapshot.data ?? const <String>[];
         if (conditions.isEmpty) {
-          return const Text('لا توجد حالات منتجات مفعّلة في قاعدة البيانات');
+          return Text(AppLocalizations.of(context).noActiveProductConditions);
         }
 
         return Wrap(
@@ -178,12 +179,12 @@ class _StepDetailsState extends State<StepDetails> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('تعذر تحميل الألوان'),
+              Text(AppLocalizations.of(context).colorsLoadError),
               TextButton(
                 onPressed: () => setState(
                   () => _colorsFuture = _catalogService.fetchColors(),
                 ),
-                child: const Text('إعادة المحاولة'),
+                child: Text(AppLocalizations.of(context).retry),
               ),
             ],
           );
@@ -191,7 +192,7 @@ class _StepDetailsState extends State<StepDetails> {
 
         final availableColors = snapshot.data ?? const <String>[];
         if (availableColors.isEmpty) {
-          return const Text('لا توجد ألوان مسجلة لهذا القسم');
+          return Text(AppLocalizations.of(context).noColorsForCategory);
         }
 
         return Wrap(
@@ -244,7 +245,7 @@ class _StepDetailsState extends State<StepDetails> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'تعذر تحميل المقاسات من قاعدة البيانات',
+                AppLocalizations.of(context).sizesLoadError,
                 style: TextStyle(color: AppTheme.textSecondary),
               ),
               TextButton(
@@ -254,7 +255,7 @@ class _StepDetailsState extends State<StepDetails> {
                           () => _sizesFuture =
                               _catalogService.fetchSizesForCategory(widget.category!),
                         ),
-                child: const Text('إعادة المحاولة'),
+                child: Text(AppLocalizations.of(context).retry),
               ),
             ],
           );
@@ -263,7 +264,7 @@ class _StepDetailsState extends State<StepDetails> {
         final availableSizes = snapshot.data ?? const <String>[];
         if (availableSizes.isEmpty) {
           return Text(
-            'لا توجد مقاسات مسجلة لهذا القسم',
+            AppLocalizations.of(context).noSizesForCategory,
             style: TextStyle(color: AppTheme.textSecondary),
           );
         }
