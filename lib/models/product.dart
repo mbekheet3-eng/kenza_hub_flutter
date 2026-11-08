@@ -101,7 +101,7 @@ class Product {
       !isSold &&
       !isDeleted &&
       isActive &&
-      statusSlug == 'available' &&
+      (statusSlug == 'available' || statusSlug == 'active') &&
       moderationStatus == 'approved';
 
   bool get isPendingReview =>
