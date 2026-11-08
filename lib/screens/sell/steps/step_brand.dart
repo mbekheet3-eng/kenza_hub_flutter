@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 
 import '../../../config/theme.dart';
 import '../../../services/catalog_service.dart';
@@ -64,7 +65,7 @@ class _StepBrandState extends State<StepBrand> {
         child: Padding(
           padding: EdgeInsets.all(16),
           child: Text(
-            'يمكن ترك العلامة التجارية فارغة لهذه الفئة',
+            AppLocalizations.of(context).brandOptionalNote,
             textAlign: TextAlign.center,
           ),
         ),
@@ -86,14 +87,14 @@ class _StepBrandState extends State<StepBrand> {
         if (snapshot.hasError) {
           return Column(
             children: [
-              const Text('تعذر تحميل العلامات التجارية'),
+              Text(AppLocalizations.of(context).brandLoadError),
               TextButton(
                 onPressed: () {
                   setState(() {
                     _brandsFuture = _catalogService.fetchBrands();
                   });
                 },
-                child: const Text('إعادة المحاولة'),
+                child: Text(AppLocalizations.of(context).retry),
               ),
             ],
           );
@@ -110,7 +111,7 @@ class _StepBrandState extends State<StepBrand> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'اختر العلامة التجارية (اختياري)',
+                AppLocalizations.of(context).chooseBrandOptional,
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(height: 12),
@@ -127,7 +128,7 @@ class _StepBrandState extends State<StepBrand> {
               ),
               const SizedBox(height: 12),
               FilterChip(
-                label: const Text('بدون علامة تجارية'),
+                label: Text(AppLocalizations.of(context).noBrand),
                 selected: _selectedBrand == null,
                 onSelected: (_) => _selectBrand(null),
                 backgroundColor: AppTheme.surfaceColor,
