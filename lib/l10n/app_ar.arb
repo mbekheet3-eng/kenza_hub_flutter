@@ -304,5 +304,7 @@
   "viewEvidence": "مشاهدة",
   "downloadEvidence": "تحميل",
   "evidenceCaptionOptional": "ملاحظة على الدليل (اختياري)",
-  "attachedEvidence": "دليل مرفق"
+  "attachedEvidence": "دليل مرفق",
+  "chooseStorefrontPhoto": "اختيار صورة واجهة المحل",
+  "chooseCoverPhoto": "اختيار صورة الغلاف"
 }
