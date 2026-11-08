@@ -41,6 +41,13 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  Future<void> _refreshHome(HomeProvider provider) async {
+    await Future.wait<void>([
+      provider.retry(),
+      _loadCategories(),
+    ]);
+  }
+
   Future<void> _loadCategories() async {
     try {
       final rows = await Supabase.instance.client
@@ -203,8 +210,11 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Consumer<HomeProvider>(
         builder: (context, homeProvider, _) {
-          return CustomScrollView(
-            slivers: [
+          return RefreshIndicator(
+            onRefresh: () => _refreshHome(homeProvider),
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
               SliverToBoxAdapter(child: _buildSearchBar(strings, homeProvider)),
               SliverToBoxAdapter(child: _buildProductStrip(homeProvider)),
               SliverToBoxAdapter(child: _buildCategoryStrip()),
@@ -285,6 +295,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
             ],
+            ),
           );
         },
       ),
