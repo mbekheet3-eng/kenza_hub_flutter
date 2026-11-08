@@ -175,10 +175,10 @@ class MarketplaceProductService {
 
     return await Future.wait(productRows.map((row) async {
       final productId = row['id'] as String;
+      final category = categoryTree(row['category_id'] as String?);
       return _parseProductRow({
         ...row,
-        if (categoryTree(row['category_id'] as String?) case final category?)
-          'category': category,
+        if (category != null) 'category': category,
         if (row['condition_id'] != null &&
             conditionsById.containsKey(row['condition_id']))
           'condition': conditionsById[row['condition_id']],
