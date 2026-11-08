@@ -10,6 +10,7 @@ create index if not exists product_image_review_attempts_user_time_idx
 alter table public.product_image_review_attempts enable row level security;
 revoke all on public.product_image_review_attempts from public,anon,authenticated;
 grant all on public.product_image_review_attempts to service_role;
+grant usage,select on sequence public.product_image_review_attempts_id_seq to service_role;
 
 create or replace function private.claim_product_image_review(
   p_image_id uuid,
