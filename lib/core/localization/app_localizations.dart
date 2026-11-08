@@ -364,6 +364,8 @@ class AppLocalizations {
   String get evidenceHash => _strings.evidenceHash;
   String get viewEvidence => _strings.viewEvidence;
   String get downloadEvidence => _strings.downloadEvidence;
+  String get evidenceCaptionOptional => _strings.evidenceCaptionOptional;
+  String get attachedEvidence => _strings.attachedEvidence;
   String get currentLanguage => _strings.languageName;
 }
 
