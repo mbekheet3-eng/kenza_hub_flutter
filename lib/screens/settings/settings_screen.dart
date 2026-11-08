@@ -26,7 +26,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildSectionHeader(AppLocalizations.of(context).account),
             _buildSettingsTile(
               icon: Icons.person_outline,
-              title: 'تعديل الملف الشخصي',
+              title: AppLocalizations.of(context).editProfileTitle,
               onTap: () => context.push('/edit-profile'),
             ),
             _buildSettingsTile(
