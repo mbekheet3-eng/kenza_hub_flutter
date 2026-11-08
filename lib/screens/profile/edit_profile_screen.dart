@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -144,8 +145,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('تم حفظ الملف الشخصي بنجاح'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).profileSaved),
             backgroundColor: Colors.green,
           ),
         );
@@ -177,16 +178,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     if (!context.watch<AuthProvider>().isSignedIn) {
       return Scaffold(
-        appBar: AppBar(title: const Text('تحرير الملف الشخصي')),
+        appBar: AppBar(title: Text(AppLocalizations.of(context).editProfileTitle)),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('سجّل الدخول لتعديل بيانات حسابك'),
+              Text(AppLocalizations.of(context).loginToEditProfile),
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () => context.push('/login'),
-                child: const Text('تسجيل الدخول'),
+                child: Text(AppLocalizations.of(context).login),
               ),
             ],
           ),
@@ -198,7 +199,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (_isLoadingProfile) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('تحرير الملف الشخصي'),
+          title: Text(AppLocalizations.of(context).editProfileTitle),
           centerTitle: true,
         ),
         body: const Center(child: CircularProgressIndicator()),
@@ -207,7 +208,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('تحرير الملف الشخصي'),
+        title: Text(AppLocalizations.of(context).editProfileTitle),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
@@ -257,7 +258,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   TextButton.icon(
                     onPressed: _pickImage,
                     icon: const Icon(Icons.camera_alt),
-                    label: const Text('غيّر الصورة'),
+                    label: Text(AppLocalizations.of(context).changePhoto),
                   ),
                 ],
               ),
@@ -328,8 +329,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           strokeWidth: 2,
                         ),
                       )
-                    : const Text(
-                        'حفظ التغييرات',
+                    : Text(
+                        AppLocalizations.of(context).saveChanges,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
