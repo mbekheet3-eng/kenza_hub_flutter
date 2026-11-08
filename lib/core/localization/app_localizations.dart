@@ -173,6 +173,23 @@ class AppLocalizations {
   String get ratings => _strings.ratings;
   String get edit => _strings.edit;
   String get aboutMe => _strings.aboutMe;
+  String get aboutTitle => _strings.aboutTitle;
+  String get brandTagline => _strings.brandTagline;
+  String get brandSubtitle => _strings.brandSubtitle;
+  String get ideaTitle => _strings.ideaTitle;
+  String get ideaBody => _strings.ideaBody;
+  String get whatYouFindTitle => _strings.whatYouFindTitle;
+  String get whatYouFindBody => _strings.whatYouFindBody;
+  String get howItWorksTitle => _strings.howItWorksTitle;
+  String get howItWorksBody => _strings.howItWorksBody;
+  String get missionTitle => _strings.missionTitle;
+  String get missionBody => _strings.missionBody;
+  String get aboutThanks => _strings.aboutThanks;
+  String get copyright => _strings.copyright;
+  String get policiesTitle => _strings.policiesTitle;
+  String get policiesIntroTitle => _strings.policiesIntroTitle;
+  String get policiesIntro => _strings.policiesIntro;
+  String get policiesDraftNotice => _strings.policiesDraftNotice;
   String get currentLanguage => _strings.languageName;
 }
 

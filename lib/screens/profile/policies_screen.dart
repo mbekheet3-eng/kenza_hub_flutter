@@ -82,7 +82,7 @@ class PoliciesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('السياسات والشروط')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context).policiesTitle)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -98,7 +98,7 @@ class PoliciesScreen extends StatelessWidget {
                 Icon(Icons.policy_outlined, color: Colors.white, size: 30),
                 SizedBox(height: 10),
                 Text(
-                  'سياسات استخدام كنزة هب',
+                  AppLocalizations.of(context).policiesIntroTitle,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -107,7 +107,7 @@ class PoliciesScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 6),
                 Text(
-                  'يرجى قراءة البنود التالية قبل استخدام المنصة.',
+                  AppLocalizations.of(context).policiesIntro,
                   style: TextStyle(color: Colors.white70, height: 1.6),
                 ),
               ],
@@ -128,7 +128,7 @@ class PoliciesScreen extends StatelessWidget {
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'هذه مسودة تشغيلية أولية للمراجعة، وليست اعتمادًا قانونيًا نهائيًا. يجب استكمال بيانات التواصل ومراجعة سياسة الخصوصية قانونيًا قبل الإطلاق العام.',
+                    AppLocalizations.of(context).policiesDraftNotice,
                     style: TextStyle(
                       color: Color(0xFF7C2D12),
                       height: 1.6,
@@ -175,7 +175,7 @@ class PoliciesScreen extends StatelessWidget {
           const SizedBox(height: 16),
           const Center(
             child: Text(
-              'كنزة هب © جميع الحقوق محفوظة',
+              AppLocalizations.of(context).copyright,
               style: TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ),

@@ -57,5 +57,22 @@
   "welcomeGreeting": "Bonjour",
   "notificationsComingSoon": "Le centre de notifications sera bientôt disponible.",
   "productCountLabel": "produits",
-  "categoriesLoadError": "Impossible de charger les catégories — réessayer"
+  "categoriesLoadError": "Impossible de charger les catégories — réessayer",
+  "aboutTitle": "À propos de Kenza Hub",
+  "brandTagline": "Si vous n’en avez plus besoin, quelqu’un d’autre en a peut-être besoin",
+  "brandSubtitle": "Achetez et vendez facilement sans commission",
+  "ideaTitle": "Notre idée",
+  "ideaBody": "Kenza Hub est une place de marché égyptienne qui réunit les personnes pour présenter, découvrir, acheter et vendre des produits. Nous pensons qu’un objet dont vous n’avez plus besoin peut être utile à quelqu’un d’autre, et que sa découverte doit être plus simple et mieux organisée.",
+  "whatYouFindTitle": "Que trouve-t-on sur Kenza Hub ?",
+  "whatYouFindBody": "La plateforme commence avec les articles pour enfants et la maison, les vêtements et les chaussures, qu’ils soient neufs ou déjà possédés. Nous améliorons progressivement la présentation, la découverte des produits et les échanges à leur sujet.",
+  "howItWorksTitle": "Comment ça marche ?",
+  "howItWorksBody": "Les visiteurs peuvent parcourir les produits disponibles. La connexion est nécessaire pour vendre ou utiliser les fonctions du compte. Le vendeur ajoute les informations, les photos et le prix du produit ; l’acheteur peut ensuite consulter l’annonce, contacter le vendeur ou suivre les étapes d’achat disponibles dans l’application.",
+  "missionTitle": "Notre mission",
+  "missionBody": "Notre mission est de proposer une place de marché simple et organisée qui donne une nouvelle utilité aux produits et permet aux particuliers et aux vendeurs de présenter clairement leurs articles et de toucher les personnes intéressées.",
+  "aboutThanks": "Kenza Hub grandit grâce à sa communauté. Merci de faire partie de notre projet.",
+  "copyright": "Kenza Hub © Tous droits réservés",
+  "policiesTitle": "Politiques et conditions",
+  "policiesIntroTitle": "Règles d’utilisation de Kenza Hub",
+  "policiesIntro": "Veuillez lire les conditions suivantes avant d’utiliser la plateforme.",
+  "policiesDraftNotice": "Il s’agit d’un premier projet opérationnel destiné à être révisé, et non d’une validation juridique définitive. Les coordonnées doivent être complétées et la politique de confidentialité examinée par un juriste avant le lancement public."
 }

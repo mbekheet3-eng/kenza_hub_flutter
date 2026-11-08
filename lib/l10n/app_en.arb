@@ -57,5 +57,22 @@
   "welcomeGreeting": "Hello",
   "notificationsComingSoon": "The notifications center is coming soon.",
   "productCountLabel": "products",
-  "categoriesLoadError": "Could not load categories — retry"
+  "categoriesLoadError": "Could not load categories — retry",
+  "aboutTitle": "About Kenza Hub",
+  "brandTagline": "If you don’t need it, someone else might",
+  "brandSubtitle": "Buy and sell easily with no commission",
+  "ideaTitle": "Our idea",
+  "ideaBody": "Kenza Hub is an Egyptian online marketplace that brings people together to list, discover, buy and sell products. We believe something you no longer need may be useful to someone else, and finding it should be easier and more organized.",
+  "whatYouFindTitle": "What can you find on Kenza Hub?",
+  "whatYouFindBody": "The marketplace starts with children’s supplies, home supplies, clothing and shoes, with both new and previously owned items. We are continuously improving how products are listed, discovered and discussed.",
+  "howItWorksTitle": "How does it work?",
+  "howItWorksBody": "Visitors can browse available products. Signing in is required to sell or use account features. Sellers add product details, photos and a price; buyers can then review the listing, contact the seller or follow the purchase steps available in the app.",
+  "missionTitle": "Our mission",
+  "missionBody": "Our mission is to provide a simple, organized marketplace that helps products find a new purpose and gives individuals and sellers a clear place to present their items and reach interested people.",
+  "aboutThanks": "Kenza Hub grows with its community. Thank you for being part of our idea.",
+  "copyright": "Kenza Hub © All rights reserved",
+  "policiesTitle": "Policies and terms",
+  "policiesIntroTitle": "Kenza Hub usage policies",
+  "policiesIntro": "Please read the following terms before using the marketplace.",
+  "policiesDraftNotice": "This is an initial operational draft for review, not final legal approval. Contact details must be completed and the privacy policy reviewed by legal counsel before public launch."
 }

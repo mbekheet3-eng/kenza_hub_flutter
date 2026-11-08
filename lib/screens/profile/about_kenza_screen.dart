@@ -9,7 +9,7 @@ class AboutKenzaScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('عن كنزة هب')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context).aboutTitle)),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -19,7 +19,7 @@ class AboutKenzaScreen extends StatelessWidget {
               color: _navy,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(Icons.storefront_rounded, color: Colors.white, size: 42),
@@ -34,7 +34,7 @@ class AboutKenzaScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'لو مش محتاجها... غيرك محتاجها',
+                  AppLocalizations.of(context).brandTagline,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 17,
@@ -43,7 +43,7 @@ class AboutKenzaScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'بيع واشتري بسهولة من غير عمولة',
+                  AppLocalizations.of(context).brandSubtitle,
                   style: TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ],
@@ -52,27 +52,27 @@ class AboutKenzaScreen extends StatelessWidget {
           const SizedBox(height: 24),
           _section(
             context,
-            title: 'فكرتنا',
+            title: AppLocalizations.of(context).ideaTitle,
             body:
-                'كنزة هب منصة إلكترونية مصرية تجمع الناس في مكان واحد لعرض المنتجات والبحث عنها وبيعها وشرائها. نؤمن أن الشيء الذي لم تعد تحتاجه قد يكون مفيدًا لشخص آخر، وأن الوصول إليه يجب أن يكون أسهل وأكثر تنظيمًا.',
+                AppLocalizations.of(context).ideaBody,
           ),
           _section(
             context,
-            title: 'ماذا تجد على كنزة هب؟',
+            title: AppLocalizations.of(context).whatYouFindTitle,
             body:
-                'تبدأ المنصة بمستلزمات الأطفال والمنزل والملابس والأحذية، مع إتاحة المنتجات الجديدة أو التي سبق اقتناؤها. ونعمل على تطوير تجربة عرض المنتجات واكتشافها والتواصل حولها بصورة تدريجية.',
+                AppLocalizations.of(context).whatYouFindBody,
           ),
           _section(
             context,
-            title: 'كيف تعمل المنصة؟',
+            title: AppLocalizations.of(context).howItWorksTitle,
             body:
-                'يمكن للزائر تصفح المنتجات المتاحة. ويتطلب البيع أو استخدام خصائص الحساب تسجيل الدخول. يضيف البائع بيانات المنتج وصوره وسعره، ثم يراجع المشتري التفاصيل ويتواصل أو يتابع خطوات الشراء المتاحة داخل التطبيق.',
+                AppLocalizations.of(context).howItWorksBody,
           ),
           _section(
             context,
-            title: 'رسالتنا',
+            title: AppLocalizations.of(context).missionTitle,
             body:
-                'تقديم سوق إلكتروني بسيط ومنظم يساعد على إعادة الاستفادة من المنتجات، ويمنح الأفراد والبائعين مساحة واضحة لعرض ما يقدمونه والوصول إلى المهتمين.',
+                AppLocalizations.of(context).missionBody,
           ),
           const SizedBox(height: 8),
           Container(
@@ -82,14 +82,14 @@ class AboutKenzaScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: _red.withOpacity(0.18)),
             ),
-            child: const Row(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(Icons.favorite_outline, color: _red),
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'كنزة هب تكبر بمشاركة مجتمعها. شكرًا لكونك جزءًا من فكرتنا.',
+                    AppLocalizations.of(context).aboutThanks,
                     style: TextStyle(
                       color: _navy,
                       fontWeight: FontWeight.w600,
@@ -100,9 +100,9 @@ class AboutKenzaScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 28),
-          const Center(
+          Center(
             child: Text(
-              'كنزة هب © جميع الحقوق محفوظة',
+              AppLocalizations.of(context).copyright,
               style: TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ),
