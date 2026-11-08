@@ -203,5 +203,20 @@
   "noSearchResults": "No results found",
   "changeFilters": "Try changing the filters or search",
   "clearPriceFilter": "Clear price filter",
-  "applyFilters": "Apply filters"
+  "applyFilters": "Apply filters",
+  "photos": "Photos",
+  "productInfo": "Product information",
+  "optionalDetails": "Additional details (optional)",
+  "colorSizeBrand": "Color, size and brand",
+  "chooseCategoryFirst": "Choose a category first to display product fields.",
+  "reviewAndPublish": "Review and publish",
+  "chooseDeliveryArea": "Choose delivery area",
+  "verifyPhone": "Verify phone number",
+  "phoneVerificationRequired": "Phone verification is required only once before your first sale or purchase.",
+  "publishProduct": "Publish product",
+  "sellProduct": "Sell a product",
+  "loginToSell": "Log in first to list your products for sale",
+  "next": "Next",
+  "publish": "Publish",
+  "previous": "Previous"
 }
