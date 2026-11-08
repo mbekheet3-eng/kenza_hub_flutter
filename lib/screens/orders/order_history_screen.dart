@@ -48,6 +48,18 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     });
   }
 
+  Future<void> _refreshOrders() async {
+    _loadOrders(force: true);
+    final future = _ordersFuture;
+    if (future != null) {
+      try {
+        await future;
+      } catch (_) {
+        // The FutureBuilder below presents the error state.
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
@@ -81,17 +93,31 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         title: Text(AppLocalizations.of(context).ordersHistory),
         centerTitle: true,
       ),
-      body: FutureBuilder<List<Order>>(
-        future: _ordersFuture!,
+      body: RefreshIndicator(
+        onRefresh: _refreshOrders,
+        child: FutureBuilder<List<Order>>(
+          future: _ordersFuture!,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.65,
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+              ],
+            );
           }
 
           if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.65,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text('${AppLocalizations.of(context).error}: ${snapshot.error}'),
                   const SizedBox(height: 16),
@@ -101,20 +127,29 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     },
                     child: Text(AppLocalizations.of(context).retry),
                   ),
-                ],
-              ),
+                  ],
+                  ),
+                ),
+              ],
             );
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
-              child: Text(AppLocalizations.of(context).noOrders),
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.65,
+                  child: Center(child: Text(AppLocalizations.of(context).noOrders)),
+                ),
+              ],
             );
           }
 
           final orders = snapshot.data!;
 
           return ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
             itemCount: orders.length,
             padding: const EdgeInsets.all(16),
             itemBuilder: (context, index) {
@@ -122,7 +157,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               return _buildOrderCard(context, order);
             },
           );
-        },
+          },
+        ),
       ),
     );
   }
