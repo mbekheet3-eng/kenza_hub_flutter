@@ -58,30 +58,33 @@ class SupabaseInitializationErrorApp extends StatelessWidget {
       ],
       debugShowCheckedModeBanner: false,
       home: Builder(
-        builder: (context) => Scaffold(
+        builder: (localizedContext) => Scaffold(
           body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.cloud_off_outlined, size: 52),
-                const SizedBox(height: 16),
-                Text(
-                  AppLocalizations.of(context).initializationError,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(message, textAlign: TextAlign.center),
-                const SizedBox(height: 16),
-                Text(
-                  AppLocalizations.of(context).initializationRetryHint,
-                  textAlign: TextAlign.center,
-                ),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.cloud_off_outlined, size: 52),
+                  const SizedBox(height: 16),
+                  Text(
+                    AppLocalizations.of(localizedContext).initializationError,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(message, textAlign: TextAlign.center),
+                  const SizedBox(height: 16),
+                  Text(
+                    AppLocalizations.of(localizedContext).initializationRetryHint,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
-          ),
           ),
         ),
       ),
