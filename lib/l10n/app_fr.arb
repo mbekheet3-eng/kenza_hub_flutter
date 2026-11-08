@@ -310,5 +310,19 @@
   "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
   "termsRequired": "Vous devez accepter les conditions générales et la politique de confidentialité pour continuer",
   "passwordRequired": "Le mot de passe est obligatoire",
-  "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères"
+  "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères",
+  "allConditions": "Tous les états",
+  "priceRange": "Fourchette de prix",
+  "phoneNumber": "Numéro de téléphone",
+  "smsCode": "Code SMS",
+  "enterSixDigitCode": "Saisissez le code à 6 chiffres",
+  "verifyCode": "Vérifier le code",
+  "sendCode": "Envoyer le code",
+  "categoryLabel": "Catégorie",
+  "addressLabel": "Adresse",
+  "priceLabel": "Prix",
+  "priceInEgp": "Prix en EGP",
+  "priceExample": "Exemple : 150,00",
+  "productName": "Nom du produit",
+  "productDescription": "Description"
 }
