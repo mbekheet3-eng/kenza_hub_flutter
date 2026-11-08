@@ -220,45 +220,24 @@ rules:
       confidence: confidenceIsValid ? confidence : 0,
     };
 
-    // Re-check the product immediately before persisting the result. An admin decision
-    // made while Gemini was processing must never be overwritten or bypassed.
-    const { data: currentProduct, error: currentProductError } = await supabase
-      .from("products")
-      .select("moderation_status, status_id")
-      .eq("id", product.id)
-      .maybeSingle();
-    if (currentProductError || !currentProduct) {
-      return json({ error: "PRODUCT_RECHECK_FAILED" }, 500);
-    }
-    if (
-      currentProduct.moderation_status !== "pending" ||
-      currentProduct.status_id !== pendingStatus.id
-    ) {
-      return json({ error: "PRODUCT_NOT_PENDING_REVIEW" }, 409);
-    }
-
-    const { error: updateError } = await supabase.from("product_images").update({
-      ai_review_status: status,
-      ai_review_result: result,
-      ai_reviewed_at: new Date().toISOString(),
-      ai_review_model: "gemini-2.5-flash",
-    }).eq("id", image.id);
-    if (updateError) {
-      console.error("Image review persistence failed", updateError.message);
-      return json({ error: "REVIEW_SAVE_FAILED" }, 500);
-    }
-
-    // Finalize the product in a separate, atomic database operation.
-    // The database publishes only when every image is approved and product-level
-    // eligibility checks still pass. Rejected images reject the listing; uncertain
-    // images remain pending for the human-review exception path.
-    const { data: productOutcome, error: finalizationError } = await supabase.rpc(
-      "finalize_product_ai_review",
-      { p_product_id: product.id },
+    // Persist the Gemini decision and finalize the product in one database
+    // transaction. The database locks the product row before changing the image,
+    // preventing a stale concurrent review from modifying an already-published listing.
+    const { data: productOutcome, error: reviewSaveError } = await supabase.rpc(
+      "record_product_image_ai_review",
+      {
+        p_product_image_id: image.id,
+        p_status: status,
+        p_result: result,
+        p_model: "gemini-2.5-flash",
+      },
     );
-    if (finalizationError) {
-      console.error("Product review finalization failed", finalizationError.message);
-      return json({ error: "PRODUCT_FINALIZATION_FAILED" }, 500);
+    if (reviewSaveError) {
+      if (reviewSaveError.message?.includes("PRODUCT_NOT_PENDING_REVIEW")) {
+        return json({ error: "PRODUCT_NOT_PENDING_REVIEW" }, 409);
+      }
+      console.error("Atomic image review persistence failed", reviewSaveError.message);
+      return json({ error: "REVIEW_SAVE_FAILED" }, 500);
     }
 
     return json({
