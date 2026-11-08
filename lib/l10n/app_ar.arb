@@ -416,5 +416,13 @@
   "noDeliveryRegions": "لا توجد مناطق توصيل مفعّلة حاليًا.",
   "enterValidPhone": "أدخل رقم هاتف صحيحًا مع كود الدولة.",
   "otpSent": "تم إرسال الرمز. أدخل رمز SMS للتحقق.",
-  "otpVerificationFailed": "تعذر إتمام التوثيق"
+  "otpVerificationFailed": "تعذر إتمام التوثيق",
+  "nameRequired": "الاسم مطلوب",
+  "confirmPasswordRequired": "يرجى تأكيد كلمة المرور",
+  "or": "أو",
+  "continueWithGoogle": "المتابعة باستخدام Google",
+  "continueWithApple": "المتابعة باستخدام Apple",
+  "passwordUpdated": "تم تحديث كلمة المرور بنجاح",
+  "newPasswordTitle": "تعيين كلمة مرور جديدة",
+  "updatePassword": "تحديث كلمة المرور"
 }
