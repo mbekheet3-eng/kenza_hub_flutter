@@ -351,6 +351,19 @@ class AppLocalizations {
   String get signupAgreeTerms => _strings.signupAgreeTerms;
   String get orCreateAccountWith => _strings.orCreateAccountWith;
   String get invalidResetLink => _strings.invalidResetLink;
+  String get evidenceUploaded => _strings.evidenceUploaded;
+  String get evidenceUploadError => _strings.evidenceUploadError;
+  String get evidenceLinkError => _strings.evidenceLinkError;
+  String get evidenceOpenError => _strings.evidenceOpenError;
+  String get evidenceInstructions => _strings.evidenceInstructions;
+  String get chooseImage => _strings.chooseImage;
+  String get takePhoto => _strings.takePhoto;
+  String get uploadingEvidence => _strings.uploadingEvidence;
+  String get registeredEvidence => _strings.registeredEvidence;
+  String get noEvidenceYet => _strings.noEvidenceYet;
+  String get evidenceHash => _strings.evidenceHash;
+  String get viewEvidence => _strings.viewEvidence;
+  String get downloadEvidence => _strings.downloadEvidence;
   String get currentLanguage => _strings.languageName;
 }
 
