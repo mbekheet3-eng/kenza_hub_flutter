@@ -240,6 +240,16 @@ class AppLocalizations {
   String get description => _strings.description;
   String get details => _strings.details;
   String get seller => _strings.seller;
+  String get productLoadError => _strings.productLoadError;
+  String get brandLabel => _strings.brandLabel;
+  String get colorLabel => _strings.colorLabel;
+  String get sizeLabel => _strings.sizeLabel;
+  String get conditionLabel => _strings.conditionLabel;
+  String get unspecified => _strings.unspecified;
+  String get newCondition => _strings.newCondition;
+  String get sellerOnKenza => _strings.sellerOnKenza;
+  String get productAddedToCart => _strings.productAddedToCart;
+  String get alreadyInCart => _strings.alreadyInCart;
   String get currentLanguage => _strings.languageName;
 }
 
