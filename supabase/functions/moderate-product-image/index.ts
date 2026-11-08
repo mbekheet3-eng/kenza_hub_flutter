@@ -16,9 +16,6 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "METHOD_NOT_ALLOWED" }, 405);
 
-  const geminiKey = Deno.env.get("GEMINI_API_KEY");
-  if (!geminiKey) return json({ error: "GEMINI_NOT_CONFIGURED" }, 503);
-
   const authHeader = req.headers.get("Authorization");
   const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
   if (!token) return json({ error: "AUTH_REQUIRED" }, 401);
@@ -193,6 +190,9 @@ rules:
 - لا ترفض صورة لمجرد ظهور شخص أو طفل بملابس عادية.
 - الصورة يجب أن تعرض سلعة مناسبة للبيع ضمن الملابس والأحذية ومستلزمات الأطفال والمنزل.
 - لا تحكم على حالة المنتج (جديد/سبق استخدامه) من الصورة وحدها.`;
+
+    const geminiKey = Deno.env.get("GEMINI_API_KEY");
+    if (!geminiKey) return json({ error: "GEMINI_NOT_CONFIGURED" }, 503);
 
     const geminiResponse = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
