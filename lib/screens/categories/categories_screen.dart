@@ -92,7 +92,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       );
       if (image == null || !mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
             AppLocalizations.of(context).imageSearchComingSoon,
           ),
@@ -101,7 +101,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(AppLocalizations.of(context).imageOpenError),
         ),
       );
@@ -535,7 +535,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   });
 
                 if (categories.isEmpty) {
-                  return const Expanded(
+                  return Expanded(
                     child: Center(child: Text(AppLocalizations.of(context).noCategories)),
                   );
                 }

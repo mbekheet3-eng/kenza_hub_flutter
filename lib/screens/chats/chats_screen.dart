@@ -14,8 +14,8 @@ class ChatsScreen extends StatelessWidget {
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: const [
-              Icon(Icons.chat_bubble_outline_rounded, size: 56),
+            children: [
+              const Icon(Icons.chat_bubble_outline_rounded, size: 56),
               SizedBox(height: 16),
               Text(
                 AppLocalizations.of(context).chatsComingSoon,

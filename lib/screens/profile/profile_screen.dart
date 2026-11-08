@@ -105,7 +105,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // Check if user is logged in
     if (authProvider.userId == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(AppLocalizations.of(context).profileTitle)),
+        appBar: AppBar(title: const Text('الملف الشخصي')),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -113,7 +113,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Icon(Icons.person_outline, size: 64, color: AppTheme.textTertiary),
               const SizedBox(height: 16),
               Text(
-                AppLocalizations.of(context).pleaseLogin,
+                'برجاء تسجيل الدخول',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 24),
@@ -130,7 +130,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // Loading state
     if (_isLoadingProfile) {
       return Scaffold(
-        appBar: AppBar(title: Text(AppLocalizations.of(context).profileTitle)),
+        appBar: AppBar(title: const Text('الملف الشخصي')),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -138,7 +138,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // Error state
     if (_error != null || _userProfile == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(AppLocalizations.of(context).profileTitle)),
+        appBar: AppBar(title: const Text('الملف الشخصي')),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -169,7 +169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context).profileTitle),
+        title: const Text('الملف الشخصي'),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -201,16 +201,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       ListTile(
                         leading: const Icon(Icons.receipt_long_outlined),
-                        title: Text(AppLocalizations.of(context).ordersHistory),
-                        subtitle: Text(AppLocalizations.of(context).ordersSubtitle),
+                        title: const Text('سجل الطلبات'),
+                        subtitle: const Text('متابعة مشترياتك وحالة الطلبات'),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => context.push('/orders'),
                       ),
                       const Divider(height: 1, indent: 16, endIndent: 16),
                       ListTile(
                         leading: const Icon(Icons.storefront_outlined),
-                        title: Text(AppLocalizations.of(context).sellerDashboard),
-                        subtitle: Text(AppLocalizations.of(context).sellerDashboardSubtitle),
+                        title: const Text('لوحة البائع'),
+                        subtitle: const Text('ملف المتجر والمبيعات وحالة الترقية'),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => context.push('/seller-dashboard'),
                       ),
@@ -239,8 +239,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Icons.info_outline,
                           color: Color(0xFFC62828),
                         ),
-                        title: Text(AppLocalizations.of(context).aboutKenza),
-                        subtitle: Text(AppLocalizations.of(context).aboutKenzaSubtitle),
+                        title: const Text('عن كنزة هب'),
+                        subtitle: const Text('تعرف على فكرتنا ورسالتنا'),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => context.push('/about-kenza'),
                       ),
@@ -250,8 +250,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Icons.policy_outlined,
                           color: Color(0xFFC62828),
                         ),
-                        title: Text(AppLocalizations.of(context).policiesTerms),
-                        subtitle: Text(AppLocalizations.of(context).policiesSubtitle),
+                        title: const Text('السياسات والشروط'),
+                        subtitle: const Text('الخصوصية والاستخدام والبيع والشحن'),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => context.push('/policies'),
                       ),
@@ -272,8 +272,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red.shade600,
                     ),
-                    child: Text(
-                      AppLocalizations.of(context).logout,
+                    child: const Text(
+                      'تسجيل الخروج',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -324,7 +324,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  user.displayName ?? AppLocalizations.of(context).userFallback,
+                  user.displayName ?? 'مستخدم',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -369,8 +369,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildStatItem(context, user.productsCount.toString(), 'منتجاتي'),
-          _buildStatItem(context, user.followersCount.toString(), AppLocalizations.of(context).followers),
-          _buildStatItem(context, user.totalReviews.toString(), AppLocalizations.of(context).ratings),
+          _buildStatItem(context, user.followersCount.toString(), 'المتابعين'),
+          _buildStatItem(context, user.totalReviews.toString(), 'التقييمات'),
         ],
       ),
     );
@@ -412,7 +412,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: ElevatedButton.icon(
               onPressed: () => context.push('/edit-profile'),
               icon: const Icon(Icons.edit),
-              label: Text(AppLocalizations.of(context).edit),
+              label: const Text('تحرير'),
             ),
           ),
         ],
@@ -427,7 +427,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            AppLocalizations.of(context).aboutMe,
+            'نبذة عني',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
