@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -71,12 +72,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('اختيار صورة من المعرض'),
+              title: Text(AppLocalizations.of(context).imagePickGallery),
               onTap: () => Navigator.pop(sheetContext, ImageSource.gallery),
             ),
             ListTile(
               leading: const Icon(Icons.camera_alt_outlined),
-              title: const Text('التقاط صورة بالكاميرا'),
+              title: Text(AppLocalizations.of(context).imageTakeCamera),
               onTap: () => Navigator.pop(sheetContext, ImageSource.camera),
             ),
           ],
@@ -92,17 +93,17 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       );
       if (image == null || !mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'تم اختيار الصورة. البحث بالصورة سيتاح بعد ربط خدمة البحث البصري.',
+            AppLocalizations.of(context).imageSearchComingSoon,
           ),
         ),
       );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('تعذر فتح الصورة. تحقق من صلاحية الكاميرا أو المعرض.'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).imageOpenError),
         ),
       );
     }
@@ -216,7 +217,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         child: Align(
           alignment: Alignment.centerRight,
           child: Text(
-            'تصفح الأقسام',
+            AppLocalizations.of(context).categoriesTitle,
             style: TextStyle(
               color: _navy,
               fontSize: 17,
@@ -494,7 +495,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               future: _categoriesFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Expanded(
+                  return Expanded(
                     child: Center(child: CircularProgressIndicator()),
                   );
                 }
@@ -509,12 +510,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           children: [
                             const Icon(Icons.cloud_off_outlined, size: 42),
                             const SizedBox(height: 12),
-                            const Text('تعذر تحميل الأقسام'),
+                            Text(AppLocalizations.of(context).categoriesLoadFailed),
                             const SizedBox(height: 12),
                             OutlinedButton.icon(
                               onPressed: _retry,
                               icon: const Icon(Icons.refresh),
-                              label: const Text('إعادة المحاولة'),
+                              label: Text(AppLocalizations.of(context).retry),
                             ),
                           ],
                         ),
@@ -535,8 +536,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   });
 
                 if (categories.isEmpty) {
-                  return const Expanded(
-                    child: Center(child: Text('لا توجد أقسام متاحة حاليًا')),
+                  return Expanded(
+                    child: Center(child: Text(AppLocalizations.of(context).noCategories)),
                   );
                 }
 
