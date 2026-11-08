@@ -48,7 +48,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: image, error: imageError } = await supabase
       .from("product_images")
-      .select("id, product_id, image_path, storage_bucket")
+      .select("id, product_id, image_path, storage_bucket, ai_review_status")
       .eq("id", imageId)
       .maybeSingle();
     if (imageError || !image) return json({ error: "IMAGE_NOT_FOUND" }, 404);
@@ -60,13 +60,46 @@ Deno.serve(async (req: Request) => {
       .maybeSingle();
     if (productError || !product) return json({ error: "PRODUCT_NOT_FOUND" }, 404);
 
-    const { data: seller, error: sellerError } = await supabase
-      .from("seller_profiles")
-      .select("owner_user_id")
-      .eq("id", product.seller_id)
+    const { data: activeUser, error: activeUserError } = await supabase
+      .from("users")
+      .select("is_active")
+      .eq("id", user.id)
       .maybeSingle();
-    if (sellerError || !seller || seller.owner_user_id !== user.id) {
-      return json({ error: "NOT_PRODUCT_OWNER" }, 403);
+    if (activeUserError || !activeUser?.is_active) {
+      return json({ error: "ACTIVE_USER_REQUIRED" }, 403);
+    }
+
+    const { data: membership, error: membershipError } = await supabase
+      .from("seller_profile_members")
+      .select("member_role, permissions")
+      .eq("seller_profile_id", product.seller_id)
+      .eq("user_id", user.id)
+      .is("revoked_at", null)
+      .maybeSingle();
+    const canManageImages = membership?.member_role === "owner" ||
+      membership?.permissions?.["products:update"] === true;
+    if (membershipError || !membership || !canManageImages) {
+      return json({ error: "PRODUCT_IMAGE_PERMISSION_REQUIRED" }, 403);
+    }
+
+    if (image.ai_review_status !== "pending") {
+      return json({ error: "IMAGE_REVIEW_ALREADY_STARTED_OR_COMPLETED" }, 409);
+    }
+
+    // Atomically claim the pending image. Repeated/concurrent calls cannot
+    // submit the same image to Gemini more than once.
+    const { data: claimedImage, error: claimError } = await supabase
+      .from("product_images")
+      .update({
+        ai_review_status: "error",
+        ai_review_result: { state: "processing", started_at: new Date().toISOString() },
+      })
+      .eq("id", image.id)
+      .eq("ai_review_status", "pending")
+      .select("id")
+      .maybeSingle();
+    if (claimError || !claimedImage) {
+      return json({ error: "IMAGE_REVIEW_ALREADY_STARTED_OR_COMPLETED" }, 409);
     }
 
     const { data: signed, error: signedError } = await supabase.storage
