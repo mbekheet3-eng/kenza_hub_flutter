@@ -179,5 +179,15 @@
   "buyNow": "Buy now",
   "description": "Description",
   "details": "Details",
-  "seller": "Seller"
+  "seller": "Seller",
+  "productLoadError": "Could not load product details",
+  "brandLabel": "Brand",
+  "colorLabel": "Color",
+  "sizeLabel": "Size",
+  "conditionLabel": "Condition",
+  "unspecified": "Not specified",
+  "newCondition": "New",
+  "sellerOnKenza": "Kenza Hub seller",
+  "productAddedToCart": "Product added to cart",
+  "alreadyInCart": "This product is already in the cart"
 }
