@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/product_provider.dart';
@@ -35,16 +36,16 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
     final authProvider = context.watch<AuthProvider>();
     if (!authProvider.isSignedIn || authProvider.userId == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('منتجاتي')),
+        appBar: AppBar(title: Text(AppLocalizations.of(context).myProductsTitle)),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('سجّل الدخول لعرض منتجاتك وإدارتها'),
+              Text(AppLocalizations.of(context).loginToManageProducts),
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () => context.push('/login'),
-                child: const Text('تسجيل الدخول'),
+                child: Text(AppLocalizations.of(context).login),
               ),
             ],
           ),
@@ -73,7 +74,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('منتجاتي'),
+        title: Text(AppLocalizations.of(context).myProductsTitle),
         elevation: 0,
         actions: [
           IconButton(
@@ -123,13 +124,13 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
         children: [
           _buildFilterChip('الكل', 'all'),
           const SizedBox(width: 8),
-          _buildFilterChip('قيد المراجعة', 'pending'),
+          _buildFilterChip(AppLocalizations.of(context).pendingReview, 'pending'),
           const SizedBox(width: 8),
           _buildFilterChip('نشط', 'active'),
           const SizedBox(width: 8),
-          _buildFilterChip('مباع', 'sold'),
+          _buildFilterChip(AppLocalizations.of(context).sold, 'sold'),
           const SizedBox(width: 8),
-          _buildFilterChip('غير نشط', 'inactive'),
+          _buildFilterChip(AppLocalizations.of(context).inactive, 'inactive'),
         ],
       ),
     );
@@ -167,7 +168,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'لا توجد منتجات',
+            AppLocalizations.of(context).noProducts,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: AppTheme.textSecondary,
             ),
@@ -178,7 +179,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryColor,
             ),
-            child: const Text('إضافة منتج أول'),
+            child: Text(AppLocalizations.of(context).addFirstProduct),
           ),
         ],
       ),
@@ -225,8 +226,8 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                         color: Colors.orange.shade700,
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Text(
-                        'قيد المراجعة',
+                      child: Text(
+                        AppLocalizations.of(context).pendingReview,
                         style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -244,8 +245,8 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                         color: Colors.red,
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Text(
-                        'مباع',
+                      child: Text(
+                        AppLocalizations.of(context).sold,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -267,8 +268,8 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                         color: Colors.grey,
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Text(
-                        'غير نشط',
+                      child: Text(
+                        AppLocalizations.of(context).inactive,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -343,7 +344,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 6),
                           ),
-                          child: const Text('تعديل', style: TextStyle(fontSize: 12)),
+                          child: Text(AppLocalizations.of(context).editProduct, style: TextStyle(fontSize: 12)),
                         ),
                       ),
                       const SizedBox(width: 4),
@@ -354,8 +355,8 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 6),
                             side: const BorderSide(color: Colors.red),
                           ),
-                          child: const Text(
-                            'حذف',
+                          child: Text(
+                            AppLocalizations.of(context).deleteProduct,
                             style: TextStyle(fontSize: 12, color: Colors.red),
                           ),
                         ),
@@ -381,7 +382,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.edit),
-              title: const Text('تعديل'),
+              title: Text(AppLocalizations.of(context).editProduct),
               onTap: () {
                 Navigator.pop(context);
                 _showEditDialog(product);
@@ -389,7 +390,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text('حذف', style: TextStyle(color: Colors.red)),
+              title: Text(AppLocalizations.of(context).deleteProduct, style: TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(context);
                 _deleteProduct(product.id);
@@ -411,7 +412,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
     final shouldSave = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('تعديل بيانات المنتج'),
+        title: Text(AppLocalizations.of(context).editProductInfo),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -442,7 +443,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('إلغاء'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -455,15 +456,15 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                   !price.isFinite ||
                   price <= 0) {
                 ScaffoldMessenger.of(dialogContext).showSnackBar(
-                  const SnackBar(
-                    content: Text('أدخل الاسم والوصف وسعراً صحيحاً أكبر من صفر.'),
+                  SnackBar(
+                    content: Text(AppLocalizations.of(context).invalidProductInput),
                   ),
                 );
                 return;
               }
               Navigator.pop(dialogContext, true);
             },
-            child: const Text('حفظ التعديلات'),
+            child: Text(AppLocalizations.of(context).saveChanges),
           ),
         ],
       ),
@@ -502,12 +503,12 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('إخفاء المنتج'),
-        content: const Text('هل أنت متأكد من إخفاء هذا المنتج من العرض؟'),
+        title: Text(AppLocalizations.of(context).hideProduct),
+        content: Text(AppLocalizations.of(context).confirmHideProduct),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('إلغاء'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           TextButton(
             onPressed: () async {
@@ -525,7 +526,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                 ),
               );
             },
-            child: const Text('إخفاء', style: TextStyle(color: Colors.red)),
+            child: Text(AppLocalizations.of(context).hide, style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
