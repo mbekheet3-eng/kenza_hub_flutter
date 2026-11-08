@@ -315,8 +315,7 @@ class _SellWizardScreenState extends State<SellWizardScreen> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
-
-
+  }
 
   bool _validateAllData() {
     return _selectedImages.isNotEmpty &&
