@@ -39,21 +39,52 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       ),
       body: Consumer<OrderTrackingProvider>(
         builder: (context, provider, _) {
-          if (provider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+          return RefreshIndicator(
+            onRefresh: () => provider.retry(widget.orderId),
+            child: Builder(
+              builder: (context) {
+                if (provider.isLoading) {
+                  return ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.65,
+                        child: const Center(child: CircularProgressIndicator()),
+                      ),
+                    ],
+                  );
+                }
 
-          if (provider.error != null) {
-            return _buildErrorState(context, provider);
-          }
+                if (provider.error != null) {
+                  return ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.65,
+                        child: _buildErrorState(context, provider),
+                      ),
+                    ],
+                  );
+                }
 
-          final order = provider.order;
-          if (order == null) {
-            return Center(child: Text(AppLocalizations.of(context).orderNotFound));
-          }
+                final order = provider.order;
+                if (order == null) {
+                  return ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.65,
+                        child: Center(
+                          child: Text(AppLocalizations.of(context).orderNotFound),
+                        ),
+                      ),
+                    ],
+                  );
+                }
 
-          return SingleChildScrollView(
-            child: Column(
+                return SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Order ID and Date
@@ -122,7 +153,10 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     ],
                   ),
                 ),
-              ],
+                  ],
+                ),
+                );
+              },
             ),
           );
         },
