@@ -23,7 +23,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Account Section
-            _buildSectionHeader('الحساب'),
+            _buildSectionHeader(AppLocalizations.of(context).account),
             _buildSettingsTile(
               icon: Icons.person_outline,
               title: 'تعديل الملف الشخصي',
@@ -31,73 +31,73 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             _buildSettingsTile(
               icon: Icons.security,
-              title: 'تغيير كلمة المرور',
+              title: AppLocalizations.of(context).changePassword,
               onTap: () => context.push('/forgot-password'),
             ),
             _buildSettingsTile(
               icon: Icons.email_outlined,
-              title: 'تغيير البريد الإلكتروني',
-              onTap: () => _showUnavailableFeature('تغيير البريد الإلكتروني'),
+              title: AppLocalizations.of(context).changeEmail,
+              onTap: () => _showUnavailableFeature(AppLocalizations.of(context).changeEmail),
             ),
             const Divider(),
 
             // Notification preferences are read-only until server persistence exists.
-            _buildSectionHeader('الإشعارات'),
+            _buildSectionHeader(AppLocalizations.of(context).notificationsTooltip),
             _buildSettingsTile(
               icon: Icons.notifications_outlined,
-              title: 'تفضيلات الإشعارات',
+              title: AppLocalizations.of(context).notificationPreferences,
               trailing: Text(AppLocalizations.of(context).notAvailable),
             ),
             const Divider(),
 
             // Privacy Section
-            _buildSectionHeader('الخصوصية والأمان'),
+            _buildSectionHeader(AppLocalizations.of(context).privacySecurity),
             _buildSettingsTile(
               icon: Icons.lock_outline,
-              title: 'سياسة الخصوصية',
+              title: AppLocalizations.of(context).privacyPolicy,
               onTap: () => context.push('/policies'),
             ),
             _buildSettingsTile(
               icon: Icons.description_outlined,
-              title: 'شروط الخدمة',
+              title: AppLocalizations.of(context).termsOfService,
               onTap: () => context.push('/policies'),
             ),
             _buildSettingsTile(
               icon: Icons.block_outlined,
-              title: 'المستخدمون المحظورون',
-              onTap: () => _showUnavailableFeature('قائمة المستخدمين المحظورين'),
+              title: AppLocalizations.of(context).blockedUsers,
+              onTap: () => _showUnavailableFeature(AppLocalizations.of(context).blockedUsersList),
             ),
             const Divider(),
 
             // App Section
-            _buildSectionHeader('التطبيق'),
+            _buildSectionHeader(AppLocalizations.of(context).appSection),
             _buildSettingsTile(
               icon: Icons.info_outline,
-              title: 'حول التطبيق',
+              title: AppLocalizations.of(context).aboutApp,
               trailing: Text(AppLocalizations.of(context).appVersion),
             ),
             _buildSettingsTile(
               icon: Icons.rate_review_outlined,
-              title: 'قيم التطبيق',
+              title: AppLocalizations.of(context).rateApp,
               onTap: () => _showRatingDialog(),
             ),
             _buildSettingsTile(
               icon: Icons.feedback_outlined,
-              title: 'أرسل لنا رأيك',
-              onTap: () => _showUnavailableFeature('إرسال الملاحظات'),
+              title: AppLocalizations.of(context).sendFeedback,
+              onTap: () => _showUnavailableFeature(AppLocalizations.of(context).submitFeedback),
             ),
             _buildSettingsTile(
               icon: Icons.help_outline,
-              title: 'المساعدة والدعم',
-              onTap: () => _showUnavailableFeature('المساعدة والدعم'),
+              title: AppLocalizations.of(context).helpSupport,
+              onTap: () => _showUnavailableFeature(AppLocalizations.of(context).helpSupport),
             ),
             const Divider(),
 
             // Danger Zone
-            _buildSectionHeader('منطقة الخطر', color: Colors.red),
+            _buildSectionHeader(AppLocalizations.of(context).dangerZone, color: Colors.red),
             _buildSettingsTile(
               icon: Icons.delete_outline,
-              title: 'حذف الحساب',
+              title: AppLocalizations.of(context).deleteAccount,
               titleColor: Colors.red,
               onTap: () => _showDeleteAccountDialog(),
             ),
@@ -143,7 +143,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showRatingDialog() {
-    _showUnavailableFeature('تقييم التطبيق');
+    _showUnavailableFeature(AppLocalizations.of(context).rateTheApp);
   }
 
   void _showUnavailableFeature(String feature) {
