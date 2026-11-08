@@ -81,7 +81,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
 
     if (!authProvider.isSignedIn) {
       return Scaffold(
-        appBar: AppBar(title: Text('لوحة البائع')),
+        appBar: AppBar(title: Text(AppLocalizations.of(context).sellerDashboard)),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -90,7 +90,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () => context.push('/login'),
-                child: Text('تسجيل الدخول'),
+                child: Text(AppLocalizations.of(context).login),
               ),
             ],
           ),
