@@ -306,5 +306,7 @@
   "evidenceCaptionOptional": "Note sur la preuve (facultatif)",
   "attachedEvidence": "Preuve jointe",
   "chooseStorefrontPhoto": "Choisir une photo de vitrine",
-  "chooseCoverPhoto": "Choisir une photo de couverture"
+  "chooseCoverPhoto": "Choisir une photo de couverture",
+  "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+  "termsRequired": "Vous devez accepter les conditions générales et la politique de confidentialité pour continuer"
 }
