@@ -325,6 +325,32 @@ class AppLocalizations {
   String get noStoreProducts => _strings.noStoreProducts;
   String get areaLabel => _strings.areaLabel;
   String get storefrontDisplayed => _strings.storefrontDisplayed;
+  String get uploadImageSuccess => _strings.uploadImageSuccess;
+  String get uploadImageError => _strings.uploadImageError;
+  String get enterStoreAddress => _strings.enterStoreAddress;
+  String get chooseStorefrontImage => _strings.chooseStorefrontImage;
+  String get displayNameLength => _strings.displayNameLength;
+  String get storeSaved => _strings.storeSaved;
+  String get saveError => _strings.saveError;
+  String get storeSettingsTitle => _strings.storeSettingsTitle;
+  String get storeDataLoadError => _strings.storeDataLoadError;
+  String get ownerOnlyStoreEdit => _strings.ownerOnlyStoreEdit;
+  String get chooseLogoImage => _strings.chooseLogoImage;
+  String get storeDirectoryPrivacy => _strings.storeDirectoryPrivacy;
+  String get showStorefront => _strings.showStorefront;
+  String get storefrontPrivacy => _strings.storefrontPrivacy;
+  String get noOnlineStoreAddress => _strings.noOnlineStoreAddress;
+  String get optionalSocialLinks => _strings.optionalSocialLinks;
+  String get settingsTitle => _strings.settingsTitle;
+  String get notAvailable => _strings.notAvailable;
+  String get appVersion => _strings.appVersion;
+  String get featureUnavailable => _strings.featureUnavailable;
+  String get accountDeactivateDelete => _strings.accountDeactivateDelete;
+  String get accountDeletionUnavailable => _strings.accountDeletionUnavailable;
+  String get ok => _strings.ok;
+  String get signupAgreeTerms => _strings.signupAgreeTerms;
+  String get orCreateAccountWith => _strings.orCreateAccountWith;
+  String get invalidResetLink => _strings.invalidResetLink;
   String get currentLanguage => _strings.languageName;
 }
 
