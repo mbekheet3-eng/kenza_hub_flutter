@@ -174,6 +174,21 @@ class AppLocalizations {
   String get confirmHideProduct => _strings.confirmHideProduct;
   String get hide => _strings.hide;
   String get notificationsTooltip => _strings.notificationsTooltip;
+  String get cartTitle => _strings.cartTitle;
+  String get cartEmpty => _strings.cartEmpty;
+  String get searchProducts => _strings.searchProducts;
+  String get singleItem => _strings.singleItem;
+  String get subtotal => _strings.subtotal;
+  String get shippingLabel => _strings.shippingLabel;
+  String get shippingCalculated => _strings.shippingCalculated;
+  String get itemsTotal => _strings.itemsTotal;
+  String get shippingDisclaimer => _strings.shippingDisclaimer;
+  String get checkout => _strings.checkout;
+  String get continueShopping => _strings.continueShopping;
+  String get clearCart => _strings.clearCart;
+  String get confirmClearCart => _strings.confirmClearCart;
+  String get cartCleared => _strings.cartCleared;
+  String get clear => _strings.clear;
   String get currentLanguage => _strings.languageName;
 }
 
