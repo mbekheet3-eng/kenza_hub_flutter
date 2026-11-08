@@ -518,27 +518,9 @@ class MarketplaceProductService {
     return _hydrateProductRows(productRows);
   }
 
-  Future<void> _requireOwnerMembership() async {
-    final userId = _client.auth.currentUser?.id;
-    if (userId == null) {
-      throw StateError('يجب تسجيل الدخول أولاً');
-    }
-    final membership = await _client
-        .from('seller_profile_members')
-        .select('member_role')
-        .eq('user_id', userId)
-        .isFilter('revoked_at', null)
-        .maybeSingle();
-
-    if (membership == null || membership['member_role'] != 'owner') {
-      throw StateError(
-        'تعديل المنتجات وإخفاؤها متاحان لصاحب المتجر فقط حتى تكتمل صلاحيات الموظفين المعتمدة.',
-      );
-    }
-  }
-
   Future<void> updateProductDetails(Product product) async {
-    await _requireOwnerMembership();
+    // The edit_product RPC performs the authoritative products:update check,
+    // including the employee permissions granted by the store owner.
     final current = await _client
         .from('products')
         .select('category_id,condition_id,color_id,size_id,brand_name,weight_kg,audience')
