@@ -366,15 +366,78 @@ class MarketplaceProductService {
     sellerProfileId = membershipRows.single['seller_profile_id'] as String?;
     if (sellerProfileId == null) return const [];
 
+    // Keep this owner-facing query independent of PostgREST relationship
+    // embedding. A PGRST200 in any nested FK embed previously caused the whole
+    // seller product list to fail, even though the product rows were present.
     final rows = await _client
         .from('products')
-        .select(_productSelect)
+        .select(
+          'id,seller_id,category_id,title_ar,title_en,description_ar,description_en,'
+          'price,views_count,created_at,updated_at,brand_name,weight_kg,'
+          'moderation_status,brand_id,color_id,size_id,condition_id,status_id,'
+          'currency_id,audience',
+        )
         .eq('seller_id', sellerProfileId)
         .order('created_at', ascending: false)
         .limit(limit);
 
-    return await Future.wait((rows as List).map((row) =>
-        _parseProductRow(Map<String, dynamic>.from(row as Map))));
+    final productRows = (rows as List)
+        .map((row) => Map<String, dynamic>.from(row as Map))
+        .toList(growable: false);
+    if (productRows.isEmpty) return const [];
+
+    final productIds = productRows
+        .map((row) => row['id'] as String?)
+        .whereType<String>()
+        .toList(growable: false);
+    final statusIds = productRows
+        .map((row) => row['status_id'] as String?)
+        .whereType<String>()
+        .toSet()
+        .toList(growable: false);
+
+    // Fetch related records with flat IN queries instead of embedded joins.
+    // This avoids a single missing/stale relationship hiding every product.
+    final imageRows = await _client
+        .from('product_images')
+        .select(
+          'product_id,image_path,storage_bucket,display_order,created_at',
+        )
+        .inFilter('product_id', productIds)
+        .order('display_order', ascending: true);
+
+    final imagesByProduct = <String, List<Map<String, dynamic>>>{};
+    for (final rawImage in imageRows as List) {
+      final image = Map<String, dynamic>.from(rawImage as Map);
+      final productId = image['product_id'] as String?;
+      if (productId == null) continue;
+      imagesByProduct.putIfAbsent(productId, () => <Map<String, dynamic>>[]);
+      imagesByProduct[productId]!.add(image);
+    }
+
+    final statusesById = <String, Map<String, dynamic>>{};
+    if (statusIds.isNotEmpty) {
+      final statusRows = await _client
+          .from('product_statuses')
+          .select('id,name_ar,name_en,slug')
+          .inFilter('id', statusIds);
+      for (final rawStatus in statusRows as List) {
+        final status = Map<String, dynamic>.from(rawStatus as Map);
+        final id = status['id'] as String?;
+        if (id != null) statusesById[id] = status;
+      }
+    }
+
+    return await Future.wait(productRows.map((row) {
+      final productId = row['id'] as String;
+      final statusId = row['status_id'] as String?;
+      return _parseProductRow({
+        ...row,
+        'images': imagesByProduct[productId] ?? const [],
+        if (statusId != null && statusesById.containsKey(statusId))
+          'status': statusesById[statusId],
+      });
+    }));
   }
 
   Future<void> _requireOwnerMembership() async {
