@@ -148,6 +148,9 @@ rules:
 
     let review: any;
     try { review = JSON.parse(textPart); } catch { return json({ error: "GEMINI_INVALID_RESPONSE" }, 502); }
+    if (!review || typeof review !== "object" || Array.isArray(review)) {
+      return json({ error: "GEMINI_INVALID_RESPONSE" }, 502);
+    }
 
     const flagKeys = [
       "unsafe_content",
