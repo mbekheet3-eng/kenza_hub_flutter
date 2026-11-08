@@ -308,5 +308,7 @@
   "chooseStorefrontPhoto": "Choisir une photo de vitrine",
   "chooseCoverPhoto": "Choisir une photo de couverture",
   "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
-  "termsRequired": "Vous devez accepter les conditions générales et la politique de confidentialité pour continuer"
+  "termsRequired": "Vous devez accepter les conditions générales et la politique de confidentialité pour continuer",
+  "passwordRequired": "Le mot de passe est obligatoire",
+  "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères"
 }
