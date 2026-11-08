@@ -167,5 +167,17 @@
   "somethingWentWrong": "حدث خطأ",
   "tryAgain": "حاول مجدداً",
   "initializationError": "تعذر الاتصال بإعدادات الخدمة",
-  "initializationRetryHint": "أغلق التطبيق وافتحه مرة أخرى. إذا استمرت المشكلة، راجع إعدادات Supabase."
+  "initializationRetryHint": "أغلق التطبيق وافتحه مرة أخرى. إذا استمرت المشكلة، راجع إعدادات Supabase.",
+  "loginToFavorite": "سجّل الدخول لإضافة المنتجات إلى المفضلة",
+  "favoriteUpdateError": "تعذر تحديث المفضلة. حاول مرة أخرى.",
+  "loginToBuy": "سجّل الدخول أولاً للشراء وإضافة المنتجات إلى السلة",
+  "productUnavailable": "هذا المنتج غير متاح حالياً",
+  "ownProductCannotBuy": "لا يمكنك شراء منتج قمت بعرضه بنفسك",
+  "proSellerCartOnly": "السلة متاحة حاليًا لمنتجات البائع المحترف فقط.",
+  "productDetailsTitle": "تفاصيل المنتج",
+  "addToCart": "إضافة إلى السلة",
+  "buyNow": "اشتري الآن",
+  "description": "الوصف",
+  "details": "التفاصيل",
+  "seller": "البائع"
 }
