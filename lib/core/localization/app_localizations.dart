@@ -368,6 +368,8 @@ class AppLocalizations {
   String get attachedEvidence => _strings.attachedEvidence;
   String get chooseStorefrontPhoto => _strings.chooseStorefrontPhoto;
   String get chooseCoverPhoto => _strings.chooseCoverPhoto;
+  String get passwordsDoNotMatch => _strings.passwordsDoNotMatch;
+  String get termsRequired => _strings.termsRequired;
   String get currentLanguage => _strings.languageName;
 }
 
