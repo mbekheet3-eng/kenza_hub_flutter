@@ -310,5 +310,19 @@
   "passwordsDoNotMatch": "كلمتا المرور غير متطابقتين",
   "termsRequired": "يجب الموافقة على الشروط والأحكام وسياسة الخصوصية للمتابعة",
   "passwordRequired": "كلمة المرور مطلوبة",
-  "passwordMinLength": "يجب ألا تقل كلمة المرور عن 6 أحرف"
+  "passwordMinLength": "يجب ألا تقل كلمة المرور عن 6 أحرف",
+  "allConditions": "جميع الحالات",
+  "priceRange": "نطاق السعر",
+  "phoneNumber": "رقم الهاتف",
+  "smsCode": "رمز SMS",
+  "enterSixDigitCode": "أدخل الرمز المكوّن من 6 أرقام",
+  "verifyCode": "تحقق من الرمز",
+  "sendCode": "إرسال الرمز",
+  "categoryLabel": "الفئة",
+  "addressLabel": "العنوان",
+  "priceLabel": "السعر",
+  "priceInEgp": "السعر بالجنيه المصري",
+  "priceExample": "مثال: 150.00",
+  "productName": "اسم المنتج",
+  "productDescription": "الوصف"
 }
