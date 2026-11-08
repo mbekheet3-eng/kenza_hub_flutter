@@ -62,7 +62,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _errorMessage = 'فشل تحميل الملف الشخصي: $e';
+        _errorMessage = '${AppLocalizations.of(context).profileLoadFailed}: $e';
         _isLoadingProfile = false;
       });
     }
@@ -86,18 +86,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         setState(() => _selectedImage = File(pickedFile.path));
       }
     } catch (e) {
-      if (mounted) _showError('فشل اختيار الصورة: $e');
+      if (mounted) _showError('${AppLocalizations.of(context).imagePickFailed}: $e');
     }
   }
 
   Future<void> _saveProfile() async {
     final displayName = _nameController.text.trim();
     if (displayName.length < 3) {
-      _showError('الاسم يجب أن يكون 3 أحرف على الأقل');
+      _showError(AppLocalizations.of(context).nameMinLength);
       return;
     }
     if (_currentUserProfile == null) {
-      _showError('بيانات المستخدم غير متاحة');
+      _showError(AppLocalizations.of(context).userDataUnavailable);
       return;
     }
 
@@ -160,7 +160,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           // Keep the original profile update error if cleanup also fails.
         }
       }
-      _showError('فشل حفظ الملف الشخصي: $e');
+      _showError('${AppLocalizations.of(context).profileSaveFailed}: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -267,26 +267,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
             // Form Section
             _buildFormField(
-              label: 'الاسم',
+              label: AppLocalizations.of(context).nameLabel,
               controller: _nameController,
               icon: Icons.person_outline,
             ),
             const SizedBox(height: 16),
             _buildFormField(
-              label: 'السيرة الذاتية',
+              label: AppLocalizations.of(context).bioLabel,
               controller: _bioController,
               icon: Icons.description_outlined,
               maxLines: 3,
             ),
             const SizedBox(height: 16),
             _buildFormField(
-              label: 'الموقع',
+              label: AppLocalizations.of(context).locationLabel,
               controller: _locationController,
               icon: Icons.location_on_outlined,
             ),
             const SizedBox(height: 16),
             _buildFormField(
-              label: 'رقم الهاتف',
+              label: AppLocalizations.of(context).phoneLabel,
               controller: _phoneController,
               icon: Icons.phone_outlined,
             ),
