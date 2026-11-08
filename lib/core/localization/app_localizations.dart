@@ -205,6 +205,27 @@ class AppLocalizations {
   String get cashOnDelivery => _strings.cashOnDelivery;
   String get noOrderCreatedNotice => _strings.noOrderCreatedNotice;
   String get backToHome => _strings.backToHome;
+  String get loginToViewOrders => _strings.loginToViewOrders;
+  String get noOrders => _strings.noOrders;
+  String get orderPrefix => _strings.orderPrefix;
+  String get dateLabel => _strings.dateLabel;
+  String get amountLabel => _strings.amountLabel;
+  String get orderDetails => _strings.orderDetails;
+  String get disputeEvidenceLabel => _strings.disputeEvidenceLabel;
+  String get trackingTitle => _strings.trackingTitle;
+  String get orderNotFound => _strings.orderNotFound;
+  String get trackingIntro => _strings.trackingIntro;
+  String get reload => _strings.reload;
+  String get orderNumber => _strings.orderNumber;
+  String get orderDate => _strings.orderDate;
+  String get progress => _strings.progress;
+  String get progressComplete => _strings.progressComplete;
+  String get orderStatus => _strings.orderStatus;
+  String get noUpdates => _strings.noUpdates;
+  String get updatedDate => _strings.updatedDate;
+  String get notes => _strings.notes;
+  String get somethingWentWrong => _strings.somethingWentWrong;
+  String get tryAgain => _strings.tryAgain;
   String get currentLanguage => _strings.languageName;
 }
 
