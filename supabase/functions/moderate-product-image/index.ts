@@ -158,7 +158,7 @@ rules:
 - لا تحكم على حالة المنتج (جديد/سبق استخدامه) من الصورة وحدها.`;
 
     const geminiResponse = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
       {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-goog-api-key": geminiKey },
@@ -232,7 +232,7 @@ rules:
       ai_review_status: status,
       ai_review_result: result,
       ai_reviewed_at: new Date().toISOString(),
-      ai_review_model: "gemini-2.5-flash",
+      ai_review_model: "gemini-3.8-flash",
     }).eq("id", image.id);
     if (updateError) {
       console.error("Image review persistence failed", updateError.message);
