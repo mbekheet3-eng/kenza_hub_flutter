@@ -329,7 +329,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${product.price} ج.م',
+                    '${product.price} ${AppLocalizations.of(context).currency}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: AppTheme.primaryColor,
                       fontWeight: FontWeight.bold,
