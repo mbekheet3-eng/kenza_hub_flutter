@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kenza_hub_flutter/core/localization/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/cart_provider.dart';
@@ -20,7 +21,7 @@ class _CartScreenState extends State<CartScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('السلة'),
+        title: Text(AppLocalizations.of(context).cartTitle),
         elevation: 0,
         actions: [
           if (cartItems.isNotEmpty)
@@ -60,7 +61,7 @@ class _CartScreenState extends State<CartScreen> {
           Icon(Icons.shopping_cart_outlined, size: 64, color: AppTheme.textTertiary),
           const SizedBox(height: 16),
           Text(
-            'السلة فارغة',
+            AppLocalizations.of(context).cartEmpty,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: AppTheme.textSecondary,
             ),
@@ -71,7 +72,7 @@ class _CartScreenState extends State<CartScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryColor,
             ),
-            child: const Text('البحث عن منتجات'),
+            child: Text(AppLocalizations.of(context).searchProducts),
           ),
         ],
       ),
@@ -119,7 +120,7 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${item.price.toStringAsFixed(2)} ج.م',
+                    '${item.price.toStringAsFixed(2)} ${AppLocalizations.of(context).currency}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: AppTheme.primaryColor,
                       fontWeight: FontWeight.bold,
@@ -129,8 +130,8 @@ class _CartScreenState extends State<CartScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'قطعة واحدة',
+                      Text(
+                        AppLocalizations.of(context).singleItem,
                         style: TextStyle(fontSize: 12),
                       ),
                       // Remove Button
@@ -166,11 +167,11 @@ class _CartScreenState extends State<CartScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'المجموع الفرعي',
+                AppLocalizations.of(context).subtotal,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               Text(
-                '$totalPrice ج.م',
+                '$totalPrice ${AppLocalizations.of(context).currency}',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -184,13 +185,13 @@ class _CartScreenState extends State<CartScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'الشحن',
+                AppLocalizations.of(context).shippingLabel,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppTheme.textSecondary,
                 ),
               ),
               Text(
-                'سيتم حسابه',
+                AppLocalizations.of(context).shippingCalculated,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppTheme.textSecondary,
                 ),
@@ -208,7 +209,7 @@ class _CartScreenState extends State<CartScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'إجمالي المنتجات',
+                AppLocalizations.of(context).itemsTotal,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -226,7 +227,7 @@ class _CartScreenState extends State<CartScreen> {
           Align(
             alignment: AlignmentDirectional.centerEnd,
             child: Text(
-              'المبلغ لا يشمل الشحن؛ سيتم تحديده عند تفعيل الاتفاق على الطلب.',
+              AppLocalizations.of(context).shippingDisclaimer,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: AppTheme.textSecondary,
               ),
@@ -244,8 +245,8 @@ class _CartScreenState extends State<CartScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 backgroundColor: AppTheme.primaryColor,
               ),
-              child: const Text(
-                'الذهاب إلى الدفع',
+              child: Text(
+                AppLocalizations.of(context).checkout,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -264,8 +265,8 @@ class _CartScreenState extends State<CartScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 side: BorderSide(color: AppTheme.primaryColor),
               ),
-              child: const Text(
-                'متابعة التسوق',
+              child: Text(
+                AppLocalizations.of(context).continueShopping,
                 style: TextStyle(fontSize: 16),
               ),
             ),
@@ -279,22 +280,22 @@ class _CartScreenState extends State<CartScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('مسح السلة'),
-        content: const Text('هل أنت متأكد من رغبتك في مسح السلة؟'),
+        title: Text(AppLocalizations.of(context).clearCart),
+        content: Text(AppLocalizations.of(context).confirmClearCart),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           TextButton(
             onPressed: () {
               context.read<CartProvider>().clear();
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('تم مسح السلة')),
+                SnackBar(content: Text(AppLocalizations.of(context).cartCleared)),
               );
             },
-            child: const Text('مسح', style: TextStyle(color: Colors.red)),
+            child: Text(AppLocalizations.of(context).clear, style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
