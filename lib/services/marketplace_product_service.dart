@@ -9,27 +9,35 @@ class MarketplaceProductService {
 
   final SupabaseClient _client;
 
-  static const String _productSelect = '''
+  static const String _productColumns = '''
     id,seller_id,category_id,title_ar,title_en,description_ar,description_en,
     price,views_count,created_at,updated_at,brand_name,weight_kg,moderation_status,
-    brand_id,color_id,size_id,condition_id,status_id,currency_id,audience,
-    category:categories!products_category_id_fkey(
-      id,slug,name_ar,name_en,parent_id,
-      parent:categories!categories_parent_id_fkey(
-        id,slug,name_ar,name_en,parent_id,
-        parent:categories!categories_parent_id_fkey(
-          id,slug,name_ar,name_en,parent_id,
-          parent:categories!categories_parent_id_fkey(slug,name_ar)
-        )
-      )
-    ),
-    condition:product_conditions!products_condition_id_fkey(name_ar,name_en,slug),
-    color:product_colors!products_color_id_fkey(name_ar,name_en,hex_code),
-    size:product_sizes!products_size_id_fkey(name_ar,name_en,size_group),
-    status:product_statuses!products_status_id_fkey(name_ar,name_en,slug),
-    seller:seller_profiles!products_seller_id_fkey(display_name,avatar_url,seller_type),
-    images:product_images!product_images_product_id_fkey(image_path,storage_bucket,display_order,created_at)
+    brand_id,color_id,size_id,condition_id,status_id,currency_id,audience
   ''';
+
+  Future<List<Map<String, dynamic>>> _rowsByIds(
+    String table,
+    String columns,
+    String column,
+    List<String> ids,
+  ) async {
+    if (ids.isEmpty) return const [];
+    final rows = await _client.from(table).select(columns).inFilter(column, ids);
+    return (rows as List)
+        .map((row) => Map<String, dynamic>.from(row as Map))
+        .toList(growable: false);
+  }
+
+  Future<List<String>> _availableStatusIds() async {
+    final rows = await _client
+        .from('product_statuses')
+        .select('id')
+        .eq('slug', 'available');
+    return (rows as List)
+        .map((row) => (row as Map)['id'] as String?)
+        .whereType<String>()
+        .toList(growable: false);
+  }
 
   Future<Product> _parseProductRow(Map<String, dynamic> row) async {
     final rawImages = row['images'];
@@ -46,8 +54,10 @@ class MarketplaceProductService {
       paths.add(path);
       try {
         urls.add(await _client.storage.from(bucket).createSignedUrl(path, 3600));
-      } catch (_) {
-        // An image is omitted if the caller is not allowed to read it.
+      } catch (error) {
+        // Keep the product visible, but make inaccessible image paths diagnosable.
+        // ignore: avoid_print
+        print('Product image URL failed for ${row['id']} ($bucket/$path): $error');
       }
     }
 
@@ -56,6 +66,133 @@ class MarketplaceProductService {
       'image_urls': urls,
       'image_paths': paths,
     });
+  }
+
+  /// Hydrates product rows using independent, bounded IN queries. Avoids fragile
+  /// nested PostgREST embeds that previously caused the whole home feed to 400.
+  Future<List<Product>> _hydrateProductRows(
+    List<Map<String, dynamic>> productRows,
+  ) async {
+    if (productRows.isEmpty) return const [];
+
+    List<String> idsFor(String key) => productRows
+        .map((row) => row[key] as String?)
+        .whereType<String>()
+        .toSet()
+        .toList(growable: false);
+
+    final productIds = idsFor('id');
+    final categoryIds = idsFor('category_id');
+    final conditionIds = idsFor('condition_id');
+    final colorIds = idsFor('color_id');
+    final sizeIds = idsFor('size_id');
+    final statusIds = idsFor('status_id');
+    final sellerIds = idsFor('seller_id');
+
+    final results = await Future.wait<List<Map<String, dynamic>>>([
+      _rowsByIds('product_images',
+          'product_id,image_path,storage_bucket,display_order,created_at',
+          'product_id', productIds),
+      _rowsByIds('categories', 'id,slug,name_ar,name_en,parent_id',
+          'id', categoryIds),
+      _rowsByIds('product_conditions', 'id,name_ar,name_en,slug',
+          'id', conditionIds),
+      _rowsByIds('product_colors', 'id,name_ar,name_en,hex_code',
+          'id', colorIds),
+      _rowsByIds('product_sizes', 'id,name_ar,name_en,size_group',
+          'id', sizeIds),
+      _rowsByIds('product_statuses', 'id,name_ar,name_en,slug',
+          'id', statusIds),
+      _rowsByIds('seller_profiles',
+          'id,owner_user_id,display_name,avatar_url,seller_type',
+          'id', sellerIds),
+    ]);
+
+    final imageRows = results[0];
+    final categoryRows = results[1];
+    final conditionRows = results[2];
+    final colorRows = results[3];
+    final sizeRows = results[4];
+    final statusRows = results[5];
+    final sellerRows = results[6];
+
+    final imagesByProduct = <String, List<Map<String, dynamic>>>{};
+    for (final image in imageRows) {
+      final productId = image['product_id'] as String?;
+      if (productId == null) continue;
+      imagesByProduct.putIfAbsent(productId, () => <Map<String, dynamic>>[]);
+      imagesByProduct[productId]!.add(image);
+    }
+    for (final images in imagesByProduct.values) {
+      images.sort((a, b) =>
+          ((a['display_order'] as num?)?.toInt() ?? 0).compareTo(
+            (b['display_order'] as num?)?.toInt() ?? 0,
+          ));
+    }
+
+    final categoriesById = <String, Map<String, dynamic>>{
+      for (final row in categoryRows) row['id'] as String: row,
+    };
+    var parentIds = categoryRows
+        .map((row) => row['parent_id'] as String?)
+        .whereType<String>()
+        .where((id) => !categoriesById.containsKey(id))
+        .toSet()
+        .toList(growable: false);
+    // Category depth is intentionally bounded to protect the feed from cycles.
+    for (var depth = 0; depth < 4 && parentIds.isNotEmpty; depth++) {
+      final parents = await _rowsByIds(
+        'categories', 'id,slug,name_ar,name_en,parent_id', 'id', parentIds);
+      for (final parent in parents) {
+        categoriesById[parent['id'] as String] = parent;
+      }
+      parentIds = parents
+          .map((row) => row['parent_id'] as String?)
+          .whereType<String>()
+          .where((id) => !categoriesById.containsKey(id))
+          .toSet()
+          .toList(growable: false);
+    }
+
+    Map<String, dynamic>? categoryTree(String? id, [Set<String>? visited]) {
+      if (id == null) return null;
+      final seen = visited ?? <String>{};
+      if (!seen.add(id)) return null;
+      final source = categoriesById[id];
+      if (source == null) return null;
+      final result = Map<String, dynamic>.from(source);
+      final parentId = source['parent_id'] as String?;
+      final parent = categoryTree(parentId, seen);
+      if (parent != null) result['parent'] = parent;
+      return result;
+    }
+
+    final conditionsById = {for (final row in conditionRows) row['id'] as String: row};
+    final colorsById = {for (final row in colorRows) row['id'] as String: row};
+    final sizesById = {for (final row in sizeRows) row['id'] as String: row};
+    final statusesById = {for (final row in statusRows) row['id'] as String: row};
+    final sellersById = {for (final row in sellerRows) row['id'] as String: row};
+
+    return await Future.wait(productRows.map((row) async {
+      final productId = row['id'] as String;
+      return _parseProductRow({
+        ...row,
+        if (categoryTree(row['category_id'] as String?) case final category?)
+          'category': category,
+        if (row['condition_id'] != null &&
+            conditionsById.containsKey(row['condition_id']))
+          'condition': conditionsById[row['condition_id']],
+        if (row['color_id'] != null && colorsById.containsKey(row['color_id']))
+          'color': colorsById[row['color_id']],
+        if (row['size_id'] != null && sizesById.containsKey(row['size_id']))
+          'size': sizesById[row['size_id']],
+        if (row['status_id'] != null && statusesById.containsKey(row['status_id']))
+          'status': statusesById[row['status_id']],
+        if (row['seller_id'] != null && sellersById.containsKey(row['seller_id']))
+          'seller': sellersById[row['seller_id']],
+        'images': imagesByProduct[productId] ?? const [],
+      });
+    }));
   }
 
   Future<List<Map<String, dynamic>>> fetchDeliveryRegions() async {
@@ -283,61 +420,67 @@ class MarketplaceProductService {
     });
   }
 
-  /// Loads the public, available listings belonging to one store profile.
+  /// Loads public, available listings belonging to one store profile.
   Future<List<Product>> fetchProductsForStore(
     String sellerProfileId, {
     int limit = 60,
   }) async {
+    final availableIds = await _availableStatusIds();
+    if (availableIds.isEmpty) return const [];
     final rows = await _client
         .from('products')
-        .select(_productSelect)
+        .select(_productColumns)
         .eq('seller_id', sellerProfileId)
-        .eq('status.slug', 'available')
+        .inFilter('status_id', availableIds)
+        .eq('moderation_status', 'approved')
         .order('created_at', ascending: false)
         .limit(limit);
-
-    return await Future.wait((rows as List).map((row) =>
-        _parseProductRow(Map<String, dynamic>.from(row as Map))));
+    return _hydrateProductRows((rows as List)
+        .map((row) => Map<String, dynamic>.from(row as Map))
+        .toList(growable: false));
   }
 
   Future<List<Product>> fetchActiveProducts({int limit = 40}) async {
+    final availableIds = await _availableStatusIds();
+    if (availableIds.isEmpty) return const [];
     final rows = await _client
         .from('products')
-        .select(_productSelect)
-        .eq('status.slug', 'available')
+        .select(_productColumns)
+        .inFilter('status_id', availableIds)
+        .eq('moderation_status', 'approved')
         .order('created_at', ascending: false)
         .limit(limit);
-
-    return await Future.wait((rows as List)
-        .map((row) => _parseProductRow(Map<String, dynamic>.from(row as Map))));
+    return _hydrateProductRows((rows as List)
+        .map((row) => Map<String, dynamic>.from(row as Map))
+        .toList(growable: false));
   }
 
-  /// Loads every active listing in bounded pages for complete catalogue search.
-  /// This avoids silently searching only the first 40/100 newest products.
+  /// Loads all available listings in pages for complete catalogue search.
   Future<List<Product>> fetchAllActiveProducts({int pageSize = 100}) async {
     if (pageSize < 1 || pageSize > 500) {
       throw ArgumentError.value(pageSize, 'pageSize', 'Must be between 1 and 500');
     }
+    final availableIds = await _availableStatusIds();
+    if (availableIds.isEmpty) return const [];
 
     final products = <Product>[];
     var offset = 0;
     while (true) {
       final rows = await _client
           .from('products')
-          .select(_productSelect)
-          .eq('status.slug', 'available')
+          .select(_productColumns)
+          .inFilter('status_id', availableIds)
+          .eq('moderation_status', 'approved')
           .order('created_at', ascending: false)
           .order('id', ascending: true)
           .range(offset, offset + pageSize - 1);
-
-      final page = await Future.wait((rows as List)
-          .map((row) => _parseProductRow(Map<String, dynamic>.from(row as Map))));
-      products.addAll(page);
-
-      if (page.length < pageSize) break;
-      offset += page.length;
+      final pageRows = (rows as List)
+          .map((row) => Map<String, dynamic>.from(row as Map))
+          .toList(growable: false);
+      products.addAll(await _hydrateProductRows(pageRows));
+      if (pageRows.length < pageSize) break;
+      offset += pageRows.length;
     }
-
     return products;
   }
 
@@ -351,7 +494,6 @@ class MarketplaceProductService {
         .eq('user_id', userId)
         .isFilter('revoked_at', null)
         .limit(2);
-
     final membershipRows = (memberships as List)
         .map((row) => Map<String, dynamic>.from(row as Map))
         .toList(growable: false);
@@ -360,84 +502,20 @@ class MarketplaceProductService {
         'حسابك مرتبط بأكثر من متجر نشط. اختر المتجر المطلوب قبل عرض المنتجات.',
       );
     }
-
-    String? sellerProfileId;
     if (membershipRows.isEmpty) return const [];
-    sellerProfileId = membershipRows.single['seller_profile_id'] as String?;
+    final sellerProfileId = membershipRows.single['seller_profile_id'] as String?;
     if (sellerProfileId == null) return const [];
 
-    // Keep this owner-facing query independent of PostgREST relationship
-    // embedding. A PGRST200 in any nested FK embed previously caused the whole
-    // seller product list to fail, even though the product rows were present.
     final rows = await _client
         .from('products')
-        .select(
-          'id,seller_id,category_id,title_ar,title_en,description_ar,description_en,'
-          'price,views_count,created_at,updated_at,brand_name,weight_kg,'
-          'moderation_status,brand_id,color_id,size_id,condition_id,status_id,'
-          'currency_id,audience',
-        )
+        .select(_productColumns)
         .eq('seller_id', sellerProfileId)
         .order('created_at', ascending: false)
         .limit(limit);
-
     final productRows = (rows as List)
         .map((row) => Map<String, dynamic>.from(row as Map))
         .toList(growable: false);
-    if (productRows.isEmpty) return const [];
-
-    final productIds = productRows
-        .map((row) => row['id'] as String?)
-        .whereType<String>()
-        .toList(growable: false);
-    final statusIds = productRows
-        .map((row) => row['status_id'] as String?)
-        .whereType<String>()
-        .toSet()
-        .toList(growable: false);
-
-    // Fetch related records with flat IN queries instead of embedded joins.
-    // This avoids a single missing/stale relationship hiding every product.
-    final imageRows = await _client
-        .from('product_images')
-        .select(
-          'product_id,image_path,storage_bucket,display_order,created_at',
-        )
-        .inFilter('product_id', productIds)
-        .order('display_order', ascending: true);
-
-    final imagesByProduct = <String, List<Map<String, dynamic>>>{};
-    for (final rawImage in imageRows as List) {
-      final image = Map<String, dynamic>.from(rawImage as Map);
-      final productId = image['product_id'] as String?;
-      if (productId == null) continue;
-      imagesByProduct.putIfAbsent(productId, () => <Map<String, dynamic>>[]);
-      imagesByProduct[productId]!.add(image);
-    }
-
-    final statusesById = <String, Map<String, dynamic>>{};
-    if (statusIds.isNotEmpty) {
-      final statusRows = await _client
-          .from('product_statuses')
-          .select('id,name_ar,name_en,slug')
-          .inFilter('id', statusIds);
-      for (final rawStatus in statusRows as List) {
-        final status = Map<String, dynamic>.from(rawStatus as Map);
-        final id = status['id'] as String?;
-        if (id != null) statusesById[id] = status;
-      }
-    }
-
-    return await Future.wait(productRows.map((row) {
-      final productId = row['id'] as String;
-      final statusId = row['status_id'] as String?;
-      return _parseProductRow({
-        ...row,
-        'images': imagesByProduct[productId] ?? const [],
-        if (statusId != null && statusesById.containsKey(statusId))
-          'status': statusesById[statusId],
-      });
-    }));
+    return _hydrateProductRows(productRows);
   }
 
   Future<void> _requireOwnerMembership() async {
@@ -490,10 +568,15 @@ class MarketplaceProductService {
   Future<Product> fetchProductById(String productId) async {
     final row = await _client
         .from('products')
-        .select(_productSelect)
+        .select(_productColumns)
         .eq('id', productId)
         .single();
-
-    return _parseProductRow(Map<String, dynamic>.from(row));
+    final products = await _hydrateProductRows([
+      Map<String, dynamic>.from(row),
+    ]);
+    if (products.isEmpty) {
+      throw StateError('تعذر تحميل بيانات المنتج');
+    }
+    return products.single;
   }
 }
