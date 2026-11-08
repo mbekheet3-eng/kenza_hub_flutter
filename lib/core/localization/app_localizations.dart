@@ -487,6 +487,24 @@ class AppLocalizations {
   String get otpVerificationFailed => _strings.otpVerificationFailed;
   String get languageSettingsTitle => _strings.languageSettingsTitle;
   String get languageSettingsSubtitle => _strings.languageSettingsSubtitle;
+  String get searchProductsOrMembers => _strings.searchProductsOrMembers;
+  String get imageSearchTooltip => _strings.imageSearchTooltip;
+  String get backToPreviousCategory => _strings.backToPreviousCategory;
+  String get socialCorner => _strings.socialCorner;
+  String get memberFallback => _strings.memberFallback;
+  String get homeProductsLoadError => _strings.homeProductsLoadError;
+  String get availableLabel => _strings.availableLabel;
+  String get promoDressesTitle => _strings.promoDressesTitle;
+  String get promoDressesSubtitle => _strings.promoDressesSubtitle;
+  String get promoReuseTitle => _strings.promoReuseTitle;
+  String get promoReuseSubtitle => _strings.promoReuseSubtitle;
+  String get promoChoicesTitle => _strings.promoChoicesTitle;
+  String get promoChoicesSubtitle => _strings.promoChoicesSubtitle;
+  String get promoEverythingTitle => _strings.promoEverythingTitle;
+  String get promoEverythingSubtitle => _strings.promoEverythingSubtitle;
+  String get logoutFailed => _strings.logoutFailed;
+  String get productModerationTitle => _strings.productModerationTitle;
+  String get productModerationSubtitle => _strings.productModerationSubtitle;
   String get chooseLanguage => _strings.chooseLanguage;
   String get currentLanguage => _strings.languageName;
 }
