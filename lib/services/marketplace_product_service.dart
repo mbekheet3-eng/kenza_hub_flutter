@@ -44,14 +44,10 @@ class MarketplaceProductService {
       final bucket = image['storage_bucket'] as String?;
       if (path == null || bucket == null) continue;
       paths.add(path);
-      if (bucket == 'product-images') {
-        urls.add(_client.storage.from(bucket).getPublicUrl(path));
-      } else {
-        try {
-          urls.add(await _client.storage.from(bucket).createSignedUrl(path, 3600));
-        } catch (_) {
-          // A restricted image is omitted if a signed URL cannot be issued.
-        }
+      try {
+        urls.add(await _client.storage.from(bucket).createSignedUrl(path, 3600));
+      } catch (_) {
+        // An image is omitted if the caller is not allowed to read it.
       }
     }
 
