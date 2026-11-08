@@ -1,3 +1,102 @@
+-- Persistent, atomic idempotency and per-user rate limiting for Gemini calls.
+create table if not exists public.product_image_review_attempts (
+  id bigint generated always as identity primary key,
+  requester_user_id uuid not null references public.users(id) on delete cascade,
+  product_image_id uuid not null references public.product_images(id) on delete cascade,
+  attempted_at timestamptz not null default now()
+);
+create index if not exists product_image_review_attempts_user_time_idx
+  on public.product_image_review_attempts(requester_user_id,attempted_at desc);
+alter table public.product_image_review_attempts enable row level security;
+revoke all on public.product_image_review_attempts from public,anon,authenticated;
+grant all on public.product_image_review_attempts to service_role;
+
+create or replace function private.claim_product_image_review(
+  p_image_id uuid,
+  p_requester_user_id uuid
+)
+returns boolean
+language plpgsql
+security definer
+set search_path=''
+as $$
+declare
+  v_image public.product_images%rowtype;
+  v_recent_attempts integer;
+begin
+  if p_requester_user_id is null or not exists (
+    select 1 from public.users u
+    where u.id=p_requester_user_id and u.is_active
+  ) then
+    raise exception 'ACTIVE_USER_REQUIRED';
+  end if;
+
+  select * into v_image
+  from public.product_images
+  where id=p_image_id
+  for update;
+
+  if v_image.id is null then
+    raise exception 'IMAGE_NOT_FOUND';
+  end if;
+
+  -- Recover an abandoned claim after five minutes. A live request keeps the
+  -- processing lease fresh only until its final status update.
+  if v_image.ai_review_status='error'
+     and v_image.ai_review_result->>'state'='processing'
+     and nullif(v_image.ai_review_result->>'started_at','')::timestamptz
+         < now() - interval '5 minutes' then
+    update public.product_images
+    set ai_review_status='pending',ai_review_result=null
+    where id=p_image_id;
+    v_image.ai_review_status := 'pending';
+    v_image.ai_review_result := null;
+  end if;
+
+  if v_image.ai_review_status <> 'pending' or v_image.ai_review_result is not null then
+    raise exception 'IMAGE_REVIEW_ALREADY_STARTED_OR_COMPLETED';
+  end if;
+
+  select count(*) into v_recent_attempts
+  from public.product_image_review_attempts
+  where requester_user_id=p_requester_user_id
+    and attempted_at >= now() - interval '15 minutes';
+
+  if v_recent_attempts >= 20 then
+    raise exception 'IMAGE_REVIEW_RATE_LIMITED';
+  end if;
+
+  insert into public.product_image_review_attempts(requester_user_id,product_image_id)
+  values(p_requester_user_id,p_image_id);
+
+  update public.product_images
+  set ai_review_status='error',
+      ai_review_result=jsonb_build_object(
+        'state','processing',
+        'started_at',now()
+      )
+  where id=p_image_id;
+
+  return true;
+end
+$$;
+revoke all on function private.claim_product_image_review(uuid,uuid) from public,anon,authenticated;
+grant execute on function private.claim_product_image_review(uuid,uuid) to service_role;
+
+create or replace function public.claim_product_image_review(
+  p_image_id uuid,
+  p_requester_user_id uuid
+)
+returns boolean
+language sql
+security definer
+set search_path=''
+as $$
+  select private.claim_product_image_review(p_image_id,p_requester_user_id)
+$$;
+revoke all on function public.claim_product_image_review(uuid,uuid) from public,anon,authenticated;
+grant execute on function public.claim_product_image_review(uuid,uuid) to service_role;
+
 -- Keep newly submitted product images private until the listing is eligible and approved.
 -- Legacy objects in the public product-images bucket are intentionally not changed here.
 create or replace function private.can_upload_product_image_path(p_name text,p_bucket text)
