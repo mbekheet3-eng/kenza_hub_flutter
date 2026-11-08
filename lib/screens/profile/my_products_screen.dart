@@ -420,14 +420,14 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
               TextField(
                 controller: titleController,
                 textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(labelText: 'اسم المنتج'),
+                decoration: InputDecoration(labelText: AppLocalizations.of(context).productName),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: descriptionController,
                 minLines: 3,
                 maxLines: 5,
-                decoration: const InputDecoration(labelText: 'الوصف'),
+                decoration: InputDecoration(labelText: AppLocalizations.of(context).productDescription),
               ),
               const SizedBox(height: 12),
               TextField(
@@ -435,7 +435,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
-                decoration: const InputDecoration(labelText: 'السعر بالجنيه'),
+                decoration: InputDecoration(labelText: AppLocalizations.of(context).priceInEgp),
               ),
             ],
           ),
