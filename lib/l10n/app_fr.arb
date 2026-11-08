@@ -324,5 +324,10 @@
   "priceInEgp": "Prix en EGP",
   "priceExample": "Exemple : 150,00",
   "productName": "Nom du produit",
-  "productDescription": "Description"
+  "productDescription": "Description",
+  "productTitleLabel": "Titre du produit",
+  "catchyTitleHint": "Saisissez un titre accrocheur",
+  "optionalProductDescription": "Description du produit (facultatif)",
+  "optionalDescriptionHint": "Ajoutez des détails si vous le souhaitez, ou laissez ce champ vide",
+  "searchAvailableBrands": "Rechercher parmi les marques disponibles..."
 }
