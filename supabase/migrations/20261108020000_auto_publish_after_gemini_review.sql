@@ -232,7 +232,7 @@ begin
      set ai_review_status = p_status,
          ai_review_result = p_result,
          ai_reviewed_at = pg_catalog.now(),
-         ai_review_model = nullif(pg_catalog.trim(p_model), '')
+         ai_review_model = nullif(pg_catalog.btrim(p_model), '')
    where id = p_product_image_id
      and product_id = v_product_id;
 
