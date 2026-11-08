@@ -276,7 +276,7 @@ class _SearchScreenState extends State<SearchScreen> {
         textInputAction: TextInputAction.search,
         onChanged: (value) => setState(() {}),
         decoration: InputDecoration(
-          hintText: 'ابحث عن منتج',
+          hintText: AppLocalizations.of(context).searchProduct,
           // In RTL, the search icon is on the right and camera on the left.
           prefixIcon: const Icon(Icons.search_rounded),
           suffixIcon: IconButton(
@@ -402,7 +402,7 @@ class _SearchScreenState extends State<SearchScreen> {
             .map((condition) => Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: FilterChip(
-                    label: Text(condition == 'all' ? 'جميع الحالات' : condition),
+                    label: Text(condition == 'all' ? AppLocalizations.of(context).allConditions : condition),
                     selected: _selectedCondition == condition,
                     onSelected: (selected) {
                       setState(() =>
@@ -612,7 +612,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 const SizedBox(height: 16),
                 Text(
                   draftPriceFilterEnabled
-                      ? 'نطاق السعر: ${draftMinPrice.toStringAsFixed(0)} - ${draftMaxPrice.toStringAsFixed(0)} ج.م'
+                      ? '${AppLocalizations.of(context).priceRange}: ${draftMinPrice.toStringAsFixed(0)} - ${draftMaxPrice.toStringAsFixed(0)} ${AppLocalizations.of(context).currency}'
                       : 'اختر نطاقاً لتفعيل فلتر السعر',
                   style: Theme.of(sheetContext).textTheme.bodySmall,
                 ),
