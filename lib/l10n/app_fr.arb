@@ -203,5 +203,20 @@
   "noSearchResults": "Aucun résultat trouvé",
   "changeFilters": "Essayez de modifier les filtres ou la recherche",
   "clearPriceFilter": "Effacer le filtre de prix",
-  "applyFilters": "Appliquer les filtres"
+  "applyFilters": "Appliquer les filtres",
+  "photos": "Photos",
+  "productInfo": "Informations sur le produit",
+  "optionalDetails": "Détails supplémentaires (facultatif)",
+  "colorSizeBrand": "Couleur, taille et marque",
+  "chooseCategoryFirst": "Choisissez d’abord une catégorie pour afficher les champs du produit.",
+  "reviewAndPublish": "Vérifier et publier",
+  "chooseDeliveryArea": "Choisir la zone de livraison",
+  "verifyPhone": "Vérifier le numéro de téléphone",
+  "phoneVerificationRequired": "La vérification du téléphone n’est requise qu’une seule fois avant votre première vente ou votre premier achat.",
+  "publishProduct": "Publier le produit",
+  "sellProduct": "Vendre un produit",
+  "loginToSell": "Connectez-vous d’abord pour mettre vos produits en vente",
+  "next": "Suivant",
+  "publish": "Publier",
+  "previous": "Précédent"
 }
