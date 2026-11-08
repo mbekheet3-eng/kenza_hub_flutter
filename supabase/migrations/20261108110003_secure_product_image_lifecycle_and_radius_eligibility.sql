@@ -240,15 +240,12 @@ begin
     return false;
   end if;
 
+  -- Phone verification is suspended by product decision (2026-11-08).
+  -- Active seller/account checks remain; phone confirmation is not a listing gate.
   if not exists (
-    select 1
-    from public.seller_profiles sp
+    select 1 from public.seller_profiles sp
     join public.users u on u.id=sp.owner_user_id
-    join auth.users au on au.id=u.id
-    where sp.id=v_product.seller_id
-      and sp.is_active
-      and u.is_active
-      and au.phone_confirmed_at is not null
+    where sp.id=v_product.seller_id and sp.is_active and u.is_active
   ) then
     return false;
   end if;
@@ -260,9 +257,8 @@ begin
     return false;
   end if;
 
-  if not private.is_seller_in_service_area(v_product.seller_id) then
-    return false;
-  end if;
+  -- Kenza delivery coverage is optional; buyer and seller may arrange delivery
+  -- anywhere in Egypt. Do not block listing publication by service radius.
 
   select count(*),
          count(*) filter (where pi.ai_review_status <> 'approved')
