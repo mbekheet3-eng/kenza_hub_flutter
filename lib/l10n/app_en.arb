@@ -416,5 +416,13 @@
   "noDeliveryRegions": "No delivery areas are currently active.",
   "enterValidPhone": "Enter a valid phone number including the country code.",
   "otpSent": "The code was sent. Enter the SMS code to verify.",
-  "otpVerificationFailed": "Could not complete verification"
+  "otpVerificationFailed": "Could not complete verification",
+  "nameRequired": "Full name is required",
+  "confirmPasswordRequired": "Please confirm your password",
+  "or": "OR",
+  "continueWithGoogle": "Continue with Google",
+  "continueWithApple": "Continue with Apple",
+  "passwordUpdated": "Password updated successfully",
+  "newPasswordTitle": "Set a new password",
+  "updatePassword": "Update password"
 }
