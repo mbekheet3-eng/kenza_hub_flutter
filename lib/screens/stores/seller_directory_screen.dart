@@ -34,8 +34,8 @@ class _SellerDirectoryScreenState extends State<SellerDirectoryScreen> {
   Widget build(BuildContext context) {
     final title = widget.agency ? 'Wekala Corner' : 'Social Corner';
     final subtitle = widget.agency
-        ? 'محلات فعلية في وكالة البلح'
-        : 'متاجر وصفحات البيع على السوشيال ميديا';
+        ? AppLocalizations.of(context).physicalShopsInWekala
+        : AppLocalizations.of(context).socialStoresAndPages;
 
     return Scaffold(
       appBar: AppBar(title: Text(title)),
@@ -48,8 +48,8 @@ class _SellerDirectoryScreenState extends State<SellerDirectoryScreen> {
           if (snapshot.hasError) {
             return _DirectoryMessage(
               icon: Icons.cloud_off_outlined,
-              message: 'تعذر تحميل المتاجر حاليًا',
-              action: 'إعادة المحاولة',
+              message: AppLocalizations.of(context).storesLoadError,
+              action: AppLocalizations.of(context).retry,
               onPressed: _refresh,
             );
           }
@@ -58,9 +58,9 @@ class _SellerDirectoryScreenState extends State<SellerDirectoryScreen> {
             return _DirectoryMessage(
               icon: Icons.storefront_outlined,
               message: widget.agency
-                  ? 'لا توجد محلات معروضة حاليًا'
-                  : 'لا توجد متاجر أونلاين معروضة حاليًا',
-              action: 'تحديث',
+                  ? AppLocalizations.of(context).noPhysicalShops
+                  : AppLocalizations.of(context).noOnlineStores,
+              action: AppLocalizations.of(context).refresh,
               onPressed: _refresh,
             );
           }
@@ -108,7 +108,7 @@ class _StoreDirectoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = (store['business_name'] ?? store['display_name'] ?? 'متجر')
+    final name = (store['business_name'] ?? store['display_name'] ?? AppLocalizations.of(context).storeLabel)
         .toString();
     final cover = store['cover_image_url'] as String?;
     final avatar = store['avatar_url'] as String?;
