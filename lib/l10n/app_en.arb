@@ -235,7 +235,7 @@
   "sizesLoadError": "Could not load sizes from the database",
   "noSizesForCategory": "No sizes are registered for this category",
   "fromGallery": "From gallery",
-  "takePhoto": "Take a photo",
+  "takePhoto": "Take photo",
   "addProductPhotosLimit": "Add product photos (up to 8 images)",
   "addPhotos": "Add photos",
   "of8ImagesAdded": "of 8 images added",
@@ -290,5 +290,17 @@
   "ok": "OK",
   "signupAgreeTerms": "I agree to the Terms and Conditions and Privacy Policy",
   "orCreateAccountWith": "Or create your account with",
-  "invalidResetLink": "The password reset link is invalid or has expired."
+  "invalidResetLink": "The password reset link is invalid or has expired.",
+  "evidenceUploaded": "Evidence uploaded and its fingerprint recorded successfully.",
+  "evidenceUploadError": "Could not upload evidence",
+  "evidenceLinkError": "Could not open the evidence link on this device.",
+  "evidenceOpenError": "Could not open evidence",
+  "evidenceInstructions": "Upload photos that explain the issue. Evidence is stored privately, its digital fingerprint is recorded, and every view or download request is logged.",
+  "chooseImage": "Choose image",
+  "uploadingEvidence": "Uploading the image and verifying its fingerprint...",
+  "registeredEvidence": "Registered evidence",
+  "noEvidenceYet": "No evidence has been recorded for this dispute yet.",
+  "evidenceHash": "SHA-256 fingerprint",
+  "viewEvidence": "View",
+  "downloadEvidence": "Download"
 }
