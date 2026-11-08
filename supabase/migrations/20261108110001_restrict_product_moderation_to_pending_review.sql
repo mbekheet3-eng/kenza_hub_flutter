@@ -7,11 +7,8 @@ CREATE OR REPLACE FUNCTION private.moderate_product(p_product_id uuid, p_decisio
 AS $function$
 declare
  v_product public.products%rowtype;
- v_available uuid;
  v_hidden uuid;
  v_pending uuid;
- v_image_count integer;
- v_unapproved integer;
 begin
  if not private.is_admin() then raise exception 'ADMIN_ONLY'; end if;
  if p_decision is null or p_decision not in ('approved','rejected','hidden') then
@@ -37,28 +34,11 @@ begin
  end if;
 
  if p_decision='approved' then
-   if not private.is_seller_in_service_area(v_product.seller_id) then
-     raise exception 'SELLER_OUTSIDE_DELIVERY_COVERAGE';
+   -- Admin approval must pass the exact same seller, phone, category,
+   -- delivery-coverage and all-images-approved gate as automatic publication.
+   if not private.publish_product_after_ai_review(p_product_id) then
+     raise exception 'PRODUCT_PUBLICATION_REQUIREMENTS_NOT_MET';
    end if;
-
-   select count(*),count(*) filter(where ai_review_status<>'approved')
-     into v_image_count,v_unapproved
-   from public.product_images
-   where product_id=p_product_id;
-
-   if v_image_count=0 or v_unapproved>0 then
-     raise exception 'IMAGE_AI_REVIEW_INCOMPLETE';
-   end if;
-
-   select id into v_available
-   from public.product_statuses
-   where slug='available' and is_active;
-
-   if v_available is null then raise exception 'AVAILABLE_STATUS_NOT_CONFIGURED'; end if;
-
-   update public.products
-   set moderation_status='approved',status_id=v_available,published_at=now()
-   where id=p_product_id;
  else
    select id into v_hidden
    from public.product_statuses
