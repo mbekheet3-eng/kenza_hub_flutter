@@ -135,6 +135,29 @@ class AppLocalizations {
   String get notificationsComingSoon => _strings.notificationsComingSoon;
   String get productCountLabel => _strings.productCountLabel;
   String get categoriesLoadError => _strings.categoriesLoadError;
+  String get retry => _strings.retry;
+  String get categoriesTitle => _strings.categoriesTitle;
+  String get categoriesLoadFailed => _strings.categoriesLoadFailed;
+  String get noCategories => _strings.noCategories;
+  String get chatsTitle => _strings.chatsTitle;
+  String get chatsComingSoon => _strings.chatsComingSoon;
+  String get chatsDescription => _strings.chatsDescription;
+  String get profileTitle => _strings.profileTitle;
+  String get pleaseLogin => _strings.pleaseLogin;
+  String get ordersHistory => _strings.ordersHistory;
+  String get ordersSubtitle => _strings.ordersSubtitle;
+  String get sellerDashboard => _strings.sellerDashboard;
+  String get sellerDashboardSubtitle => _strings.sellerDashboardSubtitle;
+  String get aboutKenza => _strings.aboutKenza;
+  String get aboutKenzaSubtitle => _strings.aboutKenzaSubtitle;
+  String get policiesTerms => _strings.policiesTerms;
+  String get policiesSubtitle => _strings.policiesSubtitle;
+  String get logout => _strings.logout;
+  String get userFallback => _strings.userFallback;
+  String get followers => _strings.followers;
+  String get ratings => _strings.ratings;
+  String get edit => _strings.edit;
+  String get aboutMe => _strings.aboutMe;
   String get currentLanguage => _strings.languageName;
 }
 
