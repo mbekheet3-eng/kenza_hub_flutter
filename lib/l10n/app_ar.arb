@@ -179,5 +179,15 @@
   "buyNow": "اشتري الآن",
   "description": "الوصف",
   "details": "التفاصيل",
-  "seller": "البائع"
+  "seller": "البائع",
+  "productLoadError": "تعذر تحميل بيانات المنتج",
+  "brandLabel": "العلامة التجارية",
+  "colorLabel": "اللون",
+  "sizeLabel": "المقاس",
+  "conditionLabel": "الحالة",
+  "unspecified": "غير محدد",
+  "newCondition": "جديد",
+  "sellerOnKenza": "بائع على كنزة هب",
+  "productAddedToCart": "تمت إضافة المنتج إلى السلة",
+  "alreadyInCart": "هذا المنتج موجود بالفعل في السلة"
 }
