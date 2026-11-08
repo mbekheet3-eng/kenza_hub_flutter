@@ -39,7 +39,7 @@ class _AdminProductModerationScreenState extends State<AdminProductModerationScr
     try {
       final rows = await _client.from('products').select(
         'id,title_ar,title_en,price,created_at,product_images(id,image_path,storage_bucket,display_order,ai_review_status,ai_review_result)',
-      ).eq('moderation_status', 'pending').order('created_at').limit(100);
+      ).inFilter('moderation_status', ['pending', 'pending_review']).order('created_at').limit(100);
       final items = <Map<String, dynamic>>[];
       for (final raw in rows) {
         final product = Map<String, dynamic>.from(raw);
