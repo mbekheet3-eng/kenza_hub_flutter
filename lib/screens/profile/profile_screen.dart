@@ -120,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () => context.go('/login'),
-                child: Text('تسجيل الدخول'),
+                child: Text(AppLocalizations.of(context).login),
               ),
             ],
           ),
@@ -369,7 +369,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildStatItem(context, user.productsCount.toString(), 'منتجاتي'),
+          _buildStatItem(context, user.productsCount.toString(), AppLocalizations.of(context).myProductsTitle),
           _buildStatItem(context, user.followersCount.toString(), AppLocalizations.of(context).followers),
           _buildStatItem(context, user.totalReviews.toString(), AppLocalizations.of(context).ratings),
         ],
@@ -405,7 +405,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: ElevatedButton.icon(
               onPressed: () => context.push('/my-products'),
               icon: const Icon(Icons.shopping_bag),
-              label: Text('منتجاتي'),
+              label: Text(AppLocalizations.of(context).myProductsTitle),
             ),
           ),
           const SizedBox(width: 12),
@@ -460,14 +460,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'منتجاتي',
+                AppLocalizations.of(context).myProductsTitle,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
               ),
               TextButton(
                 onPressed: () => context.push('/my-products'),
-                child: Text('عرض الكل'),
+                child: Text(AppLocalizations.of(context).viewAll),
               ),
             ],
           ),
@@ -479,7 +479,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               if (products.isEmpty) {
                 return Center(
                   child: Text(
-                    'لا توجد منتجات',
+                    AppLocalizations.of(context).noProducts,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 );
