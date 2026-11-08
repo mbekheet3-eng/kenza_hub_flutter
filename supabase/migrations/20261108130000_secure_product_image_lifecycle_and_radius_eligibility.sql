@@ -7,6 +7,8 @@ create table if not exists public.product_image_review_attempts (
 );
 create index if not exists product_image_review_attempts_user_time_idx
   on public.product_image_review_attempts(requester_user_id,attempted_at desc);
+create index if not exists product_image_review_attempts_time_idx
+  on public.product_image_review_attempts(attempted_at);
 alter table public.product_image_review_attempts enable row level security;
 revoke all on public.product_image_review_attempts from public,anon,authenticated;
 grant all on public.product_image_review_attempts to service_role;
@@ -46,7 +48,7 @@ begin
   if v_image.ai_review_status='error'
      and v_image.ai_review_result->>'state'='processing'
      and nullif(v_image.ai_review_result->>'started_at','')::timestamptz
-         < now() - interval '5 minutes' then
+         < now() - interval '10 minutes' then
     update public.product_images
     set ai_review_status='pending',ai_review_result=null
     where id=p_image_id;
@@ -57,6 +59,9 @@ begin
   if v_image.ai_review_status <> 'pending' or v_image.ai_review_result is not null then
     raise exception 'IMAGE_REVIEW_ALREADY_STARTED_OR_COMPLETED';
   end if;
+
+  delete from public.product_image_review_attempts
+  where attempted_at < now() - interval '24 hours';
 
   select count(*) into v_recent_attempts
   from public.product_image_review_attempts
