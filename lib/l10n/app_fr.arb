@@ -165,5 +165,7 @@
   "updatedDate": "Mis à jour",
   "notes": "Notes",
   "somethingWentWrong": "Une erreur s’est produite",
-  "tryAgain": "Réessayer"
+  "tryAgain": "Réessayer",
+  "initializationError": "Impossible de se connecter à la configuration du service",
+  "initializationRetryHint": "Fermez puis rouvrez l’application. Si le problème persiste, vérifiez la configuration Supabase."
 }
