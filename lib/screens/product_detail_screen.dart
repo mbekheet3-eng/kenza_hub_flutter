@@ -80,6 +80,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Future<void> _buy(Product product) async {
     if (!await _ensureLogin()) return;
+    if (!mounted) return;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -114,6 +115,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Future<void> _makeOffer(Product product) async {
     if (!await _ensureLogin()) return;
+    if (!mounted) return;
     final priceController = TextEditingController(text: product.price.toStringAsFixed(2));
     final noteController = TextEditingController();
     final formKey = GlobalKey<FormState>();
