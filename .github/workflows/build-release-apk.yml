@@ -1,0 +1,170 @@
+name: Build Release APK (Internal Testing)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-release-apk:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - name: Check out implementation branch
+        uses: actions/checkout@v4
+        with:
+          ref: phase-1/implementation
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze Flutter code
+        run: flutter analyze
+
+      - name: Generate Android platform with the legacy package identity
+        run: flutter create --platforms=android --org com.kenza --project-name hub .
+
+      - name: Configure Android internet permission and OAuth callback
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          manifest = Path("android/app/src/main/AndroidManifest.xml")
+          text = manifest.read_text()
+          permission = '<uses-permission android:name="android.permission.INTERNET" />'
+          if permission not in text:
+              manifest_start = text.find("<manifest")
+              manifest_end = text.find(">", manifest_start)
+              if manifest_start < 0 or manifest_end < 0:
+                  raise SystemExit("Could not locate Android manifest root.")
+              text = text[:manifest_end + 1] + "\n    " + permission + text[manifest_end + 1:]
+          if 'android:host="login-callback"' not in text:
+              callback = """
+                      <intent-filter>
+                          <action android:name="android.intent.action.VIEW" />
+                          <category android:name="android.intent.category.DEFAULT" />
+                          <category android:name="android.intent.category.BROWSABLE" />
+                          <data android:scheme="com.kenza.hub" android:host="login-callback" />
+                      </intent-filter>"""
+              activity_pattern = re.compile(
+                  r'(<activity\b[^>]*android:name="[^"]*MainActivity"[^>]*>)([\s\S]*?)(</activity>)'
+              )
+              match = activity_pattern.search(text)
+              if not match:
+                  raise SystemExit("Could not locate Android MainActivity in generated manifest.")
+              updated_activity = match.group(1) + match.group(2) + callback + "\n        " + match.group(3)
+              text = text[:match.start()] + updated_activity + text[match.end():]
+          manifest.write_text(text)
+          PY
+
+      - name: Prepare the existing Android signing identity
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$ANDROID_KEYSTORE_BASE64" || (echo "Missing ANDROID_KEYSTORE_BASE64 in this repository (or shared organization secrets)." && exit 1)
+          test -n "$ANDROID_KEYSTORE_PASSWORD" || (echo "Missing ANDROID_KEYSTORE_PASSWORD in this repository (or shared organization secrets)." && exit 1)
+          test -n "$ANDROID_KEY_ALIAS" || (echo "Missing ANDROID_KEY_ALIAS in this repository (or shared organization secrets)." && exit 1)
+          test -n "$ANDROID_KEY_PASSWORD" || (echo "Missing ANDROID_KEY_PASSWORD in this repository (or shared organization secrets)." && exit 1)
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/upload-keystore.jks
+          test -s android/upload-keystore.jks
+          keytool -list -keystore android/upload-keystore.jks -storetype JKS -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" > /dev/null
+          python3 - <<'PY'
+          from pathlib import Path
+          candidates = [Path("android/app/build.gradle.kts"), Path("android/app/build.gradle")]
+          gradle = next((p for p in candidates if p.exists()), None)
+          if gradle is None:
+              raise SystemExit("Android app Gradle file was not generated.")
+          text = gradle.read_text()
+          if gradle.suffix == ".kts":
+              text = text.replace(
+                  '    buildTypes {',
+                  '''    signingConfigs {
+                  create("release") {
+                      storeFile = rootProject.file("upload-keystore.jks")
+                      storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                      keyAlias = System.getenv("ANDROID_KEY_ALIAS")
+                      keyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+                  }
+              }
+
+              buildTypes {''',
+                  1,
+              )
+              text = text.replace(
+                  'signingConfig = signingConfigs.getByName("debug")',
+                  'signingConfig = signingConfigs.getByName("release")',
+                  1,
+              )
+          else:
+              text = text.replace(
+                  '    buildTypes {',
+                  '''    signingConfigs {
+                  release {
+                      storeFile = rootProject.file("upload-keystore.jks")
+                      storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                      keyAlias = System.getenv("ANDROID_KEY_ALIAS")
+                      keyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+                  }
+              }
+
+              buildTypes {''',
+                  1,
+              )
+              text = text.replace(
+                  'signingConfig signingConfigs.debug',
+                  'signingConfig signingConfigs.release',
+                  1,
+              )
+          if 'applicationId = "com.kenza.hub"' not in text and 'applicationId "com.kenza.hub"' not in text:
+              raise SystemExit("Generated Android applicationId is not com.kenza.hub.")
+          if 'signingConfigs.getByName("release")' not in text and 'signingConfigs.release' not in text:
+              raise SystemExit("Could not configure release signing.")
+          gradle.write_text(text)
+          print(f"Configured {gradle} for com.kenza.hub and the existing release key.")
+          PY
+
+      - name: Build signed Release APK for internal testing
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          flutter build apk --release --no-shrink \
+            --build-name=0.1.0 \
+            --build-number="$(date +%s)" \
+            --dart-define=SUPABASE_URL=https://mxdcfewkajwvtwtjoeia.supabase.co \
+            --dart-define=SUPABASE_PUBLISHABLE_KEY=sb_publishable_lQr0NWJLqKP6lPx44ZCxAw_CtGsmpE-
+
+      - name: Verify package identity and APK
+        run: |
+          test -s build/app/outputs/flutter-apk/app-release.apk
+          ls -lh build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: kenza-hub-release-apk-update
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 7
