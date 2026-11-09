@@ -9,6 +9,7 @@ import 'product_detail_screen.dart';
 import 'about_kenza_screen.dart';
 import 'policies_screen.dart';
 import 'password_recovery_screen.dart';
+import 'messages_inbox_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -147,6 +148,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       const Divider(height: 28),
+                      ListTile(
+                        leading: const Icon(Icons.mail_outline_rounded),
+                        title: const Text('الرسائل والعروض وطلبات الشراء'),
+                        subtitle: const Text('محادثاتك والطلبات الواردة والصادرة'),
+                        trailing: const Icon(Icons.chevron_left),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const MessagesInboxScreen()),
+                        ),
+                      ),
                       ListTile(
                         leading: const Icon(Icons.favorite_border_rounded),
                         title: const Text('المفضلة'),
