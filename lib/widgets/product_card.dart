@@ -7,10 +7,14 @@ class ProductCard extends StatelessWidget {
     super.key,
     required this.product,
     required this.onTap,
+    this.isFavorite = false,
+    this.onFavoriteTap,
   });
 
   final Product product;
   final VoidCallback onTap;
+  final bool isFavorite;
+  final VoidCallback? onFavoriteTap;
 
   @override
   Widget build(BuildContext context) {
@@ -22,19 +26,43 @@ class ProductCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-              child: product.primaryImage == null
-                  ? const ColoredBox(
-                      color: Color(0xFFEDEDF4),
-                      child: Icon(Icons.image_outlined, size: 42),
-                    )
-                  : Image.network(
-                      product.primaryImage!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const ColoredBox(
-                        color: Color(0xFFEDEDF4),
-                        child: Icon(Icons.broken_image_outlined, size: 42),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  product.primaryImage == null
+                      ? const ColoredBox(
+                          color: Color(0xFFEDEDF4),
+                          child: Icon(Icons.image_outlined, size: 42),
+                        )
+                      : Image.network(
+                          product.primaryImage!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const ColoredBox(
+                            color: Color(0xFFEDEDF4),
+                            child: Icon(Icons.broken_image_outlined, size: 42),
+                          ),
+                        ),
+                  if (onFavoriteTap != null)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Material(
+                        color: Colors.white.withValues(alpha: 0.94),
+                        shape: const CircleBorder(),
+                        elevation: 2,
+                        child: IconButton(
+                          tooltip: isFavorite ? 'إزالة من المفضلة' : 'إضافة للمفضلة',
+                          visualDensity: VisualDensity.compact,
+                          onPressed: onFavoriteTap,
+                          icon: Icon(
+                            isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                            color: isFavorite ? Colors.red : Colors.black87,
+                          ),
+                        ),
                       ),
                     ),
+                ],
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(10),
