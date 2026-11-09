@@ -98,6 +98,44 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) setState(() {});
   }
 
+  Future<void> _openCategories() async {
+    if (_categories.isEmpty) {
+      _showComingSoon('الأقسام');
+      return;
+    }
+    final selectedId = await showModalBottomSheet<String?>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          children: [
+            const ListTile(
+              title: Text('الأقسام'),
+              titleTextStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+            ),
+            ListTile(
+              leading: const Icon(Icons.grid_view_rounded),
+              title: const Text('كل المنتجات'),
+              onTap: () => Navigator.pop(sheetContext, ''),
+            ),
+            ..._categories.map(
+              (category) => ListTile(
+                leading: const Icon(Icons.category_outlined),
+                title: Text(category.nameAr),
+                onTap: () => Navigator.pop(sheetContext, category.id),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (selectedId == null || !mounted) return;
+    setState(() => _categoryId = selectedId.isEmpty ? null : selectedId);
+    await _load();
+  }
+
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('$feature قريبًا')),
@@ -306,10 +344,37 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _openSell,
-        icon: const Icon(Icons.add),
-        label: const Text('أضف منتجًا'),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: NavigationBar(
+          selectedIndex: 0,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          destinations: const [
+            NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home_rounded), label: 'الرئيسية'),
+            NavigationDestination(icon: Icon(Icons.grid_view_outlined), selectedIcon: Icon(Icons.grid_view_rounded), label: 'الأقسام'),
+            NavigationDestination(icon: Icon(Icons.add_circle_outline_rounded), selectedIcon: Icon(Icons.add_circle_rounded), label: 'إضافة منتج'),
+            NavigationDestination(icon: Icon(Icons.chat_bubble_outline_rounded), selectedIcon: Icon(Icons.chat_rounded), label: 'الرسائل'),
+            NavigationDestination(icon: Icon(Icons.person_outline_rounded), selectedIcon: Icon(Icons.person_rounded), label: 'حسابي'),
+          ],
+          onDestinationSelected: (index) {
+            switch (index) {
+              case 0:
+                break;
+              case 1:
+                _openCategories();
+                break;
+              case 2:
+                _openSell();
+                break;
+              case 3:
+                _showComingSoon('الرسائل');
+                break;
+              case 4:
+                _openProfile();
+                break;
+            }
+          },
+        ),
       ),
     );
   }
