@@ -5,12 +5,14 @@ import '../models/category.dart';
 import '../models/product.dart';
 import '../services/marketplace_service.dart';
 import '../services/favorites_service.dart';
+import '../services/notification_service.dart';
 import '../widgets/product_card.dart';
 import 'login_screen.dart';
 import 'product_detail_screen.dart';
 import 'product_form_screen.dart';
 import 'profile_screen.dart';
 import 'search_screen.dart';
+import 'notifications_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,6 +30,12 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _categoryId;
   bool _loading = true;
   String? _error;
+  Stream<List<Map<String, dynamic>>>? _notificationStream;
+
+  void _bindNotificationStream() {
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    _notificationStream = userId == null ? null : NotificationService().watchNotifications();
+  }
 
   String get _firstName {
     final user = Supabase.instance.client.auth.currentUser;
@@ -42,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _bindNotificationStream();
     _load();
   }
 
@@ -148,7 +157,20 @@ class _HomeScreenState extends State<HomeScreen> {
         MaterialPageRoute(builder: (_) => const ProfileScreen()),
       );
     }
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(_bindNotificationStream);
+    }
+  }
+
+  Future<void> _openNotifications() async {
+    if (Supabase.instance.client.auth.currentUser == null) {
+      await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LoginScreen()));
+      if (!mounted || Supabase.instance.client.auth.currentUser == null) return;
+      setState(_bindNotificationStream);
+    }
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+    );
   }
 
   Future<void> _openCategories() async {
@@ -237,10 +259,45 @@ class _HomeScreenState extends State<HomeScreen> {
                         onPressed: _openProfile,
                         icon: const Icon(Icons.person_outline_rounded, size: 27),
                       ),
-                      IconButton(
-                        tooltip: 'الإشعارات',
-                        onPressed: () => _showComingSoon('الإشعارات'),
-                        icon: const Icon(Icons.notifications_none_rounded, size: 27),
+                      StreamBuilder<List<Map<String, dynamic>>>(
+                        stream: _notificationStream,
+                        builder: (context, snapshot) {
+                          final unread = (snapshot.data ?? [])
+                              .where((item) => item['is_read'] != true)
+                              .length;
+                          return IconButton(
+                            tooltip: 'الإشعارات',
+                            onPressed: _openNotifications,
+                            icon: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                const Icon(Icons.notifications_none_rounded, size: 27),
+                                if (unread > 0)
+                                  Positioned(
+                                    top: -5,
+                                    right: -7,
+                                    child: Container(
+                                      constraints: const BoxConstraints(minWidth: 17, minHeight: 17),
+                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        unread > 99 ? '99+' : '$unread',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
