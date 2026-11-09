@@ -484,5 +484,6 @@
   "privacySecurityTitle": "8. Data protection",
   "privacySecurityBody": "Access controls and permissions are intended to limit unnecessary access and help protect accounts and the service. No internet service can guarantee absolute security. Keep your login details and verification codes confidential and report unusual activity.",
   "privacyChangesTitle": "9. Changes to this privacy policy",
-  "privacyChangesBody": "This policy may be updated when app features or data practices change. The latest version will be displayed in the app. The responsible entity's details and contact channels must be completed, and this policy must be reviewed by legal counsel before public launch."
+  "privacyChangesBody": "This policy may be updated when app features or data practices change. The latest version will be displayed in the app. The responsible entity's details and contact channels must be completed, and this policy must be reviewed by legal counsel before public launch.",
+  "privacyDraftNotice": "This is an initial draft based on the current service design, not a final legal notice. The responsible entity and contact details must be added, and the text must receive legal review before public launch."
 }
