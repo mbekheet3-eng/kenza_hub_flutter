@@ -61,6 +61,21 @@ class MarketplaceService {
     return Future.wait(rows.map(_mapProduct));
   }
 
+  Future<List<Product>> getProductsByIds(List<String> productIds) async {
+    if (productIds.isEmpty) return [];
+
+    final rows = await _client
+        .from('products')
+        .select(
+          'id,owner_id,category_id,title,description,price,currency,created_at,product_images(id,storage_path,sort_order)',
+        )
+        .inFilter('id', productIds)
+        .eq('status', 'published')
+        .order('created_at', ascending: false);
+
+    return Future.wait(rows.map(_mapProduct));
+  }
+
   Future<Product> getProduct(String productId) async {
     final row = await _client
         .from('products')
