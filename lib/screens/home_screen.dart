@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/category.dart';
 import '../models/product.dart';
 import '../services/marketplace_service.dart';
+import '../services/favorites_service.dart';
 import '../widgets/product_card.dart';
 import 'login_screen.dart';
 import 'product_detail_screen.dart';
@@ -23,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final _search = TextEditingController();
   List<Category> _categories = [];
   List<Product> _products = [];
+  Set<String> _favoriteIds = {};
   String? _categoryId;
   bool _loading = true;
   String? _error;
@@ -60,15 +62,66 @@ class _HomeScreenState extends State<HomeScreen> {
         categoryId: _categoryId,
         query: _search.text,
       );
+      var favoriteIds = <String>{};
+      if (Supabase.instance.client.auth.currentUser != null) {
+        try {
+          favoriteIds = await FavoritesService().getFavoriteProductIds();
+        } catch (_) {
+          // Product discovery should remain available if favorites cannot load.
+        }
+      }
       if (!mounted) return;
       setState(() {
         _categories = categories;
         _products = products;
+        _favoriteIds = favoriteIds;
       });
     } catch (error) {
       if (mounted) setState(() => _error = error.toString());
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _toggleFavorite(Product product) async {
+    var user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      await Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+      if (!mounted) return;
+      user = Supabase.instance.client.auth.currentUser;
+      if (user == null) return;
+    }
+
+    final wasFavorite = _favoriteIds.contains(product.id);
+    try {
+      final favorites = FavoritesService();
+      if (wasFavorite) {
+        await favorites.removeFavorite(product.id);
+      } else {
+        await favorites.addFavorite(product.id);
+      }
+      if (!mounted) return;
+      setState(() {
+        if (wasFavorite) {
+          _favoriteIds.remove(product.id);
+        } else {
+          _favoriteIds.add(product.id);
+        }
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(wasFavorite
+              ? 'تمت إزالة المنتج من المفضلة'
+              : 'تمت إضافة المنتج للمفضلة'),
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('تعذر تحديث المفضلة: $error')),
+      );
     }
   }
 
@@ -320,6 +373,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         final product = _products[index];
                         return ProductCard(
                           product: product,
+                          isFavorite: _favoriteIds.contains(product.id),
+                          onFavoriteTap: () => _toggleFavorite(product),
                           onTap: () async {
                             await Navigator.of(context).push(
                               MaterialPageRoute(
