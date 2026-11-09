@@ -1,0 +1,136 @@
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../models/product.dart';
+import '../services/favorites_service.dart';
+import '../services/marketplace_service.dart';
+import '../widgets/product_card.dart';
+import 'product_detail_screen.dart';
+
+class FavoritesScreen extends StatefulWidget {
+  const FavoritesScreen({super.key});
+
+  @override
+  State<FavoritesScreen> createState() => _FavoritesScreenState();
+}
+
+class _FavoritesScreenState extends State<FavoritesScreen> {
+  final _favorites = FavoritesService();
+  final _marketplace = MarketplaceService();
+  List<Product> _products = [];
+  bool _loading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final ids = await _favorites.getFavoriteProductIds();
+      final products = ids.isEmpty
+          ? <Product>[]
+          : await _marketplace.getProductsByIds(ids.toList());
+      if (!mounted) return;
+      setState(() => _products = products);
+    } catch (error) {
+      if (mounted) setState(() => _error = error.toString());
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _remove(Product product) async {
+    try {
+      await _favorites.removeFavorite(product.id);
+      if (!mounted) return;
+      setState(() => _products.removeWhere((item) => item.id == product.id));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تمت إزالة المنتج من المفضلة')),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('تعذرت إزالة المنتج: $error')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('المفضلة')),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('تعذر تحميل المفضلة'),
+                        const SizedBox(height: 8),
+                        Text(_error!, textAlign: TextAlign.center),
+                        const SizedBox(height: 12),
+                        FilledButton(
+                          onPressed: _load,
+                          child: const Text('إعادة المحاولة'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : _products.isEmpty
+                  ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.favorite_border_rounded, size: 56),
+                            SizedBox(height: 12),
+                            Text('لم تضف أي منتجات للمفضلة بعد'),
+                            SizedBox(height: 6),
+                            Text('اضغط على القلب في صورة أي منتج لحفظه هنا'),
+                            ],
+                        ),
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _load,
+                      child: GridView.builder(
+                        padding: const EdgeInsets.all(12),
+                        itemCount: _products.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 0.68,
+                        ),
+                        itemBuilder: (context, index) {
+                          final product = _products[index];
+                          return ProductCard(
+                            product: product,
+                            isFavorite: true,
+                            onFavoriteTap: () => _remove(product),
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    ProductDetailScreen(productId: product.id),
+                              ),
+                            ).then((_) => _load()),
+                          );
+                        },
+                      ),
+                    ),
+    );
+  }
+}
