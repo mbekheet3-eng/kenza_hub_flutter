@@ -145,6 +145,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const Divider(height: 28),
                       ListTile(
+                        leading: const Icon(Icons.favorite_border_rounded),
+                        title: const Text('المفضلة'),
+                        trailing: const Icon(Icons.chevron_left),
+                        onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('قسم المفضلة قريبًا')),
+                        ),
+                      ),
+                      ListTile(
                         leading: const Icon(Icons.lock_reset_outlined),
                         title: const Text('تغيير كلمة المرور'),
                         trailing: const Icon(Icons.chevron_left),
