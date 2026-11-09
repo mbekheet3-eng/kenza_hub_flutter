@@ -484,5 +484,6 @@
   "privacySecurityTitle": "8. Protection des données",
   "privacySecurityBody": "Des contrôles d’accès et des autorisations visent à limiter les accès inutiles et à protéger les comptes et le service. Aucun service en ligne ne peut garantir une sécurité absolue. Gardez vos identifiants et codes de vérification confidentiels et signalez toute activité inhabituelle.",
   "privacyChangesTitle": "9. Modifications de la politique",
-  "privacyChangesBody": "Cette politique peut être mise à jour lorsque les fonctions de l’application ou les pratiques de traitement changent. La version la plus récente sera affichée dans l’application. Les coordonnées de l’entité responsable doivent être complétées et cette politique doit être examinée par un juriste avant le lancement public."
+  "privacyChangesBody": "Cette politique peut être mise à jour lorsque les fonctions de l’application ou les pratiques de traitement changent. La version la plus récente sera affichée dans l’application. Les coordonnées de l’entité responsable doivent être complétées et cette politique doit être examinée par un juriste avant le lancement public.",
+  "privacyDraftNotice": "Ce document est un premier projet fondé sur la conception actuelle du service, et non un avis juridique définitif. L’entité responsable et ses coordonnées doivent être ajoutées, puis le texte doit être examiné par un juriste avant le lancement public."
 }
