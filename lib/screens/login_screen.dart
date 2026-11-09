@@ -28,7 +28,9 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _busy = true);
     try {
       await action();
-      if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
+      // Close only the login route. Callers (e.g. the sell flow) must remain
+      // mounted so they can continue after authentication succeeds.
+      if (mounted) Navigator.of(context).pop();
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
