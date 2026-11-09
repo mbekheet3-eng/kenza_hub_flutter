@@ -11,6 +11,7 @@ import 'policies_screen.dart';
 import 'password_recovery_screen.dart';
 import 'messages_inbox_screen.dart';
 import 'favorites_screen.dart';
+import 'notifications_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -149,6 +150,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       const Divider(height: 28),
+                      ListTile(
+                        leading: const Icon(Icons.notifications_none_rounded),
+                        title: const Text('الإشعارات'),
+                        subtitle: const Text('تنبيهات الرسائل والعروض وطلبات الشراء'),
+                        trailing: const Icon(Icons.chevron_left),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+                        ),
+                      ),
                       ListTile(
                         leading: const Icon(Icons.mail_outline_rounded),
                         title: const Text('الرسائل والعروض وطلبات الشراء'),
