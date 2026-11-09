@@ -10,6 +10,7 @@ import 'about_kenza_screen.dart';
 import 'policies_screen.dart';
 import 'password_recovery_screen.dart';
 import 'messages_inbox_screen.dart';
+import 'favorites_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -161,8 +162,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         leading: const Icon(Icons.favorite_border_rounded),
                         title: const Text('المفضلة'),
                         trailing: const Icon(Icons.chevron_left),
-                        onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('قسم المفضلة قريبًا')),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const FavoritesScreen()),
                         ),
                       ),
                       ListTile(
