@@ -90,9 +90,5 @@ class MarketplaceTransactionService {
       'sender_id': _userId,
       'body': text,
     });
-    await _client
-        .from('conversations')
-        .update({'last_message_at': DateTime.now().toUtc().toIso8601String()})
-        .eq('id', conversationId);
   }
 }
