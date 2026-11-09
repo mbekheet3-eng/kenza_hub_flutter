@@ -4,6 +4,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/product.dart';
 import '../services/marketplace_service.dart';
 import 'product_form_screen.dart';
+import 'conversation_screen.dart';
+import '../services/marketplace_transaction_service.dart';
+import 'login_screen.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({super.key, required this.productId});
@@ -16,6 +19,7 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final _service = MarketplaceService();
+  final _transactionService = MarketplaceTransactionService();
   late Future<Product> _product;
 
   @override
@@ -60,6 +64,138 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('تعذر حذف المنتج: $error')),
+        );
+      }
+    }
+  }
+
+
+  Future<bool> _ensureLogin() async {
+    if (Supabase.instance.client.auth.currentUser != null) return true;
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+    );
+    return mounted && Supabase.instance.client.auth.currentUser != null;
+  }
+
+  Future<void> _buy(Product product) async {
+    if (!await _ensureLogin()) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('تأكيد طلب الشراء'),
+        content: Text('سيتم إرسال طلب للبائع بالسعر الحالي ${product.price.toStringAsFixed(2)} ج.م. لا يوجد دفع إلكتروني الآن.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('رجوع')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('إرسال الطلب')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await _transactionService.createOrder(
+        productId: product.id,
+        sellerId: product.ownerId,
+        price: product.price,
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم إرسال طلبك للبائع، وفي انتظار موافقته')),
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('تعذر إرسال الطلب: $error')),
+        );
+      }
+    }
+  }
+
+  Future<void> _makeOffer(Product product) async {
+    if (!await _ensureLogin()) return;
+    final priceController = TextEditingController(text: product.price.toStringAsFixed(2));
+    final noteController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('تقديم عرض سعر'),
+        content: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: priceController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(labelText: 'السعر المقترح بالجنيه'),
+                validator: (value) {
+                  final price = double.tryParse((value ?? '').trim());
+                  return price == null || price <= 0 ? 'أدخل سعرًا صحيحًا' : null;
+                },
+              ),
+              TextField(
+                controller: noteController,
+                maxLines: 2,
+                decoration: const InputDecoration(labelText: 'رسالة للبائع (اختياري)'),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('إلغاء')),
+          FilledButton(
+            onPressed: () {
+              if (formKey.currentState!.validate()) Navigator.pop(ctx, true);
+            },
+            child: const Text('إرسال العرض'),
+          ),
+        ],
+      ),
+    );
+    if (result == true) {
+      try {
+        await _transactionService.createOffer(
+          productId: product.id,
+          sellerId: product.ownerId,
+          offeredPrice: double.parse(priceController.text.trim()),
+          message: noteController.text,
+        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('تم إرسال عرض السعر للبائع')),
+          );
+        }
+      } catch (error) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('تعذر إرسال العرض: $error')),
+          );
+        }
+      }
+    }
+    priceController.dispose();
+    noteController.dispose();
+  }
+
+  Future<void> _contactSeller(Product product) async {
+    if (!await _ensureLogin()) return;
+    try {
+      final conversationId = await _transactionService.getOrCreateConversation(
+        productId: product.id,
+        sellerId: product.ownerId,
+      );
+      if (!mounted) return;
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ConversationScreen(conversationId: conversationId),
+        ),
+      );
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('تعذر فتح المحادثة: $error')),
         );
       }
     }
@@ -136,6 +272,38 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       'تاريخ النشر: ${MaterialLocalizations.of(context).formatMediumDate(product.createdAt.toLocal())}',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
+
+                    if (!isOwner) ...[
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          onPressed: () => _buy(product),
+                          icon: const Icon(Icons.shopping_bag_outlined),
+                          label: const Text('شراء الآن'),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () => _makeOffer(product),
+                              icon: const Icon(Icons.local_offer_outlined),
+                              label: const Text('تقديم عرض'),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () => _contactSeller(product),
+                              icon: const Icon(Icons.chat_bubble_outline),
+                              label: const Text('التواصل مع البائع'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     if (isOwner) ...[
                       const SizedBox(height: 24),
                       Row(
