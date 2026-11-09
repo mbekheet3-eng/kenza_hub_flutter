@@ -87,6 +87,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     controller.dispose();
     if (name == null || name.isEmpty || _user == null) return;
     try {
+      // Keep the Auth metadata (used by the home greeting) and profile row
+      // (used by the account screen) in sync.
+      await _auth.updateDisplayName(name);
       await Supabase.instance.client
           .from('profiles')
           .update({'display_name': name})
