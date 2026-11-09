@@ -6,6 +6,9 @@ import '../l10n/app_strings.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
 import 'signup_screen.dart';
+import 'about_kenza_screen.dart';
+import 'policies_screen.dart';
+import 'privacy_policy_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -360,14 +363,26 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         const SizedBox(height: 4),
                         const Divider(color: Color(0xFFE2E8F0), height: 1),
                         const SizedBox(height: 14),
-                        const Text(
-                          'من نحن  •  الشروط والأحكام  •  سياسة الخصوصية',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF64748B),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 2,
+                          children: [
+                            TextButton(
+                              onPressed: () => _open(const AboutKenzaScreen()),
+                              child: Text(strings.aboutTitle),
+                            ),
+                            const Text('•', style: TextStyle(color: Color(0xFF94A3B8))),
+                            TextButton(
+                              onPressed: () => _open(const PoliciesScreen()),
+                              child: Text(strings.policiesTitle),
+                            ),
+                            const Text('•', style: TextStyle(color: Color(0xFF94A3B8))),
+                            TextButton(
+                              onPressed: () => _open(const PrivacyPolicyScreen()),
+                              child: Text(strings.privacyPolicy),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 10),
                         const Text(
