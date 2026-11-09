@@ -1,0 +1,136 @@
+name: Prepare Flutter platforms
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out implementation branch
+        uses: actions/checkout@v4
+        with:
+          ref: phase-1/implementation
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Generate Android and iOS scaffolding
+        run: flutter create . --platforms=android,ios --org com.kenza
+
+      - name: Configure Kenza Hub application identifiers and OAuth callbacks
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import plistlib
+          import re
+
+          manifest = Path("android/app/src/main/AndroidManifest.xml")
+          text = manifest.read_text()
+          permission = '<uses-permission android:name="android.permission.INTERNET" />'
+          if permission not in text:
+              manifest_start = text.find("<manifest")
+              manifest_end = text.find(">", manifest_start)
+              if manifest_start < 0 or manifest_end < 0:
+                  raise SystemExit("Could not locate Android manifest root.")
+              text = text[:manifest_end + 1] + "\n    " + permission + text[manifest_end + 1:]
+          launcher = '''<category android:name="android.intent.category.LAUNCHER" />'''
+          callback = '''
+                      <!-- Supabase OAuth callback -->
+                      <intent-filter>
+                          <action android:name="android.intent.action.VIEW" />
+                          <category android:name="android.intent.category.DEFAULT" />
+                          <category android:name="android.intent.category.BROWSABLE" />
+                          <data android:scheme="com.kenza.hub" android:host="login-callback" />
+                      </intent-filter>'''
+          if "com.kenza.hub" not in text:
+              if launcher not in text:
+                  raise SystemExit("Could not find Android launcher category to add OAuth callback.")
+              text = text.replace(launcher, launcher + callback, 1)
+          text = re.sub(r'android:label="[^"]+"', 'android:label="كنزة هب"', text, count=1)
+          manifest.write_text(text)
+
+          gradle_files = list(Path("android/app").glob("build.gradle*"))
+          if not gradle_files:
+              raise SystemExit("Android app Gradle file was not generated.")
+          gradle = gradle_files[0]
+          gtext = gradle.read_text()
+          if "applicationId" not in gtext:
+              raise SystemExit("Could not find applicationId in Android Gradle file.")
+          gtext = re.sub(r'applicationId\s*[= ]\s*["\'][^"\']+["\']',
+                         'applicationId = "com.kenza.hub"', gtext, count=1)
+          gtext = re.sub(r'namespace\s*[= ]\s*["\'][^"\']+["\']',
+                         'namespace = "com.kenza.hub"', gtext, count=1)
+
+          # Configure release signing from GitHub Actions environment secrets.
+          if gradle.suffix == ".kts":
+              signing = """
+              signingConfigs {
+                  create("release") {
+                      storeFile = file("upload-keystore.jks")
+                      storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: ""
+                      keyAlias = System.getenv("ANDROID_KEY_ALIAS") ?: ""
+                      keyPassword = System.getenv("ANDROID_KEY_PASSWORD") ?: ""
+                  }
+              }
+              """
+              release_config = 'signingConfig = signingConfigs.getByName("release")'
+              gtext = gtext.replace("    buildTypes {", signing + "\n    buildTypes {", 1)
+              gtext = gtext.replace('        release {', '        release {\n            ' + release_config, 1)
+          else:
+              signing = """
+              signingConfigs {
+                  release {
+                      storeFile = file("upload-keystore.jks")
+                      storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: ""
+                      keyAlias = System.getenv("ANDROID_KEY_ALIAS") ?: ""
+                      keyPassword = System.getenv("ANDROID_KEY_PASSWORD") ?: ""
+                  }
+              }
+              """
+              gtext = gtext.replace("    buildTypes {", signing + "\n    buildTypes {", 1)
+              gtext = gtext.replace('        release {', '        release {\n            signingConfig = signingConfigs.release', 1)
+          gradle.write_text(gtext)
+
+          info = Path("ios/Runner/Info.plist")
+          with info.open("rb") as f:
+              data = plistlib.load(f)
+          data["CFBundleURLTypes"] = [{
+              "CFBundleURLName": "com.kenza.hub",
+              "CFBundleURLSchemes": ["com.kenza.hub"],
+          }]
+          data["NSPhotoLibraryUsageDescription"] = "نحتاج الوصول إلى الصور لاختيار صور المنتجات التي تريد نشرها."
+          data["NSCameraUsageDescription"] = "نحتاج استخدام الكاميرا لالتقاط صور المنتجات التي تريد نشرها."
+          with info.open("wb") as f:
+              plistlib.dump(data, f)
+
+          pbx = Path("ios/Runner.xcodeproj/project.pbxproj")
+          ptext = pbx.read_text()
+          ptext = re.sub(r'PRODUCT_BUNDLE_IDENTIFIER = [^;]+;',
+                         'PRODUCT_BUNDLE_IDENTIFIER = com.kenza.hub;', ptext)
+          pbx.write_text(ptext)
+          PY
+
+      - name: Resolve Flutter packages
+        run: flutter pub get
+
+      - name: Save generated platform files to implementation branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add android ios pubspec.lock
+          if git diff --cached --quiet; then
+            echo "No platform changes to commit."
+          else
+            git commit -m "chore: generate Android and iOS platform scaffolding"
+            git push origin HEAD:phase-1/implementation
+          fi
+
+      - name: Analyze Flutter source
+        run: flutter analyze
