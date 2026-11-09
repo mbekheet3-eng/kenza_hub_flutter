@@ -83,8 +83,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   String _date(dynamic value) {
     final date = value is String ? DateTime.tryParse(value)?.toLocal() : null;
     if (date == null) return '';
-    return '\${date.day}/\${date.month}/\${date.year} - '
-        '\${date.hour.toString().padLeft(2, '0')}:\${date.minute.toString().padLeft(2, '0')}';
+    return '${date.day}/${date.month}/${date.year} - '
+        '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -106,7 +106,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text('تعذر تحميل الإشعارات: \${snapshot.error}'),
+                child: Text('تعذر تحميل الإشعارات: ${snapshot.error}'),
               ),
             );
           }
@@ -149,7 +149,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   style: TextStyle(fontWeight: unread ? FontWeight.w800 : FontWeight.w500),
                 ),
                 subtitle: Text(
-                  '\${row['body'] ?? ''}\\n\${_date(row['created_at'])}',
+                  "${row['body'] ?? ''}\n${_date(row['created_at'])}",
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
