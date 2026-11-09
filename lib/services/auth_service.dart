@@ -57,5 +57,11 @@ class AuthService {
     await _client.auth.updateUser(UserAttributes(password: password));
   }
 
+  Future<void> updateDisplayName(String displayName) async {
+    await _client.auth.updateUser(
+      UserAttributes(data: {'display_name': displayName.trim()}),
+    );
+  }
+
   Future<void> signOut() => _client.auth.signOut();
 }
