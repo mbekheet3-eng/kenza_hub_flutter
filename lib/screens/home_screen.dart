@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return metadataName.split(RegExp(r'\\s+')).first;
     }
     final emailName = user?.email?.split('@').first;
-    return emailName == null || emailName.isEmpty ? 'بك' : emailName;
+    return emailName == null || emailName.isEmpty ? AppStrings.of(context)!.greetingFallback : emailName;
   }
 
   @override
@@ -124,14 +124,14 @@ class _HomeScreenState extends State<HomeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(wasFavorite
-              ? 'تمت إزالة المنتج من المفضلة'
-              : 'تمت إضافة المنتج للمفضلة'),
+              ? AppStrings.of(context)!.favoriteRemoved
+              : AppStrings.of(context)!.favoriteAddedToast),
         ),
       );
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تعذر تحديث المفضلة: $error')),
+        SnackBar(content: Text(AppStrings.of(context)!.favoriteUpdateError)),
       );
     }
   }
@@ -227,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$feature قريبًا')),
+      SnackBar(content: Text(AppStrings.of(context)!.featureComingSoon)),
     );
   }
 
@@ -252,13 +252,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'أهلاً',
+                              AppStrings.of(context)!.welcomeGreeting,
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: colors.onSurfaceVariant,
                                   ),
                             ),
                             Text(
-                              user == null ? 'بك في كنزة هب' : _firstName,
+                              user == null ? AppStrings.of(context)!.welcomeGuest : _firstName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -380,14 +380,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          'أحدث المنتجات',
+                          AppStrings.of(context)!.latestProducts,
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w800,
                               ),
                         ),
                       ),
                       Text(
-                        'تسوّق واكتشف',
+                        AppStrings.of(context)!.discoverAndShop,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: colors.onSurfaceVariant,
                             ),
@@ -412,9 +412,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           const Icon(Icons.cloud_off_outlined, size: 42),
                           const SizedBox(height: 12),
-                          const Text('تعذر تحميل المنتجات'),
+                          Text(AppStrings.of(context)!.homeProductsLoadError),
                           const SizedBox(height: 8),
-                          Text(_error!, textAlign: TextAlign.center),
+                          Text(AppStrings.of(context)!.homeProductsLoadError, textAlign: TextAlign.center),
                           const SizedBox(height: 12),
                           FilledButton(
                             onPressed: _load,

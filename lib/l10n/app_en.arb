@@ -582,5 +582,9 @@
   "applyPriceFilter": "Apply",
   "sortByLabel": "Sort by",
   "priceFilterEnabled": "Price filter on",
-  "priceFilterLabel": "Price"
+  "priceFilterLabel": "Price",
+  "greetingFallback": "there",
+  "welcomeGuest": "Welcome to Kenza Hub",
+  "featureComingSoon": "This feature is coming soon.",
+  "discoverAndShop": "Shop and discover"
 }

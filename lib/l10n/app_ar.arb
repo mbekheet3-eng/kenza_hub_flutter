@@ -582,5 +582,9 @@
   "applyPriceFilter": "تطبيق",
   "sortByLabel": "ترتيب حسب",
   "priceFilterEnabled": "السعر مفعّل",
-  "priceFilterLabel": "السعر"
+  "priceFilterLabel": "السعر",
+  "greetingFallback": "بك",
+  "welcomeGuest": "بك في كنزة هب",
+  "featureComingSoon": "هذه الميزة قيد التجهيز.",
+  "discoverAndShop": "تسوّق واكتشف"
 }
