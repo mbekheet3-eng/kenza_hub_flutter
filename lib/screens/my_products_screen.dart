@@ -59,7 +59,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
       body: RefreshIndicator(
         onRefresh: _load,
         child: _loading
-            ? const ListView(
+            ? ListView(
                 physics: AlwaysScrollableScrollPhysics(),
                 children: [
                   SizedBox(height: 220),
