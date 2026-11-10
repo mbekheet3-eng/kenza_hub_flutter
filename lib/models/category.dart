@@ -21,17 +21,13 @@ class Category {
 
   bool get isRoot => parentId == null;
 
-  String nameFor(String languageCode) {
-    switch (languageCode) {
-      case 'ar':
-        return nameAr;
-      case 'fr':
-        return CategoryLabels.french(slug, nameEn) ?? nameFr;
-      case 'en':
-      default:
-        return nameEn;
-    }
-  }
+  String nameFor(String languageCode) => CategoryLabels.name(
+        slug,
+        languageCode,
+        nameAr,
+        nameEn,
+        nameFr,
+      );
 
   factory Category.fromMap(Map<String, dynamic> map) => Category(
         id: map['id'] as String,
