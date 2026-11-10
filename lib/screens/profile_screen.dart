@@ -47,6 +47,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         _profile = profile;
       });
+    } catch (_) {
+      // Keep the account menu usable if profile data cannot be refreshed.
     } finally {
       if (mounted) setState(() => _loading = false);
     }
