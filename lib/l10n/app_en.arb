@@ -575,5 +575,12 @@
   "actionTooltipLabel": "Action",
   "offersTab": "Offers",
   "purchaseOrdersTab": "Purchase orders",
-  "messagesTab": "Messages"
+  "messagesTab": "Messages",
+  "favoriteAddedToast": "Product added to favorites",
+  "priceRangeTitle": "Price range in EGP",
+  "enablePriceFilter": "Enable price filter",
+  "applyPriceFilter": "Apply",
+  "sortByLabel": "Sort by",
+  "priceFilterEnabled": "Price filter on",
+  "priceFilterLabel": "Price"
 }

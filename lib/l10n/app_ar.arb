@@ -575,5 +575,12 @@
   "actionTooltipLabel": "إجراء",
   "offersTab": "العروض",
   "purchaseOrdersTab": "طلبات الشراء",
-  "messagesTab": "الرسائل"
+  "messagesTab": "الرسائل",
+  "favoriteAddedToast": "تمت إضافة المنتج للمفضلة",
+  "priceRangeTitle": "نطاق السعر بالجنيه المصري",
+  "enablePriceFilter": "تفعيل فلتر السعر",
+  "applyPriceFilter": "تطبيق",
+  "sortByLabel": "ترتيب حسب",
+  "priceFilterEnabled": "السعر مفعّل",
+  "priceFilterLabel": "السعر"
 }
