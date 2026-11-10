@@ -40,7 +40,7 @@ The more specialized store/agency sections and additional marketplace features r
 
 ## Category localization contract
 
-`categories.name_ar`, `categories.name_en`, and `categories.name_fr` are required and must not be blank. When adding a category, provide all three translations in the same insert or migration. Do not change `id` or `slug` when translating labels. Flutter uses `Category.nameFor(languageCode)` so all category surfaces can display the selected language consistently.
+`categories.name_ar`, `categories.name_en`, and `categories.name_fr` are required and must not be blank (enforced by database constraints). When adding a category, provide all three translations in the same insert or migration. Do not change `id` or `slug` when translating labels. Flutter uses `Category.nameFor(languageCode)` so all category surfaces can display the selected language consistently.
 
 ## Security
 
@@ -57,5 +57,6 @@ The repository contains the migration files corresponding to the deployed databa
 - `20261108190009_create_private_product_images_storage.sql`
 - `20261108191509_create_profile_on_signup_and_seed_core_categories.sql`
 - `20261110010000_add_french_category_names.sql`
+- `20261110011000_require_all_category_translations.sql`
 
 The first four files are a source-controlled reconstruction of the verified deployed schema and policies. Before using them to provision another project, replay them against a clean disposable Supabase project and compare the resulting schema, RLS policies, grants, and Storage policies with this contract.
