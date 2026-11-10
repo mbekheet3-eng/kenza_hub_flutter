@@ -8,6 +8,9 @@ on:
     paths:
       - pubspec.yaml
       - .github/workflows/resolve-flutter-dependencies.yml
+      - lib/**/*.dart
+      - android/**/*.gradle.kts
+      - android/app/src/main/AndroidManifest.xml
 
 permissions:
   contents: write
