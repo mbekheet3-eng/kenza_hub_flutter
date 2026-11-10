@@ -630,5 +630,7 @@
   "passwordMismatchOrTooShort": "Vérifiez que les deux mots de passe correspondent et comportent au moins 8 caractères",
   "passwordUpdateFailed": "Impossible de mettre à jour le mot de passe. Veuillez réessayer.",
   "brandName": "Kenza Hub",
-  "missingConfigurationMessage": "La connexion au serveur doit être configurée avant le démarrage de l’application. Vérifiez sa configuration."
+  "missingConfigurationMessage": "La connexion au serveur doit être configurée avant le démarrage de l’application. Vérifiez sa configuration.",
+  "addFavoriteTooltip": "Ajouter aux favoris",
+  "removeFavoriteTooltip": "Retirer des favoris"
 }

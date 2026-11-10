@@ -630,5 +630,7 @@
   "passwordMismatchOrTooShort": "Make sure both passwords match and contain at least 8 characters",
   "passwordUpdateFailed": "Could not update the password. Please try again.",
   "brandName": "Kenza Hub",
-  "missingConfigurationMessage": "The app's server connection must be configured before it can start. Please check the app configuration."
+  "missingConfigurationMessage": "The app's server connection must be configured before it can start. Please check the app configuration.",
+  "addFavoriteTooltip": "Add to favorites",
+  "removeFavoriteTooltip": "Remove from favorites"
 }

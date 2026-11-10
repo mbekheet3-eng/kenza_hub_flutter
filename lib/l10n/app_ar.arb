@@ -630,5 +630,7 @@
   "passwordMismatchOrTooShort": "تأكد من تطابق كلمتي المرور وأنهما 8 أحرف على الأقل",
   "passwordUpdateFailed": "تعذر تحديث كلمة المرور. حاول مرة أخرى.",
   "brandName": "كنزة هب",
-  "missingConfigurationMessage": "يلزم إعداد اتصال التطبيق بالخادم قبل تشغيله. يرجى مراجعة إعدادات التطبيق."
+  "missingConfigurationMessage": "يلزم إعداد اتصال التطبيق بالخادم قبل تشغيله. يرجى مراجعة إعدادات التطبيق.",
+  "addFavoriteTooltip": "إضافة للمفضلة",
+  "removeFavoriteTooltip": "إزالة من المفضلة"
 }
