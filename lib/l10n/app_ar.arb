@@ -542,5 +542,8 @@
   "gallery": "المعرض",
   "camera": "الكاميرا",
   "productPhotos": "صور المنتج (حتى 8 صور)",
-  "languageChange": "تغيير اللغة"
+  "languageChange": "تغيير اللغة",
+  "messageSentRefreshFailedPrefix": "تم إرسال الرسالة، لكن تعذر تحديث المحادثة",
+  "sendMessageFailedPrefix": "تعذر إرسال الرسالة",
+  "conversationLoadFailedPrefix": "تعذر تحميل المحادثة"
 }

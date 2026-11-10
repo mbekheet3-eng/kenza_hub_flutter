@@ -57,7 +57,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'تم إرسال الرسالة، لكن تعذر تحديث المحادثة: $error',
+                '${AppStrings.of(context)!.messageSentRefreshFailedPrefix}: $error',
               ),
             ),
           );
@@ -66,7 +66,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذر إرسال الرسالة: $error')),
+          SnackBar(content: Text('${AppStrings.of(context)!.sendMessageFailedPrefix}: $error')),
         );
       }
     } finally {
@@ -91,7 +91,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 }
                 if (snapshot.hasError) {
                   return Center(
-                    child: Text('تعذر تحميل المحادثة: ${snapshot.error}'),
+                    child: Text('${AppStrings.of(context)!.conversationLoadFailedPrefix}: ${snapshot.error}'),
                   );
                 }
                 final rows = snapshot.data ?? [];
@@ -148,7 +148,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       maxLines: 4,
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => _send(),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: AppStrings.of(context)!.messageHint,
                       ),
                     ),

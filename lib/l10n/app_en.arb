@@ -542,5 +542,8 @@
   "gallery": "Gallery",
   "camera": "Camera",
   "productPhotos": "Product photos (up to 8)",
-  "languageChange": "Change language"
+  "languageChange": "Change language",
+  "messageSentRefreshFailedPrefix": "Message sent, but the conversation could not be refreshed",
+  "sendMessageFailedPrefix": "Could not send the message",
+  "conversationLoadFailedPrefix": "Could not load the conversation"
 }
