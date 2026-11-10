@@ -51,7 +51,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       if (!mounted) return;
       setState(() => _products.removeWhere((item) => item.id == product.id));
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppStrings.of(context)!.favoriteRemoved)),
+        SnackBar(content: Text(AppStrings.of(context)!.favoriteRemoved)),
       );
     } catch (error) {
       if (!mounted) return;
@@ -64,9 +64,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.of(context)!.favoritesTitle)),
+      appBar: AppBar(title: Text(AppStrings.of(context)!.favoritesTitle)),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(
                   child: Padding(
@@ -80,14 +80,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         const SizedBox(height: 12),
                         FilledButton(
                           onPressed: _load,
-                          child: const Text(AppStrings.of(context)!.retryAction),
+                          child: Text(AppStrings.of(context)!.retryAction),
                         ),
                       ],
                     ),
                   ),
                 )
               : _products.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Padding(
                         padding: EdgeInsets.all(24),
                         child: Column(

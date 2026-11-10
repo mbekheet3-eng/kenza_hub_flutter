@@ -47,11 +47,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text(AppStrings.of(context)!.cancelLabel),
+            child: Text(AppStrings.of(context)!.cancelLabel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text(AppStrings.of(context)!.deleteLabel),
+            child: Text(AppStrings.of(context)!.deleteLabel),
           ),
         ],
       ),
@@ -102,7 +102,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم إرسال طلبك للبائع، وفي انتظار موافقته')),
+          SnackBar(content: Text('تم إرسال طلبك للبائع، وفي انتظار موافقته')),
         );
       }
     } catch (error) {
@@ -147,7 +147,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text(AppStrings.of(context)!.cancelLabel)),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(AppStrings.of(context)!.cancelLabel)),
           FilledButton(
             onPressed: () {
               if (formKey.currentState!.validate()) Navigator.pop(ctx, true);
@@ -167,7 +167,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('تم إرسال عرض السعر للبائع')),
+            SnackBar(content: Text('تم إرسال عرض السعر للبائع')),
           );
         }
       } catch (error) {
@@ -208,12 +208,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Widget build(BuildContext context) {
     final userId = Supabase.instance.client.auth.currentUser?.id;
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.of(context)!.productDetailsTitle)),
+      appBar: AppBar(title: Text(AppStrings.of(context)!.productDetailsTitle)),
       body: FutureBuilder<Product>(
         future: _product,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError || !snapshot.hasData) {
             return Center(
@@ -239,7 +239,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           (url) => Image.network(
                             url,
                             fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) => const Center(
+                            errorBuilder: (_, __, ___) => Center(
                               child: Icon(Icons.broken_image_outlined, size: 48),
                             ),
                           ),
@@ -283,7 +283,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         child: FilledButton.icon(
                           onPressed: () => _buy(product),
                           icon: const Icon(Icons.shopping_bag_outlined),
-                          label: const Text(AppStrings.of(context)!.buyNowLabel),
+                          label: Text(AppStrings.of(context)!.buyNowLabel),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -293,7 +293,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             child: OutlinedButton.icon(
                               onPressed: () => _makeOffer(product),
                               icon: const Icon(Icons.local_offer_outlined),
-                              label: const Text(AppStrings.of(context)!.offerLabel),
+                              label: Text(AppStrings.of(context)!.offerLabel),
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -301,7 +301,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             child: OutlinedButton.icon(
                               onPressed: () => _contactSeller(product),
                               icon: const Icon(Icons.chat_bubble_outline),
-                              label: const Text(AppStrings.of(context)!.contactSellerLabel),
+                              label: Text(AppStrings.of(context)!.contactSellerLabel),
                             ),
                           ),
                         ],
@@ -315,7 +315,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             child: OutlinedButton.icon(
                               onPressed: () => _edit(product),
                               icon: const Icon(Icons.edit_outlined),
-                              label: const Text(AppStrings.of(context)!.editLabel),
+                              label: Text(AppStrings.of(context)!.editLabel),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -323,7 +323,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             child: FilledButton.tonalIcon(
                               onPressed: _delete,
                               icon: const Icon(Icons.delete_outline),
-                              label: const Text(AppStrings.of(context)!.deleteLabel),
+                              label: Text(AppStrings.of(context)!.deleteLabel),
                             ),
                           ),
                         ],

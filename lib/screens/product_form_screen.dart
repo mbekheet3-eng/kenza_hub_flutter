@@ -90,7 +90,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     if (!mounted || picked == null) return;
     if (_images.length >= MarketplaceService.maxImages) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('الحد الأقصى 8 صور')),
+        SnackBar(content: Text('الحد الأقصى 8 صور')),
       );
       return;
     }
@@ -144,7 +144,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(_isEditing ? 'تعديل المنتج' : 'إضافة منتج')),
       body: _loading && _categories.isEmpty
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator())
           : Form(
               key: _formKey,
               child: ListView(
@@ -202,12 +202,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                         OutlinedButton.icon(
                           onPressed: _saving ? null : _pickGallery,
                           icon: const Icon(Icons.photo_library_outlined),
-                          label: const Text(AppStrings.of(context)!.gallery),
+                          label: Text(AppStrings.of(context)!.gallery),
                         ),
                         OutlinedButton.icon(
                           onPressed: _saving ? null : _pickCamera,
                           icon: const Icon(Icons.camera_alt_outlined),
-                          label: const Text(AppStrings.of(context)!.camera),
+                          label: Text(AppStrings.of(context)!.camera),
                         ),
                       ],
                     ),

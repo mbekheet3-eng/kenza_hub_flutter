@@ -116,7 +116,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
       future: future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
           return ListView(
@@ -124,7 +124,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
             children: [
               const SizedBox(height: 80),
               Center(child: Text('تعذر تحميل البيانات: ${snapshot.error}')),
-              Center(child: TextButton(onPressed: _refresh, child: const Text(AppStrings.of(context)!.retryAction))),
+              Center(child: TextButton(onPressed: _refresh, child: Text(AppStrings.of(context)!.retryAction))),
             ],
           );
         }
@@ -205,7 +205,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppStrings.of(context)!.messagesOrdersTitle),
+        title: Text(AppStrings.of(context)!.messagesOrdersTitle),
         bottom: TabBar(
           controller: _tabs,
           isScrollable: true,

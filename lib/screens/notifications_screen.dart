@@ -92,11 +92,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppStrings.of(context)!.notificationsTitle),
+        title: Text(AppStrings.of(context)!.notificationsTitle),
         actions: [
           TextButton(
             onPressed: _markAllRead,
-            child: const Text(AppStrings.of(context)!.readAll),
+            child: Text(AppStrings.of(context)!.readAll),
           ),
         ],
       ),
@@ -113,11 +113,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           }
           if (snapshot.connectionState == ConnectionState.waiting &&
               !snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator());
           }
           final rows = snapshot.data ?? [];
           if (rows.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
                 padding: EdgeInsets.all(24),
                 child: Column(

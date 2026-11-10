@@ -79,7 +79,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     final myId = Supabase.instance.client.auth.currentUser?.id;
 
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.of(context)!.conversationTitle)),
+      appBar: AppBar(title: Text(AppStrings.of(context)!.conversationTitle)),
       body: Column(
         children: [
           Expanded(
@@ -87,7 +87,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
               future: _messages,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(child: CircularProgressIndicator());
                 }
                 if (snapshot.hasError) {
                   return Center(
@@ -96,7 +96,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 }
                 final rows = snapshot.data ?? [];
                 if (rows.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Text(AppStrings.of(context)!.startConversation),
                   );
                 }

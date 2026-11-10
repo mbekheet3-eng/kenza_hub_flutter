@@ -206,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.grid_view_rounded),
-              title: const Text(AppStrings.of(context)!.allProducts),
+              title: Text(AppStrings.of(context)!.allProducts),
               onTap: () => Navigator.pop(sheetContext, ''),
             ),
             ..._categories.map(
@@ -348,7 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: ChoiceChip(
-                          label: const Text(AppStrings.of(context)!.allLabel),
+                          label: Text(AppStrings.of(context)!.allLabel),
                           selected: _categoryId == null,
                           onSelected: (_) {
                             setState(() => _categoryId = null);
@@ -418,7 +418,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(height: 12),
                           FilledButton(
                             onPressed: _load,
-                            child: const Text(AppStrings.of(context)!.retryAction),
+                            child: Text(AppStrings.of(context)!.retryAction),
                           ),
                         ],
                       ),

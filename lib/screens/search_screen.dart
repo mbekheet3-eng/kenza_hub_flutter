@@ -170,7 +170,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     final products = _visibleProducts;
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.of(context)!.searchTitle)),
+      appBar: AppBar(title: Text(AppStrings.of(context)!.searchTitle)),
       body: Column(
         children: [
           Padding(
@@ -190,7 +190,7 @@ class _SearchScreenState extends State<SearchScreen> {
               Expanded(child: DropdownButtonFormField<String>(
                 initialValue: _sort,
                 decoration: const InputDecoration(labelText: 'ترتيب حسب'),
-                items: const [
+                items: [
                   DropdownMenuItem(value: 'newest', child: Text(AppStrings.of(context)!.newestLabel)),
                   DropdownMenuItem(value: 'price_low', child: Text(AppStrings.of(context)!.priceLowLabel)),
                   DropdownMenuItem(value: 'price_high', child: Text(AppStrings.of(context)!.priceHighLabel)),
@@ -202,16 +202,16 @@ class _SearchScreenState extends State<SearchScreen> {
             ]),
           ),
           Expanded(
-            child: _loading ? const Center(child: CircularProgressIndicator())
+            child: _loading ? Center(child: CircularProgressIndicator())
                 : _error != null ? Center(child: Padding(
                     padding: const EdgeInsets.all(24),
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
                       const Text('تعذر تحميل نتائج البحث'), const SizedBox(height: 8),
                       Text(_error!, textAlign: TextAlign.center), const SizedBox(height: 12),
-                      FilledButton(onPressed: _load, child: const Text(AppStrings.of(context)!.retryAction)),
+                      FilledButton(onPressed: _load, child: Text(AppStrings.of(context)!.retryAction)),
                     ]),
                   ))
-                : products.isEmpty ? const Center(child: Text(AppStrings.of(context)!.noResults))
+                : products.isEmpty ? Center(child: Text(AppStrings.of(context)!.noResults))
                 : GridView.builder(
                     padding: const EdgeInsets.all(12), itemCount: products.length,
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

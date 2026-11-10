@@ -26,7 +26,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
   Future<void> _save() async {
     if (_password.text.length < 8 || _password.text != _confirm.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تأكد من تطابق كلمتي المرور وأنهما 8 أحرف على الأقل')),
+        SnackBar(content: Text('تأكد من تطابق كلمتي المرور وأنهما 8 أحرف على الأقل')),
       );
       return;
     }
@@ -36,7 +36,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
       await _auth.updatePassword(_password.text);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم تحديث كلمة المرور')),
+          SnackBar(content: Text('تم تحديث كلمة المرور')),
         );
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
@@ -54,11 +54,11 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.of(context)!.accountPasswordTitle)),
+      appBar: AppBar(title: Text(AppStrings.of(context)!.accountPasswordTitle)),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          const Text(AppStrings.of(context)!.passwordIntro),
+          Text(AppStrings.of(context)!.passwordIntro),
           const SizedBox(height: 18),
           TextField(
             controller: _password,
@@ -76,7 +76,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
             onPressed: _busy ? null : _save,
             child: _busy
                 ? const CircularProgressIndicator()
-                : const Text(AppStrings.of(context)!.savePassword),
+                : Text(AppStrings.of(context)!.savePassword),
           ),
         ],
       ),

@@ -79,11 +79,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text(AppStrings.of(context)!.cancelLabel),
+            child: Text(AppStrings.of(context)!.cancelLabel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, controller.text.trim()),
-            child: const Text(AppStrings.of(context)!.saveChanges),
+            child: Text(AppStrings.of(context)!.saveChanges),
           ),
         ],
       ),
@@ -118,7 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = _user;
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppStrings.of(context)!.profileTitle),
+        title: Text(AppStrings.of(context)!.profileTitle),
         actions: [
           IconButton(
             onPressed: _signOut,
@@ -128,9 +128,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       body: user == null
-          ? const Center(child: Text('سجّل الدخول لعرض حسابك'))
+          ? Center(child: Text('سجّل الدخول لعرض حسابك'))
           : _loading
-              ? const Center(child: CircularProgressIndicator())
+              ? Center(child: CircularProgressIndicator())
               : RefreshIndicator(
                   onRefresh: _load,
                   child: ListView(
