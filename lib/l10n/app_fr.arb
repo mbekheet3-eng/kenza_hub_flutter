@@ -545,5 +545,6 @@
   "languageChange": "Changer de langue",
   "messageSentRefreshFailedPrefix": "Message envoyé, mais la conversation n’a pas pu être actualisée",
   "sendMessageFailedPrefix": "Impossible d’envoyer le message",
-  "conversationLoadFailedPrefix": "Impossible de charger la conversation"
+  "conversationLoadFailedPrefix": "Impossible de charger la conversation",
+  "favoriteLoadError": "Impossible de charger vos favoris. Veuillez réessayer."
 }

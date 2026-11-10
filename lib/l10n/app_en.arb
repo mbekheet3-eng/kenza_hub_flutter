@@ -545,5 +545,6 @@
   "languageChange": "Change language",
   "messageSentRefreshFailedPrefix": "Message sent, but the conversation could not be refreshed",
   "sendMessageFailedPrefix": "Could not send the message",
-  "conversationLoadFailedPrefix": "Could not load the conversation"
+  "conversationLoadFailedPrefix": "Could not load the conversation",
+  "favoriteLoadError": "Could not load your favorites. Please try again."
 }

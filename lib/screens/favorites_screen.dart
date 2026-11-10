@@ -56,7 +56,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تعذرت إزالة المنتج: $error')),
+        SnackBar(content: Text(AppStrings.of(context)!.favoriteUpdateError)),
       );
     }
   }
@@ -74,9 +74,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('تعذر تحميل المفضلة'),
+                        Text(AppStrings.of(context)!.favoriteLoadError),
                         const SizedBox(height: 8),
-                        Text(_error!, textAlign: TextAlign.center),
+                        Text(AppStrings.of(context)!.favoriteLoadError, textAlign: TextAlign.center),
                         const SizedBox(height: 12),
                         FilledButton(
                           onPressed: _load,
