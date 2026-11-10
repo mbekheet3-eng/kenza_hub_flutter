@@ -310,7 +310,7 @@
   "passwordsDoNotMatch": "Passwords do not match",
   "termsRequired": "You must agree to the Terms and Conditions and Privacy Policy to continue",
   "passwordRequired": "Password is required",
-  "passwordMinLength": "Password must be at least 6 characters",
+  "passwordMinLength": "Password (at least 8 characters)",
   "allConditions": "All conditions",
   "priceRange": "Price range",
   "phoneNumber": "Phone number",
@@ -488,5 +488,11 @@
   "privacyDraftNotice": "This is an initial draft based on the current service design, not a final legal notice. The responsible entity and contact details must be added, and the text must receive legal review before public launch.",
   "loginFailedPrefix": "Unable to log in",
   "emailFirst": "Enter your email address first",
-  "resetLinkFailedPrefix": "Unable to send the reset link"
+  "resetLinkFailedPrefix": "Unable to send the reset link",
+  "signupValidationError": "Check your name, email, password (at least 8 characters), and acceptance of the terms.",
+  "signupSuccessTitle": "Account created",
+  "signupSuccessMessage": "If email confirmation is enabled, open the confirmation email we sent you, then log in.",
+  "signupFailedPrefix": "Unable to create the account",
+  "signupDescription": "One account to browse, sell, and manage your products.",
+  "displayNameLabel": "Name shown to other members"
 }
