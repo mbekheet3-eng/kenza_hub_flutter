@@ -66,7 +66,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(AppStrings.of(context)!.favoritesTitle)),
       body: _loading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(
                   child: Padding(
@@ -75,9 +75,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(AppStrings.of(context)!.favoriteLoadError),
-                        const SizedBox(height: 8),
-                        Text(AppStrings.of(context)!.favoriteLoadError, textAlign: TextAlign.center),
-                        const SizedBox(height: 12),
+                        const const SizedBox(height: 12),
                         FilledButton(
                           onPressed: _load,
                           child: Text(AppStrings.of(context)!.retryAction),
@@ -89,14 +87,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               : _products.isEmpty
                   ? Center(
                       child: Padding(
-                        padding: EdgeInsets.all(24),
+                        padding: const EdgeInsets.all(24),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.favorite_border_rounded, size: 56),
+                            const Icon(Icons.favorite_border_rounded, size: 56),
                             SizedBox(height: 12),
                             Text(AppStrings.of(context)!.emptyFavorites),
-                            SizedBox(height: 6),
+                            const SizedBox(height: 6),
                             Text(AppStrings.of(context)!.favoriteHint),
                             ],
                         ),

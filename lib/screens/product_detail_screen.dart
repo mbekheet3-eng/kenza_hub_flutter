@@ -213,7 +213,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         future: _product,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError || !snapshot.hasData) {
             return Center(
@@ -239,7 +239,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           (url) => Image.network(
                             url,
                             fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) => Center(
+                            errorBuilder: (_, __, ___) => const Center(
                               child: Icon(Icons.broken_image_outlined, size: 48),
                             ),
                           ),

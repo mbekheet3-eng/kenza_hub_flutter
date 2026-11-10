@@ -131,7 +131,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: user == null
           ? Center(child: Text(AppStrings.of(context)!.loginToViewAccount))
           : _loading
-              ? Center(child: CircularProgressIndicator())
+              ? const Center(child: CircularProgressIndicator())
               : RefreshIndicator(
                   onRefresh: _load,
                   child: ListView(

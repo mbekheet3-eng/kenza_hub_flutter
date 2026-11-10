@@ -144,7 +144,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(_isEditing ? AppStrings.of(context)!.editProduct : AppStrings.of(context)!.sellProduct)),
       body: _loading && _categories.isEmpty
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Form(
               key: _formKey,
               child: ListView(

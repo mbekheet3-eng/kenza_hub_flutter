@@ -113,18 +113,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           }
           if (snapshot.connectionState == ConnectionState.waiting &&
               !snapshot.hasData) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           final rows = snapshot.data ?? [];
           if (rows.isEmpty) {
             return Center(
               child: Padding(
-                padding: EdgeInsets.all(24),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.notifications_none_rounded, size: 56),
-                    SizedBox(height: 12),
+                    const Icon(Icons.notifications_none_rounded, size: 56),
+                    const SizedBox(height: 12),
                     Text(AppStrings.of(context)!.emptyNotifications),
                   ],
                 ),

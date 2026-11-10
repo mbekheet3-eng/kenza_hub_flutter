@@ -202,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             ListTile(
               title: Text(AppStrings.of(context)!.homeSections),
-              titleTextStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+              titleTextStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
             ),
             ListTile(
               leading: const Icon(Icons.grid_view_rounded),
@@ -471,11 +471,11 @@ class _HomeScreenState extends State<HomeScreen> {
           selectedIndex: 0,
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           destinations: [
-            NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home_rounded), label: AppStrings.of(context)!.mainHome),
-            NavigationDestination(icon: Icon(Icons.grid_view_outlined), selectedIcon: Icon(Icons.grid_view_rounded), label: AppStrings.of(context)!.homeSections),
-            NavigationDestination(icon: Icon(Icons.add_circle_outline_rounded), selectedIcon: Icon(Icons.add_circle_rounded), label: AppStrings.of(context)!.addProduct),
-            NavigationDestination(icon: Icon(Icons.chat_bubble_outline_rounded), selectedIcon: Icon(Icons.chat_rounded), label: AppStrings.of(context)!.messages),
-            NavigationDestination(icon: Icon(Icons.person_outline_rounded), selectedIcon: Icon(Icons.person_rounded), label: AppStrings.of(context)!.accountTab),
+            NavigationDestination(icon: const Icon(Icons.home_outlined), selectedIcon: const Icon(Icons.home_rounded), label: AppStrings.of(context)!.mainHome),
+            NavigationDestination(icon: const Icon(Icons.grid_view_outlined), selectedIcon: const Icon(Icons.grid_view_rounded), label: AppStrings.of(context)!.homeSections),
+            NavigationDestination(icon: const Icon(Icons.add_circle_outline_rounded), selectedIcon: const Icon(Icons.add_circle_rounded), label: AppStrings.of(context)!.addProduct),
+            NavigationDestination(icon: const Icon(Icons.chat_bubble_outline_rounded), selectedIcon: const Icon(Icons.chat_rounded), label: AppStrings.of(context)!.messages),
+            NavigationDestination(icon: const Icon(Icons.person_outline_rounded), selectedIcon: const Icon(Icons.person_rounded), label: AppStrings.of(context)!.accountTab),
           ],
           onDestinationSelected: (index) {
             switch (index) {

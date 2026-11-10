@@ -23,7 +23,7 @@ class AboutKenzaScreen extends StatelessWidget {
               children: [
                 const Icon(Icons.storefront_rounded, color: Colors.white, size: 42),
                 const SizedBox(height: 18),
-                Text(s.brandName, style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
+                Text(s.brandName, style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Text(s.brandTagline, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 10),
