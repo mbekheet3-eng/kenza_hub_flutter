@@ -34,7 +34,16 @@ The Android Firebase app must use package name `com.kenza.hub` in Firebase proje
 
 The Firebase client configuration is not a service-account credential. Never add a Firebase service-account private key, Supabase service-role key, or FCM server credential to Flutter or GitHub source files.
 
-**Important:** This configures the Android client and token registration only. Actual remote delivery still requires a trusted server-side sender (for example, a Supabase Edge Function using FCM HTTP v1) and service-account credentials stored only as Supabase secrets. Do not send FCM messages directly from the Flutter client.
+**Server sender deployed:** Supabase Edge Function `send-push-notification` is deployed with FCM HTTP v1 support. It accepts only a trusted Supabase server key, loads active Android tokens for the notification recipient, sends the notification, and deactivates unregistered tokens.
+
+Before delivery works, complete both Dashboard steps:
+
+1. Add Edge Function secret `FIREBASE_SERVICE_ACCOUNT_JSON` with the full JSON contents of a Firebase service-account key from Firebase project `kenza-hub`. Keep this secret only in Supabase Edge Function Secrets; never commit or share it.
+2. Create a Database Webhook on `public.notifications`, event **INSERT**, targeting Edge Function `send-push-notification`, method POST. Add the Supabase service-key authentication header using the Dashboard's **Add auth header with service key** option. The function performs its own key validation.
+
+The function is deployed with gateway JWT verification disabled only because current Supabase secret API keys are not JWTs; it validates the incoming server key against Supabase-injected server secrets itself. Never expose that key to Flutter or GitHub.
+
+Do not send FCM messages directly from the Flutter client.
 
 The workflow **Resolve Flutter dependencies** runs `flutter pub get` and `flutter analyze`, then commits the resolved `pubspec.lock`. It does not build an APK.
 
