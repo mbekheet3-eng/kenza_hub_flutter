@@ -141,7 +141,7 @@ class _SearchScreenState extends State<SearchScreen> {
               children: [
                 Text(AppStrings.of(context)!.priceRangeTitle, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
                 const SizedBox(height: 12),
-                Text('${draft.start.round()} - ${draft.end.round()} ج.م'),
+                Text('${draft.start.round()} - ${draft.end.round()} ${AppStrings.of(context)!.currency}'),
                 RangeSlider(
                   values: draft, min: 0, max: 100000, divisions: 100,
                   onChanged: (value) => setSheetState(() => draft = value),
@@ -206,7 +206,6 @@ class _SearchScreenState extends State<SearchScreen> {
                 : _error != null ? Center(child: Padding(
                     padding: const EdgeInsets.all(24),
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      const Text(AppStrings.of(context)!.searchLoadError), const SizedBox(height: 8),
                       Text(AppStrings.of(context)!.searchLoadError, textAlign: TextAlign.center), const SizedBox(height: 12),
                       FilledButton(onPressed: _load, child: Text(AppStrings.of(context)!.retryAction)),
                     ]),
