@@ -42,8 +42,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text(AppStrings.of(context)!.deleteProductConfirmTitle),
-        content: const Text(AppStrings.of(context)!.deleteProductConfirmBody),
+        title: Text(AppStrings.of(context)!.deleteProductConfirmTitle),
+        content: Text(AppStrings.of(context)!.deleteProductConfirmBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -85,11 +85,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text(AppStrings.of(context)!.confirmPurchaseTitle),
+        title: Text(AppStrings.of(context)!.confirmPurchaseTitle),
         content: Text(AppStrings.of(context)!.purchaseConfirmMessage),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text(AppStrings.of(context)!.backLabel)),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text(AppStrings.of(context)!.sendOrderLabel)),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(AppStrings.of(context)!.backLabel)),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(AppStrings.of(context)!.sendOrderLabel)),
         ],
       ),
     );
@@ -123,7 +123,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text(AppStrings.of(context)!.offerDialogTitle),
+        title: Text(AppStrings.of(context)!.offerDialogTitle),
         content: Form(
           key: formKey,
           child: Column(
@@ -272,7 +272,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Text(product.description.isEmpty ? AppStrings.of(context)!.noDescription : product.description),
                     const SizedBox(height: 18),
                     Text(
-                      'تاريخ النشر: ${MaterialLocalizations.of(context).formatMediumDate(product.createdAt.toLocal())}',
+                      '${AppStrings.of(context)!.publishedDateLabel}: ${MaterialLocalizations.of(context).formatMediumDate(product.createdAt.toLocal())}',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
 
