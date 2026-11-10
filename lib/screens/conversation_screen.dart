@@ -118,17 +118,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          // Sent messages use Kenza's brand red; received
-                          // messages use the neutral surface from the app theme.
-                          color: mine
-                              ? colors.primary
-                              : colors.surfaceContainerHighest,
+                          // Sent messages are white; received messages are light grey.
+                          color: mine ? Colors.white : Colors.grey.shade200,
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
                           row['body'] as String,
                           style: TextStyle(
-                            color: mine ? colors.onPrimary : colors.onSurface,
+                            color: Colors.black87,
                           ),
                         ),
                       ),
