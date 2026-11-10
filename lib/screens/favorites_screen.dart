@@ -75,7 +75,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(AppStrings.of(context)!.favoriteLoadError),
-                        const const SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         FilledButton(
                           onPressed: _load,
                           child: Text(AppStrings.of(context)!.retryAction),
@@ -92,7 +92,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             const Icon(Icons.favorite_border_rounded, size: 56),
-                            SizedBox(height: 12),
+                            const SizedBox(height: 12),
                             Text(AppStrings.of(context)!.emptyFavorites),
                             const SizedBox(height: 6),
                             Text(AppStrings.of(context)!.favoriteHint),
