@@ -212,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ..._categories.map(
               (category) => ListTile(
                 leading: const Icon(Icons.category_outlined),
-                title: Text(category.nameAr),
+                title: Text(category.nameFor(Localizations.localeOf(context).languageCode)),
                 onTap: () => Navigator.pop(sheetContext, category.id),
               ),
             ),
