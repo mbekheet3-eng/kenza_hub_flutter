@@ -42,8 +42,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('حذف المنتج'),
-        content: const Text('هل أنت متأكد من حذف المنتج وصوره؟ لا يمكن التراجع عن هذا الإجراء.'),
+        title: const Text(AppStrings.of(context)!.deleteProductConfirmTitle),
+        content: const Text(AppStrings.of(context)!.deleteProductConfirmBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -64,7 +64,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذر حذف المنتج: $error')),
+          SnackBar(content: Text(AppStrings.of(context)!.deleteProductFailed)),
         );
       }
     }
@@ -85,11 +85,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('تأكيد طلب الشراء'),
-        content: Text('سيتم إرسال طلب للبائع بالسعر الحالي ${product.price.toStringAsFixed(2)} ج.م. لا يوجد دفع إلكتروني الآن.'),
+        title: const Text(AppStrings.of(context)!.confirmPurchaseTitle),
+        content: Text(AppStrings.of(context)!.purchaseConfirmMessage),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('رجوع')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('إرسال الطلب')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text(AppStrings.of(context)!.backLabel)),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text(AppStrings.of(context)!.sendOrderLabel)),
         ],
       ),
     );
@@ -102,13 +102,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تم إرسال طلبك للبائع، وفي انتظار موافقته')),
+          SnackBar(content: Text(AppStrings.of(context)!.orderSentWaiting)),
         );
       }
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذر إرسال الطلب: $error')),
+          SnackBar(content: Text(AppStrings.of(context)!.orderSendFailed)),
         );
       }
     }
@@ -123,7 +123,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('تقديم عرض سعر'),
+        title: const Text(AppStrings.of(context)!.offerDialogTitle),
         content: Form(
           key: formKey,
           child: Column(
@@ -132,16 +132,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               TextFormField(
                 controller: priceController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(labelText: 'السعر المقترح بالجنيه'),
+                decoration: InputDecoration(labelText: AppStrings.of(context)!.proposedPriceLabel),
                 validator: (value) {
                   final price = double.tryParse((value ?? '').trim());
-                  return price == null || price <= 0 ? 'أدخل سعرًا صحيحًا' : null;
+                  return price == null || price <= 0 ? AppStrings.of(context)!.invalidPrice : null;
                 },
               ),
               TextField(
                 controller: noteController,
                 maxLines: 2,
-                decoration: const InputDecoration(labelText: 'رسالة للبائع (اختياري)'),
+                decoration: InputDecoration(labelText: AppStrings.of(context)!.sellerMessageOptional),
               ),
             ],
           ),
@@ -152,7 +152,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             onPressed: () {
               if (formKey.currentState!.validate()) Navigator.pop(ctx, true);
             },
-            child: const Text('إرسال العرض'),
+            child: Text(AppStrings.of(context)!.sendOfferLabel),
           ),
         ],
       ),
@@ -167,13 +167,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('تم إرسال عرض السعر للبائع')),
+            SnackBar(content: Text(AppStrings.of(context)!.offerSent)),
           );
         }
       } catch (error) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('تعذر إرسال العرض: $error')),
+            SnackBar(content: Text(AppStrings.of(context)!.offerSendFailed)),
           );
         }
       }
@@ -198,7 +198,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذر فتح المحادثة: $error')),
+          SnackBar(content: Text(AppStrings.of(context)!.conversationOpenFailed)),
         );
       }
     }
@@ -219,7 +219,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text('تعذر تحميل المنتج: ${snapshot.error ?? ''}'),
+                child: Text(AppStrings.of(context)!.productLoadError),
               ),
             );
           }
@@ -260,7 +260,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Text(product.title, style: Theme.of(context).textTheme.headlineSmall),
                     const SizedBox(height: 10),
                     Text(
-                      '${product.price.toStringAsFixed(2)} ج.م',
+                      '${product.price.toStringAsFixed(2)} ${AppStrings.of(context)!.currency}',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             color: const Color(0xFF5558C9),
                             fontWeight: FontWeight.bold,
@@ -269,7 +269,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     const SizedBox(height: 20),
                     Text(AppStrings.of(context)!.descriptionLabel, style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 8),
-                    Text(product.description.isEmpty ? 'لا يوجد وصف' : product.description),
+                    Text(product.description.isEmpty ? AppStrings.of(context)!.noDescription : product.description),
                     const SizedBox(height: 18),
                     Text(
                       'تاريخ النشر: ${MaterialLocalizations.of(context).formatMediumDate(product.createdAt.toLocal())}',
