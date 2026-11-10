@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_strings.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'conversation_screen.dart';
@@ -123,7 +124,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
             children: [
               const SizedBox(height: 80),
               Center(child: Text('تعذر تحميل البيانات: ${snapshot.error}')),
-              Center(child: TextButton(onPressed: _refresh, child: const Text('إعادة المحاولة'))),
+              Center(child: TextButton(onPressed: _refresh, child: const Text(AppStrings.of(context)!.retryAction))),
             ],
           );
         }
@@ -183,8 +184,8 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
                   tooltip: 'إجراء',
                   onSelected: (value) => _updateStatus(table: table, id: row['id'] as String, status: value),
                   itemBuilder: (_) => const [
-                    PopupMenuItem(value: 'accepted', child: Text('قبول')),
-                    PopupMenuItem(value: 'rejected', child: Text('رفض')),
+                    PopupMenuItem(value: 'accepted', child: Text(AppStrings.of(context)!.acceptLabel)),
+                    PopupMenuItem(value: 'rejected', child: Text(AppStrings.of(context)!.rejectLabel)),
                   ],
                 )
               : null,
@@ -204,7 +205,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('الرسائل والطلبات'),
+        title: const Text(AppStrings.of(context)!.messagesOrdersTitle),
         bottom: TabBar(
           controller: _tabs,
           isScrollable: true,

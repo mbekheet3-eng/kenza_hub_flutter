@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_strings.dart';
 
 import '../services/auth_service.dart';
 
@@ -53,11 +54,11 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('تعيين كلمة مرور جديدة')),
+      appBar: AppBar(title: const Text(AppStrings.of(context)!.accountPasswordTitle)),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          const Text('اكتب كلمة المرور الجديدة لحسابك.'),
+          const Text(AppStrings.of(context)!.passwordIntro),
           const SizedBox(height: 18),
           TextField(
             controller: _password,
@@ -75,7 +76,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
             onPressed: _busy ? null : _save,
             child: _busy
                 ? const CircularProgressIndicator()
-                : const Text('حفظ كلمة المرور'),
+                : const Text(AppStrings.of(context)!.savePassword),
           ),
         ],
       ),

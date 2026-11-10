@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_strings.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/product.dart';
@@ -78,11 +79,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('إلغاء'),
+            child: const Text(AppStrings.of(context)!.cancelLabel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, controller.text.trim()),
-            child: const Text('حفظ'),
+            child: const Text(AppStrings.of(context)!.saveChanges),
           ),
         ],
       ),
@@ -117,11 +118,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = _user;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('حسابي'),
+        title: const Text(AppStrings.of(context)!.profileTitle),
         actions: [
           IconButton(
             onPressed: _signOut,
-            tooltip: 'تسجيل الخروج',
+            tooltip: AppStrings.of(context)!.logoutLabel,
             icon: const Icon(Icons.logout),
           ),
         ],

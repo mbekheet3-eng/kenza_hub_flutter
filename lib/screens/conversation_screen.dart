@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_strings.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../services/marketplace_transaction_service.dart';
@@ -78,7 +79,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     final myId = Supabase.instance.client.auth.currentUser?.id;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('المحادثة')),
+      appBar: AppBar(title: const Text(AppStrings.of(context)!.conversationTitle)),
       body: Column(
         children: [
           Expanded(
@@ -96,7 +97,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 final rows = snapshot.data ?? [];
                 if (rows.isEmpty) {
                   return const Center(
-                    child: Text('ابدأ المحادثة برسالة للبائع'),
+                    child: Text(AppStrings.of(context)!.startConversation),
                   );
                 }
                 return ListView.builder(
@@ -148,7 +149,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => _send(),
                       decoration: const InputDecoration(
-                        hintText: 'اكتب رسالتك',
+                        hintText: AppStrings.of(context)!.messageHint,
                       ),
                     ),
                   ),

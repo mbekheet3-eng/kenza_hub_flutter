@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_strings.dart';
 
 import '../services/notification_service.dart';
 import 'conversation_screen.dart';
@@ -91,11 +92,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('الإشعارات'),
+        title: const Text(AppStrings.of(context)!.notificationsTitle),
         actions: [
           TextButton(
             onPressed: _markAllRead,
-            child: const Text('قراءة الكل'),
+            child: const Text(AppStrings.of(context)!.readAll),
           ),
         ],
       ),
@@ -124,7 +125,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   children: [
                     Icon(Icons.notifications_none_rounded, size: 56),
                     SizedBox(height: 12),
-                    Text('لا توجد إشعارات حتى الآن'),
+                    Text(AppStrings.of(context)!.emptyNotifications),
                   ],
                 ),
               ),

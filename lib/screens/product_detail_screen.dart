@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_strings.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/product.dart';
@@ -46,11 +47,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('إلغاء'),
+            child: const Text(AppStrings.of(context)!.cancelLabel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('حذف'),
+            child: const Text(AppStrings.of(context)!.deleteLabel),
           ),
         ],
       ),
@@ -146,7 +147,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('إلغاء')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text(AppStrings.of(context)!.cancelLabel)),
           FilledButton(
             onPressed: () {
               if (formKey.currentState!.validate()) Navigator.pop(ctx, true);
@@ -207,7 +208,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Widget build(BuildContext context) {
     final userId = Supabase.instance.client.auth.currentUser?.id;
     return Scaffold(
-      appBar: AppBar(title: const Text('تفاصيل المنتج')),
+      appBar: AppBar(title: const Text(AppStrings.of(context)!.productDetailsTitle)),
       body: FutureBuilder<Product>(
         future: _product,
         builder: (context, snapshot) {
@@ -266,7 +267,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ),
                     ),
                     const SizedBox(height: 20),
-                    Text('الوصف', style: Theme.of(context).textTheme.titleMedium),
+                    Text(AppStrings.of(context)!.descriptionLabel, style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 8),
                     Text(product.description.isEmpty ? 'لا يوجد وصف' : product.description),
                     const SizedBox(height: 18),
@@ -282,7 +283,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         child: FilledButton.icon(
                           onPressed: () => _buy(product),
                           icon: const Icon(Icons.shopping_bag_outlined),
-                          label: const Text('شراء الآن'),
+                          label: const Text(AppStrings.of(context)!.buyNowLabel),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -292,7 +293,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             child: OutlinedButton.icon(
                               onPressed: () => _makeOffer(product),
                               icon: const Icon(Icons.local_offer_outlined),
-                              label: const Text('تقديم عرض'),
+                              label: const Text(AppStrings.of(context)!.offerLabel),
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -300,7 +301,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             child: OutlinedButton.icon(
                               onPressed: () => _contactSeller(product),
                               icon: const Icon(Icons.chat_bubble_outline),
-                              label: const Text('التواصل مع البائع'),
+                              label: const Text(AppStrings.of(context)!.contactSellerLabel),
                             ),
                           ),
                         ],
@@ -314,7 +315,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             child: OutlinedButton.icon(
                               onPressed: () => _edit(product),
                               icon: const Icon(Icons.edit_outlined),
-                              label: const Text('تعديل'),
+                              label: const Text(AppStrings.of(context)!.editLabel),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -322,7 +323,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             child: FilledButton.tonalIcon(
                               onPressed: _delete,
                               icon: const Icon(Icons.delete_outline),
-                              label: const Text('حذف'),
+                              label: const Text(AppStrings.of(context)!.deleteLabel),
                             ),
                           ),
                         ],

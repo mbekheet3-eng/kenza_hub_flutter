@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_strings.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/product.dart';
@@ -169,7 +170,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     final products = _visibleProducts;
     return Scaffold(
-      appBar: AppBar(title: const Text('البحث عن المنتجات')),
+      appBar: AppBar(title: const Text(AppStrings.of(context)!.searchTitle)),
       body: Column(
         children: [
           Padding(
@@ -178,7 +179,7 @@ class _SearchScreenState extends State<SearchScreen> {
               controller: _query, textInputAction: TextInputAction.search,
               onSubmitted: (_) => _load(),
               decoration: InputDecoration(
-                hintText: 'ابحث عن منتج', prefixIcon: const Icon(Icons.search),
+                hintText: AppStrings.of(context)!.searchHint, prefixIcon: const Icon(Icons.search),
                 suffixIcon: IconButton(onPressed: () { _query.clear(); _load(); }, icon: const Icon(Icons.close)),
               ),
             ),
@@ -190,9 +191,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 initialValue: _sort,
                 decoration: const InputDecoration(labelText: 'ترتيب حسب'),
                 items: const [
-                  DropdownMenuItem(value: 'newest', child: Text('الأحدث')),
-                  DropdownMenuItem(value: 'price_low', child: Text('السعر: الأقل أولاً')),
-                  DropdownMenuItem(value: 'price_high', child: Text('السعر: الأعلى أولاً')),
+                  DropdownMenuItem(value: 'newest', child: Text(AppStrings.of(context)!.newestLabel)),
+                  DropdownMenuItem(value: 'price_low', child: Text(AppStrings.of(context)!.priceLowLabel)),
+                  DropdownMenuItem(value: 'price_high', child: Text(AppStrings.of(context)!.priceHighLabel)),
                 ],
                 onChanged: (value) => setState(() => _sort = value ?? 'newest'),
               )),
@@ -207,10 +208,10 @@ class _SearchScreenState extends State<SearchScreen> {
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
                       const Text('تعذر تحميل نتائج البحث'), const SizedBox(height: 8),
                       Text(_error!, textAlign: TextAlign.center), const SizedBox(height: 12),
-                      FilledButton(onPressed: _load, child: const Text('إعادة المحاولة')),
+                      FilledButton(onPressed: _load, child: const Text(AppStrings.of(context)!.retryAction)),
                     ]),
                   ))
-                : products.isEmpty ? const Center(child: Text('لا توجد نتائج مطابقة'))
+                : products.isEmpty ? const Center(child: Text(AppStrings.of(context)!.noResults))
                 : GridView.builder(
                     padding: const EdgeInsets.all(12), itemCount: products.length,
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
