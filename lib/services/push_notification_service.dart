@@ -25,6 +25,7 @@ class PushNotificationService {
   StreamSubscription<AuthState>? _authSubscription;
   StreamSubscription<String>? _tokenSubscription;
   StreamSubscription<RemoteMessage>? _openedSubscription;
+  StreamSubscription<RemoteMessage>? _foregroundSubscription;
   bool _initialized = false;
 
   Future<void> initialize() async {
@@ -45,6 +46,9 @@ class PushNotificationService {
 
     _openedSubscription =
         FirebaseMessaging.onMessageOpenedApp.listen((_) => _openNotifications());
+
+    _foregroundSubscription =
+        FirebaseMessaging.onMessage.listen(_showForegroundMessage);
 
     if (_client.auth.currentUser != null) {
       await _requestPermissionAndRegister();
@@ -137,6 +141,29 @@ class PushNotificationService {
     await _authSubscription?.cancel();
     await _tokenSubscription?.cancel();
     await _openedSubscription?.cancel();
+    await _foregroundSubscription?.cancel();
+  }
+
+  void _showForegroundMessage(RemoteMessage message) {
+    final context = rootNavigatorKey.currentContext;
+    if (context == null) return;
+
+    final title = message.notification?.title;
+    final body = message.notification?.body;
+    final content = [title, body]
+        .whereType<String>()
+        .where((value) => value.trim().isNotEmpty)
+        .join(' — ');
+
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+      SnackBar(
+        content: Text(content.isEmpty ? 'لديك إشعار جديد' : content),
+        action: SnackBarAction(
+          label: 'عرض',
+          onPressed: _openNotifications,
+        ),
+      ),
+    );
   }
 
   void _openNotifications() {
