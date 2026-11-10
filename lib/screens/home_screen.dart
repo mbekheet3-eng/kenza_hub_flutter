@@ -360,7 +360,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         (category) => Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: ChoiceChip(
-                            label: Text(category.nameAr),
+                            label: Text(category.nameFor(Localizations.localeOf(context).languageCode)),
                             selected: _categoryId == category.id,
                             onSelected: (_) {
                               setState(() => _categoryId = category.id);
