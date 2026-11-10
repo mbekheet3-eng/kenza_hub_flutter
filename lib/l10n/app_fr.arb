@@ -528,5 +528,19 @@
   "savePassword": "Enregistrer le mot de passe",
   "galleryLabel": "Galerie",
   "cameraLabel": "Appareil photo",
-  "productPhotosTitle": "Photos du produit (jusqu’à 8)"
+  "productPhotosTitle": "Photos du produit (jusqu’à 8)",
+  "homeSections": "Catégories",
+  "allProducts": "Tous les produits",
+  "allLabel": "Tout",
+  "searchProductHint": "Rechercher un produit",
+  "imageSearch": "Recherche par image",
+  "mainHome": "Accueil",
+  "addProduct": "Ajouter un produit",
+  "messages": "Messages",
+  "accountTab": "Mon compte",
+  "actionTooltip": "Action",
+  "gallery": "Galerie",
+  "camera": "Appareil photo",
+  "productPhotos": "Photos du produit (jusqu’à 8)",
+  "languageChange": "Changer de langue"
 }

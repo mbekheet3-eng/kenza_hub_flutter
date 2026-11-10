@@ -528,5 +528,19 @@
   "savePassword": "حفظ كلمة المرور",
   "galleryLabel": "المعرض",
   "cameraLabel": "الكاميرا",
-  "productPhotosTitle": "صور المنتج (حتى 8 صور)"
+  "productPhotosTitle": "صور المنتج (حتى 8 صور)",
+  "homeSections": "الأقسام",
+  "allProducts": "كل المنتجات",
+  "allLabel": "الكل",
+  "searchProductHint": "ابحث عن منتج",
+  "imageSearch": "البحث بالصور",
+  "mainHome": "الرئيسية",
+  "addProduct": "إضافة منتج",
+  "messages": "الرسائل",
+  "accountTab": "حسابي",
+  "actionTooltip": "إجراء",
+  "gallery": "المعرض",
+  "camera": "الكاميرا",
+  "productPhotos": "صور المنتج (حتى 8 صور)",
+  "languageChange": "تغيير اللغة"
 }

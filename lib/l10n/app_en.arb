@@ -528,5 +528,19 @@
   "savePassword": "Save password",
   "galleryLabel": "Gallery",
   "cameraLabel": "Camera",
-  "productPhotosTitle": "Product photos (up to 8)"
+  "productPhotosTitle": "Product photos (up to 8)",
+  "homeSections": "Categories",
+  "allProducts": "All products",
+  "allLabel": "All",
+  "searchProductHint": "Search for a product",
+  "imageSearch": "Search by image",
+  "mainHome": "Home",
+  "addProduct": "Add product",
+  "messages": "Messages",
+  "accountTab": "My account",
+  "actionTooltip": "Action",
+  "gallery": "Gallery",
+  "camera": "Camera",
+  "productPhotos": "Product photos (up to 8)",
+  "languageChange": "Change language"
 }

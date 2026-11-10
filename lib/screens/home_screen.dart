@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_strings.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/category.dart';
@@ -188,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _openCategories() async {
     if (_categories.isEmpty) {
-      _showComingSoon('الأقسام');
+      _showComingSoon(AppStrings.of(context)!.homeSections);
       return;
     }
     final selectedId = await showModalBottomSheet<String?>(
@@ -200,12 +201,12 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.symmetric(vertical: 8),
           children: [
             const ListTile(
-              title: Text('الأقسام'),
+              title: Text(AppStrings.of(context)!.homeSections),
               titleTextStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
             ),
             ListTile(
               leading: const Icon(Icons.grid_view_rounded),
-              title: const Text('كل المنتجات'),
+              title: const Text(AppStrings.of(context)!.allProducts),
               onTap: () => Navigator.pop(sheetContext, ''),
             ),
             ..._categories.map(
@@ -274,7 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               .where((item) => item['is_read'] != true)
                               .length;
                           return IconButton(
-                            tooltip: 'الإشعارات',
+                            tooltip: AppStrings.of(context)!.notificationsTitle,
                             onPressed: _openNotifications,
                             icon: Stack(
                               clipBehavior: Clip.none,
@@ -326,11 +327,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     decoration: InputDecoration(
-                      hintText: 'ابحث عن منتج',
+                      hintText: AppStrings.of(context)!.searchProductHint,
                       prefixIcon: const Icon(Icons.search),
                       suffixIcon: IconButton(
-                        tooltip: 'البحث بالصور',
-                        onPressed: () => _showComingSoon('البحث بالصور'),
+                        tooltip: AppStrings.of(context)!.imageSearch,
+                        onPressed: () => _showComingSoon(AppStrings.of(context)!.imageSearch),
                         icon: const Icon(Icons.camera_alt_outlined),
                       ),
                     ),
@@ -347,7 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: ChoiceChip(
-                          label: const Text('الكل'),
+                          label: const Text(AppStrings.of(context)!.allLabel),
                           selected: _categoryId == null,
                           onSelected: (_) {
                             setState(() => _categoryId = null);
@@ -417,7 +418,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(height: 12),
                           FilledButton(
                             onPressed: _load,
-                            child: const Text('إعادة المحاولة'),
+                            child: const Text(AppStrings.of(context)!.retryAction),
                           ),
                         ],
                       ),
@@ -427,7 +428,7 @@ class _HomeScreenState extends State<HomeScreen> {
               else if (_products.isEmpty)
                 const SliverFillRemaining(
                   hasScrollBody: false,
-                  child: Center(child: Text('لا توجد منتجات منشورة حتى الآن')),
+                  child: Center(child: Text(AppStrings.of(context)!.noProducts)),
                 )
               else
                 SliverPadding(
@@ -470,11 +471,11 @@ class _HomeScreenState extends State<HomeScreen> {
           selectedIndex: 0,
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           destinations: const [
-            NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home_rounded), label: 'الرئيسية'),
-            NavigationDestination(icon: Icon(Icons.grid_view_outlined), selectedIcon: Icon(Icons.grid_view_rounded), label: 'الأقسام'),
-            NavigationDestination(icon: Icon(Icons.add_circle_outline_rounded), selectedIcon: Icon(Icons.add_circle_rounded), label: 'إضافة منتج'),
-            NavigationDestination(icon: Icon(Icons.chat_bubble_outline_rounded), selectedIcon: Icon(Icons.chat_rounded), label: 'الرسائل'),
-            NavigationDestination(icon: Icon(Icons.person_outline_rounded), selectedIcon: Icon(Icons.person_rounded), label: 'حسابي'),
+            NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home_rounded), label: AppStrings.of(context)!.mainHome),
+            NavigationDestination(icon: Icon(Icons.grid_view_outlined), selectedIcon: Icon(Icons.grid_view_rounded), label: AppStrings.of(context)!.homeSections),
+            NavigationDestination(icon: Icon(Icons.add_circle_outline_rounded), selectedIcon: Icon(Icons.add_circle_rounded), label: AppStrings.of(context)!.addProduct),
+            NavigationDestination(icon: Icon(Icons.chat_bubble_outline_rounded), selectedIcon: Icon(Icons.chat_rounded), label: AppStrings.of(context)!.messages),
+            NavigationDestination(icon: Icon(Icons.person_outline_rounded), selectedIcon: Icon(Icons.person_rounded), label: AppStrings.of(context)!.accountTab),
           ],
           onDestinationSelected: (index) {
             switch (index) {

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import '../l10n/app_strings.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../models/category.dart';
@@ -192,7 +193,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   ),
                   if (!_isEditing) ...[
                     const SizedBox(height: 20),
-                    Text('صور المنتج (حتى 8 صور)', style: Theme.of(context).textTheme.titleMedium),
+                    Text(AppStrings.of(context)!.productPhotos, style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
@@ -201,12 +202,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                         OutlinedButton.icon(
                           onPressed: _saving ? null : _pickGallery,
                           icon: const Icon(Icons.photo_library_outlined),
-                          label: const Text('المعرض'),
+                          label: const Text(AppStrings.of(context)!.gallery),
                         ),
                         OutlinedButton.icon(
                           onPressed: _saving ? null : _pickCamera,
                           icon: const Icon(Icons.camera_alt_outlined),
-                          label: const Text('الكاميرا'),
+                          label: const Text(AppStrings.of(context)!.camera),
                         ),
                       ],
                     ),
