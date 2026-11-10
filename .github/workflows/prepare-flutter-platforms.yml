@@ -36,7 +36,7 @@ jobs:
           import re
 
           manifest = Path("android/app/src/main/AndroidManifest.xml")
-          text = manifest.read_text()
+          text = manifest.read_text(encoding="utf-8")
           permission = '<uses-permission android:name="android.permission.INTERNET" />'
           if permission not in text:
               manifest_start = text.find("<manifest")
@@ -44,33 +44,53 @@ jobs:
               if manifest_start < 0 or manifest_end < 0:
                   raise SystemExit("Could not locate Android manifest root.")
               text = text[:manifest_end + 1] + "\n    " + permission + text[manifest_end + 1:]
-          launcher = '''<category android:name="android.intent.category.LAUNCHER" />'''
-          callback = '''
-                      <!-- Supabase OAuth callback -->
-                      <intent-filter>
-                          <action android:name="android.intent.action.VIEW" />
-                          <category android:name="android.intent.category.DEFAULT" />
-                          <category android:name="android.intent.category.BROWSABLE" />
-                          <data android:scheme="com.kenza.hub" android:host="login-callback" />
-                      </intent-filter>'''
-          if "com.kenza.hub" not in text:
-              if launcher not in text:
-                  raise SystemExit("Could not find Android launcher category to add OAuth callback.")
-              text = text.replace(launcher, launcher + callback, 1)
+
+          callback = """
+                  <!-- Supabase OAuth callback -->
+                  <intent-filter>
+                      <action android:name="android.intent.action.VIEW" />
+                      <category android:name="android.intent.category.DEFAULT" />
+                      <category android:name="android.intent.category.BROWSABLE" />
+                      <data android:scheme="com.kenza.hub" android:host="login-callback" />
+                  </intent-filter>"""
+
+          if 'android:scheme="com.kenza.hub"' not in text:
+              launcher_filter = re.search(
+                  r'<intent-filter>\s*(?:(?!</intent-filter>).)*'
+                  r'android.intent.action.MAIN(?:(?!</intent-filter>).)*'
+                  r'android.intent.category.LAUNCHER(?:(?!</intent-filter>).)*</intent-filter>',
+                  text,
+                  re.DOTALL,
+              )
+              if not launcher_filter:
+                  raise SystemExit("Could not locate the MAIN/LAUNCHER intent-filter in Android manifest.")
+              text = text[:launcher_filter.end()] + callback + text[launcher_filter.end():]
+
           text = re.sub(r'android:label="[^"]+"', 'android:label="كنزة هب"', text, count=1)
-          manifest.write_text(text)
+          manifest.write_text(text, encoding="utf-8")
 
           gradle_files = list(Path("android/app").glob("build.gradle*"))
           if not gradle_files:
               raise SystemExit("Android app Gradle file was not generated.")
           gradle = gradle_files[0]
-          gtext = gradle.read_text()
+          gtext = gradle.read_text(encoding="utf-8")
           if "applicationId" not in gtext:
               raise SystemExit("Could not find applicationId in Android Gradle file.")
-          gtext = re.sub(r'applicationId\s*[= ]\s*["\'][^"\']+["\']',
-                         'applicationId = "com.kenza.hub"', gtext, count=1)
-          gtext = re.sub(r'namespace\s*[= ]\s*["\'][^"\']+["\']',
-                         'namespace = "com.kenza.hub"', gtext, count=1)
+          gtext = re.sub(
+              r'applicationId\s*[= ]\s*["\'][^"\']+["\']',
+              'applicationId = "com.kenza.hub"',
+              gtext,
+              count=1,
+          )
+          if re.search(r'namespace\s*[= ]\s*["\'][^"\']+["\']', gtext):
+              gtext = re.sub(
+                  r'namespace\s*[= ]\s*["\'][^"\']+["\']',
+                  'namespace = "com.kenza.hub"',
+                  gtext,
+                  count=1,
+              )
+          else:
+              raise SystemExit("Could not find namespace in Android Gradle file.")
 
           if gradle.suffix == ".kts":
               signing = """
@@ -83,9 +103,12 @@ jobs:
                   }
               }
               """
-              release_config = 'signingConfig = signingConfigs.getByName("release")'
               gtext = gtext.replace("    buildTypes {", signing + "\n    buildTypes {", 1)
-              gtext = gtext.replace('        release {', '        release {\n            ' + release_config, 1)
+              gtext = gtext.replace(
+                  "        release {",
+                  '        release {\n            signingConfig = signingConfigs.getByName("release")',
+                  1,
+              )
           else:
               signing = """
               signingConfigs {
@@ -98,13 +121,17 @@ jobs:
               }
               """
               gtext = gtext.replace("    buildTypes {", signing + "\n    buildTypes {", 1)
-              gtext = gtext.replace('        release {', '        release {\n            signingConfig = signingConfigs.release', 1)
-          gradle.write_text(gtext)
+              gtext = gtext.replace(
+                  "        release {",
+                  "        release {\n            signingConfig = signingConfigs.release",
+                  1,
+              )
+          gradle.write_text(gtext, encoding="utf-8")
 
           activity = Path("android/app/src/main/kotlin/com/kenza/hub/MainActivity.kt")
           if not activity.exists():
               raise SystemExit("Expected MainActivity.kt was not generated for com.kenza.hub.")
-          if "package com.kenza.hub" not in activity.read_text():
+          if "package com.kenza.hub" not in activity.read_text(encoding="utf-8"):
               raise SystemExit("MainActivity package does not match com.kenza.hub.")
           PY
 
