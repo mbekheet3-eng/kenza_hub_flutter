@@ -156,7 +156,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     items: _categories
                         .map((category) => DropdownMenuItem(
                               value: category.id,
-                              child: Text(Localizations.localeOf(context).languageCode == 'ar' ? category.nameAr : category.nameEn),
+                              child: Text(category.nameFor(Localizations.localeOf(context).languageCode)),
                             ))
                         .toList(),
                     onChanged: (value) => setState(() => _categoryId = value),
