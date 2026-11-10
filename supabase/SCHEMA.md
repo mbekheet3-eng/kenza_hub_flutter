@@ -40,7 +40,7 @@ The more specialized store/agency sections and additional marketplace features r
 
 ## Category localization contract
 
-`categories.name_ar`, `categories.name_en`, and `categories.name_fr` are required and must not be blank. When adding a category, provide all three translations in the same insert or migration. Do not change `id` or `slug` when translating labels.
+`categories.name_ar`, `categories.name_en`, and `categories.name_fr` are required and must not be blank (enforced by database constraints). When adding a category, provide all three translations in the same insert or migration. Do not change `id` or `slug` when translating labels.
 
 ## Security
 
@@ -49,7 +49,7 @@ RLS is enabled on all four public tables. Product writes are owner-scoped. The A
 
 ## Migration source files
 
-The repository now contains the six migration files corresponding to the deployed database history:
+The repository now contains the seven migration files corresponding to the deployed database history:
 
 - `20261108185823_create_marketplace_core_tables.sql`
 - `20261108185831_optimize_core_rls_and_category_index.sql`
