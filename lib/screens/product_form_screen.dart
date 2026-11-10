@@ -64,7 +64,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         _categoryId ??= categories.isNotEmpty ? categories.first.id : null;
       });
     } catch (error) {
-      if (mounted) setState(() => _error = error.toString());
+      if (mounted) setState(() => _error = AppStrings.of(context)!.categoryLoadDatabaseError);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -90,7 +90,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     if (!mounted || picked == null) return;
     if (_images.length >= MarketplaceService.maxImages) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('الحد الأقصى 8 صور')),
+        SnackBar(content: Text(AppStrings.of(context)!.maxProductImagesReached)),
       );
       return;
     }
@@ -100,11 +100,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     if (_categoryId == null) {
-      setState(() => _error = 'لا توجد فئات متاحة. حاول لاحقًا.');
+      setState(() => _error = AppStrings.of(context)!.noCategoriesAvailable);
       return;
     }
     if (!_isEditing && _images.isEmpty) {
-      setState(() => _error = 'أضف صورة واحدة على الأقل');
+      setState(() => _error = AppStrings.of(context)!.addAtLeastOnePhoto);
       return;
     }
 
@@ -133,7 +133,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       }
       if (mounted) Navigator.of(context).pop(true);
     } catch (error) {
-      if (mounted) setState(() => _error = error.toString());
+      if (mounted) setState(() => _error = AppStrings.of(context)!.productSaveFailed);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -142,7 +142,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isEditing ? 'تعديل المنتج' : 'إضافة منتج')),
+      appBar: AppBar(title: Text(_isEditing ? AppStrings.of(context)!.editProduct : AppStrings.of(context)!.sellProduct)),
       body: _loading && _categories.isEmpty
           ? Center(child: CircularProgressIndicator())
           : Form(
@@ -152,23 +152,23 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 children: [
                   DropdownButtonFormField<String>(
                     initialValue: _categoryId,
-                    decoration: const InputDecoration(labelText: 'الفئة'),
+                    decoration: InputDecoration(labelText: AppStrings.of(context)!.categoryFieldLabel),
                     items: _categories
                         .map((category) => DropdownMenuItem(
                               value: category.id,
-                              child: Text(category.nameAr),
+                              child: Text(Localizations.localeOf(context).languageCode == 'ar' ? category.nameAr : category.nameEn),
                             ))
                         .toList(),
                     onChanged: (value) => setState(() => _categoryId = value),
-                    validator: (value) => value == null ? 'اختر الفئة' : null,
+                    validator: (value) => value == null ? AppStrings.of(context)!.chooseCategoryValidation : null,
                   ),
                   const SizedBox(height: 14),
                   TextFormField(
                     controller: _title,
                     maxLength: 100,
-                    decoration: const InputDecoration(labelText: 'عنوان المنتج'),
+                    decoration: InputDecoration(labelText: AppStrings.of(context)!.productTitleField),
                     validator: (value) => value == null || value.trim().isEmpty
-                        ? 'اكتب عنوان المنتج'
+                        ? AppStrings.of(context)!.productTitleRequired
                         : null,
                   ),
                   const SizedBox(height: 8),
@@ -176,19 +176,19 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     controller: _description,
                     maxLines: 4,
                     maxLength: 1000,
-                    decoration: const InputDecoration(labelText: 'وصف المنتج (اختياري)'),
+                    decoration: InputDecoration(labelText: AppStrings.of(context)!.productDescriptionOptional),
                   ),
                   const SizedBox(height: 14),
                   TextFormField(
                     controller: _price,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(
-                      labelText: 'السعر بالجنيه المصري',
-                      suffixText: 'ج.م',
+                    decoration: InputDecoration(
+                      labelText: AppStrings.of(context)!.priceEgpLabel,
+                      suffixText: AppStrings.of(context)!.currency,
                     ),
                     validator: (value) {
                       final price = double.tryParse(value ?? '');
-                      return price == null || price <= 0 ? 'أدخل سعرًا أكبر من صفر' : null;
+                      return price == null || price <= 0 ? AppStrings.of(context)!.priceMustBePositive : null;
                     },
                   ),
                   if (!_isEditing) ...[
@@ -255,7 +255,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                             width: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : Text(_isEditing ? 'حفظ التعديلات' : 'نشر المنتج'),
+                        : Text(_isEditing ? AppStrings.of(context)!.saveChanges : AppStrings.of(context)!.publishProduct),
                   ),
                 ],
               ),

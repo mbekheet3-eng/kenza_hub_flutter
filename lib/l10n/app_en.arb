@@ -615,5 +615,16 @@
   "messagesOrdersSubtitle": "Your conversations and incoming and outgoing requests",
   "changePasswordLabel": "Change password",
   "myProductsEmpty": "You haven't added any products yet",
-  "profileLoadError": "Could not load account details. Please try again."
+  "profileLoadError": "Could not load account details. Please try again.",
+  "categoryFieldLabel": "Category",
+  "chooseCategoryValidation": "Choose a category",
+  "productTitleField": "Product title",
+  "productTitleRequired": "Enter a product title",
+  "productDescriptionOptional": "Product description (optional)",
+  "priceEgpLabel": "Price in EGP",
+  "priceMustBePositive": "Enter a price greater than zero",
+  "maxProductImagesReached": "Maximum of 8 photos",
+  "noCategoriesAvailable": "No categories are available. Please try again later.",
+  "addAtLeastOnePhoto": "Add at least one photo",
+  "productSaveFailed": "Could not save the product. Please try again."
 }

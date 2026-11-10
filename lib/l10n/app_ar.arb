@@ -615,5 +615,16 @@
   "messagesOrdersSubtitle": "محادثاتك والطلبات الواردة والصادرة",
   "changePasswordLabel": "تغيير كلمة المرور",
   "myProductsEmpty": "لم تضف أي منتجات بعد",
-  "profileLoadError": "تعذر تحميل بيانات الحساب. حاول مرة أخرى."
+  "profileLoadError": "تعذر تحميل بيانات الحساب. حاول مرة أخرى.",
+  "categoryFieldLabel": "الفئة",
+  "chooseCategoryValidation": "اختر الفئة",
+  "productTitleField": "عنوان المنتج",
+  "productTitleRequired": "اكتب عنوان المنتج",
+  "productDescriptionOptional": "وصف المنتج (اختياري)",
+  "priceEgpLabel": "السعر بالجنيه المصري",
+  "priceMustBePositive": "أدخل سعرًا أكبر من صفر",
+  "maxProductImagesReached": "الحد الأقصى 8 صور",
+  "noCategoriesAvailable": "لا توجد فئات متاحة. حاول لاحقًا.",
+  "addAtLeastOnePhoto": "أضف صورة واحدة على الأقل",
+  "productSaveFailed": "تعذر حفظ المنتج. حاول مرة أخرى."
 }

@@ -615,5 +615,16 @@
   "messagesOrdersSubtitle": "Vos conversations et demandes reçues et envoyées",
   "changePasswordLabel": "Changer le mot de passe",
   "myProductsEmpty": "Vous n’avez pas encore ajouté de produits",
-  "profileLoadError": "Impossible de charger les informations du compte. Veuillez réessayer."
+  "profileLoadError": "Impossible de charger les informations du compte. Veuillez réessayer.",
+  "categoryFieldLabel": "Catégorie",
+  "chooseCategoryValidation": "Choisissez une catégorie",
+  "productTitleField": "Titre du produit",
+  "productTitleRequired": "Saisissez un titre de produit",
+  "productDescriptionOptional": "Description du produit (facultatif)",
+  "priceEgpLabel": "Prix en EGP",
+  "priceMustBePositive": "Saisissez un prix supérieur à zéro",
+  "maxProductImagesReached": "8 photos maximum",
+  "noCategoriesAvailable": "Aucune catégorie n’est disponible. Réessayez plus tard.",
+  "addAtLeastOnePhoto": "Ajoutez au moins une photo",
+  "productSaveFailed": "Impossible d’enregistrer le produit. Veuillez réessayer."
 }
