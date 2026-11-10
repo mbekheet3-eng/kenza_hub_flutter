@@ -21,14 +21,13 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Generate Android and iOS scaffolding
-        run: flutter create . --platforms=android,ios --org com.kenza
+      - name: Generate Android scaffolding
+        run: flutter create . --platforms=android --org com.kenza --project-name hub
 
       - name: Configure Kenza Hub application identifiers and OAuth callbacks
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import plistlib
           import re
 
           manifest = Path("android/app/src/main/AndroidManifest.xml")
@@ -98,23 +97,13 @@ jobs:
               gtext = gtext.replace('        release {', '        release {\n            signingConfig = signingConfigs.release', 1)
           gradle.write_text(gtext)
 
-          info = Path("ios/Runner/Info.plist")
-          with info.open("rb") as f:
-              data = plistlib.load(f)
-          data["CFBundleURLTypes"] = [{
-              "CFBundleURLName": "com.kenza.hub",
-              "CFBundleURLSchemes": ["com.kenza.hub"],
-          }]
-          data["NSPhotoLibraryUsageDescription"] = "نحتاج الوصول إلى الصور لاختيار صور المنتجات التي تريد نشرها."
-          data["NSCameraUsageDescription"] = "نحتاج استخدام الكاميرا لالتقاط صور المنتجات التي تريد نشرها."
-          with info.open("wb") as f:
-              plistlib.dump(data, f)
+          # Ensure Flutter generated the native activity under the exact legacy package.
+          activity = Path("android/app/src/main/kotlin/com/kenza/hub/MainActivity.kt")
+          if not activity.exists():
+              raise SystemExit("Expected MainActivity.kt was not generated for com.kenza.hub.")
+          if "package com.kenza.hub" not in activity.read_text():
+              raise SystemExit("MainActivity package does not match com.kenza.hub.")
 
-          pbx = Path("ios/Runner.xcodeproj/project.pbxproj")
-          ptext = pbx.read_text()
-          ptext = re.sub(r'PRODUCT_BUNDLE_IDENTIFIER = [^;]+;',
-                         'PRODUCT_BUNDLE_IDENTIFIER = com.kenza.hub;', ptext)
-          pbx.write_text(ptext)
           PY
 
       - name: Resolve Flutter packages
@@ -124,7 +113,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add android ios pubspec.lock
+          git add android pubspec.lock
           if git diff --cached --quiet; then
             echo "No platform changes to commit."
           else
