@@ -287,7 +287,7 @@
   "featureUnavailable": "n’est pas disponible actuellement et sera activé une fois son implémentation terminée.",
   "accountDeactivateDelete": "Désactiver ou supprimer le compte",
   "accountDeletionUnavailable": "La désactivation et la suppression du compte ne sont pas disponibles actuellement. Aucune suppression ne sera effectuée depuis cet écran.",
-  "ok": "OK",
+  "ok": "D’accord",
   "signupAgreeTerms": "J’accepte les conditions générales et la politique de confidentialité",
   "orCreateAccountWith": "Ou créez votre compte avec",
   "invalidResetLink": "Le lien de réinitialisation du mot de passe est invalide ou a expiré.",
@@ -310,7 +310,7 @@
   "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
   "termsRequired": "Vous devez accepter les conditions générales et la politique de confidentialité pour continuer",
   "passwordRequired": "Le mot de passe est obligatoire",
-  "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères",
+  "passwordMinLength": "Mot de passe (8 caractères minimum)",
   "allConditions": "Tous les états",
   "priceRange": "Fourchette de prix",
   "phoneNumber": "Numéro de téléphone",
@@ -488,5 +488,11 @@
   "privacyDraftNotice": "Ce document est un premier projet fondé sur la conception actuelle du service, et non un avis juridique définitif. L’entité responsable et ses coordonnées doivent être ajoutées, puis le texte doit être examiné par un juriste avant le lancement public.",
   "loginFailedPrefix": "Impossible de se connecter",
   "emailFirst": "Saisissez d’abord votre adresse e-mail",
-  "resetLinkFailedPrefix": "Impossible d’envoyer le lien de réinitialisation"
+  "resetLinkFailedPrefix": "Impossible d’envoyer le lien de réinitialisation",
+  "signupValidationError": "Vérifiez votre nom, votre e-mail, votre mot de passe (8 caractères minimum) et votre acceptation des conditions.",
+  "signupSuccessTitle": "Compte créé",
+  "signupSuccessMessage": "Si la confirmation par e-mail est activée, ouvrez le message de confirmation que nous vous avons envoyé, puis connectez-vous.",
+  "signupFailedPrefix": "Impossible de créer le compte",
+  "signupDescription": "Un seul compte pour parcourir, vendre et gérer vos produits.",
+  "displayNameLabel": "Nom affiché aux autres membres"
 }
