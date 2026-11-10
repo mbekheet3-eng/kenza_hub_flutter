@@ -150,5 +150,14 @@ jobs:
             git push origin HEAD:phase-1/implementation
           fi
 
+      - name: Remove generated placeholder widget test
+        run: |
+          # flutter create generates a sample test for package:hub/main.dart,
+          # but this repository has its own app entry point and no MyApp widget.
+          # Remove only that untouched Flutter template test; preserve real project tests.
+          if [ -f test/widget_test.dart ] && grep -q "package:hub/main.dart" test/widget_test.dart; then
+            rm test/widget_test.dart
+          fi
+
       - name: Analyze Flutter source
         run: flutter analyze
