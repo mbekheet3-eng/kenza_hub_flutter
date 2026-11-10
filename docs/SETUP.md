@@ -1,10 +1,8 @@
 # Kenza Hub — setup
 
-## 1. Generate Flutter mobile platform scaffolding
+## 1. Generate Flutter Android platform scaffolding
 
-The repository includes a manual GitHub Actions workflow named **Prepare Flutter platforms**. Run it from Actions → Prepare Flutter platforms → Run workflow. It generates the official Android and iOS scaffolding, configures the Kenza Hub application identifier and Supabase OAuth callback, resolves packages, and commits the generated platform files to `phase-1/implementation`. It does not build an APK or merge into `main`.
-
-The workflow then runs `flutter analyze`. A failed analysis is reported in the workflow logs; it does not mean an APK was built.
+The repository includes a manual GitHub Actions workflow named **Prepare Flutter platforms**. Run it from Actions → Prepare Flutter platforms → Run workflow. It prepares the Android scaffold and Supabase OAuth callback on `phase-1/implementation`. It does not build an APK or merge into `main`.
 
 ## 2. Configure Supabase
 
@@ -13,9 +11,7 @@ Use the new Kenza Hub project only:
 - Project ref: `mxdcfewkajwvtwtjoeia`
 - Project URL: `https://mxdcfewkajwvtwtjoeia.supabase.co`
 
-Get the project's publishable key from Supabase API settings. The Flutter client uses the `SUPABASE_PUBLISHABLE_KEY` build-time define. Never use a service-role or secret key in Flutter. Never use a service-role or secret key in Flutter.
-
-Run with build-time values:
+The Flutter client reads `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` from build-time defines. Never use a service-role or secret key in Flutter.
 
 ```bash
 flutter run \
@@ -23,55 +19,43 @@ flutter run \
   --dart-define=SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_KEY
 ```
 
-Do not commit keys to GitHub.
+Do not commit Supabase keys to GitHub.
 
-## 3. Google and Apple login — deferred
+## 3. Android Firebase Cloud Messaging
 
-Google and Apple sign-in are intentionally postponed. Do not configure or test these providers in the current phase. The callback notes below are retained for the later OAuth phase.
+The Android Firebase app must use package name `com.kenza.hub` in Firebase project `kenza-hub`.
 
+- Place its Firebase client configuration at `android/app/google-services.json`.
+- The Google Services Gradle plugin is applied by the Android app module.
+- Flutter initializes Firebase Core and Firebase Messaging at startup.
+- Notification permission is requested after a user signs in.
+- The FCM token is stored in Supabase `public.device_tokens` for the signed-in user. It is deactivated before sign-out.
+- Tapping a system notification opens the in-app Notifications screen.
 
+The Firebase client configuration is not a service-account credential. Never add a Firebase service-account private key, Supabase service-role key, or FCM server credential to Flutter or GitHub source files.
 
-The Flutter code must use this OAuth callback for continuity with the existing app identity:
+**Important:** This configures the Android client and token registration only. Actual remote delivery still requires a trusted server-side sender (for example, a Supabase Edge Function using FCM HTTP v1) and service-account credentials stored only as Supabase secrets. Do not send FCM messages directly from the Flutter client.
+
+The workflow **Resolve Flutter dependencies** runs `flutter pub get` and `flutter analyze`, then commits the resolved `pubspec.lock`. It does not build an APK.
+
+## 4. Google and Apple login
+
+Google and Apple OAuth provider credentials and full sign-in verification remain a separate configuration task. The Android callback is:
 
 ```
 com.kenza.hub://login-callback/
 ```
 
-Add that exact callback to Supabase Authentication → URL Configuration → Redirect URLs.
+Add the exact callback to Supabase Authentication → URL Configuration → Redirect URLs before enabling provider login.
 
-Enable Google and Apple in Authentication → Sign In / Providers and enter the credentials supplied by their respective developer consoles. Provider credentials are intentionally not stored in this repository.
-
-After generating the platform scaffolding in step 1:
-
-- Android: add an intent filter for scheme `com.kenza.hub` and host `login-callback` to the main activity.
-- iOS: register `com.kenza.hub` under `CFBundleURLSchemes` in Runner's `Info.plist`.
-- iOS: add `NSCameraUsageDescription` and `NSPhotoLibraryUsageDescription` descriptions to `Info.plist`.
-
-Google and Apple buttons are implemented, but OAuth cannot complete until provider credentials and native redirect handling are configured.
-
-## 4. Product images
+## 5. Product images
 
 The app uses the existing private `product-images` bucket. It uploads JPEG, PNG, or WebP files (maximum 10 MiB each) and generates signed URLs for display. Do not make the bucket public.
 
-## 5. Phase-one scope
-
-Included: guest browsing, email/password authentication, Google and Apple OAuth entry points, password reset, profile name, product publishing, product editing/deletion, and private image storage.
-
-Not included yet: orders, payments, messaging, favorites, seller subscriptions, store management, advanced search, automated image moderation, or APK release automation.
-
 ## 6. Android release signing (manual only)
 
-The app keeps the legacy Android application ID `com.kenza.hub`. To install an update over the existing Android app, the release must also use the exact same original upload/signing keystore and credentials.
+The app keeps the Android application ID `com.kenza.hub`. To install an update over an existing app, the release must use the exact same original upload/signing keystore and credentials.
 
-In the old repository, the four Actions secrets were identified by name. GitHub does not reveal saved secret values and they cannot be copied automatically between repositories. Add the same original values manually to the new repository under Settings → Secrets and variables → Actions:
+Keep keystore files and credentials in protected GitHub Actions secrets only. Never paste secret values into chat, source files, commits, or workflow logs. Do not generate a replacement keystore if the intention is to update an existing installation.
 
-- `ANDROID_KEYSTORE_BASE64`
-- `ANDROID_KEYSTORE_PASSWORD`
-- `ANDROID_KEY_ALIAS`
-- `ANDROID_KEY_PASSWORD`
-
-Do not paste secret values into chat, source files, commits, or workflow logs. `ANDROID_KEYSTORE_BASE64` must contain the Base64 encoding of the original `.jks` file, not a newly generated keystore.
-
-The repository has a separate **Build signed Android APK** workflow. It is manual-only (Actions → Build signed Android APK → Run workflow), restores the keystore temporarily, builds a release APK, and uploads the APK as a workflow artifact. It is not run automatically by this setup and does not merge anything into `main`.
-
-Before distributing an update, confirm that the new `versionCode` is higher than the version currently installed on users' devices. Never generate a replacement keystore if the intention is to update the existing app.
+APK builds remain manual-only and are not triggered by the Firebase setup workflow.
