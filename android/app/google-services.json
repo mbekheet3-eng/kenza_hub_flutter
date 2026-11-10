@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "882976395340",
+    "project_id": "kenza-hub",
+    "storage_bucket": "kenza-hub.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:882976395340:android:9a6a1a517c5be1fe6e24e9",
+        "android_client_info": {
+          "package_name": "com.kenza.hub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "882976395340-nd8a0ocj955doo8oi8nf8184nqmkh8m7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzgnACPgt1s0Q4n35z48P3DJjswPiT8dM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "882976395340-7hvc9qair13qae1kdspi5phclqb4j8c8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "882976395340-ti4t9taev5vslp5mlt5ed8nv81n2vv52.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mycompany.kenzahub"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:882976395340:android:071d8227c8cd07666e24e9",
+        "android_client_info": {
+          "package_name": "com.mycompany.kenzahub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "882976395340-hqkikj59kiptdtr26uiifvb0hiuvrtv8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mycompany.kenzahub",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "882976395340-nd8a0ocj955doo8oi8nf8184nqmkh8m7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzgnACPgt1s0Q4n35z48P3DJjswPiT8dM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "882976395340-7hvc9qair13qae1kdspi5phclqb4j8c8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "882976395340-ti4t9taev5vslp5mlt5ed8nv81n2vv52.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mycompany.kenzahub"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
