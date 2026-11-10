@@ -469,13 +469,36 @@ class _HomeScreenState extends State<HomeScreen> {
         top: false,
         child: NavigationBar(
           selectedIndex: 0,
-          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          height: 68,
+          backgroundColor: Colors.white,
+          indicatorColor: const Color(0xFFFCE8E8),
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
           destinations: [
-            NavigationDestination(icon: const Icon(Icons.home_outlined), selectedIcon: const Icon(Icons.home_rounded), label: AppStrings.of(context)!.mainHome),
-            NavigationDestination(icon: const Icon(Icons.grid_view_outlined), selectedIcon: const Icon(Icons.grid_view_rounded), label: AppStrings.of(context)!.homeSections),
-            NavigationDestination(icon: const Icon(Icons.add_circle_outline_rounded), selectedIcon: const Icon(Icons.add_circle_rounded), label: AppStrings.of(context)!.addProduct),
-            NavigationDestination(icon: const Icon(Icons.chat_bubble_outline_rounded), selectedIcon: const Icon(Icons.chat_rounded), label: AppStrings.of(context)!.messages),
-            NavigationDestination(icon: const Icon(Icons.person_outline_rounded), selectedIcon: const Icon(Icons.person_rounded), label: AppStrings.of(context)!.accountTab),
+            NavigationDestination(
+              icon: const Icon(Icons.home_outlined, color: Color(0xFFB86B6B)),
+              selectedIcon: const Icon(Icons.home_rounded, color: Color(0xFFC62828)),
+              label: AppStrings.of(context)!.mainHome,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.grid_view_outlined, color: Color(0xFFB86B6B)),
+              selectedIcon: const Icon(Icons.grid_view_rounded, color: Color(0xFFC62828)),
+              label: AppStrings.of(context)!.homeSections,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.add_circle_outline_rounded, size: 32, color: Color(0xFFC62828)),
+              selectedIcon: const Icon(Icons.add_circle_rounded, size: 34, color: Color(0xFFC62828)),
+              label: AppStrings.of(context)!.addProduct,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.chat_bubble_outline_rounded, color: Color(0xFFB86B6B)),
+              selectedIcon: const Icon(Icons.chat_rounded, color: Color(0xFFC62828)),
+              label: AppStrings.of(context)!.messages,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.person_outline_rounded, color: Color(0xFFB86B6B)),
+              selectedIcon: const Icon(Icons.person_rounded, color: Color(0xFFC62828)),
+              label: AppStrings.of(context)!.accountTab,
+            ),
           ],
           onDestinationSelected: (index) {
             switch (index) {

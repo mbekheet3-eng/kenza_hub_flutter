@@ -2,17 +2,14 @@ import 'package:flutter/material.dart';
 import '../l10n/app_strings.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../models/product.dart';
 import '../services/auth_service.dart';
-import '../services/marketplace_service.dart';
-import '../widgets/product_card.dart';
-import 'product_detail_screen.dart';
 import 'about_kenza_screen.dart';
 import 'policies_screen.dart';
 import 'password_recovery_screen.dart';
 import 'messages_inbox_screen.dart';
 import 'favorites_screen.dart';
 import 'notifications_screen.dart';
+import 'my_products_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -23,11 +20,8 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final _auth = AuthService();
-  final _service = MarketplaceService();
   Map<String, dynamic>? _profile;
-  List<Product> _products = [];
   bool _loading = true;
-  String? _error;
 
   User? get _user => Supabase.instance.client.auth.currentUser;
 
@@ -42,7 +36,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (user == null) return;
     setState(() {
       _loading = true;
-      _error = null;
     });
     try {
       final profile = await Supabase.instance.client
@@ -50,14 +43,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           .select('display_name,avatar_url')
           .eq('id', user.id)
           .maybeSingle();
-      final products = await _service.getMyProducts();
       if (!mounted) return;
       setState(() {
         _profile = profile;
-        _products = products;
       });
-    } catch (error) {
-      if (mounted) setState(() => _error = error.toString());
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -202,42 +191,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           MaterialPageRoute(builder: (_) => const PoliciesScreen()),
                         ),
                       ),
-                      const Divider(height: 28),
-                      Text('${AppStrings.of(context)!.myProductsTitle} (${_products.length})',
-                          style: Theme.of(context).textTheme.titleLarge),
-                      if (_error != null)
-                        Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Text(AppStrings.of(context)!.profileLoadError, style: const TextStyle(color: Colors.red)),
+                      ListTile(
+                        leading: const Icon(Icons.inventory_2_outlined),
+                        title: Text(AppStrings.of(context)!.myProductsTitle),
+                        trailing: Icon(isRtl ? Icons.chevron_left : Icons.chevron_right),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const MyProductsScreen()),
                         ),
-                      if (_products.isEmpty && _error == null)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 24),
-                          child: Text(AppStrings.of(context)!.myProductsEmpty),
-                        )
-                      else
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: _products.length,
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 0.68,
-                          ),
-                          itemBuilder: (context, index) {
-                            final product = _products[index];
-                            return ProductCard(
-                              product: product,
-                              onTap: () => Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => ProductDetailScreen(productId: product.id),
-                                ),
-                              ).then((_) => _load()),
-                            );
-                          },
-                        ),
+                      ),
                     ],
                   ),
                 ),
