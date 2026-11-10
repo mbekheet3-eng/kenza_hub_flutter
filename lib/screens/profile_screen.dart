@@ -39,6 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _load() async {
     final user = _user;
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
     if (user == null) return;
     setState(() {
       _loading = true;
@@ -155,7 +156,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         leading: const Icon(Icons.notifications_none_rounded),
                         title: Text(AppStrings.of(context)!.notificationsTitle),
                         subtitle: Text(AppStrings.of(context)!.notificationsSubtitle),
-                        trailing: const Icon(Icons.chevron_right, matchTextDirection: true),
+                        trailing: Icon(isRtl ? Icons.chevron_left : Icons.chevron_right),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const NotificationsScreen()),
                         ),
@@ -164,7 +165,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         leading: const Icon(Icons.mail_outline_rounded),
                         title: Text(AppStrings.of(context)!.messagesOrdersTitle),
                         subtitle: Text(AppStrings.of(context)!.messagesOrdersSubtitle),
-                        trailing: const Icon(Icons.chevron_left),
+                        trailing: Icon(isRtl ? Icons.chevron_left : Icons.chevron_right),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const MessagesInboxScreen()),
                         ),
@@ -210,8 +211,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: Text(AppStrings.of(context)!.profileLoadError, style: const TextStyle(color: Colors.red)),
                         ),
                       if (_products.isEmpty && _error == null)
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 24),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 24),
                           child: Text(AppStrings.of(context)!.myProductsEmpty),
                         )
                       else

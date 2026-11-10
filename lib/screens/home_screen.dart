@@ -200,7 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
           shrinkWrap: true,
           padding: const EdgeInsets.symmetric(vertical: 8),
           children: [
-            const ListTile(
+            ListTile(
               title: Text(AppStrings.of(context)!.homeSections),
               titleTextStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
             ),
@@ -426,7 +426,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 )
               else if (_products.isEmpty)
-                const SliverFillRemaining(
+                SliverFillRemaining(
                   hasScrollBody: false,
                   child: Center(child: Text(AppStrings.of(context)!.noProducts)),
                 )
@@ -470,7 +470,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: NavigationBar(
           selectedIndex: 0,
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-          destinations: const [
+          destinations: [
             NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home_rounded), label: AppStrings.of(context)!.mainHome),
             NavigationDestination(icon: Icon(Icons.grid_view_outlined), selectedIcon: Icon(Icons.grid_view_rounded), label: AppStrings.of(context)!.homeSections),
             NavigationDestination(icon: Icon(Icons.add_circle_outline_rounded), selectedIcon: Icon(Icons.add_circle_rounded), label: AppStrings.of(context)!.addProduct),
