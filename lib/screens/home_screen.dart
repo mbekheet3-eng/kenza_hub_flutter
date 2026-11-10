@@ -187,14 +187,48 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  List<Category> get _rootCategories =>
+      _categories.where((category) => category.parentId == null).toList()
+        ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+
+  List<Category> _childrenOf(String parentId) => _categories
+      .where((category) => category.parentId == parentId)
+      .toList()
+    ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+
+  Widget _categoryTile(Category category, BuildContext sheetContext) {
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final children = _childrenOf(category.id);
+    if (children.isEmpty) {
+      return ListTile(
+        leading: const Icon(Icons.category_outlined),
+        title: Text(category.nameFor(languageCode)),
+        onTap: () => Navigator.pop(sheetContext, category.id),
+      );
+    }
+    return ExpansionTile(
+      leading: const Icon(Icons.folder_outlined),
+      title: Text(category.nameFor(languageCode)),
+      children: [
+        ListTile(
+          dense: true,
+          title: Text('${category.nameFor(languageCode)} — ${AppStrings.of(context)!.allProducts}'),
+          onTap: () => Navigator.pop(sheetContext, category.id),
+        ),
+        ...children.map((child) => _categoryTile(child, sheetContext)),
+      ],
+    );
+  }
+
   Future<void> _openCategories() async {
-    if (_categories.isEmpty) {
+    if (_rootCategories.isEmpty) {
       _showComingSoon(AppStrings.of(context)!.homeSections);
       return;
     }
     final selectedId = await showModalBottomSheet<String?>(
       context: context,
       showDragHandle: true,
+      isScrollControlled: true,
       builder: (sheetContext) => SafeArea(
         child: ListView(
           shrinkWrap: true,
@@ -209,13 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title: Text(AppStrings.of(context)!.allProducts),
               onTap: () => Navigator.pop(sheetContext, ''),
             ),
-            ..._categories.map(
-              (category) => ListTile(
-                leading: const Icon(Icons.category_outlined),
-                title: Text(category.nameFor(Localizations.localeOf(context).languageCode)),
-                onTap: () => Navigator.pop(sheetContext, category.id),
-              ),
-            ),
+            ..._rootCategories.map((category) => _categoryTile(category, sheetContext)),
           ],
         ),
       ),
@@ -356,7 +384,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                         ),
                       ),
-                      ..._categories.map(
+                      ..._rootCategories.map(
                         (category) => Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: ChoiceChip(
