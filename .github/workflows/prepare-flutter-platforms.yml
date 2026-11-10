@@ -2,6 +2,11 @@ name: Prepare Flutter platforms
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - phase-1/implementation
+    paths:
+      - .github/workflows/prepare-flutter-platforms.yml
 
 permissions:
   contents: write
@@ -67,7 +72,6 @@ jobs:
           gtext = re.sub(r'namespace\s*[= ]\s*["\'][^"\']+["\']',
                          'namespace = "com.kenza.hub"', gtext, count=1)
 
-          # Configure release signing from GitHub Actions environment secrets.
           if gradle.suffix == ".kts":
               signing = """
               signingConfigs {
@@ -97,13 +101,11 @@ jobs:
               gtext = gtext.replace('        release {', '        release {\n            signingConfig = signingConfigs.release', 1)
           gradle.write_text(gtext)
 
-          # Ensure Flutter generated the native activity under the exact legacy package.
           activity = Path("android/app/src/main/kotlin/com/kenza/hub/MainActivity.kt")
           if not activity.exists():
               raise SystemExit("Expected MainActivity.kt was not generated for com.kenza.hub.")
           if "package com.kenza.hub" not in activity.read_text():
               raise SystemExit("MainActivity package does not match com.kenza.hub.")
-
           PY
 
       - name: Resolve Flutter packages
