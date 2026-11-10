@@ -632,5 +632,6 @@
   "brandName": "Kenza Hub",
   "missingConfigurationMessage": "La connexion au serveur doit être configurée avant le démarrage de l’application. Vérifiez sa configuration.",
   "addFavoriteTooltip": "Ajouter aux favoris",
-  "removeFavoriteTooltip": "Retirer des favoris"
+  "removeFavoriteTooltip": "Retirer des favoris",
+  "viewNotification": "Voir"
 }

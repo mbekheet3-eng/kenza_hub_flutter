@@ -4,6 +4,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+import '../l10n/app_strings.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../app.dart';
@@ -157,9 +159,9 @@ class PushNotificationService {
 
     ScaffoldMessenger.maybeOf(context)?.showSnackBar(
       SnackBar(
-        content: Text(content.isEmpty ? 'لديك إشعار جديد' : content),
+        content: Text(content.isEmpty ? AppStrings.of(context)!.newNotification : content),
         action: SnackBarAction(
-          label: 'عرض',
+          label: AppStrings.of(context)!.viewNotification,
           onPressed: _openNotifications,
         ),
       ),

@@ -57,7 +57,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                '${AppStrings.of(context)!.messageSentRefreshFailedPrefix}: $error',
+                AppStrings.of(context)!.messageSentRefreshFailedPrefix,
               ),
             ),
           );
@@ -66,7 +66,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${AppStrings.of(context)!.sendMessageFailedPrefix}: $error')),
+          SnackBar(content: Text(AppStrings.of(context)!.sendMessageFailedPrefix)),
         );
       }
     } finally {
@@ -91,7 +91,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 }
                 if (snapshot.hasError) {
                   return Center(
-                    child: Text('${AppStrings.of(context)!.conversationLoadFailedPrefix}: ${snapshot.error}'),
+                    child: Text(AppStrings.of(context)!.conversationLoadFailedPrefix),
                   );
                 }
                 final rows = snapshot.data ?? [];

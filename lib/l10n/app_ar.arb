@@ -632,5 +632,6 @@
   "brandName": "كنزة هب",
   "missingConfigurationMessage": "يلزم إعداد اتصال التطبيق بالخادم قبل تشغيله. يرجى مراجعة إعدادات التطبيق.",
   "addFavoriteTooltip": "إضافة للمفضلة",
-  "removeFavoriteTooltip": "إزالة من المفضلة"
+  "removeFavoriteTooltip": "إزالة من المفضلة",
+  "viewNotification": "عرض"
 }

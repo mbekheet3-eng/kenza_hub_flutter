@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         final strings = AppStrings.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${strings.loginFailedPrefix}: $error')),
+          SnackBar(content: Text(strings.loginFailedPrefix)),
         );
       }
     } finally {
@@ -62,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${strings.resetLinkFailedPrefix}: $error')),
+          SnackBar(content: Text(strings.resetLinkFailedPrefix)),
         );
       }
     }

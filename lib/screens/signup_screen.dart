@@ -71,7 +71,7 @@ class _SignupScreenState extends State<SignupScreen> {
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${strings.signupFailedPrefix}: $error')),
+          SnackBar(content: Text(strings.signupFailedPrefix)),
         );
       }
     } finally {

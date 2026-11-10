@@ -632,5 +632,6 @@
   "brandName": "Kenza Hub",
   "missingConfigurationMessage": "The app's server connection must be configured before it can start. Please check the app configuration.",
   "addFavoriteTooltip": "Add to favorites",
-  "removeFavoriteTooltip": "Remove from favorites"
+  "removeFavoriteTooltip": "Remove from favorites",
+  "viewNotification": "View"
 }
