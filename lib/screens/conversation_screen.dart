@@ -31,18 +31,37 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 
   Future<void> _refresh() async {
-    setState(() => _messages = _service.getMessages(widget.conversationId));
-    await _messages;
+    final future = _service.getMessages(widget.conversationId);
+    setState(() => _messages = future);
+    await future;
   }
 
   Future<void> _send() async {
     final text = _messageController.text.trim();
     if (text.isEmpty || _sending) return;
+
     setState(() => _sending = true);
     try {
+      // Only this operation determines whether the message was sent.
       await _service.sendMessage(widget.conversationId, text);
       _messageController.clear();
-      await _refresh();
+
+      if (!mounted) return;
+
+      // A refresh failure must not be reported as a message-send failure.
+      try {
+        await _refresh();
+      } catch (error) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'تم إرسال الرسالة، لكن تعذر تحديث المحادثة: $error',
+              ),
+            ),
+          );
+        }
+      }
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -57,6 +76,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
   @override
   Widget build(BuildContext context) {
     final myId = Supabase.instance.client.auth.currentUser?.id;
+    final colors = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(title: const Text('المحادثة')),
       body: Column(
@@ -69,11 +90,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (snapshot.hasError) {
-                  return Center(child: Text('تعذر تحميل المحادثة: ${snapshot.error}'));
+                  return Center(
+                    child: Text('تعذر تحميل المحادثة: ${snapshot.error}'),
+                  );
                 }
                 final rows = snapshot.data ?? [];
                 if (rows.isEmpty) {
-                  return const Center(child: Text('ابدأ المحادثة برسالة للبائع'));
+                  return const Center(
+                    child: Text('ابدأ المحادثة برسالة للبائع'),
+                  );
                 }
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
@@ -82,16 +107,30 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     final row = rows[index];
                     final mine = row['sender_id'] == myId;
                     return Align(
-                      alignment: mine ? AlignmentDirectional.centerEnd : AlignmentDirectional.centerStart,
+                      alignment: mine
+                          ? AlignmentDirectional.centerEnd
+                          : AlignmentDirectional.centerStart,
                       child: Container(
                         constraints: const BoxConstraints(maxWidth: 300),
                         margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
                         decoration: BoxDecoration(
-                          color: mine ? Theme.of(context).colorScheme.primaryContainer : Theme.of(context).colorScheme.surfaceContainerHighest,
+                          // Sent messages use Kenza's brand red; received
+                          // messages use the neutral surface from the app theme.
+                          color: mine
+                              ? colors.primary
+                              : colors.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: Text(row['body'] as String),
+                        child: Text(
+                          row['body'] as String,
+                          style: TextStyle(
+                            color: mine ? colors.onPrimary : colors.onSurface,
+                          ),
+                        ),
                       ),
                     );
                   },
@@ -112,14 +151,20 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       maxLines: 4,
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => _send(),
-                      decoration: const InputDecoration(hintText: 'اكتب رسالتك'),
+                      decoration: const InputDecoration(
+                        hintText: 'اكتب رسالتك',
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
                   IconButton.filled(
                     onPressed: _sending ? null : _send,
                     icon: _sending
-                        ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
                         : const Icon(Icons.send_rounded),
                   ),
                 ],
