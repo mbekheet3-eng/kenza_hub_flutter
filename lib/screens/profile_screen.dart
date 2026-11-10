@@ -39,7 +39,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _load() async {
     final user = _user;
-    final isRtl = Directionality.of(context) == TextDirection.rtl;
     if (user == null) return;
     setState(() {
       _loading = true;
@@ -117,6 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final user = _user;
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
     return Scaffold(
       appBar: AppBar(
         title: Text(AppStrings.of(context)!.profileTitle),
