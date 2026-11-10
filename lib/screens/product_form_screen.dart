@@ -105,15 +105,16 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     final fields = <Widget>[];
     final languageCode = Localizations.localeOf(context).languageCode;
     for (var depth = 0; depth <= _selectionPath.length; depth++) {
-      final parentId = depth == 0 ? null : _selectionPath[depth - 1].id;
+      final level = depth;
+      final parentId = level == 0 ? null : _selectionPath[level - 1].id;
       final options = _childrenOf(parentId);
       if (options.isEmpty) continue;
-      final selectedId = depth < _selectionPath.length
-          ? _selectionPath[depth].id
+      final selectedId = level < _selectionPath.length
+          ? _selectionPath[level].id
           : null;
       fields.add(
         DropdownButtonFormField<String>(
-          key: ValueKey('category-level-$depth-${parentId ?? 'root'}'),
+          key: ValueKey('category-level-$level-${parentId ?? 'root'}'),
           initialValue: selectedId,
           decoration: InputDecoration(
             labelText: AppStrings.of(context)!.categoryFieldLabel,
@@ -124,7 +125,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     child: Text(category.nameFor(languageCode)),
                   ))
               .toList(),
-          onChanged: _saving ? null : (value) => _selectCategory(depth, value),
+          onChanged: _saving ? null : (value) => _selectCategory(level, value),
         ),
       );
       fields.add(const SizedBox(height: 12));
