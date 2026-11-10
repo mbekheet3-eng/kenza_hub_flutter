@@ -605,5 +605,15 @@
   "offerSendFailed": "Could not send the offer. Please try again.",
   "conversationOpenFailed": "Could not open the conversation. Please try again.",
   "noDescription": "No description provided",
-  "publishedDateLabel": "Published"
+  "publishedDateLabel": "Published",
+  "editNameTitle": "Edit name",
+  "displayNameField": "Display name",
+  "profileUpdateFailed": "Could not update your name. Please try again.",
+  "loginToViewAccount": "Log in to view your account",
+  "memberFallbackName": "Kenza Hub member",
+  "notificationsSubtitle": "Alerts for messages, offers, and purchase requests",
+  "messagesOrdersSubtitle": "Your conversations and incoming and outgoing requests",
+  "changePasswordLabel": "Change password",
+  "myProductsEmpty": "You haven't added any products yet",
+  "profileLoadError": "Could not load account details. Please try again."
 }

@@ -605,5 +605,15 @@
   "offerSendFailed": "تعذر إرسال العرض. حاول مرة أخرى.",
   "conversationOpenFailed": "تعذر فتح المحادثة. حاول مرة أخرى.",
   "noDescription": "لا يوجد وصف",
-  "publishedDateLabel": "تاريخ النشر"
+  "publishedDateLabel": "تاريخ النشر",
+  "editNameTitle": "تعديل الاسم",
+  "displayNameField": "الاسم الظاهر",
+  "profileUpdateFailed": "تعذر تحديث الاسم. حاول مرة أخرى.",
+  "loginToViewAccount": "سجّل الدخول لعرض حسابك",
+  "memberFallbackName": "عضو كنزة هب",
+  "notificationsSubtitle": "تنبيهات الرسائل والعروض وطلبات الشراء",
+  "messagesOrdersSubtitle": "محادثاتك والطلبات الواردة والصادرة",
+  "changePasswordLabel": "تغيير كلمة المرور",
+  "myProductsEmpty": "لم تضف أي منتجات بعد",
+  "profileLoadError": "تعذر تحميل بيانات الحساب. حاول مرة أخرى."
 }

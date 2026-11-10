@@ -605,5 +605,15 @@
   "offerSendFailed": "Impossible d’envoyer l’offre. Veuillez réessayer.",
   "conversationOpenFailed": "Impossible d’ouvrir la conversation. Veuillez réessayer.",
   "noDescription": "Aucune description fournie",
-  "publishedDateLabel": "Publié"
+  "publishedDateLabel": "Publié",
+  "editNameTitle": "Modifier le nom",
+  "displayNameField": "Nom affiché",
+  "profileUpdateFailed": "Impossible de mettre à jour votre nom. Veuillez réessayer.",
+  "loginToViewAccount": "Connectez-vous pour consulter votre compte",
+  "memberFallbackName": "Membre Kenza Hub",
+  "notificationsSubtitle": "Alertes pour les messages, les offres et les demandes d’achat",
+  "messagesOrdersSubtitle": "Vos conversations et demandes reçues et envoyées",
+  "changePasswordLabel": "Changer le mot de passe",
+  "myProductsEmpty": "Vous n’avez pas encore ajouté de produits",
+  "profileLoadError": "Impossible de charger les informations du compte. Veuillez réessayer."
 }

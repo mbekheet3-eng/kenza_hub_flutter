@@ -70,11 +70,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final name = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('تعديل الاسم'),
+        title: Text(AppStrings.of(context)!.editNameTitle),
         content: TextField(
           controller: controller,
           maxLength: 60,
-          decoration: const InputDecoration(labelText: 'الاسم الظاهر'),
+          decoration: InputDecoration(labelText: AppStrings.of(context)!.displayNameField),
         ),
         actions: [
           TextButton(
@@ -102,7 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذر تحديث الاسم: $error')),
+          SnackBar(content: Text(AppStrings.of(context)!.profileUpdateFailed)),
         );
       }
     }
@@ -128,7 +128,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       body: user == null
-          ? Center(child: Text('سجّل الدخول لعرض حسابك'))
+          ? Center(child: Text(AppStrings.of(context)!.loginToViewAccount))
           : _loading
               ? Center(child: CircularProgressIndicator())
               : RefreshIndicator(
@@ -142,7 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         title: Text(
                           (_profile?['display_name'] as String?)?.isNotEmpty == true
                               ? _profile!['display_name'] as String
-                              : 'عضو كنزة هب',
+                              : AppStrings.of(context)!.memberFallbackName,
                         ),
                         subtitle: Text(user.email ?? ''),
                         trailing: IconButton(
@@ -153,17 +153,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const Divider(height: 28),
                       ListTile(
                         leading: const Icon(Icons.notifications_none_rounded),
-                        title: const Text('الإشعارات'),
-                        subtitle: const Text('تنبيهات الرسائل والعروض وطلبات الشراء'),
-                        trailing: const Icon(Icons.chevron_left),
+                        title: Text(AppStrings.of(context)!.notificationsTitle),
+                        subtitle: Text(AppStrings.of(context)!.notificationsSubtitle),
+                        trailing: const Icon(Icons.chevron_right, matchTextDirection: true),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const NotificationsScreen()),
                         ),
                       ),
                       ListTile(
                         leading: const Icon(Icons.mail_outline_rounded),
-                        title: const Text('الرسائل والعروض وطلبات الشراء'),
-                        subtitle: const Text('محادثاتك والطلبات الواردة والصادرة'),
+                        title: Text(AppStrings.of(context)!.messagesOrdersTitle),
+                        subtitle: Text(AppStrings.of(context)!.messagesOrdersSubtitle),
                         trailing: const Icon(Icons.chevron_left),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const MessagesInboxScreen()),
@@ -171,7 +171,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       ListTile(
                         leading: const Icon(Icons.favorite_border_rounded),
-                        title: const Text('المفضلة'),
+                        title: Text(AppStrings.of(context)!.favoritesTitle),
                         trailing: const Icon(Icons.chevron_left),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const FavoritesScreen()),
@@ -179,7 +179,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       ListTile(
                         leading: const Icon(Icons.lock_reset_outlined),
-                        title: const Text('تغيير كلمة المرور'),
+                        title: Text(AppStrings.of(context)!.changePasswordLabel),
                         trailing: const Icon(Icons.chevron_left),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const PasswordRecoveryScreen()),
@@ -187,7 +187,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       ListTile(
                         leading: const Icon(Icons.info_outline),
-                        title: const Text('عن كنزة هب'),
+                        title: Text(AppStrings.of(context)!.aboutKenza),
                         trailing: const Icon(Icons.chevron_left),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const AboutKenzaScreen()),
@@ -195,24 +195,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       ListTile(
                         leading: const Icon(Icons.policy_outlined),
-                        title: const Text('الشروط والسياسات'),
+                        title: Text(AppStrings.of(context)!.policiesTerms),
                         trailing: const Icon(Icons.chevron_left),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const PoliciesScreen()),
                         ),
                       ),
                       const Divider(height: 28),
-                      Text('منتجاتي (${_products.length})',
+                      Text('${AppStrings.of(context)!.myProductsTitle} (${_products.length})',
                           style: Theme.of(context).textTheme.titleLarge),
                       if (_error != null)
                         Padding(
                           padding: const EdgeInsets.all(12),
-                          child: Text(_error!, style: const TextStyle(color: Colors.red)),
+                          child: Text(AppStrings.of(context)!.profileLoadError, style: const TextStyle(color: Colors.red)),
                         ),
                       if (_products.isEmpty && _error == null)
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 24),
-                          child: Text('لم تضف أي منتجات بعد'),
+                          child: Text(AppStrings.of(context)!.myProductsEmpty),
                         )
                       else
                         GridView.builder(
