@@ -5,6 +5,9 @@ import 'config/app_theme.dart';
 import 'l10n/app_strings.dart';
 import 'screens/splash_screen.dart';
 
+final GlobalKey<NavigatorState> rootNavigatorKey =
+    GlobalKey<NavigatorState>();
+
 class KenzaHubApp extends StatelessWidget {
   const KenzaHubApp({super.key});
 
@@ -13,6 +16,7 @@ class KenzaHubApp extends StatelessWidget {
     return ValueListenableBuilder<Locale>(
       valueListenable: AppLocale.notifier,
       builder: (context, locale, _) => MaterialApp(
+        navigatorKey: rootNavigatorKey,
         title: 'كنزة هب',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
