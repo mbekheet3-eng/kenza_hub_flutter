@@ -11,11 +11,26 @@ class MarketplaceService {
       : _client = client ?? Supabase.instance.client;
 
   final SupabaseClient _client;
+  Future<List<Category>>? _categoriesCache;
   static const String bucket = 'product-images';
   static const int maxImageBytes = 10 * 1024 * 1024;
   static const int maxImages = 8;
 
   Future<List<Category>> getCategories() async {
+    final cached = _categoriesCache;
+    if (cached != null) return cached;
+
+    final request = _loadCategories();
+    _categoriesCache = request;
+    try {
+      return await request;
+    } catch (_) {
+      _categoriesCache = null;
+      rethrow;
+    }
+  }
+
+  Future<List<Category>> _loadCategories() async {
     final rows = await _client
         .from('categories')
         .select('id,parent_id,name_ar,name_en,name_fr,slug,sort_order')
