@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../app.dart';
@@ -131,6 +131,12 @@ class PushNotificationService {
       debugPrint('Could not deactivate the FCM token: $error');
       debugPrintStack(stackTrace: stackTrace);
     }
+  }
+
+  Future<void> dispose() async {
+    await _authSubscription?.cancel();
+    await _tokenSubscription?.cancel();
+    await _openedSubscription?.cancel();
   }
 
   void _openNotifications() {
