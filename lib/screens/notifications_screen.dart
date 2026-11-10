@@ -28,7 +28,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تعذر تحديث الإشعارات: $error')),
+        SnackBar(content: Text(AppStrings.of(context)!.notificationsUpdateError)),
       );
     }
   }
@@ -58,7 +58,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تعذر فتح الإشعار: $error')),
+        SnackBar(content: Text(AppStrings.of(context)!.notificationOpenError)),
       );
     }
   }
@@ -107,7 +107,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text('تعذر تحميل الإشعارات: ${snapshot.error}'),
+                child: Text(AppStrings.of(context)!.notificationsLoadError),
               ),
             );
           }
@@ -146,7 +146,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   child: Icon(_icon(row['type']?.toString())),
                 ),
                 title: Text(
-                  row['title']?.toString() ?? 'إشعار جديد',
+                  row['title']?.toString() ?? AppStrings.of(context)!.newNotification,
                   style: TextStyle(fontWeight: unread ? FontWeight.w800 : FontWeight.w500),
                 ),
                 subtitle: Text(

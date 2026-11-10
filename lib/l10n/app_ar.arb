@@ -546,5 +546,9 @@
   "messageSentRefreshFailedPrefix": "تم إرسال الرسالة، لكن تعذر تحديث المحادثة",
   "sendMessageFailedPrefix": "تعذر إرسال الرسالة",
   "conversationLoadFailedPrefix": "تعذر تحميل المحادثة",
-  "favoriteLoadError": "تعذر تحميل المفضلة. حاول مرة أخرى."
+  "favoriteLoadError": "تعذر تحميل المفضلة. حاول مرة أخرى.",
+  "notificationsUpdateError": "تعذر تحديث الإشعارات. حاول مرة أخرى.",
+  "notificationOpenError": "تعذر فتح الإشعار. حاول مرة أخرى.",
+  "notificationsLoadError": "تعذر تحميل الإشعارات.",
+  "newNotification": "إشعار جديد"
 }

@@ -546,5 +546,9 @@
   "messageSentRefreshFailedPrefix": "Message envoyé, mais la conversation n’a pas pu être actualisée",
   "sendMessageFailedPrefix": "Impossible d’envoyer le message",
   "conversationLoadFailedPrefix": "Impossible de charger la conversation",
-  "favoriteLoadError": "Impossible de charger vos favoris. Veuillez réessayer."
+  "favoriteLoadError": "Impossible de charger vos favoris. Veuillez réessayer.",
+  "notificationsUpdateError": "Impossible de mettre à jour les notifications. Veuillez réessayer.",
+  "notificationOpenError": "Impossible d’ouvrir la notification. Veuillez réessayer.",
+  "notificationsLoadError": "Impossible de charger les notifications.",
+  "newNotification": "Nouvelle notification"
 }
