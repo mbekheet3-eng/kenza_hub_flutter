@@ -5,7 +5,7 @@ Project: `mxdcfewkajwvtwtjoeia`
 ## Tables
 
 - `profiles`: one row per Auth user; only the owner can read or update it.
-- `categories`: active categories are readable by guests and members.
+- `categories`: active categories are readable by guests and members. Every row must provide non-empty `name_ar`, `name_en`, and `name_fr`; the app selects the matching label using the member's chosen language. `id` and `slug` remain language-independent and stable.
 - `products`: `owner_id`, `category_id`, `title`, `description`, `price`, `currency`, `status`, `created_at`.
 - `product_images`: `product_id`, `storage_path`, `alt_text`, `sort_order`, `created_at`.
 
@@ -31,12 +31,16 @@ This is immediate publication after a successful upload, not an admin review que
 
 ## Categories seeded
 
-- clothes — ملابس
-- shoes — أحذية
-- children-supplies — مستلزمات الأطفال
-- home-supplies — مستلزمات المنزل
+- clothes — ملابس / Clothes / Vêtements
+- shoes — أحذية / Shoes / Chaussures
+- children-supplies — مستلزمات الأطفال / Children Supplies / Articles pour enfants
+- home-supplies — مستلزمات المنزل / Home Supplies / Articles pour la maison
 
 The more specialized store/agency sections and additional marketplace features remain outside phase one.
+
+## Category localization contract
+
+`categories.name_ar`, `categories.name_en`, and `categories.name_fr` are required and must not be blank. When adding a category, provide all three translations in the same insert or migration. Do not change `id` or `slug` when translating labels.
 
 ## Security
 
@@ -45,12 +49,13 @@ RLS is enabled on all four public tables. Product writes are owner-scoped. The A
 
 ## Migration source files
 
-The repository now contains the five migration files corresponding to the deployed database history:
+The repository now contains the six migration files corresponding to the deployed database history:
 
 - `20261108185823_create_marketplace_core_tables.sql`
 - `20261108185831_optimize_core_rls_and_category_index.sql`
 - `20261108185839_tighten_core_table_grants.sql`
 - `20261108190009_create_private_product_images_storage.sql`
 - `20261108191509_create_profile_on_signup_and_seed_core_categories.sql`
+- `20261110010000_add_french_category_names.sql
 
 The first four files are a source-controlled reconstruction of the verified deployed schema and policies. Before using them to provision another project, replay them against a clean disposable Supabase project and compare the resulting schema, RLS policies, grants, and Storage policies with this contract.
