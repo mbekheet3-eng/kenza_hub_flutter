@@ -1,0 +1,105 @@
+name: Build Debug APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-debug-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out implementation branch
+        uses: actions/checkout@v4
+        with:
+          ref: phase-1/implementation
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze Flutter code
+        run: flutter analyze
+
+      - name: Generate Android platform files for this build
+        run: flutter create --platforms=android --org com.kenza --project-name hub .
+
+      - name: Configure Android internet permission, app identity, and OAuth callback
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          manifest = Path("android/app/src/main/AndroidManifest.xml")
+          text = manifest.read_text()
+          permission = '<uses-permission android:name="android.permission.INTERNET" />'
+          if permission not in text:
+              manifest_start = text.find("<manifest")
+              manifest_end = text.find(">", manifest_start)
+              if manifest_start < 0 or manifest_end < 0:
+                  raise SystemExit("Could not locate Android manifest root.")
+              text = text[:manifest_end + 1] + "\n    " + permission + text[manifest_end + 1:]
+          if 'android:host="login-callback"' not in text:
+              callback = """
+                      <intent-filter>
+                          <action android:name="android.intent.action.VIEW" />
+                          <category android:name="android.intent.category.DEFAULT" />
+                          <category android:name="android.intent.category.BROWSABLE" />
+                          <data android:scheme="com.kenza.hub" android:host="login-callback" />
+                      </intent-filter>"""
+              launcher = '<category android:name="android.intent.category.LAUNCHER" />'
+              if launcher not in text:
+                  raise SystemExit("Could not locate Android launcher intent filter.")
+              launcher_start = text.find(launcher)
+              launcher_end = text.find("</intent-filter>", launcher_start)
+              if launcher_start < 0 or launcher_end < 0:
+                  raise SystemExit("Could not locate the launcher intent-filter boundary.")
+              launcher_end += len("</intent-filter>")
+              text = text[:launcher_end] + "\n" + callback + text[launcher_end:]
+          manifest.write_text(text)
+
+          gradle_files = list(Path("android/app").glob("build.gradle*"))
+          if not gradle_files:
+              raise SystemExit("Android app Gradle file was not generated.")
+          gradle = gradle_files[0]
+          gtext = gradle.read_text()
+          lines = gtext.splitlines()
+          app_count = namespace_count = 0
+          for index, line in enumerate(lines):
+              stripped = line.strip()
+              indent = line[:len(line) - len(line.lstrip())]
+              if stripped.startswith("applicationId ") or stripped.startswith("applicationId="):
+                  lines[index] = indent + 'applicationId = "com.kenza.hub"'
+                  app_count += 1
+              elif stripped.startswith("namespace ") or stripped.startswith("namespace="):
+                  lines[index] = indent + 'namespace = "com.kenza.hub"'
+                  namespace_count += 1
+          if app_count != 1:
+              raise SystemExit("Could not set Android applicationId.")
+          if namespace_count != 1:
+              raise SystemExit("Could not set Android namespace.")
+          gradle.write_text("\n".join(lines) + "\n")
+          PY
+
+      - name: Build internal testing APK
+        run: >
+          flutter build apk --debug
+          --dart-define=SUPABASE_URL=https://mxdcfewkajwvtwtjoeia.supabase.co
+          --dart-define=SUPABASE_PUBLISHABLE_KEY=sb_publishable_lQr0NWJLqKP6lPx44ZCxAw_CtGsmpE-
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: kenza-hub-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
