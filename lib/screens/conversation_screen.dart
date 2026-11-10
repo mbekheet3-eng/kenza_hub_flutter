@@ -123,7 +123,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         ),
                         child: Text(
                           row['body'] as String,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.black87,
                           ),
                         ),
