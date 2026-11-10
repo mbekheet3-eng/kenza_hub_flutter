@@ -13,6 +13,7 @@ import 'product_form_screen.dart';
 import 'profile_screen.dart';
 import 'search_screen.dart';
 import 'notifications_screen.dart';
+import 'messages_inbox_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -170,6 +171,18 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     await Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+    );
+  }
+
+  Future<void> _openMessages() async {
+    if (Supabase.instance.client.auth.currentUser == null) {
+      await Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+      if (!mounted || Supabase.instance.client.auth.currentUser == null) return;
+    }
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const MessagesInboxScreen()),
     );
   }
 
@@ -479,7 +492,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _openSell();
                 break;
               case 3:
-                _showComingSoon('الرسائل');
+                _openMessages();
                 break;
               case 4:
                 _openProfile();
