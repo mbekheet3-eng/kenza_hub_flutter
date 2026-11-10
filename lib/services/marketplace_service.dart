@@ -68,25 +68,30 @@ class MarketplaceService {
         .eq('status', 'published');
 
     final categories = await getCategories();
-    final searchSlugs = categoryId == null
-        ? CategoryLabels.searchSlugs(query)
-        : const <String>[];
-    final selectedIds = <String>{};
+    final searchSlugs = CategoryLabels.searchSlugs(query);
+    final searchCategoryIds = categories
+        .where((item) => searchSlugs.contains(item.slug))
+        .map((item) => item.id)
+        .toSet();
+
+    Set<String>? categoryScope;
     if (categoryId != null && categoryId.isNotEmpty) {
-      selectedIds.add(categoryId);
-    } else if (searchSlugs.isNotEmpty) {
-      selectedIds.addAll(
-        categories.where((item) => searchSlugs.contains(item.slug)).map((item) => item.id),
-      );
+      categoryScope = _categoryScopeIds(categories, {categoryId});
+    }
+    if (searchCategoryIds.isNotEmpty) {
+      final intentScope = _categoryScopeIds(categories, searchCategoryIds);
+      categoryScope = categoryScope == null
+          ? intentScope
+          : categoryScope.intersection(intentScope);
     }
 
-    if (selectedIds.isNotEmpty) {
-      final scopedIds = _categoryScopeIds(categories, selectedIds);
-      request = request.inFilter('category_id', scopedIds.toList());
+    if (categoryScope != null) {
+      if (categoryScope.isEmpty) return [];
+      request = request.inFilter('category_id', categoryScope.toList());
     }
 
     final normalizedQuery = query?.trim() ?? '';
-    final isCategoryIntent = categoryId == null && searchSlugs.isNotEmpty;
+    final isCategoryIntent = searchSlugs.isNotEmpty;
     if (normalizedQuery.isNotEmpty && !isCategoryIntent) {
       request = request.ilike('title', '%$normalizedQuery%');
     }
