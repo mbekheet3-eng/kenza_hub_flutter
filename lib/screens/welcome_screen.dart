@@ -207,7 +207,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           ],
                         ),
                         PopupMenuButton<String>(
-                          tooltip: isArabic ? AppStrings.of(context)!.languageChange : 'Change language',
+                          tooltip: strings.languageChange,
                           onSelected: AppLocale.setLanguage,
                           itemBuilder: (context) => const [
                             PopupMenuItem(value: 'ar', child: Text('العربية')),
@@ -225,7 +225,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               children: [
                                 const Icon(Icons.language_rounded, size: 18),
                                 const SizedBox(width: 6),
-                                Text(isArabic ? 'العربية' : 'English',
+                                Text(languageCode == 'ar' ? 'العربية' : languageCode == 'fr' ? 'Français' : 'English',
                                   style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
                                 const SizedBox(width: 3),
                                 const Icon(Icons.keyboard_arrow_down_rounded, size: 17),

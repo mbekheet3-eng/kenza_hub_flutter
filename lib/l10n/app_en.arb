@@ -628,5 +628,7 @@
   "addAtLeastOnePhoto": "Add at least one photo",
   "productSaveFailed": "Could not save the product. Please try again.",
   "passwordMismatchOrTooShort": "Make sure both passwords match and contain at least 8 characters",
-  "passwordUpdateFailed": "Could not update the password. Please try again."
+  "passwordUpdateFailed": "Could not update the password. Please try again.",
+  "brandName": "Kenza Hub",
+  "missingConfigurationMessage": "The app's server connection must be configured before it can start. Please check the app configuration."
 }
