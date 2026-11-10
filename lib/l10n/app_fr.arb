@@ -626,5 +626,7 @@
   "maxProductImagesReached": "8 photos maximum",
   "noCategoriesAvailable": "Aucune catégorie n’est disponible. Réessayez plus tard.",
   "addAtLeastOnePhoto": "Ajoutez au moins une photo",
-  "productSaveFailed": "Impossible d’enregistrer le produit. Veuillez réessayer."
+  "productSaveFailed": "Impossible d’enregistrer le produit. Veuillez réessayer.",
+  "passwordMismatchOrTooShort": "Vérifiez que les deux mots de passe correspondent et comportent au moins 8 caractères",
+  "passwordUpdateFailed": "Impossible de mettre à jour le mot de passe. Veuillez réessayer."
 }

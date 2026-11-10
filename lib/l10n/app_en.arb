@@ -626,5 +626,7 @@
   "maxProductImagesReached": "Maximum of 8 photos",
   "noCategoriesAvailable": "No categories are available. Please try again later.",
   "addAtLeastOnePhoto": "Add at least one photo",
-  "productSaveFailed": "Could not save the product. Please try again."
+  "productSaveFailed": "Could not save the product. Please try again.",
+  "passwordMismatchOrTooShort": "Make sure both passwords match and contain at least 8 characters",
+  "passwordUpdateFailed": "Could not update the password. Please try again."
 }

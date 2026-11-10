@@ -626,5 +626,7 @@
   "maxProductImagesReached": "الحد الأقصى 8 صور",
   "noCategoriesAvailable": "لا توجد فئات متاحة. حاول لاحقًا.",
   "addAtLeastOnePhoto": "أضف صورة واحدة على الأقل",
-  "productSaveFailed": "تعذر حفظ المنتج. حاول مرة أخرى."
+  "productSaveFailed": "تعذر حفظ المنتج. حاول مرة أخرى.",
+  "passwordMismatchOrTooShort": "تأكد من تطابق كلمتي المرور وأنهما 8 أحرف على الأقل",
+  "passwordUpdateFailed": "تعذر تحديث كلمة المرور. حاول مرة أخرى."
 }
