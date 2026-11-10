@@ -57,7 +57,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
   String _productTitle(Map<String, dynamic> row) {
     final product = row['products'];
     if (product is Map && product['title'] is String) return product['title'] as String;
-    return 'منتج من كنزة هب';
+    return AppStrings.of(context)!.productFallback;
   }
 
   String _date(dynamic value) {
@@ -69,11 +69,11 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
 
   String _status(dynamic value) {
     switch (value) {
-      case 'pending': return 'في انتظار الرد';
-      case 'accepted': return 'مقبول';
-      case 'rejected': return 'مرفوض';
-      case 'cancelled': return 'ملغي';
-      case 'completed': return 'مكتمل';
+      case 'pending': return AppStrings.of(context)!.statusPending;
+      case 'accepted': return AppStrings.of(context)!.statusAccepted;
+      case 'rejected': return AppStrings.of(context)!.statusRejected;
+      case 'cancelled': return AppStrings.of(context)!.statusCancelled;
+      case 'completed': return AppStrings.of(context)!.statusCompleted;
       default: return value?.toString() ?? '';
     }
   }
@@ -87,13 +87,13 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
       await _client.from(table).update({'status': status}).eq('id', id);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(status == 'accepted' ? 'تم القبول' : 'تم الرفض')),
+        SnackBar(content: Text(status == 'accepted' ? AppStrings.of(context)!.acceptedToast : AppStrings.of(context)!.rejectedToast)),
       );
       await _refresh();
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تعذر تحديث الحالة: $error')),
+        SnackBar(content: Text(AppStrings.of(context)!.statusUpdateFailed)),
       );
     }
   }
@@ -123,7 +123,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
             physics: const AlwaysScrollableScrollPhysics(),
             children: [
               const SizedBox(height: 80),
-              Center(child: Text('تعذر تحميل البيانات: ${snapshot.error}')),
+              Center(child: Text(AppStrings.of(context)!.inboxLoadError)),
               Center(child: TextButton(onPressed: _refresh, child: Text(AppStrings.of(context)!.retryAction))),
             ],
           );
@@ -134,7 +134,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
   }
 
   Widget _conversationList(List<Map<String, dynamic>> rows) {
-    if (rows.isEmpty) return _empty('لا توجد محادثات حتى الآن');
+    if (rows.isEmpty) return _empty(AppStrings.of(context)!.noConversations);
     return ListView.separated(
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: rows.length,
@@ -143,12 +143,12 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         final row = rows[index];
         final messages = (row['messages'] as List?)?.cast<Map<String, dynamic>>() ?? [];
         messages.sort((a, b) => (b['created_at'] ?? '').toString().compareTo((a['created_at'] ?? '').toString()));
-        final preview = messages.isEmpty ? 'ابدأ المحادثة' : (messages.first['body']?.toString() ?? 'رسالة');
+        final preview = messages.isEmpty ? AppStrings.of(context)!.startConversationShort : (messages.first['body']?.toString() ?? AppStrings.of(context)!.messagePreviewFallback);
         final isBuyer = row['buyer_id'] == _userId;
         return ListTile(
           leading: const CircleAvatar(child: Icon(Icons.chat_bubble_outline)),
           title: Text(_productTitle(row), maxLines: 1, overflow: TextOverflow.ellipsis),
-          subtitle: Text('${isBuyer ? 'البائع' : 'المشتري'} • $preview', maxLines: 1, overflow: TextOverflow.ellipsis),
+          subtitle: Text('${isBuyer ? AppStrings.of(context)!.sellerRole : AppStrings.of(context)!.buyerRole} • $preview', maxLines: 1, overflow: TextOverflow.ellipsis),
           trailing: Text(_date(row['created_at']), style: Theme.of(context).textTheme.bodySmall),
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => ConversationScreen(conversationId: row['id'] as String)),
@@ -159,7 +159,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
   }
 
   Widget _transactionList(List<Map<String, dynamic>> rows, {required bool isOffer}) {
-    if (rows.isEmpty) return _empty(isOffer ? 'لا توجد عروض حتى الآن' : 'لا توجد طلبات شراء حتى الآن');
+    if (rows.isEmpty) return _empty(isOffer ? AppStrings.of(context)!.noOffers : AppStrings.of(context)!.noPurchaseOrders);
     final table = isOffer ? 'product_offers' : 'product_orders';
     return ListView.separated(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -176,14 +176,14 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
           leading: CircleAvatar(child: Icon(isOffer ? Icons.local_offer_outlined : Icons.shopping_bag_outlined)),
           title: Text(_productTitle(row), maxLines: 1, overflow: TextOverflow.ellipsis),
           subtitle: Text(
-            '${isOffer ? 'عرض سعر' : 'طلب شراء'}: $price $currency\n'
-            '${isSeller ? 'من مشتري' : 'مقدم للبائع'} • ${_status(row['status'])} • ${_date(row['created_at'])}',
+            '${isOffer ? AppStrings.of(context)!.offerPriceLabel : AppStrings.of(context)!.purchaseOrderLabel}: $price $currency\n'
+            '${isSeller ? AppStrings.of(context)!.fromBuyerLabel : AppStrings.of(context)!.submittedToSellerLabel} • ${_status(row['status'])} • ${_date(row['created_at'])}',
           ),
           trailing: isSeller && pending
               ? PopupMenuButton<String>(
-                  tooltip: 'إجراء',
+                  tooltip: AppStrings.of(context)!.actionTooltipLabel,
                   onSelected: (value) => _updateStatus(table: table, id: row['id'] as String, status: value),
-                  itemBuilder: (_) => const [
+                  itemBuilder: (_) => [
                     PopupMenuItem(value: 'accepted', child: Text(AppStrings.of(context)!.acceptLabel)),
                     PopupMenuItem(value: 'rejected', child: Text(AppStrings.of(context)!.rejectLabel)),
                   ],
@@ -209,7 +209,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         bottom: TabBar(
           controller: _tabs,
           isScrollable: true,
-          tabs: const [Tab(text: 'الرسائل'), Tab(text: 'العروض'), Tab(text: 'طلبات الشراء')],
+          tabs: [Tab(text: AppStrings.of(context)!.messagesTab), Tab(text: AppStrings.of(context)!.offersTab), Tab(text: AppStrings.of(context)!.purchaseOrdersTab)],
         ),
       ),
       body: TabBarView(
