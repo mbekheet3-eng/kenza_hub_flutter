@@ -5,10 +5,13 @@ on:
     branches:
       - phase-1/implementation
       - feature/localization-phase1
+      - feature/category-trilingual-localization
     paths:
       - 'lib/**'
       - 'pubspec.yaml'
       - 'pubspec.lock'
+      - 'supabase/migrations/**'
+      - 'supabase/SCHEMA.md'
       - '.github/workflows/flutter-analyze.yml'
   workflow_dispatch:
 
