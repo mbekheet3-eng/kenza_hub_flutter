@@ -113,6 +113,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           : null;
       fields.add(
         DropdownButtonFormField<String>(
+          key: ValueKey('category-level-$depth-${parentId ?? 'root'}'),
           initialValue: selectedId,
           decoration: InputDecoration(
             labelText: AppStrings.of(context)!.categoryFieldLabel,
