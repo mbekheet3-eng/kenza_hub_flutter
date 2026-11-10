@@ -81,6 +81,30 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
+  String _notificationTitle(Map<String, dynamic> row) {
+    final strings = AppStrings.of(context)!;
+    switch (row['type']?.toString()) {
+      case 'new_message':
+        return strings.notificationNewMessageTitle;
+      case 'new_offer':
+        return strings.notificationNewOfferTitle;
+      case 'offer_accepted':
+        return strings.notificationOfferAcceptedTitle;
+      case 'offer_rejected':
+        return strings.notificationOfferRejectedTitle;
+      case 'new_order':
+        return strings.notificationNewOrderTitle;
+      case 'order_accepted':
+        return strings.notificationOrderAcceptedTitle;
+      case 'order_rejected':
+        return strings.notificationOrderRejectedTitle;
+      case 'order_updated':
+        return strings.notificationOrderUpdatedTitle;
+      default:
+        return row['title']?.toString() ?? strings.newNotification;
+    }
+  }
+
   String _date(dynamic value) {
     final date = value is String ? DateTime.tryParse(value)?.toLocal() : null;
     if (date == null) return '';
@@ -146,7 +170,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   child: Icon(_icon(row['type']?.toString())),
                 ),
                 title: Text(
-                  row['title']?.toString() ?? AppStrings.of(context)!.newNotification,
+                  _notificationTitle(row),
                   style: TextStyle(fontWeight: unread ? FontWeight.w800 : FontWeight.w500),
                 ),
                 subtitle: Text(

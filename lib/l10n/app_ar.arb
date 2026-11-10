@@ -633,5 +633,13 @@
   "missingConfigurationMessage": "يلزم إعداد اتصال التطبيق بالخادم قبل تشغيله. يرجى مراجعة إعدادات التطبيق.",
   "addFavoriteTooltip": "إضافة للمفضلة",
   "removeFavoriteTooltip": "إزالة من المفضلة",
-  "viewNotification": "عرض"
+  "viewNotification": "عرض",
+  "notificationNewMessageTitle": "رسالة جديدة",
+  "notificationNewOfferTitle": "عرض سعر جديد",
+  "notificationOfferAcceptedTitle": "تم قبول عرضك",
+  "notificationOfferRejectedTitle": "تم رفض عرضك",
+  "notificationNewOrderTitle": "طلب شراء جديد",
+  "notificationOrderAcceptedTitle": "تم قبول طلب الشراء",
+  "notificationOrderRejectedTitle": "تم رفض طلب الشراء",
+  "notificationOrderUpdatedTitle": "تم تحديث الطلب"
 }

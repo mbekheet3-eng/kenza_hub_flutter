@@ -633,5 +633,13 @@
   "missingConfigurationMessage": "The app's server connection must be configured before it can start. Please check the app configuration.",
   "addFavoriteTooltip": "Add to favorites",
   "removeFavoriteTooltip": "Remove from favorites",
-  "viewNotification": "View"
+  "viewNotification": "View",
+  "notificationNewMessageTitle": "New message",
+  "notificationNewOfferTitle": "New offer",
+  "notificationOfferAcceptedTitle": "Your offer was accepted",
+  "notificationOfferRejectedTitle": "Your offer was declined",
+  "notificationNewOrderTitle": "New purchase request",
+  "notificationOrderAcceptedTitle": "Purchase request accepted",
+  "notificationOrderRejectedTitle": "Purchase request declined",
+  "notificationOrderUpdatedTitle": "Order updated"
 }
