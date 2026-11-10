@@ -25,7 +25,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   final _description = TextEditingController();
   final _price = TextEditingController();
   List<Category> _categories = [];
-  String? _categoryId;
+  final List<Category> _selectionPath = [];
   final List<File> _images = [];
   bool _loading = false;
   bool _saving = false;
@@ -41,7 +41,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       _title.text = product.title;
       _description.text = product.description;
       _price.text = product.price.toStringAsFixed(0);
-      _categoryId = product.categoryId;
     }
     _loadCategories();
   }
@@ -59,15 +58,77 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     try {
       final categories = await _service.getCategories();
       if (!mounted) return;
+      final byId = {for (final category in categories) category.id: category};
+      final path = <Category>[];
+      var current = byId[widget.product?.categoryId];
+      while (current != null) {
+        path.add(current);
+        current = current.parentId == null ? null : byId[current.parentId];
+      }
       setState(() {
         _categories = categories;
-        _categoryId ??= categories.isNotEmpty ? categories.first.id : null;
+        _selectionPath
+          ..clear()
+          ..addAll(path.reversed);
       });
     } catch (error) {
       if (mounted) setState(() => _error = AppStrings.of(context)!.categoryLoadDatabaseError);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  List<Category> _childrenOf(String? parentId) => _categories
+      .where((category) => category.parentId == parentId)
+      .toList()
+    ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+
+  String? get _selectedLeafCategoryId {
+    if (_selectionPath.isEmpty) return null;
+    final selected = _selectionPath.last;
+    return _childrenOf(selected.id).isEmpty ? selected.id : null;
+  }
+
+  void _selectCategory(int depth, String? categoryId) {
+    setState(() {
+      final nextPath = _selectionPath.take(depth).toList();
+      if (categoryId != null) {
+        nextPath.add(_categories.firstWhere((category) => category.id == categoryId));
+      }
+      _selectionPath
+        ..clear()
+        ..addAll(nextPath);
+    });
+  }
+
+  List<Widget> _buildCategoryFields(BuildContext context) {
+    final fields = <Widget>[];
+    final languageCode = Localizations.localeOf(context).languageCode;
+    for (var depth = 0; depth <= _selectionPath.length; depth++) {
+      final parentId = depth == 0 ? null : _selectionPath[depth - 1].id;
+      final options = _childrenOf(parentId);
+      if (options.isEmpty) continue;
+      final selectedId = depth < _selectionPath.length
+          ? _selectionPath[depth].id
+          : null;
+      fields.add(
+        DropdownButtonFormField<String>(
+          initialValue: selectedId,
+          decoration: InputDecoration(
+            labelText: AppStrings.of(context)!.categoryFieldLabel,
+          ),
+          items: options
+              .map((category) => DropdownMenuItem(
+                    value: category.id,
+                    child: Text(category.nameFor(languageCode)),
+                  ))
+              .toList(),
+          onChanged: _saving ? null : (value) => _selectCategory(depth, value),
+        ),
+      );
+      fields.add(const SizedBox(height: 12));
+    }
+    return fields;
   }
 
   Future<void> _pickGallery() async {
@@ -99,8 +160,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_categoryId == null) {
-      setState(() => _error = AppStrings.of(context)!.noCategoriesAvailable);
+    final categoryId = _selectedLeafCategoryId;
+    if (categoryId == null) {
+      setState(() => _error = AppStrings.of(context)!.chooseCategoryValidation);
       return;
     }
     if (!_isEditing && _images.isEmpty) {
@@ -120,11 +182,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           title: _title.text,
           description: _description.text,
           price: price,
-          categoryId: _categoryId!,
+          categoryId: categoryId,
         );
       } else {
         await _service.publishProduct(
-          categoryId: _categoryId!,
+          categoryId: categoryId,
           title: _title.text,
           description: _description.text,
           price: price,
@@ -150,18 +212,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  DropdownButtonFormField<String>(
-                    initialValue: _categoryId,
-                    decoration: InputDecoration(labelText: AppStrings.of(context)!.categoryFieldLabel),
-                    items: _categories
-                        .map((category) => DropdownMenuItem(
-                              value: category.id,
-                              child: Text(category.nameFor(Localizations.localeOf(context).languageCode)),
-                            ))
-                        .toList(),
-                    onChanged: (value) => setState(() => _categoryId = value),
-                    validator: (value) => value == null ? AppStrings.of(context)!.chooseCategoryValidation : null,
-                  ),
+                  ..._buildCategoryFields(context),
                   const SizedBox(height: 14),
                   TextFormField(
                     controller: _title,
