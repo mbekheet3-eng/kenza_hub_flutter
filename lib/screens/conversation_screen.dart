@@ -76,7 +76,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
   @override
   Widget build(BuildContext context) {
     final myId = Supabase.instance.client.auth.currentUser?.id;
-    final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: const Text('المحادثة')),
