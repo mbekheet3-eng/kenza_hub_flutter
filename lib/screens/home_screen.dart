@@ -14,6 +14,7 @@ import 'profile_screen.dart';
 import 'search_screen.dart';
 import 'notifications_screen.dart';
 import 'messages_inbox_screen.dart';
+import 'special_markets_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -186,6 +187,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> _openSpecialMarkets() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const SpecialMarketsScreen()),
+    );
+  }
+
   Future<void> _openCategories() async {
     if (_categories.isEmpty) {
       _showComingSoon('الأقسام');
@@ -332,6 +339,47 @@ class _HomeScreenState extends State<HomeScreen> {
                         tooltip: 'البحث بالصور',
                         onPressed: () => _showComingSoon('البحث بالصور'),
                         icon: const Icon(Icons.camera_alt_outlined),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                  child: Material(
+                    color: const Color(0xFFF3F4F6),
+                    borderRadius: BorderRadius.circular(16),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: _openSpecialMarkets,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 42,
+                              height: 42,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(Icons.storefront_outlined, color: Color(0xFFC62828)),
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('الأسواق الخاصة', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+                                  SizedBox(height: 3),
+                                  Text('اكتشف الوكالة والهاند ميد والأنتيكات وتجار السوشيال', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: Color(0xFF0F172A)),
+                          ],
+                        ),
                       ),
                     ),
                   ),
