@@ -17,7 +17,7 @@ class MarketplaceService {
   Future<List<Category>> getCategories() async {
     final rows = await _client
         .from('categories')
-        .select('id,name_ar,name_en,slug')
+        .select('id,name_ar,name_en,name_fr,slug')
         .eq('is_active', true)
         .order('sort_order');
     return rows.map((row) => Category.fromMap(row)).toList();
