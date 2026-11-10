@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_strings.dart';
 import '../services/auth_service.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -29,15 +30,14 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> _submit() async {
+    final strings = AppStrings.of(context)!;
     if (_name.text.trim().isEmpty ||
         _email.text.trim().isEmpty ||
         _password.text.length < 8 ||
         _password.text != _confirm.text ||
         !_acceptedTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('راجع الاسم والبريد وكلمة المرور (8 أحرف على الأقل) والموافقة على الشروط'),
-        ),
+        SnackBar(content: Text(strings.signupValidationError)),
       );
       return;
     }
@@ -54,15 +54,15 @@ class _SignupScreenState extends State<SignupScreen> {
           context: context,
           barrierDismissible: false,
           builder: (dialogContext) => AlertDialog(
-            title: const Text('تم إنشاء الحساب'),
-            content: const Text('إذا كان تأكيد البريد مفعّلاً، افتح رسالة التأكيد التي أرسلناها إليك ثم سجّل الدخول.'),
+            title: Text(strings.signupSuccessTitle),
+            content: Text(strings.signupSuccessMessage),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(dialogContext).pop();
                   Navigator.of(context).pop();
                 },
-                child: const Text('حسنًا'),
+                child: Text(strings.ok),
               ),
             ],
           ),
@@ -71,7 +71,7 @@ class _SignupScreenState extends State<SignupScreen> {
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذر إنشاء الحساب: $error')),
+          SnackBar(content: Text('${strings.signupFailedPrefix}: $error')),
         );
       }
     } finally {
@@ -81,22 +81,24 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('إنشاء حساب')),
+      appBar: AppBar(title: Text(strings.signupTitle)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            Text('انضم إلى كنزة هب', style: Theme.of(context).textTheme.headlineMedium),
+            Text(strings.joinUs,
+                style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 8),
-            const Text('حساب واحد للتصفح والبيع وإدارة منتجاتك.'),
+            Text(strings.signupDescription),
             const SizedBox(height: 24),
             TextField(
               controller: _name,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(
-                labelText: 'الاسم الذي سيظهر للآخرين',
-                prefixIcon: Icon(Icons.person_outline),
+              decoration: InputDecoration(
+                labelText: strings.displayNameLabel,
+                prefixIcon: const Icon(Icons.person_outline),
               ),
             ),
             const SizedBox(height: 14),
@@ -104,9 +106,9 @@ class _SignupScreenState extends State<SignupScreen> {
               controller: _email,
               keyboardType: TextInputType.emailAddress,
               autocorrect: false,
-              decoration: const InputDecoration(
-                labelText: 'البريد الإلكتروني',
-                prefixIcon: Icon(Icons.email_outlined),
+              decoration: InputDecoration(
+                labelText: strings.email,
+                prefixIcon: const Icon(Icons.email_outlined),
               ),
             ),
             const SizedBox(height: 14),
@@ -114,11 +116,14 @@ class _SignupScreenState extends State<SignupScreen> {
               controller: _password,
               obscureText: _hidePassword,
               decoration: InputDecoration(
-                labelText: 'كلمة المرور (8 أحرف على الأقل)',
+                labelText: strings.passwordMinLength,
                 prefixIcon: const Icon(Icons.lock_outline),
                 suffixIcon: IconButton(
-                  onPressed: () => setState(() => _hidePassword = !_hidePassword),
-                  icon: Icon(_hidePassword ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () =>
+                      setState(() => _hidePassword = !_hidePassword),
+                  icon: Icon(
+                    _hidePassword ? Icons.visibility : Icons.visibility_off,
+                  ),
                 ),
               ),
             ),
@@ -126,23 +131,28 @@ class _SignupScreenState extends State<SignupScreen> {
             TextField(
               controller: _confirm,
               obscureText: _hidePassword,
-              decoration: const InputDecoration(
-                labelText: 'تأكيد كلمة المرور',
-                prefixIcon: Icon(Icons.lock_outline),
+              decoration: InputDecoration(
+                labelText: strings.confirmPassword,
+                prefixIcon: const Icon(Icons.lock_outline),
               ),
             ),
             const SizedBox(height: 12),
             CheckboxListTile(
               contentPadding: EdgeInsets.zero,
               value: _acceptedTerms,
-              onChanged: _busy ? null : (value) => setState(() => _acceptedTerms = value ?? false),
-              title: const Text('أوافق على شروط الاستخدام وسياسة الخصوصية'),
+              onChanged: _busy
+                  ? null
+                  : (value) =>
+                      setState(() => _acceptedTerms = value ?? false),
+              title: Text(strings.agreeToTerms),
               controlAffinity: ListTileControlAffinity.leading,
             ),
             const SizedBox(height: 12),
             FilledButton(
               onPressed: _busy ? null : _submit,
-              child: _busy ? const CircularProgressIndicator() : const Text('إنشاء الحساب'),
+              child: _busy
+                  ? const CircularProgressIndicator()
+                  : Text(strings.signUp),
             ),
           ],
         ),
