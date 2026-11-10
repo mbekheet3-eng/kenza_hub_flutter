@@ -1,5 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'push_notification_service.dart';
+
 class AuthService {
   final SupabaseClient _client = Supabase.instance.client;
 
@@ -63,5 +65,8 @@ class AuthService {
     );
   }
 
-  Future<void> signOut() => _client.auth.signOut();
+  Future<void> signOut() async {
+    await PushNotificationService.instance.deactivateCurrentDevice();
+    await _client.auth.signOut();
+  }
 }
