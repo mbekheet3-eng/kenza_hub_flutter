@@ -267,11 +267,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                       ),
-                      IconButton(
-                        tooltip: user == null ? 'تسجيل الدخول' : 'حسابي',
-                        onPressed: _openProfile,
-                        icon: const Icon(Icons.person_outline_rounded, size: 27),
-                      ),
                       StreamBuilder<List<Map<String, dynamic>>>(
                         stream: _notificationStream,
                         builder: (context, snapshot) {
