@@ -1,0 +1,46 @@
+name: Resolve Flutter dependencies
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - phase-1/implementation
+    paths:
+      - pubspec.yaml
+      - .github/workflows/resolve-flutter-dependencies.yml
+
+permissions:
+  contents: write
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out implementation branch
+        uses: actions/checkout@v4
+        with:
+          ref: phase-1/implementation
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Resolve pinned Flutter packages
+        run: flutter pub get
+
+      - name: Analyze Flutter source
+        run: flutter analyze
+
+      - name: Commit resolved lockfile
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pubspec.lock
+          if git diff --cached --quiet; then
+            echo "pubspec.lock is already up to date."
+          else
+            git commit -m "chore: resolve Firebase messaging dependencies"
+            git push origin HEAD:phase-1/implementation
+          fi
