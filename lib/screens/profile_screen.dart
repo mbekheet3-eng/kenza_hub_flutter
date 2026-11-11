@@ -11,6 +11,7 @@ import 'policies_screen.dart';
 import 'password_recovery_screen.dart';
 import 'messages_inbox_screen.dart';
 import 'favorites_screen.dart';
+import 'gender_change_request_screen.dart';
 import 'notifications_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -175,6 +176,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const FavoritesScreen()),
                         ),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.manage_accounts_outlined),
+                        title: const Text('النوع المسجل'),
+                        subtitle: const Text('طلب تغيير النوع من خلال الإدارة فقط'),
+                        trailing: const Icon(Icons.chevron_left),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const GenderChangeRequestScreen()),
+                        ).then((_) => _load()),
                       ),
                       ListTile(
                         leading: const Icon(Icons.lock_reset_outlined),
