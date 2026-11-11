@@ -26,8 +26,7 @@ class _GenderOnboardingScreenState extends State<GenderOnboardingScreen> {
     try {
       await Supabase.instance.client
           .from('profiles')
-          .update({'gender': _gender})
-          .eq('id', user.id);
+          .upsert({'id': user.id, 'gender': _gender}, onConflict: 'id');
       widget.onCompleted();
     } catch (error) {
       if (mounted) setState(() => _error = 'تعذر حفظ الاختيار: $error');
