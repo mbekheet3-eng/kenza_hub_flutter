@@ -8,6 +8,7 @@ on:
       - test/all-latest-changes
       - fix/radio-group-flutter-347
       - feature/category-trilingual-localization
+      - feature/special-markets-ui
     paths:
       - 'lib/**'
       - 'pubspec.yaml'
