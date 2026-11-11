@@ -6,7 +6,7 @@ import 'package:kenza_hub_marketplace/screens/special_markets_screen.dart';
 void main() {
   testWidgets('shows only the two approved special markets in Arabic', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         locale: const Locale('ar'),
         supportedLocales: AppStrings.supportedLocales,
         localizationsDelegates: AppStrings.localizationsDelegates,
