@@ -17,7 +17,7 @@ class KenzaHubApp extends StatelessWidget {
       valueListenable: AppLocale.notifier,
       builder: (context, locale, _) => MaterialApp(
         navigatorKey: rootNavigatorKey,
-        title: 'كنزة هب',
+        title: 'Kenza',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
