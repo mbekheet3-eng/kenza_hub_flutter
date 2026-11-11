@@ -166,8 +166,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.sizeOf(context).height;
     final strings = AppStrings.of(context)!;
-    final languageCode = Localizations.localeOf(context).languageCode;
-    final isArabic = languageCode == 'ar';
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isSmallScreen = screenHeight < 700;
     final imageWidth = (screenWidth * 0.40).clamp(145.0, 175.0).toDouble();
