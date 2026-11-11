@@ -65,13 +65,23 @@ RLS is enabled on all exposed public tables. Private profile rows are owner-scop
 
 ## Migration source files
 
-The repository contains the source-controlled migrations for the deployed database contract and the category expansion:
+The repository contains these source-controlled migrations for the current phase-one contract and category tree:
 
 - `20261108185823_create_marketplace_core_tables.sql`
 - `20261108185831_optimize_core_rls_and_category_index.sql`
 - `20261108185839_tighten_core_table_grants.sql`
 - `20261108190009_create_private_product_images_storage.sql`
 - `20261108191509_create_profile_on_signup_and_seed_core_categories.sql`
-- `20261110010000_add_french_category_names.sql
+- `20261110010000_add_french_category_names.sql`
+- `20261110011000_require_all_category_translations.sql`
+- `20261110233041_expand_marketplace_category_tree.sql`
+- `20261110233452_fix_category_tree_sort_order.sql`
+- `20261111000854_member_profile_public_fields_and_avatars.sql`
+- `20261111005953_gender_audience_controls.sql`
+- `20261111010027_gender_change_admin_review.sql`
+- `20261111010617_tighten_gender_change_admin_permissions.sql`
+- `20261111010641_optimize_gender_change_rls.sql`
+- `20261111010822_enforce_gender_audience_in_existing_chats.sql`
+- `20261111010854_limit_profile_updates_to_owner.sql`
 
-The first four files are a source-controlled reconstruction of the verified deployed schema and policies. Before using them to provision another project, replay them against a clean disposable Supabase project and compare the resulting schema, RLS policies, grants, and Storage policies with this contract.
+The category expansion migrations add the nested catalog and the required French translations. Do not apply these migrations directly to the live Supabase project until the database plan is approved and the migrations have been validated against a disposable project. The first four core migration files are a source-controlled reconstruction of the verified deployed schema and policies; before using them to provision another project, replay them against a clean disposable Supabase project and compare the resulting schema, RLS policies, grants, and Storage policies with this contract.
