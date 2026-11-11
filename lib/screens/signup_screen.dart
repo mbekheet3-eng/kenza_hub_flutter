@@ -127,13 +127,13 @@ class _SignupScreenState extends State<SignupScreen> {
                   RadioListTile<String>(
                     value: 'male',
                     title: const Text('رجل'),
-                    contentPadding: const EdgeInsets.zero,
+                    contentPadding: EdgeInsets.zero,
                     enabled: !_busy,
                   ),
                   RadioListTile<String>(
                     value: 'female',
                     title: const Text('امرأة'),
-                    contentPadding: const EdgeInsets.zero,
+                    contentPadding: EdgeInsets.zero,
                     enabled: !_busy,
                   ),
                 ],
