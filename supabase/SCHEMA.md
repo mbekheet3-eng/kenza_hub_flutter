@@ -53,7 +53,7 @@ The more specialized store/agency sections and additional marketplace features r
 
 ## Security
 
-RLS is enabled on all four public tables. Product writes are owner-scoped. The Auth insert trigger creates a matching profile row from the signup display-name metadata. No service-role key belongs in the Flutter client.
+RLS is enabled on all exposed public tables. Private profile rows are owner-scoped, while the public member projection is read-only for client roles. Product writes are owner-scoped. The Auth insert trigger creates a matching profile row from the signup display-name metadata. No service-role key belongs in the Flutter client.
 
 
 ## Migration source files
