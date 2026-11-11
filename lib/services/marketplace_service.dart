@@ -271,7 +271,9 @@ class MarketplaceService {
       try {
         await _reviewProductImages(productId);
       } on _ProductImageReviewException catch (error) {
-        preserveDraft = error.retryable;
+        // Keep rejected and review-required products, including their uploaded images,
+        // so the owner can edit the listing and submit it for review again.
+        preserveDraft = true;
         rethrow;
       }
 
