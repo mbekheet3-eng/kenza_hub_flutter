@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../config/app_locale.dart';
 import '../l10n/app_strings.dart';
+import '../widgets/kenza_logo.dart';
 
 import 'home_screen.dart';
 import 'login_screen.dart';
@@ -193,7 +194,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Image.asset('assets/logos/logo.png', width: 48, height: 48, fit: BoxFit.contain,
+                            KenzaLogo(width: 48, height: 48,
                               errorBuilder: (_, __, ___) => const Icon(Icons.storefront_rounded, color: Color(0xFFC62828), size: 40)),
                             const SizedBox(width: 9),
                             Text(
