@@ -12,6 +12,7 @@ import 'password_recovery_screen.dart';
 import 'messages_inbox_screen.dart';
 import 'favorites_screen.dart';
 import 'gender_change_request_screen.dart';
+import 'admin_gender_requests_screen.dart';
 import 'notifications_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -177,6 +178,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           MaterialPageRoute(builder: (_) => const FavoritesScreen()),
                         ),
                       ),
+                      if (user.appMetadata['role'] == 'admin')
+                        ListTile(
+                          leading: const Icon(Icons.admin_panel_settings_outlined),
+                          title: const Text('مراجعة طلبات تغيير النوع'),
+                          trailing: const Icon(Icons.chevron_left),
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const AdminGenderRequestsScreen()),
+                          ),
+                        ),
                       ListTile(
                         leading: const Icon(Icons.manage_accounts_outlined),
                         title: const Text('النوع المسجل'),
