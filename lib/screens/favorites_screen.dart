@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_strings.dart';
 import '../models/product.dart';
 import '../services/favorites_service.dart';
 import '../services/marketplace_service.dart';
@@ -50,12 +51,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       if (!mounted) return;
       setState(() => _products.removeWhere((item) => item.id == product.id));
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تمت إزالة المنتج من المفضلة')),
+        SnackBar(content: Text(AppStrings.of(context)!.favoriteRemoved)),
       );
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تعذرت إزالة المنتج: $error')),
+        SnackBar(content: Text(AppStrings.of(context)!.favoriteUpdateError)),
       );
     }
   }
@@ -63,7 +64,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('المفضلة')),
+      appBar: AppBar(title: Text(AppStrings.of(context)!.favoritesTitle)),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
@@ -73,30 +74,28 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('تعذر تحميل المفضلة'),
-                        const SizedBox(height: 8),
-                        Text(_error!, textAlign: TextAlign.center),
+                        Text(AppStrings.of(context)!.favoriteLoadError),
                         const SizedBox(height: 12),
                         FilledButton(
                           onPressed: _load,
-                          child: const Text('إعادة المحاولة'),
+                          child: Text(AppStrings.of(context)!.retryAction),
                         ),
                       ],
                     ),
                   ),
                 )
               : _products.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Padding(
-                        padding: EdgeInsets.all(24),
+                        padding: const EdgeInsets.all(24),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.favorite_border_rounded, size: 56),
-                            SizedBox(height: 12),
-                            Text('لم تضف أي منتجات للمفضلة بعد'),
-                            SizedBox(height: 6),
-                            Text('اضغط على القلب في صورة أي منتج لحفظه هنا'),
+                            const Icon(Icons.favorite_border_rounded, size: 56),
+                            const SizedBox(height: 12),
+                            Text(AppStrings.of(context)!.emptyFavorites),
+                            const SizedBox(height: 6),
+                            Text(AppStrings.of(context)!.favoriteHint),
                             ],
                         ),
                       ),

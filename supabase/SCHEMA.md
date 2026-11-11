@@ -47,6 +47,13 @@ This is immediate publication after a successful upload, not an admin review que
 
 The more specialized store/agency sections and additional marketplace features remain outside phase one.
 
+## Category hierarchy
+
+- Categories use `parent_id` to form a tree; root categories have `parent_id = null`.
+- `sort_order` controls ordering among siblings.
+- Product creation requires selecting a leaf category. Selecting a parent category filters products across its descendants.
+- Stable slugs are used by Flutter for category translations and category-intent search; category IDs remain unchanged.
+
 ## Category localization contract
 
 `categories.name_ar`, `categories.name_en`, and `categories.name_fr` are required and must not be blank (enforced by database constraints). When adding a category, provide all three translations in the same insert or migration. Do not change `id` or `slug` when translating labels.
@@ -58,7 +65,7 @@ RLS is enabled on all exposed public tables. Private profile rows are owner-scop
 
 ## Migration source files
 
-The repository now contains the seven migration files corresponding to the deployed database history:
+The repository contains the source-controlled migrations for the deployed database contract and the category expansion:
 
 - `20261108185823_create_marketplace_core_tables.sql`
 - `20261108185831_optimize_core_rls_and_category_index.sql`

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_strings.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/product.dart';
@@ -99,14 +100,14 @@ class _SearchScreenState extends State<SearchScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(wasFavorite
-              ? 'تمت إزالة المنتج من المفضلة'
-              : 'تمت إضافة المنتج للمفضلة'),
+              ? AppStrings.of(context)!.favoriteRemoved
+              : AppStrings.of(context)!.favoriteAddedToast),
         ),
       );
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تعذر تحديث المفضلة: $error')),
+        SnackBar(content: Text(AppStrings.of(context)!.favoriteUpdateError)),
       );
     }
   }
@@ -138,9 +139,9 @@ class _SearchScreenState extends State<SearchScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('نطاق السعر بالجنيه المصري', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+                Text(AppStrings.of(context)!.priceRangeTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
                 const SizedBox(height: 12),
-                Text('${draft.start.round()} - ${draft.end.round()} ج.م'),
+                Text('${draft.start.round()} - ${draft.end.round()} ${AppStrings.of(context)!.currency}'),
                 RangeSlider(
                   values: draft, min: 0, max: 100000, divisions: 100,
                   onChanged: (value) => setSheetState(() => draft = value),
@@ -148,11 +149,11 @@ class _SearchScreenState extends State<SearchScreen> {
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero, value: enabled,
                   onChanged: (value) => setSheetState(() => enabled = value),
-                  title: const Text('تفعيل فلتر السعر'),
+                  title: Text(AppStrings.of(context)!.enablePriceFilter),
                 ),
                 SizedBox(width: double.infinity, child: FilledButton(
                   onPressed: () => Navigator.pop(sheetContext, (draft, enabled)),
-                  child: const Text('تطبيق'),
+                  child: Text(AppStrings.of(context)!.applyPriceFilter),
                 )),
               ],
             ),
@@ -169,7 +170,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     final products = _visibleProducts;
     return Scaffold(
-      appBar: AppBar(title: const Text('البحث عن المنتجات')),
+      appBar: AppBar(title: Text(AppStrings.of(context)!.searchTitle)),
       body: Column(
         children: [
           Padding(
@@ -178,7 +179,7 @@ class _SearchScreenState extends State<SearchScreen> {
               controller: _query, textInputAction: TextInputAction.search,
               onSubmitted: (_) => _load(),
               decoration: InputDecoration(
-                hintText: 'ابحث عن منتج', prefixIcon: const Icon(Icons.search),
+                hintText: AppStrings.of(context)!.searchHint, prefixIcon: const Icon(Icons.search),
                 suffixIcon: IconButton(onPressed: () { _query.clear(); _load(); }, icon: const Icon(Icons.close)),
               ),
             ),
@@ -188,16 +189,16 @@ class _SearchScreenState extends State<SearchScreen> {
             child: Row(children: [
               Expanded(child: DropdownButtonFormField<String>(
                 initialValue: _sort,
-                decoration: const InputDecoration(labelText: 'ترتيب حسب'),
-                items: const [
-                  DropdownMenuItem(value: 'newest', child: Text('الأحدث')),
-                  DropdownMenuItem(value: 'price_low', child: Text('السعر: الأقل أولاً')),
-                  DropdownMenuItem(value: 'price_high', child: Text('السعر: الأعلى أولاً')),
+                decoration: InputDecoration(labelText: AppStrings.of(context)!.sortByLabel),
+                items: [
+                  DropdownMenuItem(value: 'newest', child: Text(AppStrings.of(context)!.newestLabel)),
+                  DropdownMenuItem(value: 'price_low', child: Text(AppStrings.of(context)!.priceLowLabel)),
+                  DropdownMenuItem(value: 'price_high', child: Text(AppStrings.of(context)!.priceHighLabel)),
                 ],
                 onChanged: (value) => setState(() => _sort = value ?? 'newest'),
               )),
               const SizedBox(width: 10),
-              OutlinedButton.icon(onPressed: _showPriceFilter, icon: const Icon(Icons.tune), label: Text(_filterPrice ? 'السعر مفعّل' : 'السعر')),
+              OutlinedButton.icon(onPressed: _showPriceFilter, icon: const Icon(Icons.tune), label: Text(_filterPrice ? AppStrings.of(context)!.priceFilterEnabled : AppStrings.of(context)!.priceFilterLabel)),
             ]),
           ),
           Expanded(
@@ -205,12 +206,11 @@ class _SearchScreenState extends State<SearchScreen> {
                 : _error != null ? Center(child: Padding(
                     padding: const EdgeInsets.all(24),
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      const Text('تعذر تحميل نتائج البحث'), const SizedBox(height: 8),
-                      Text(_error!, textAlign: TextAlign.center), const SizedBox(height: 12),
-                      FilledButton(onPressed: _load, child: const Text('إعادة المحاولة')),
+                      Text(AppStrings.of(context)!.searchLoadError, textAlign: TextAlign.center), const SizedBox(height: 12),
+                      FilledButton(onPressed: _load, child: Text(AppStrings.of(context)!.retryAction)),
                     ]),
                   ))
-                : products.isEmpty ? const Center(child: Text('لا توجد نتائج مطابقة'))
+                : products.isEmpty ? Center(child: Text(AppStrings.of(context)!.noResults))
                 : GridView.builder(
                     padding: const EdgeInsets.all(12), itemCount: products.length,
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

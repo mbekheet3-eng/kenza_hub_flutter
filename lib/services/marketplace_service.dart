@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../data/category_labels.dart';
 import '../models/category.dart';
 import '../models/product.dart';
 
@@ -10,6 +11,7 @@ class MarketplaceService {
       : _client = client ?? Supabase.instance.client;
 
   final SupabaseClient _client;
+  Future<List<Category>>? _categoriesCache;
   static const String bucket = 'product-images';
   static const int maxImageBytes = 10 * 1024 * 1024;
   static const int maxImages = 8;
@@ -34,12 +36,42 @@ class MarketplaceService {
   }
 
   Future<List<Category>> getCategories() async {
+    final cached = _categoriesCache;
+    if (cached != null) return cached;
+
+    final request = _loadCategories();
+    _categoriesCache = request;
+    try {
+      return await request;
+    } catch (_) {
+      _categoriesCache = null;
+      rethrow;
+    }
+  }
+
+  Future<List<Category>> _loadCategories() async {
     final rows = await _client
         .from('categories')
-        .select('id,name_ar,name_en,slug')
+        .select('id,parent_id,name_ar,name_en,name_fr,slug,sort_order')
         .eq('is_active', true)
         .order('sort_order');
     return rows.map((row) => Category.fromMap(row)).toList();
+  }
+
+  Set<String> _categoryScopeIds(
+    List<Category> categories,
+    Set<String> selectedIds,
+  ) {
+    final result = <String>{};
+    final pending = selectedIds.toList();
+    while (pending.isNotEmpty) {
+      final currentId = pending.removeLast();
+      if (!result.add(currentId)) continue;
+      for (final child in categories.where((item) => item.parentId == currentId)) {
+        pending.add(child.id);
+      }
+    }
+    return result;
   }
 
   Future<List<Product>> getPublishedProducts({
@@ -54,11 +86,33 @@ class MarketplaceService {
         )
         .eq('status', 'published');
 
+    final categories = await getCategories();
+    final searchSlugs = CategoryLabels.searchSlugs(query);
+    final searchCategoryIds = categories
+        .where((item) => searchSlugs.contains(item.slug))
+        .map((item) => item.id)
+        .toSet();
+
+    Set<String>? categoryScope;
     if (categoryId != null && categoryId.isNotEmpty) {
-      request = request.eq('category_id', categoryId);
+      categoryScope = _categoryScopeIds(categories, {categoryId});
     }
-    if (query != null && query.trim().isNotEmpty) {
-      request = request.ilike('title', '%${query.trim()}%');
+    if (searchCategoryIds.isNotEmpty) {
+      final intentScope = _categoryScopeIds(categories, searchCategoryIds);
+      categoryScope = categoryScope == null
+          ? intentScope
+          : categoryScope.intersection(intentScope);
+    }
+
+    if (categoryScope != null) {
+      if (categoryScope.isEmpty) return [];
+      request = request.inFilter('category_id', categoryScope.toList());
+    }
+
+    final normalizedQuery = query?.trim() ?? '';
+    final isCategoryIntent = searchSlugs.isNotEmpty;
+    if (normalizedQuery.isNotEmpty && !isCategoryIntent) {
+      request = request.ilike('title', '%$normalizedQuery%');
     }
 
     final rows = await request.order('created_at', ascending: false).limit(limit);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_strings.dart';
 
 import '../services/notification_service.dart';
 import 'conversation_screen.dart';
@@ -27,7 +28,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تعذر تحديث الإشعارات: $error')),
+        SnackBar(content: Text(AppStrings.of(context)!.notificationsUpdateError)),
       );
     }
   }
@@ -57,7 +58,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تعذر فتح الإشعار: $error')),
+        SnackBar(content: Text(AppStrings.of(context)!.notificationOpenError)),
       );
     }
   }
@@ -80,6 +81,30 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
+  String _notificationTitle(Map<String, dynamic> row) {
+    final strings = AppStrings.of(context)!;
+    switch (row['type']?.toString()) {
+      case 'new_message':
+        return strings.notificationNewMessageTitle;
+      case 'new_offer':
+        return strings.notificationNewOfferTitle;
+      case 'offer_accepted':
+        return strings.notificationOfferAcceptedTitle;
+      case 'offer_rejected':
+        return strings.notificationOfferRejectedTitle;
+      case 'new_order':
+        return strings.notificationNewOrderTitle;
+      case 'order_accepted':
+        return strings.notificationOrderAcceptedTitle;
+      case 'order_rejected':
+        return strings.notificationOrderRejectedTitle;
+      case 'order_updated':
+        return strings.notificationOrderUpdatedTitle;
+      default:
+        return row['title']?.toString() ?? strings.newNotification;
+    }
+  }
+
   String _date(dynamic value) {
     final date = value is String ? DateTime.tryParse(value)?.toLocal() : null;
     if (date == null) return '';
@@ -91,11 +116,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('الإشعارات'),
+        title: Text(AppStrings.of(context)!.notificationsTitle),
         actions: [
           TextButton(
             onPressed: _markAllRead,
-            child: const Text('قراءة الكل'),
+            child: Text(AppStrings.of(context)!.readAll),
           ),
         ],
       ),
@@ -106,7 +131,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text('تعذر تحميل الإشعارات: ${snapshot.error}'),
+                child: Text(AppStrings.of(context)!.notificationsLoadError),
               ),
             );
           }
@@ -116,15 +141,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           }
           final rows = snapshot.data ?? [];
           if (rows.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
-                padding: EdgeInsets.all(24),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.notifications_none_rounded, size: 56),
-                    SizedBox(height: 12),
-                    Text('لا توجد إشعارات حتى الآن'),
+                    const Icon(Icons.notifications_none_rounded, size: 56),
+                    const SizedBox(height: 12),
+                    Text(AppStrings.of(context)!.emptyNotifications),
                   ],
                 ),
               ),
@@ -145,7 +170,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   child: Icon(_icon(row['type']?.toString())),
                 ),
                 title: Text(
-                  row['title']?.toString() ?? 'إشعار جديد',
+                  _notificationTitle(row),
                   style: TextStyle(fontWeight: unread ? FontWeight.w800 : FontWeight.w500),
                 ),
                 subtitle: Text(
