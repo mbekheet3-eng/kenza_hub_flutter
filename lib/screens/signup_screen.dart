@@ -98,7 +98,8 @@ class _SignupScreenState extends State<SignupScreen> {
               controller: _name,
               textCapitalization: TextCapitalization.words,
               decoration: const InputDecoration(
-                labelText: 'الاسم الذي سيظهر للآخرين',
+                labelText: 'الاسم (الاسم الأول يكفي)',
+                helperText: 'يمكنك كتابة اسمك الأول فقط أو الاسم بالكامل.',
                 prefixIcon: Icon(Icons.person_outline),
               ),
             ),
