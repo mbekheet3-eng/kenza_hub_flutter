@@ -47,16 +47,31 @@ class _KenzaSplashScreenState extends State<KenzaSplashScreen> {
               constraints.maxHeight * 0.78,
             );
             return Center(
-              child: Image.asset(
-                'assets/logos/logo.png',
-                width: logoSize,
-                height: logoSize,
-                fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => const Icon(
-                  Icons.storefront_rounded,
-                  size: 112,
-                  color: Color(0xFFC62828),
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/logos/logo.png',
+                    width: logoSize,
+                    height: logoSize,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => const Icon(
+                      Icons.storefront_rounded,
+                      size: 112,
+                      color: Color(0xFFC62828),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Kenza',
+                    style: TextStyle(
+                      color: Color(0xFF17366F),
+                      fontSize: 28,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ],
               ),
             );
           },
