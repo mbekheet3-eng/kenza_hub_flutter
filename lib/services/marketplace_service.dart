@@ -14,6 +14,17 @@ class MarketplaceService {
   static const int maxImageBytes = 10 * 1024 * 1024;
   static const int maxImages = 8;
 
+  Future<String?> getMyGender() async {
+    final user = _client.auth.currentUser;
+    if (user == null) return null;
+    final row = await _client
+        .from('profiles')
+        .select('gender')
+        .eq('id', user.id)
+        .maybeSingle();
+    return row?['gender'] as String?;
+  }
+
   Future<List<Category>> getCategories() async {
     final rows = await _client
         .from('categories')
@@ -31,7 +42,7 @@ class MarketplaceService {
     var request = _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,price,currency,created_at,product_images(id,storage_path,sort_order)',
+          'id,owner_id,category_id,title,description,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
         )
         .eq('status', 'published');
 
@@ -53,7 +64,7 @@ class MarketplaceService {
     final rows = await _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,price,currency,created_at,product_images(id,storage_path,sort_order)',
+          'id,owner_id,category_id,title,description,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
         )
         .eq('owner_id', user.id)
         .order('created_at', ascending: false);
@@ -67,7 +78,7 @@ class MarketplaceService {
     final rows = await _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,price,currency,created_at,product_images(id,storage_path,sort_order)',
+          'id,owner_id,category_id,title,description,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
         )
         .inFilter('id', productIds)
         .eq('status', 'published')
@@ -80,7 +91,7 @@ class MarketplaceService {
     final row = await _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,price,currency,created_at,product_images(id,storage_path,sort_order)',
+          'id,owner_id,category_id,title,description,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
         )
         .eq('id', productId)
         .single();
@@ -115,6 +126,7 @@ class MarketplaceService {
     required String description,
     required double price,
     required List<File> images,
+    required String audience,
   }) async {
     final user = _client.auth.currentUser;
     if (user == null) throw Exception('يجب تسجيل الدخول أولاً');
@@ -130,11 +142,13 @@ class MarketplaceService {
         .insert({
           'owner_id': user.id,
           'category_id': categoryId,
+          'audience': audience,
           'title': title.trim(),
           'description': description.trim(),
           'price': price,
           'currency': 'EGP',
           'status': 'draft',
+          'audience': audience,
         })
         .select('id')
         .single();
@@ -217,6 +231,7 @@ class MarketplaceService {
     required String description,
     required double price,
     required String categoryId,
+    required String audience,
   }) async {
     final user = _client.auth.currentUser;
     if (user == null) throw Exception('يجب تسجيل الدخول أولاً');
