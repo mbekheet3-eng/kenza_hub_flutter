@@ -37,6 +37,27 @@ jobs:
       - name: Generate Android platform with the legacy package identity
         run: flutter create --platforms=android --org com.kenza --project-name hub .
 
+      - name: Apply Kenza brand mark and Android app identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 --decode assets/logos/kenza_mark.png.base64 > assets/logos/logo.png
+          mkdir -p android/app/src/main/res/mipmap-mdpi android/app/src/main/res/mipmap-hdpi android/app/src/main/res/mipmap-xhdpi android/app/src/main/res/mipmap-xxhdpi android/app/src/main/res/mipmap-xxxhdpi
+          for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            cp assets/logos/logo.png "android/app/src/main/res/mipmap-${density}/ic_launcher.png"
+          done
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          manifest = Path("android/app/src/main/AndroidManifest.xml")
+          text = manifest.read_text()
+          text, count = re.subn(r'android:label="[^"]*"', 'android:label="Kenza"', text, count=1)
+          if count != 1:
+              raise SystemExit("Could not set Android application label to Kenza.")
+          manifest.write_text(text)
+          PY
+
       - name: Configure Android internet permission and OAuth callback
         shell: bash
         run: |
