@@ -328,6 +328,13 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     const SizedBox(height: 16),
                     Text(_error!, style: const TextStyle(color: Colors.red)),
                   ],
+                  if (_saving) ...[
+                    const SizedBox(height: 8),
+                    const Text(
+                      'جاري رفع الصور وفحص جودتها وملاءمتها قبل النشر...',
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                   const SizedBox(height: 24),
                   FilledButton(
                     onPressed: _saving || _loading || _gender == null ? null : _save,
