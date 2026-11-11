@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/product.dart';
 import '../services/auth_service.dart';
 import '../services/marketplace_service.dart';
+import '../widgets/member_avatar.dart';
 import '../widgets/product_card.dart';
 import 'product_detail_screen.dart';
 import 'about_kenza_screen.dart';
@@ -11,9 +15,9 @@ import 'policies_screen.dart';
 import 'password_recovery_screen.dart';
 import 'messages_inbox_screen.dart';
 import 'favorites_screen.dart';
+import 'notifications_screen.dart';
 import 'gender_change_request_screen.dart';
 import 'admin_gender_requests_screen.dart';
-import 'notifications_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -23,11 +27,15 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  static const _avatarChoices = ['🧑', '👩', '👨', '🧕', '🦊', '🐼', '🌸', '⭐'];
+
   final _auth = AuthService();
   final _service = MarketplaceService();
+  final _imagePicker = ImagePicker();
   Map<String, dynamic>? _profile;
   List<Product> _products = [];
   bool _loading = true;
+  bool _savingAvatar = false;
   String? _error;
 
   User? get _user => Supabase.instance.client.auth.currentUser;
@@ -75,7 +83,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         content: TextField(
           controller: controller,
           maxLength: 60,
-          decoration: const InputDecoration(labelText: 'الاسم الظاهر'),
+          textCapitalization: TextCapitalization.words,
+          decoration: const InputDecoration(
+            labelText: 'اسمك',
+            helperText: 'يمكنك كتابة الاسم الأول فقط أو الاسم بالكامل.',
+          ),
         ),
         actions: [
           TextButton(
@@ -92,8 +104,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     controller.dispose();
     if (name == null || name.isEmpty || _user == null) return;
     try {
-      // Keep the Auth metadata (used by the home greeting) and profile row
-      // (used by the account screen) in sync.
       await _auth.updateDisplayName(name);
       await Supabase.instance.client
           .from('profiles')
@@ -106,6 +116,153 @@ class _ProfileScreenState extends State<ProfileScreen> {
           SnackBar(content: Text('تعذر تحديث الاسم: $error')),
         );
       }
+    }
+  }
+
+  Future<void> _showAvatarOptions() async {
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('الصورة الشخصية', style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 8),
+              const Text('اختر صورة من جهازك أو Avatar جاهزًا.'),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pop(sheetContext, 'photo'),
+                  icon: const Icon(Icons.photo_library_outlined),
+                  label: const Text('اختيار صورة من الجهاز'),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: Text('اختيار Avatar', style: Theme.of(context).textTheme.titleMedium),
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 14,
+                runSpacing: 14,
+                children: _avatarChoices.map((avatar) {
+                  return InkWell(
+                    borderRadius: BorderRadius.circular(40),
+                    onTap: () => Navigator.pop(sheetContext, 'preset:$avatar'),
+                    child: CircleAvatar(
+                      radius: 27,
+                      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      child: Text(avatar, style: const TextStyle(fontSize: 28)),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => Navigator.pop(sheetContext, 'default'),
+                child: const Text('استخدام الصورة الافتراضية'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (choice == null) return;
+    if (choice == 'photo') {
+      await _pickProfilePhoto();
+    } else if (choice == 'default') {
+      await _saveAvatar(null);
+    } else if (choice.startsWith('preset:')) {
+      await _saveAvatar(choice);
+    }
+  }
+
+  Future<void> _pickProfilePhoto() async {
+    final user = _user;
+    if (user == null || _savingAvatar) return;
+
+    try {
+      final picked = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1200,
+        imageQuality: 85,
+      );
+      if (picked == null) return;
+
+      final file = File(picked.path);
+      final bytes = await file.readAsBytes();
+      if (bytes.length > 5 * 1024 * 1024) {
+        throw Exception('حجم الصورة بعد ضغطها يجب ألا يتجاوز 5 ميجابايت');
+      }
+
+      final extension = picked.path.split('.').last.toLowerCase();
+      final contentType = switch (extension) {
+        'png' => 'image/png',
+        'webp' => 'image/webp',
+        _ => 'image/jpeg',
+      };
+      final path = '${user.id}/avatar_${DateTime.now().microsecondsSinceEpoch}.${extension == 'png' || extension == 'webp' ? extension : 'jpg'}';
+
+      setState(() => _savingAvatar = true);
+      await Supabase.instance.client.storage.from('member-avatars').uploadBinary(
+            path,
+            bytes,
+            fileOptions: FileOptions(contentType: contentType, upsert: false),
+          );
+      final publicUrl = Supabase.instance.client.storage
+          .from('member-avatars')
+          .getPublicUrl(path);
+      await _saveAvatar(publicUrl, uploadedPath: path);
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('تعذر تحديث الصورة: $error')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _savingAvatar = false);
+    }
+  }
+
+  Future<void> _saveAvatar(String? avatar, {String? uploadedPath}) async {
+    final user = _user;
+    if (user == null) return;
+    final oldAvatar = _profile?['avatar_url'] as String?;
+    try {
+      setState(() => _savingAvatar = true);
+      await Supabase.instance.client
+          .from('profiles')
+          .update({'avatar_url': avatar})
+          .eq('id', user.id);
+
+      final marker = '/storage/v1/object/public/member-avatars/';
+      if (oldAvatar != null && oldAvatar.contains(marker)) {
+        final oldPath = oldAvatar.split(marker).last;
+        if (oldPath.isNotEmpty && oldPath != uploadedPath) {
+          try {
+            await Supabase.instance.client.storage.from('member-avatars').remove([oldPath]);
+          } catch (_) {
+            // A stale image should not block saving the new profile photo.
+          }
+        }
+      }
+      await _load();
+    } catch (error) {
+      if (uploadedPath != null) {
+        try {
+          await Supabase.instance.client.storage.from('member-avatars').remove([uploadedPath]);
+        } catch (_) {}
+      }
+      rethrow;
+    } finally {
+      if (mounted) setState(() => _savingAvatar = false);
     }
   }
 
@@ -139,7 +296,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        leading: const CircleAvatar(child: Icon(Icons.person_outline)),
+                        leading: MemberAvatar(
+                          avatarUrl: _profile?['avatar_url'] as String?,
+                          radius: 28,
+                        ),
                         title: Text(
                           (_profile?['display_name'] as String?)?.isNotEmpty == true
                               ? _profile!['display_name'] as String
@@ -148,8 +308,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         subtitle: Text(user.email ?? ''),
                         trailing: IconButton(
                           onPressed: _editName,
+                          tooltip: 'تعديل الاسم',
                           icon: const Icon(Icons.edit_outlined),
                         ),
+                      ),
+                      OutlinedButton.icon(
+                        onPressed: _savingAvatar ? null : _showAvatarOptions,
+                        icon: _savingAvatar
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Icon(Icons.camera_alt_outlined),
+                        label: const Text('تغيير الصورة الشخصية أو اختيار Avatar'),
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'الاسم الكامل، إذا كتبته، يظهر لك وحدك. الأعضاء الآخرون يرون الاسم الأول فقط.',
+                        style: TextStyle(color: Colors.grey),
                       ),
                       const Divider(height: 28),
                       ListTile(
