@@ -25,6 +25,14 @@ class MarketplaceService {
     return row?['gender'] as String?;
   }
 
+  Future<Map<String, dynamic>?> getPublicMemberProfile(String memberId) async {
+    return _client
+        .from('member_public_profiles')
+        .select('first_name,avatar_url')
+        .eq('id', memberId)
+        .maybeSingle();
+  }
+
   Future<List<Category>> getCategories() async {
     final rows = await _client
         .from('categories')
