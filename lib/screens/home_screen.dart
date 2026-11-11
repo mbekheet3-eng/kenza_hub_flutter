@@ -16,6 +16,7 @@ import 'profile_screen.dart';
 import 'search_screen.dart';
 import 'notifications_screen.dart';
 import 'messages_inbox_screen.dart';
+import 'special_markets_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -221,6 +222,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> _openSpecialMarkets() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const SpecialMarketsScreen(),
+      ),
+    );
+  }
+
   Future<void> _openCategories() async {
     if (_rootCategories.isEmpty) {
       _showComingSoon(AppStrings.of(context)!.homeSections);
@@ -264,6 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final user = Supabase.instance.client.auth.currentUser;
     final colors = Theme.of(context).colorScheme;
+    final languageCode = Localizations.localeOf(context).languageCode;
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
@@ -368,6 +378,64 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                  child: Material(
+                    color: colors.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(16),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: _openSpecialMarkets,
+                      child: Padding(
+                        padding: const EdgeInsets.all(14),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: colors.surface,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                Icons.storefront_outlined,
+                                color: colors.primary,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    AppStrings.of(context)!.specialMarketsTitle,
+                                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    AppStrings.of(context)!.specialMarketsSubtitle,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(fontSize: 11, color: colors.onSurfaceVariant),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Directionality.of(context) == TextDirection.rtl
+                                  ? Icons.arrow_back_ios_new_rounded
+                                  : Icons.arrow_forward_ios_rounded,
+                              size: 16,
+                              color: colors.onSurface,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
                 child: SizedBox(
                   height: 48,
                   child: ListView(
@@ -385,11 +453,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                         ),
                       ),
-                      ..._categories.map(
+                      ..._rootCategories.map(
                         (category) => Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: ChoiceChip(
-                            label: Text(category.nameAr),
+                            label: Text(category.nameFor(languageCode)),
                             selected: _categoryId == category.id,
                             onSelected: (_) {
                               setState(() => _categoryId = category.id);
