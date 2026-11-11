@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'auth_gate.dart';
 
@@ -38,30 +39,27 @@ class _KenzaSplashScreenState extends State<KenzaSplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(
-              'assets/images/logo.png',
-              width: 156,
-              height: 156,
-              fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => const Icon(
-                Icons.storefront_rounded,
-                size: 112,
-                color: Color(0xFFC62828),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final logoSize = math.min(
+              constraints.maxWidth * 0.88,
+              constraints.maxHeight * 0.78,
+            );
+            return Center(
+              child: Image.asset(
+                'assets/logos/logo.png',
+                width: logoSize,
+                height: logoSize,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => const Icon(
+                  Icons.storefront_rounded,
+                  size: 112,
+                  color: Color(0xFFC62828),
+                ),
               ),
-            ),
-            const SizedBox(height: 22),
-            const Text('كنزة هب', textDirection: TextDirection.rtl,
-              style: TextStyle(color: Color(0xFF0F172A), fontSize: 30,
-                fontWeight: FontWeight.w800)),
-            const SizedBox(height: 5),
-            const Text('Kenza Hub', style: TextStyle(
-              color: Color(0xFFC62828), fontSize: 17,
-              fontWeight: FontWeight.w600, letterSpacing: 1.1)),
-          ],
+            );
+          },
         ),
       ),
     );

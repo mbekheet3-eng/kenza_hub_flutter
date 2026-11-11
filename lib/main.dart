@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app.dart';
+import 'l10n/app_strings.dart';
 import 'services/push_notification_service.dart';
 
 Future<void> main() async {
@@ -47,15 +48,19 @@ class MissingConfigurationApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Center(
-          child: Padding(
-            padding: EdgeInsets.all(24),
-            child: Text(
-              'يلزم إعداد SUPABASE_URL و SUPABASE_PUBLISHABLE_KEY قبل تشغيل التطبيق.',
-              textAlign: TextAlign.center,
+      localizationsDelegates: AppStrings.localizationsDelegates,
+      supportedLocales: AppStrings.supportedLocales,
+      home: Builder(
+        builder: (context) => Scaffold(
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                AppStrings.of(context)!.missingConfigurationMessage,
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
         ),

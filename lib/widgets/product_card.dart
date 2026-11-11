@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/product.dart';
+import '../l10n/app_strings.dart';
 
 class ProductCard extends StatelessWidget {
   const ProductCard({
@@ -51,7 +52,9 @@ class ProductCard extends StatelessWidget {
                         shape: const CircleBorder(),
                         elevation: 2,
                         child: IconButton(
-                          tooltip: isFavorite ? 'إزالة من المفضلة' : 'إضافة للمفضلة',
+                          tooltip: isFavorite
+                              ? AppStrings.of(context)!.removeFavoriteTooltip
+                              : AppStrings.of(context)!.addFavoriteTooltip,
                           visualDensity: VisualDensity.compact,
                           onPressed: onFavoriteTap,
                           icon: Icon(
@@ -77,7 +80,7 @@ class ProductCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '${product.price.toStringAsFixed(0)} ج.م',
+                    '${product.price.toStringAsFixed(0)} ${AppStrings.of(context)!.currency}',
                     style: const TextStyle(
                       color: Color(0xFF5558C9),
                       fontWeight: FontWeight.bold,

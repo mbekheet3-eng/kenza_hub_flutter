@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_strings.dart';
 import '../services/auth_service.dart';
 import 'signup_screen.dart';
 
@@ -33,8 +34,9 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) Navigator.of(context).pop();
     } catch (error) {
       if (mounted) {
+        final strings = AppStrings.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذر تسجيل الدخول: $error')),
+          SnackBar(content: Text(strings.loginFailedPrefix)),
         );
       }
     } finally {
@@ -43,9 +45,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _forgotPassword() async {
+    final strings = AppStrings.of(context)!;
     if (_email.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('اكتب بريدك الإلكتروني أولاً')),
+        SnackBar(content: Text(strings.emailFirst)),
       );
       return;
     }
@@ -53,13 +56,13 @@ class _LoginScreenState extends State<LoginScreen> {
       await _auth.resetPassword(_email.text);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم إرسال رابط إعادة تعيين كلمة المرور إذا كان البريد مسجلاً')),
+          SnackBar(content: Text(strings.resetEmailSent)),
         );
       }
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذر إرسال الرابط: $error')),
+          SnackBar(content: Text(strings.resetLinkFailedPrefix)),
         );
       }
     }
@@ -67,24 +70,26 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('تسجيل الدخول')),
+      appBar: AppBar(title: Text(strings.loginTitle)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             const SizedBox(height: 20),
-            Text('أهلاً بعودتك', style: Theme.of(context).textTheme.headlineMedium),
+            Text(strings.welcomeBack,
+                style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 8),
-            const Text('سجّل دخولك لإدارة منتجاتك. يمكنك التصفح كضيف.'),
+            Text(strings.loginSubtitle),
             const SizedBox(height: 28),
             TextField(
               controller: _email,
               keyboardType: TextInputType.emailAddress,
               autocorrect: false,
-              decoration: const InputDecoration(
-                labelText: 'البريد الإلكتروني',
-                prefixIcon: Icon(Icons.email_outlined),
+              decoration: InputDecoration(
+                labelText: strings.email,
+                prefixIcon: const Icon(Icons.email_outlined),
               ),
             ),
             const SizedBox(height: 14),
@@ -92,11 +97,14 @@ class _LoginScreenState extends State<LoginScreen> {
               controller: _password,
               obscureText: _hidePassword,
               decoration: InputDecoration(
-                labelText: 'كلمة المرور',
+                labelText: strings.password,
                 prefixIcon: const Icon(Icons.lock_outline),
                 suffixIcon: IconButton(
-                  onPressed: () => setState(() => _hidePassword = !_hidePassword),
-                  icon: Icon(_hidePassword ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () =>
+                      setState(() => _hidePassword = !_hidePassword),
+                  icon: Icon(
+                    _hidePassword ? Icons.visibility : Icons.visibility_off,
+                  ),
                 ),
               ),
             ),
@@ -104,28 +112,33 @@ class _LoginScreenState extends State<LoginScreen> {
               alignment: AlignmentDirectional.centerEnd,
               child: TextButton(
                 onPressed: _busy ? null : _forgotPassword,
-                child: const Text('نسيت كلمة المرور؟'),
+                child: Text(strings.forgotPassword),
               ),
             ),
             const SizedBox(height: 8),
             FilledButton(
               onPressed: _busy
                   ? null
-                  : () => _run(() => _auth.signIn(
-                        email: _email.text,
-                        password: _password.text,
-                      )),
-              child: _busy ? const CircularProgressIndicator() : const Text('تسجيل الدخول'),
+                  : () => _run(
+                        () => _auth.signIn(
+                          email: _email.text,
+                          password: _password.text,
+                        ),
+                      ),
+              child: _busy
+                  ? const CircularProgressIndicator()
+                  : Text(strings.login),
             ),
-
             const SizedBox(height: 24),
             TextButton(
               onPressed: _busy
                   ? null
                   : () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const SignupScreen()),
+                        MaterialPageRoute(
+                          builder: (_) => const SignupScreen(),
+                        ),
                       ),
-              child: const Text('ليس لديك حساب؟ أنشئ حسابًا جديدًا'),
+              child: Text('${strings.noAccount}${strings.signUp}'),
             ),
           ],
         ),

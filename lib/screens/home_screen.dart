@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../l10n/app_strings.dart';
+
 import '../models/category.dart';
 import '../models/product.dart';
 import '../services/marketplace_service.dart';
@@ -186,35 +188,63 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  List<Category> get _rootCategories =>
+      _categories.where((category) => category.parentId == null).toList()
+        ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+
+  List<Category> _childrenOf(String? parentId) => _categories
+      .where((category) => category.parentId == parentId)
+      .toList()
+    ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+
+  Widget _categoryTile(Category category, BuildContext sheetContext) {
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final children = _childrenOf(category.id);
+    if (children.isEmpty) {
+      return ListTile(
+        leading: const Icon(Icons.category_outlined),
+        title: Text(category.nameFor(languageCode)),
+        onTap: () => Navigator.pop(sheetContext, category.id),
+      );
+    }
+    return ExpansionTile(
+      leading: const Icon(Icons.folder_outlined),
+      title: Text(category.nameFor(languageCode)),
+      children: [
+        ListTile(
+          dense: true,
+          title: Text('${category.nameFor(languageCode)} — ${AppStrings.of(context)!.allProducts}'),
+          onTap: () => Navigator.pop(sheetContext, category.id),
+        ),
+        ...children.map((child) => _categoryTile(child, sheetContext)),
+      ],
+    );
+  }
+
   Future<void> _openCategories() async {
-    if (_categories.isEmpty) {
-      _showComingSoon('الأقسام');
+    if (_rootCategories.isEmpty) {
+      _showComingSoon(AppStrings.of(context)!.homeSections);
       return;
     }
     final selectedId = await showModalBottomSheet<String?>(
       context: context,
       showDragHandle: true,
+      isScrollControlled: true,
       builder: (sheetContext) => SafeArea(
         child: ListView(
           shrinkWrap: true,
           padding: const EdgeInsets.symmetric(vertical: 8),
           children: [
-            const ListTile(
-              title: Text('الأقسام'),
-              titleTextStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+            ListTile(
+              title: Text(AppStrings.of(context)!.homeSections),
+              titleTextStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
             ),
             ListTile(
               leading: const Icon(Icons.grid_view_rounded),
-              title: const Text('كل المنتجات'),
+              title: Text(AppStrings.of(context)!.allProducts),
               onTap: () => Navigator.pop(sheetContext, ''),
             ),
-            ..._categories.map(
-              (category) => ListTile(
-                leading: const Icon(Icons.category_outlined),
-                title: Text(category.nameAr),
-                onTap: () => Navigator.pop(sheetContext, category.id),
-              ),
-            ),
+            ..._rootCategories.map((category) => _categoryTile(category, sheetContext)),
           ],
         ),
       ),
@@ -226,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$feature قريبًا')),
+      SnackBar(content: Text(AppStrings.of(context)!.featureComingSoon)),
     );
   }
 
