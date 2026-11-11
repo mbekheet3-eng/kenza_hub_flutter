@@ -121,13 +121,15 @@ class _GenderChangeRequestScreenState extends State<GenderChangeRequestScreen> {
                   Text('النوع المطلوب', style: Theme.of(context).textTheme.titleMedium),
                   RadioGroup<String>(
                     groupValue: _requestedGender,
-                    onChanged: _sending
-                        ? null
-                        : (value) => setState(() => _requestedGender = value),
+                    onChanged: (value) {
+                      if (_sending || value == null) return;
+                      setState(() => _requestedGender = value);
+                    },
                     child: RadioListTile<String>(
                       value: _currentGender == 'female' ? 'male' : 'female',
                       title: Text(_currentGender == 'female' ? 'رجل' : 'امرأة'),
-                      contentPadding: EdgeInsets.zero,
+                      contentPadding: const EdgeInsets.zero,
+                      enabled: !_sending,
                     ),
                   ),
                   TextField(
