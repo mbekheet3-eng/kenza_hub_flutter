@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../widgets/member_avatar.dart';
+
 import '../models/product.dart';
 import '../services/marketplace_service.dart';
 import 'product_form_screen.dart';
@@ -21,6 +23,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final _service = MarketplaceService();
   final _transactionService = MarketplaceTransactionService();
   late Future<Product> _product;
+  final Map<String, Future<Map<String, dynamic>?>> _publicMemberProfiles = {};
+
+  Future<Map<String, dynamic>?> _publicProfileFor(String memberId) {
+    return _publicMemberProfiles.putIfAbsent(
+      memberId,
+      () => _service.getPublicMemberProfile(memberId),
+    );
+  }
 
   @override
   void initState() {
@@ -266,6 +276,26 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ),
                     ),
                     const SizedBox(height: 12),
+                    FutureBuilder<Map<String, dynamic>?>(
+                      future: _publicProfileFor(product.ownerId),
+                      builder: (context, snapshot) {
+                        final publicProfile = snapshot.data;
+                        return ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: MemberAvatar(
+                            avatarUrl: publicProfile?['avatar_url'] as String?,
+                            radius: 23,
+                          ),
+                          title: Text(
+                            (publicProfile?['first_name'] as String?)?.isNotEmpty == true
+                                ? publicProfile!['first_name'] as String
+                                : 'عضو كنزة هب',
+                          ),
+                          subtitle: const Text('البائع'),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 8),
                     Chip(
                       avatar: const Icon(Icons.groups_outlined, size: 18),
                       label: Text(product.audience == 'women_only'
