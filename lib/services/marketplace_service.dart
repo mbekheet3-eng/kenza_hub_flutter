@@ -142,7 +142,6 @@ class MarketplaceService {
         .insert({
           'owner_id': user.id,
           'category_id': categoryId,
-          'audience': audience,
           'title': title.trim(),
           'description': description.trim(),
           'price': price,
@@ -243,6 +242,7 @@ class MarketplaceService {
           'description': description.trim(),
           'price': price,
           'category_id': categoryId,
+          'audience': audience,
         })
         .eq('id', productId)
         .eq('owner_id', user.id)
