@@ -70,7 +70,27 @@ The active Supabase project uses the Edge Function `review-product-images` to re
 - The Gemini key and Supabase service-role key are server-only. Never place either key in Flutter, GitHub source, build arguments, or client logs.
 - The function records its decision in the private `product_moderation` table. Only the service role can access that table.
 - A database trigger blocks publication unless the server has recorded an approved result. Changing listing title, description, category, or product images resets the approval and returns a published product to draft before another review.
-- Clear rejection keeps the product unpublished; uncertain results or service failures also keep it unpublished and can be retried. There is no automatic approval fallback.
+- Clear prohibited content or an unmistakably unrelated image may be rejected. Uncertain cases and poor image quality must go to review/retry rather than being treated as prohibited. Service failures keep the product unpublished; there is no automatic approval fallback.
+
+### Approved moderation policy
+
+**Reject only clear violations**, including:
+- Firearms, ammunition, weapon parts, explosives and fireworks.
+- Illegal drugs and drug paraphernalia.
+- Tobacco, vapes and nicotine products.
+- Alcoholic beverages.
+- Prescription-only or otherwise legally restricted medicines.
+- Explicit pornography and adult sexual products.
+- Poisons and dangerous chemicals.
+- Clearly evidenced counterfeit goods, or goods explicitly advertised as counterfeit.
+- Terrorist/extremist propaganda and material promoting violence or hatred.
+- Protected wildlife, products made from protected species, and illegal wildlife trade.
+- Unmistakably non-listing content such as pornography, graphic violence, memes, blank images or unrelated scenery/screenshots.
+
+**Allow ordinary legal marketplace goods**, including new and used clothing, shoes, bags, furniture, home supplies, appliances, electronics, accessories, children's toys, and educational/recreational items. Brand logos, ordinary packaging, signs of use, scratches, hands, people modelling ordinary clothing, and normal home backgrounds are not violations by themselves.
+
+**Quality is separate from prohibited content.** Blurry, dark, low-resolution, poorly framed or partially obstructed photos should be sent for review or a clearer-photo retry, not rejected as prohibited. Unfamiliar items and ambiguous evidence must go to review. Never infer theft, counterfeiting, illegality or protected-wildlife origin from suspicion alone. Do not identify people or infer personal traits.
+
 - Product photos and the associated listing title/description are sent to Google Gemini for this review. The privacy policy now discloses this processing; legal review of Google processing terms, transfer locations and any required notices/consents is still required before public launch.
 
 The review function is deployed with JWT verification enabled. Do not disable it.
