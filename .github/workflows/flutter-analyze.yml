@@ -11,6 +11,7 @@ on:
       - feature/special-markets-ui
     paths:
       - 'lib/**'
+      - 'test/**'
       - 'pubspec.yaml'
       - 'pubspec.lock'
       - 'supabase/migrations/**'
