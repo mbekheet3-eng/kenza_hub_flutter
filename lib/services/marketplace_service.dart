@@ -23,6 +23,14 @@ class MarketplaceService {
     return rows.map((row) => Category.fromMap(row)).toList();
   }
 
+  Future<Map<String, dynamic>?> getPublicMemberProfile(String memberId) async {
+    return _client
+        .from('member_public_profiles')
+        .select('first_name,avatar_url')
+        .eq('id', memberId)
+        .maybeSingle();
+  }
+
   Future<List<Product>> getPublishedProducts({
     String? categoryId,
     String? query,
