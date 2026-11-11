@@ -49,19 +49,25 @@ class _GenderOnboardingScreenState extends State<GenderOnboardingScreen> {
               const SizedBox(height: 8),
               const Text('هذا الاختيار مطلوب لتحديد الإعلانات التي يمكنك مشاهدتها والتواصل مع أصحابها.'),
               const SizedBox(height: 20),
-              RadioListTile<String>(
-                value: 'male',
+              RadioGroup<String>(
                 groupValue: _gender,
-                onChanged: _saving ? null : (value) => setState(() => _gender = value),
-                title: const Text('رجل'),
-                contentPadding: EdgeInsets.zero,
-              ),
-              RadioListTile<String>(
-                value: 'female',
-                groupValue: _gender,
-                onChanged: _saving ? null : (value) => setState(() => _gender = value),
-                title: const Text('امرأة'),
-                contentPadding: EdgeInsets.zero,
+                onChanged: _saving
+                    ? null
+                    : (value) => setState(() => _gender = value),
+                child: Column(
+                  children: [
+                    RadioListTile<String>(
+                      value: 'male',
+                      title: const Text('رجل'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                    RadioListTile<String>(
+                      value: 'female',
+                      title: const Text('امرأة'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ],
+                ),
               ),
               if (_error != null) ...[
                 const SizedBox(height: 12),
