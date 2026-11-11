@@ -118,20 +118,23 @@ class _SignupScreenState extends State<SignupScreen> {
             const SizedBox(height: 6),
             RadioGroup<String>(
               groupValue: _gender,
-              onChanged: _busy
-                  ? null
-                  : (value) => setState(() => _gender = value),
+              onChanged: (value) {
+                if (_busy || value == null) return;
+                setState(() => _gender = value);
+              },
               child: Column(
                 children: [
                   RadioListTile<String>(
                     value: 'male',
                     title: const Text('رجل'),
-                    contentPadding: EdgeInsets.zero,
+                    contentPadding: const EdgeInsets.zero,
+                    enabled: !_busy,
                   ),
                   RadioListTile<String>(
                     value: 'female',
                     title: const Text('امرأة'),
-                    contentPadding: EdgeInsets.zero,
+                    contentPadding: const EdgeInsets.zero,
+                    enabled: !_busy,
                   ),
                 ],
               ),
