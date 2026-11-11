@@ -10,6 +10,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
     final sections = <(String, String)>[
       (s.privacyDataTitle, s.privacyDataBody),
       (s.privacyUseTitle, s.privacyUseBody),
+      (s.privacyAiReviewTitle, s.privacyAiReviewBody),
       (s.privacyPhoneTitle, s.privacyPhoneBody),
       (s.privacyVisibilityTitle, s.privacyVisibilityBody),
       (s.privacyMessagesTitle, s.privacyMessagesBody),
