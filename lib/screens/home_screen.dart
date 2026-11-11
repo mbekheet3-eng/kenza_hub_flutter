@@ -15,8 +15,7 @@ import 'product_form_screen.dart';
 import 'profile_screen.dart';
 import 'search_screen.dart';
 import 'notifications_screen.dart';
-import 'messages_inbox_screen.dart';
-import 'special_markets_screen.dart';
+import 'favorites_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -177,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> _openMessages() async {
+  Future<void> _openFavorites() async {
     if (Supabase.instance.client.auth.currentUser == null) {
       await Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -185,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!mounted || Supabase.instance.client.auth.currentUser == null) return;
     }
     await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const MessagesInboxScreen()),
+      MaterialPageRoute(builder: (_) => const FavoritesScreen()),
     );
   }
 
@@ -219,14 +218,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         ...children.map((child) => _categoryTile(child, sheetContext)),
       ],
-    );
-  }
-
-  Future<void> _openSpecialMarkets() async {
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => const SpecialMarketsScreen(),
-      ),
     );
   }
 
@@ -378,64 +369,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                  child: Material(
-                    color: colors.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(16),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: _openSpecialMarkets,
-                      child: Padding(
-                        padding: const EdgeInsets.all(14),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 44,
-                              height: 44,
-                              decoration: BoxDecoration(
-                                color: colors.surface,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(
-                                Icons.storefront_outlined,
-                                color: colors.primary,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    AppStrings.of(context)!.specialMarketsTitle,
-                                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
-                                  ),
-                                  const SizedBox(height: 3),
-                                  Text(
-                                    AppStrings.of(context)!.specialMarketsSubtitle,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(fontSize: 11, color: colors.onSurfaceVariant),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Icon(
-                              Directionality.of(context) == TextDirection.rtl
-                                  ? Icons.arrow_back_ios_new_rounded
-                                  : Icons.arrow_forward_ios_rounded,
-                              size: 16,
-                              color: colors.onSurface,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SliverToBoxAdapter(
                 child: SizedBox(
                   height: 48,
                   child: ListView(
@@ -564,34 +497,52 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: SafeArea(
         top: false,
-        child: NavigationBar(
-          selectedIndex: 0,
-          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-          destinations: const [
-            NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home_rounded), label: 'الرئيسية'),
-            NavigationDestination(icon: Icon(Icons.grid_view_outlined), selectedIcon: Icon(Icons.grid_view_rounded), label: 'الأقسام'),
-            NavigationDestination(icon: Icon(Icons.add_circle_outline_rounded), selectedIcon: Icon(Icons.add_circle_rounded), label: 'إضافة منتج'),
-            NavigationDestination(icon: Icon(Icons.chat_bubble_outline_rounded), selectedIcon: Icon(Icons.chat_rounded), label: 'الرسائل'),
-            NavigationDestination(icon: Icon(Icons.person_outline_rounded), selectedIcon: Icon(Icons.person_rounded), label: 'حسابي'),
-          ],
-          onDestinationSelected: (index) {
-            switch (index) {
-              case 0:
-                break;
-              case 1:
-                _openCategories();
-                break;
-              case 2:
-                _openSell();
-                break;
-              case 3:
-                _openMessages();
-                break;
-              case 4:
-                _openProfile();
-                break;
-            }
-          },
+        child: Container(
+          height: 76,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            border: Border(
+              top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(child: IconButton(
+                tooltip: 'الرئيسية',
+                onPressed: () {},
+                icon: Icon(Icons.home_rounded, size: 27, color: Theme.of(context).colorScheme.primary),
+              )),
+              Expanded(child: IconButton(
+                tooltip: 'الأقسام',
+                onPressed: _openCategories,
+                icon: const Icon(Icons.grid_view_rounded, size: 26),
+              )),
+              Expanded(child: Center(child: Material(
+                color: Theme.of(context).colorScheme.primary,
+                elevation: 5,
+                shape: const CircleBorder(),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: _openSell,
+                  child: const SizedBox(
+                    width: 56, height: 56,
+                    child: Icon(Icons.add_rounded, color: Colors.white, size: 32),
+                  ),
+                ),
+              ))),
+              Expanded(child: IconButton(
+                tooltip: 'المفضلة',
+                onPressed: _openFavorites,
+                icon: const Icon(Icons.favorite_border_rounded, size: 26),
+              )),
+              Expanded(child: IconButton(
+                tooltip: 'حسابي',
+                onPressed: _openProfile,
+                icon: const Icon(Icons.person_outline_rounded, size: 27),
+              )),
+            ],
+          ),
         ),
       ),
     );
