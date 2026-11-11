@@ -4,7 +4,8 @@ Project: `mxdcfewkajwvtwtjoeia`
 
 ## Tables
 
-- `profiles`: one row per Auth user; only the owner can read or update it.
+- `profiles`: one private row per Auth user; only the owner can read or update it. The full saved name and email remain private.
+- `member_public_profiles`: a restricted public projection containing only the first name and avatar URL; it never contains email or the full name.
 - `categories`: active categories are readable by guests and members. Every row must provide non-empty `name_ar`, `name_en`, and `name_fr`; the app selects the matching label using the member's chosen language. `id` and `slug` remain language-independent and stable.
 - `products`: `owner_id`, `category_id`, `title`, `description`, `price`, `currency`, `status`, `created_at`.
 - `product_images`: `product_id`, `storage_path`, `alt_text`, `sort_order`, `created_at`.
@@ -19,6 +20,14 @@ Project: `mxdcfewkajwvtwtjoeia`
 5. If any step fails, remove uploaded files and delete the draft product.
 
 This is immediate publication after a successful upload, not an admin review queue. Draft status is an internal safety state while the upload is in progress.
+
+## Member profiles and avatars
+
+- Public member names are derived in the database from the first whitespace-separated part of the saved profile name.
+- The private `profiles` table remains owner-readable only. A trigger synchronizes only `first_name` and `avatar_url` to `member_public_profiles`.
+- The public projection is readable by guests and members; client roles have no write access to it.
+- Bucket: `member-avatars` (public read, 5 MiB maximum, JPEG/PNG/WebP). Upload, replacement, and deletion are restricted to the authenticated member's own UUID folder.
+- Built-in avatars are stored as `preset:<emoji>` values and do not require an uploaded file.
 
 ## Storage
 
