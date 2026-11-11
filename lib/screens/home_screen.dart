@@ -234,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                             ),
                             Text(
-                              user == null ? 'بك في كنزة هب' : _firstName,
+                              user == null ? 'بك في كنزة' : _firstName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: Theme.of(context).textTheme.titleLarge?.copyWith(
