@@ -5,6 +5,7 @@ on:
     branches:
       - phase-1/implementation
       - feature/audience-gender-restrictions
+      - test/all-latest-changes
     paths:
       - 'lib/**'
       - 'pubspec.yaml'
