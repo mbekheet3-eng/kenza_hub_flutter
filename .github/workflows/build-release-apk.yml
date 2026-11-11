@@ -45,8 +45,9 @@ jobs:
           mkdir -p android/app/src/main/res/mipmap-mdpi android/app/src/main/res/mipmap-hdpi android/app/src/main/res/mipmap-xhdpi android/app/src/main/res/mipmap-xxhdpi android/app/src/main/res/mipmap-xxxhdpi
           for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
             cp /tmp/kenza_logo.png "android/app/src/main/res/mipmap-${density}/ic_launcher.png"
-            cp /tmp/kenza_logo.png "android/app/src/main/res/mipmap-${density}/ic_launcher_foreground.png"
-          done
+                  done
+          # Use the generated legacy launcher PNGs; remove adaptive resources that reference the raw source as a foreground layer.
+          rm -rf android/app/src/main/res/mipmap-anydpi-v26
           python3 - <<'PY'
           from pathlib import Path
           import re
