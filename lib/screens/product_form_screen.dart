@@ -66,7 +66,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       setState(() {
         _categories = categories;
         _gender = gender;
-        if (gender == null) _error = 'أكمل تحديد النوع من إعدادات الحساب قبل نشر المنتجات.';
+        if (gender == null) _error = 'يجب تحديد النوع قبل نشر المنتجات.';
         if (gender == 'female' && _audience == 'men_only' || gender == 'male' && _audience == 'women_only') _audience = 'all';
         _categoryId ??= categories.isNotEmpty ? categories.first.id : null;
       });
@@ -174,7 +174,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   const SizedBox(height: 14),
                   if (_gender != null) ...[
                     DropdownButtonFormField<String>(
-                      value: _audience,
+                      initialValue: _audience,
                       decoration: const InputDecoration(labelText: 'الجمهور المسموح له بمشاهدة الإعلان'),
                       items: [
                         const DropdownMenuItem(value: 'all', child: Text('للجميع')),
