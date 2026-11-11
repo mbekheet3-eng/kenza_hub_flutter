@@ -294,22 +294,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
-                      ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: MemberAvatar(
-                          avatarUrl: _profile?['avatar_url'] as String?,
-                          radius: 28,
-                        ),
-                        title: Text(
-                          (_profile?['display_name'] as String?)?.isNotEmpty == true
-                              ? _profile!['display_name'] as String
-                              : 'عضو كنزة هب',
-                        ),
-                        subtitle: Text(user.email ?? ''),
-                        trailing: IconButton(
-                          onPressed: _editName,
-                          tooltip: 'تعديل الاسم',
-                          icon: const Icon(Icons.edit_outlined),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            MemberAvatar(
+                              avatarUrl: _profile?['avatar_url'] as String?,
+                              radius: 48,
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    (_profile?['display_name'] as String?)?.isNotEmpty == true
+                                        ? _profile!['display_name'] as String
+                                        : 'عضو كنزة هب',
+                                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    user.email ?? '',
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: _editName,
+                              tooltip: 'تعديل الاسم',
+                              icon: const Icon(Icons.edit_outlined),
+                            ),
+                          ],
                         ),
                       ),
                       OutlinedButton.icon(
