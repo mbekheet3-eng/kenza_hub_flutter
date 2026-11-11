@@ -199,7 +199,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             Text(
                               'Kenza',
                               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: const Color(0xFFC62828),
+                                color: const Color(0xFF17366F),
                                 fontSize: 22,
                                 fontWeight: FontWeight.w800,
                               ),
