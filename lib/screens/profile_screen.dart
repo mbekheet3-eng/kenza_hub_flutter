@@ -398,44 +398,102 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       const Divider(height: 28),
-                      Text('منتجاتي (${_products.length})',
-                          style: Theme.of(context).textTheme.titleLarge),
-                      if (_error != null)
-                        Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Text(_error!, style: const TextStyle(color: Colors.red)),
-                        ),
-                      if (_products.isEmpty && _error == null)
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 24),
-                          child: Text('لم تضف أي منتجات بعد'),
-                        )
-                      else
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: _products.length,
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 0.68,
+                      ListTile(
+                        leading: const Icon(Icons.inventory_2_outlined),
+                        title: Text('منتجاتي (${_products.length})'),
+                        subtitle: const Text('عرض وإدارة المنتجات التي أضفتها'),
+                        trailing: const Icon(Icons.chevron_left),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => MyProductsScreen(initialProducts: _products),
                           ),
-                          itemBuilder: (context, index) {
-                            final product = _products[index];
-                            return ProductCard(
-                              product: product,
-                              onTap: () => Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => ProductDetailScreen(productId: product.id),
-                                ),
-                              ).then((_) => _load()),
-                            );
-                          },
-                        ),
+                        ).then((_) => _load()),
+                      ),
                     ],
                   ),
                 ),
+    );
+  }
+}
+
+
+class MyProductsScreen extends StatefulWidget {
+  const MyProductsScreen({super.key, required this.initialProducts});
+  final List<Product> initialProducts;
+
+  @override
+  State<MyProductsScreen> createState() => _MyProductsScreenState();
+}
+
+class _MyProductsScreenState extends State<MyProductsScreen> {
+  final _service = MarketplaceService();
+  late List<Product> _products;
+  bool _loading = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _products = List<Product>.from(widget.initialProducts);
+  }
+
+  Future<void> _load() async {
+    setState(() { _loading = true; _error = null; });
+    try {
+      final products = await _service.getMyProducts();
+      if (!mounted) return;
+      setState(() => _products = products);
+    } catch (error) {
+      if (mounted) setState(() => _error = error.toString());
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('منتجاتي')),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+              ? Center(child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    const Text('تعذر تحميل منتجاتك'),
+                    const SizedBox(height: 12),
+                    Text(_error!, textAlign: TextAlign.center),
+                    const SizedBox(height: 12),
+                    FilledButton(onPressed: _load, child: const Text('إعادة المحاولة')),
+                  ]),
+                ))
+              : _products.isEmpty
+                  ? const Center(child: Text('لم تضف أي منتجات بعد'))
+                  : RefreshIndicator(
+                      onRefresh: _load,
+                      child: GridView.builder(
+                        padding: const EdgeInsets.all(12),
+                        itemCount: _products.length,
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 0.68,
+                        ),
+                        itemBuilder: (context, index) {
+                          final product = _products[index];
+                          return ProductCard(
+                            product: product,
+                            onTap: () async {
+                              await Navigator.of(context).push(MaterialPageRoute(
+                                builder: (_) => ProductDetailScreen(productId: product.id),
+                              ));
+                              if (mounted) await _load();
+                            },
+                          );
+                        },
+                      ),
+                    ),
     );
   }
 }
