@@ -7,10 +7,10 @@ void main() {
   testWidgets('shows only the two approved special markets in Arabic', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
-        locale: const Locale('ar'),
+        locale: Locale('ar'),
         supportedLocales: AppStrings.supportedLocales,
         localizationsDelegates: AppStrings.localizationsDelegates,
-        home: const SpecialMarketsScreen(),
+        home: SpecialMarketsScreen(),
       ),
     );
 
