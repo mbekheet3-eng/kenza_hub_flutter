@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+
 import '../l10n/app_strings.dart';
+import 'privacy_policy_screen.dart';
+import 'terms_screen.dart';
 
 class PoliciesScreen extends StatelessWidget {
   const PoliciesScreen({super.key});
@@ -7,49 +10,59 @@ class PoliciesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = AppStrings.of(context)!;
-    final sections = <(String, String)>[
-      (s.termsAccountTitle, s.termsAccountBody),
-      (s.termsListingsTitle, s.termsListingsBody),
-      (s.termsSellerTitle, s.termsSellerBody),
-      (s.termsBuyerTitle, s.termsBuyerBody),
-      (s.termsDeliveryTitle, s.termsDeliveryBody),
-      (s.termsPaymentTitle, s.termsPaymentBody),
-      (s.termsPrivacyTitle, s.termsPrivacyBody),
-      (s.termsConductTitle, s.termsConductBody),
-      (s.termsPlatformTitle, s.termsPlatformBody),
-      (s.termsChangesTitle, s.termsChangesBody),
-    ];
-
     return Scaffold(
       appBar: AppBar(title: Text(s.policiesTitle)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _notice(s.policiesIntro),
-          const SizedBox(height: 12),
-          ...sections.map((section) => Card(
-            margin: const EdgeInsets.only(bottom: 8),
-            child: ExpansionTile(
-              title: Text(section.$1, style: const TextStyle(fontWeight: FontWeight.w700)),
-              childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
-              children: [
-                Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text(section.$2, style: const TextStyle(height: 1.8, color: Color(0xFF475569))),
-                ),
-              ],
+          Text(
+            s.policiesIntro,
+            style: const TextStyle(height: 1.8, color: Color(0xFF475569)),
+          ),
+          const SizedBox(height: 16),
+          _documentTile(
+            context,
+            icon: Icons.gavel_outlined,
+            title: s.termsAndConditions,
+            subtitle: s.termsOfService,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const TermsScreen(),
+              ),
             ),
-          )),
-          const SizedBox(height: 12),
-          _notice(s.policiesDraftNotice),
+          ),
+          _documentTile(
+            context,
+            icon: Icons.privacy_tip_outlined,
+            title: s.privacyPolicy,
+            subtitle: s.privacySecurity,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const PrivacyPolicyScreen(),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  static Widget _notice(String text) => Container(
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(16)),
-    child: Text(text, style: const TextStyle(color: Colors.white, height: 1.7)),
-  );
+  Widget _documentTile(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: ListTile(
+        leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+        subtitle: Text(subtitle),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: onTap,
+      ),
+    );
+  }
 }
