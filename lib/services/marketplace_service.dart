@@ -6,6 +6,16 @@ import '../data/category_labels.dart';
 import '../models/category.dart';
 import '../models/product.dart';
 
+class _ProductImageReviewException implements Exception {
+  const _ProductImageReviewException(this.message, {required this.retryable});
+
+  final String message;
+  final bool retryable;
+
+  @override
+  String toString() => message;
+}
+
 class MarketplaceService {
   MarketplaceService({SupabaseClient? client})
       : _client = client ?? Supabase.instance.client;
@@ -216,6 +226,7 @@ class MarketplaceService {
 
     final productId = created['id'] as String;
     final uploadedPaths = <String>[];
+    var preserveDraft = false;
 
     try {
       final imageRows = <Map<String, dynamic>>[];
@@ -257,32 +268,63 @@ class MarketplaceService {
 
       await _client.from('product_images').insert(imageRows);
 
-      final published = await _client
-          .from('products')
-          .update({'status': 'published'})
-          .eq('id', productId)
-          .eq('owner_id', user.id)
-          .select('id');
-
-      if (published.isEmpty) {
-        throw Exception('تعذر نشر المنتج. حاول مرة أخرى');
+      try {
+        await _reviewProductImages(productId);
+      } on _ProductImageReviewException catch (error) {
+        preserveDraft = error.retryable;
+        rethrow;
       }
 
       return productId;
     } catch (_) {
-      if (uploadedPaths.isNotEmpty) {
+      if (!preserveDraft && uploadedPaths.isNotEmpty) {
         try {
           await _client.storage.from(bucket).remove(uploadedPaths);
         } catch (_) {
           // Keep the original publishing error; orphan cleanup can be retried.
         }
       }
-      try {
-        await _client.from('products').delete().eq('id', productId);
-      } catch (_) {
-        // Keep the original publishing error.
+      if (!preserveDraft) {
+        try {
+          await _client.from('products').delete().eq('id', productId);
+        } catch (_) {
+          // Keep the original publishing error.
+        }
       }
       rethrow;
+    }
+  }
+
+  Future<void> _reviewProductImages(String productId) async {
+    try {
+      final response = await _client.functions.invoke(
+        'review-product-images',
+        body: {'product_id': productId},
+      );
+      final data = response.data;
+      if (data is! Map) {
+        throw const _ProductImageReviewException(
+          'تعذر قراءة نتيجة مراجعة الصور. لم يتم نشر المنتج؛ حاول مرة أخرى.',
+          retryable: true,
+        );
+      }
+
+      if (data['status'] == 'approved') return;
+
+      final message = data['message_ar'] is String
+          ? data['message_ar'] as String
+          : 'لم تتم الموافقة على الصور. لم يتم نشر المنتج.';
+      throw _ProductImageReviewException(
+        message,
+        retryable: data['status'] != 'rejected',
+      );
+    } on _ProductImageReviewException {
+      rethrow;
+    } catch (_) {
+      throw const _ProductImageReviewException(
+        'تعذر إكمال مراجعة الصور الآن. لم يتم نشر المنتج؛ حاول مرة أخرى لاحقًا.',
+        retryable: true,
+      );
     }
   }
 
@@ -297,6 +339,22 @@ class MarketplaceService {
     final user = _client.auth.currentUser;
     if (user == null) throw Exception('يجب تسجيل الدخول أولاً');
 
+    final previous = await _client
+        .from('products')
+        .select('title,description,category_id,status')
+        .eq('id', productId)
+        .eq('owner_id', user.id)
+        .maybeSingle();
+
+    if (previous == null) {
+      throw Exception('لم يتم العثور على المنتج أو لا تملك صلاحية تعديله');
+    }
+
+    final needsImageReview = previous['status'] == 'draft' ||
+        previous['title'] != title.trim() ||
+        (previous['description'] ?? '') != description.trim() ||
+        previous['category_id'] != categoryId;
+
     final rows = await _client
         .from('products')
         .update({
@@ -310,7 +368,13 @@ class MarketplaceService {
         .eq('owner_id', user.id)
         .select('id');
 
-    if (rows.isEmpty) throw Exception('لم يتم العثور على المنتج أو لا تملك صلاحية تعديله');
+    if (rows.isEmpty) {
+      throw Exception('لم يتم العثور على المنتج أو لا تملك صلاحية تعديله');
+    }
+
+    if (needsImageReview) {
+      await _reviewProductImages(productId);
+    }
   }
 
   Future<void> deleteProduct(String productId) async {
