@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'auth_gate.dart';
+import '../widgets/kenza_logo.dart';
 
 class KenzaSplashScreen extends StatefulWidget {
   const KenzaSplashScreen({super.key});
@@ -50,17 +51,7 @@ class _KenzaSplashScreenState extends State<KenzaSplashScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset(
-                    'assets/logos/logo.png',
-                    width: logoSize,
-                    height: logoSize,
-                    fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => const Icon(
-                      Icons.storefront_rounded,
-                      size: 112,
-                      color: Color(0xFFC62828),
-                    ),
-                  ),
+                  KenzaLogo(width: logoSize, height: logoSize),
                   const SizedBox(height: 8),
                   const Text(
                     'Kenza',
