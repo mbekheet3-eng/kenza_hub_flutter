@@ -265,6 +265,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                     ),
+                    const SizedBox(height: 12),
+                    Chip(
+                      avatar: const Icon(Icons.groups_outlined, size: 18),
+                      label: Text(product.audience == 'women_only'
+                          ? 'للنساء فقط'
+                          : product.audience == 'men_only'
+                              ? 'للرجال فقط'
+                              : 'للجميع'),
+                    ),
                     const SizedBox(height: 20),
                     Text('الوصف', style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 8),
