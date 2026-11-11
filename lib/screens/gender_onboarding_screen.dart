@@ -51,20 +51,23 @@ class _GenderOnboardingScreenState extends State<GenderOnboardingScreen> {
               const SizedBox(height: 20),
               RadioGroup<String>(
                 groupValue: _gender,
-                onChanged: _saving
-                    ? null
-                    : (value) => setState(() => _gender = value),
+                onChanged: (value) {
+                  if (_saving || value == null) return;
+                  setState(() => _gender = value);
+                },
                 child: Column(
                   children: [
                     RadioListTile<String>(
                       value: 'male',
                       title: const Text('رجل'),
-                      contentPadding: EdgeInsets.zero,
+                      contentPadding: const EdgeInsets.zero,
+                      enabled: !_saving,
                     ),
                     RadioListTile<String>(
                       value: 'female',
                       title: const Text('امرأة'),
-                      contentPadding: EdgeInsets.zero,
+                      contentPadding: const EdgeInsets.zero,
+                      enabled: !_saving,
                     ),
                   ],
                 ),
