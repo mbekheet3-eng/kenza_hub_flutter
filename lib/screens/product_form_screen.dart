@@ -201,7 +201,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         );
       } else {
         await _service.publishProduct(
-          categoryId: _categoryId!,
+          categoryId: categoryId,
           title: _title.text,
           description: _description.text,
           price: price,
