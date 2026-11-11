@@ -16,6 +16,7 @@ import 'profile_screen.dart';
 import 'search_screen.dart';
 import 'notifications_screen.dart';
 import 'favorites_screen.dart';
+import 'categories_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -192,66 +193,11 @@ class _HomeScreenState extends State<HomeScreen> {
       _categories.where((category) => category.parentId == null).toList()
         ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
 
-  List<Category> _childrenOf(String? parentId) => _categories
-      .where((category) => category.parentId == parentId)
-      .toList()
-    ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
-
-  Widget _categoryTile(Category category, BuildContext sheetContext) {
-    final languageCode = Localizations.localeOf(context).languageCode;
-    final children = _childrenOf(category.id);
-    if (children.isEmpty) {
-      return ListTile(
-        leading: const Icon(Icons.category_outlined),
-        title: Text(category.nameFor(languageCode)),
-        onTap: () => Navigator.pop(sheetContext, category.id),
-      );
-    }
-    return ExpansionTile(
-      leading: const Icon(Icons.folder_outlined),
-      title: Text(category.nameFor(languageCode)),
-      children: [
-        ListTile(
-          dense: true,
-          title: Text('${category.nameFor(languageCode)} — ${AppStrings.of(context)!.allProducts}'),
-          onTap: () => Navigator.pop(sheetContext, category.id),
-        ),
-        ...children.map((child) => _categoryTile(child, sheetContext)),
-      ],
-    );
-  }
-
   Future<void> _openCategories() async {
-    if (_rootCategories.isEmpty) {
-      _showComingSoon(AppStrings.of(context)!.homeSections);
-      return;
-    }
-    final selectedId = await showModalBottomSheet<String?>(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      builder: (sheetContext) => SafeArea(
-        child: ListView(
-          shrinkWrap: true,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          children: [
-            ListTile(
-              title: Text(AppStrings.of(context)!.homeSections),
-              titleTextStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
-            ),
-            ListTile(
-              leading: const Icon(Icons.grid_view_rounded),
-              title: Text(AppStrings.of(context)!.allProducts),
-              onTap: () => Navigator.pop(sheetContext, ''),
-            ),
-            ..._rootCategories.map((category) => _categoryTile(category, sheetContext)),
-          ],
-        ),
-      ),
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const CategoriesScreen()),
     );
-    if (selectedId == null || !mounted) return;
-    setState(() => _categoryId = selectedId.isEmpty ? null : selectedId);
-    await _load();
+    if (mounted) _load();
   }
 
   void _showComingSoon(String feature) {
