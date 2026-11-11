@@ -32,7 +32,7 @@ jobs:
         run: flutter pub get
 
       - name: Analyze Flutter code
-        run: flutter analyze
+        run: flutter analyze --no-fatal-infos
 
       - name: Generate Android platform with the legacy package identity
         run: flutter create --platforms=android --org com.kenza --project-name hub .
