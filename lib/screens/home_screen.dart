@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final user = Supabase.instance.client.auth.currentUser;
     final metadataName = user?.userMetadata?['display_name']?.toString().trim();
     if (metadataName != null && metadataName.isNotEmpty) {
-      return metadataName.split(RegExp(r'\\s+')).first;
+      return metadataName.split(RegExp(r'\s+')).first;
     }
     final emailName = user?.email?.split('@').first;
     return emailName == null || emailName.isEmpty ? 'بك' : emailName;
