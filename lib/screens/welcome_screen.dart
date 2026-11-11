@@ -193,11 +193,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Image.asset('assets/images/logo.png', width: 48, height: 48, fit: BoxFit.contain,
+                            Image.asset('assets/logos/logo.png', width: 48, height: 48, fit: BoxFit.contain,
                               errorBuilder: (_, __, ___) => const Icon(Icons.storefront_rounded, color: Color(0xFFC62828), size: 40)),
                             const SizedBox(width: 9),
                             Text(
-                              isArabic ? 'كنزة هب' : 'Kenza Hub',
+                              'Kenza',
                               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                 color: const Color(0xFFC62828),
                                 fontSize: 22,
