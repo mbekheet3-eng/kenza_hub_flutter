@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../services/marketplace_transaction_service.dart';
+import '../widgets/member_avatar.dart';
 
 class ConversationScreen extends StatefulWidget {
   const ConversationScreen({super.key, required this.conversationId});
@@ -17,17 +18,41 @@ class _ConversationScreenState extends State<ConversationScreen> {
   final _messageController = TextEditingController();
   bool _sending = false;
   late Future<List<Map<String, dynamic>>> _messages;
+  late Future<Map<String, dynamic>?> _otherMember;
 
   @override
   void initState() {
     super.initState();
     _messages = _service.getMessages(widget.conversationId);
+    _otherMember = _loadOtherMemberProfile();
   }
 
   @override
   void dispose() {
     _messageController.dispose();
     super.dispose();
+  }
+
+  Future<Map<String, dynamic>?> _loadOtherMemberProfile() async {
+    final client = Supabase.instance.client;
+    final myId = client.auth.currentUser?.id;
+    if (myId == null) return null;
+
+    final conversation = await client
+        .from('conversations')
+        .select('buyer_id,seller_id')
+        .eq('id', widget.conversationId)
+        .maybeSingle();
+    if (conversation == null) return null;
+
+    final otherMemberId = conversation['buyer_id'] == myId
+        ? conversation['seller_id'] as String
+        : conversation['buyer_id'] as String;
+    return client
+        .from('member_public_profiles')
+        .select('first_name,avatar_url')
+        .eq('id', otherMemberId)
+        .maybeSingle();
   }
 
   Future<void> _refresh() async {
@@ -78,7 +103,29 @@ class _ConversationScreenState extends State<ConversationScreen> {
     final myId = Supabase.instance.client.auth.currentUser?.id;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('المحادثة')),
+      appBar: AppBar(
+        title: FutureBuilder<Map<String, dynamic>?>(
+          future: _otherMember,
+          builder: (context, snapshot) {
+            final member = snapshot.data;
+            final firstName = member?['first_name'] as String?;
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                MemberAvatar(
+                  avatarUrl: member?['avatar_url'] as String?,
+                  radius: 17,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  firstName?.isNotEmpty == true ? firstName! : 'المحادثة',
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            );
+          },
+        ),
+      ),
       body: Column(
         children: [
           Expanded(
