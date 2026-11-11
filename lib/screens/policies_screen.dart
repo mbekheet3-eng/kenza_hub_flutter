@@ -26,9 +26,7 @@ class PoliciesScreen extends StatelessWidget {
             title: s.termsAndConditions,
             subtitle: s.termsOfService,
             onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const TermsScreen(),
-              ),
+              MaterialPageRoute<void>(builder: (_) => const TermsScreen()),
             ),
           ),
           _documentTile(
