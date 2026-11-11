@@ -194,8 +194,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            KenzaLogo(width: 48, height: 48,
-                              errorBuilder: (_, __, ___) => const Icon(Icons.storefront_rounded, color: Color(0xFFC62828), size: 40)),
+                            const KenzaLogo(width: 48, height: 48),
                             const SizedBox(width: 9),
                             Text(
                               'Kenza',
