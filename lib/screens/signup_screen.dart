@@ -116,19 +116,25 @@ class _SignupScreenState extends State<SignupScreen> {
             const SizedBox(height: 18),
             Text('النوع (إلزامي)', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 6),
-            RadioListTile<String>(
-              value: 'male',
+            RadioGroup<String>(
               groupValue: _gender,
-              onChanged: _busy ? null : (value) => setState(() => _gender = value),
-              title: const Text('رجل'),
-              contentPadding: EdgeInsets.zero,
-            ),
-            RadioListTile<String>(
-              value: 'female',
-              groupValue: _gender,
-              onChanged: _busy ? null : (value) => setState(() => _gender = value),
-              title: const Text('امرأة'),
-              contentPadding: EdgeInsets.zero,
+              onChanged: _busy
+                  ? null
+                  : (value) => setState(() => _gender = value),
+              child: Column(
+                children: [
+                  RadioListTile<String>(
+                    value: 'male',
+                    title: const Text('رجل'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  RadioListTile<String>(
+                    value: 'female',
+                    title: const Text('امرأة'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 8),
             TextField(
