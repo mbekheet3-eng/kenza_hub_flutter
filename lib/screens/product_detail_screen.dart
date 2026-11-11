@@ -6,6 +6,7 @@ import '../services/marketplace_service.dart';
 import 'product_form_screen.dart';
 import 'conversation_screen.dart';
 import '../services/marketplace_transaction_service.dart';
+import '../widgets/member_avatar.dart';
 import 'login_screen.dart';
 
 class ProductDetailScreen extends StatefulWidget {
@@ -21,6 +22,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final _service = MarketplaceService();
   final _transactionService = MarketplaceTransactionService();
   late Future<Product> _product;
+  final Map<String, Future<Map<String, dynamic>?>> _publicMemberProfiles = {};
+
+  Future<Map<String, dynamic>?> _publicProfileFor(String memberId) {
+    return _publicMemberProfiles.putIfAbsent(
+      memberId,
+      () => _service.getPublicMemberProfile(memberId),
+    );
+  }
 
   @override
   void initState() {
@@ -265,7 +274,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 14),
+                    FutureBuilder<Map<String, dynamic>?>(
+                      future: _publicProfileFor(product.ownerId),
+                      builder: (context, snapshot) {
+                        final publicProfile = snapshot.data;
+                        return ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: MemberAvatar(
+                            avatarUrl: publicProfile?['avatar_url'] as String?,
+                            radius: 23,
+                          ),
+                          title: Text(
+                            (publicProfile?['first_name'] as String?)?.isNotEmpty == true
+                                ? publicProfile!['first_name'] as String
+                                : 'عضو كنزة هب',
+                          ),
+                          subtitle: const Text('البائع'),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 8),
                     Text('الوصف', style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 8),
                     Text(product.description.isEmpty ? 'لا يوجد وصف' : product.description),
