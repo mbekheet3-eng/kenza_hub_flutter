@@ -6,6 +6,7 @@ on:
       - phase-1/implementation
       - feature/audience-gender-restrictions
       - test/all-latest-changes
+      - fix/radio-group-flutter-347
     paths:
       - 'lib/**'
       - 'pubspec.yaml'
