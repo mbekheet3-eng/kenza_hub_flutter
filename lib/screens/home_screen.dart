@@ -273,6 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final user = Supabase.instance.client.auth.currentUser;
     final colors = Theme.of(context).colorScheme;
+    final languageCode = Localizations.localeOf(context).languageCode;
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
@@ -452,11 +453,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                         ),
                       ),
-                      ..._categories.map(
+                      ..._rootCategories.map(
                         (category) => Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: ChoiceChip(
-                            label: Text(category.nameAr),
+                            label: Text(category.nameFor(languageCode)),
                             selected: _categoryId == category.id,
                             onSelected: (_) {
                               setState(() => _categoryId = category.id);
