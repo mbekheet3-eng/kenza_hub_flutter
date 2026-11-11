@@ -294,6 +294,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
+                      if (_error != null)
+                        Material(
+                          color: Theme.of(context).colorScheme.errorContainer,
+                          borderRadius: BorderRadius.circular(12),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'تعذر تحميل بعض بيانات الحساب: $_error',
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onErrorContainer,
+                                  ),
+                                ),
+                                Align(
+                                  alignment: AlignmentDirectional.centerEnd,
+                                  child: TextButton(
+                                    onPressed: _load,
+                                    child: const Text('إعادة المحاولة'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         child: Row(
