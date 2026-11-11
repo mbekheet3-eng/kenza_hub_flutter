@@ -60,13 +60,13 @@ class _GenderOnboardingScreenState extends State<GenderOnboardingScreen> {
                     RadioListTile<String>(
                       value: 'male',
                       title: const Text('رجل'),
-                      contentPadding: const EdgeInsets.zero,
+                      contentPadding: EdgeInsets.zero,
                       enabled: !_saving,
                     ),
                     RadioListTile<String>(
                       value: 'female',
                       title: const Text('امرأة'),
-                      contentPadding: const EdgeInsets.zero,
+                      contentPadding: EdgeInsets.zero,
                       enabled: !_saving,
                     ),
                   ],
