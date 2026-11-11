@@ -36,7 +36,7 @@ class _SignupScreenState extends State<SignupScreen> {
         !_acceptedTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('راجع الاسم والبريد وكلمة المرور (8 أحرف على الأقل) والموافقة على الشروط'),
+          content: Text('أدخل اسمك الأول على الأقل، وراجع البريد وكلمة المرور والموافقة على الشروط'),
         ),
       );
       return;
@@ -95,7 +95,8 @@ class _SignupScreenState extends State<SignupScreen> {
               controller: _name,
               textCapitalization: TextCapitalization.words,
               decoration: const InputDecoration(
-                labelText: 'الاسم الذي سيظهر للآخرين',
+                labelText: 'الاسم (الاسم الأول يكفي)',
+                helperText: 'يمكنك كتابة اسمك الأول فقط أو الاسم بالكامل.',
                 prefixIcon: Icon(Icons.person_outline),
               ),
             ),
