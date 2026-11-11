@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../services/auth_service.dart';
+import 'gender_onboarding_screen.dart';
 import 'home_screen.dart';
 import 'password_recovery_screen.dart';
 import 'welcome_screen.dart';
@@ -20,11 +21,67 @@ class AuthGate extends StatelessWidget {
         }
 
         final userId = auth.currentUser?.id;
-        if (userId == null) {
-          return const WelcomeScreen();
-        }
+        if (userId == null) return const WelcomeScreen();
 
-        return HomeScreen(key: ValueKey(userId));
+        return _MemberGenderGate(key: ValueKey(userId), userId: userId);
+      },
+    );
+  }
+}
+
+class _MemberGenderGate extends StatefulWidget {
+  const _MemberGenderGate({super.key, required this.userId});
+
+  final String userId;
+
+  @override
+  State<_MemberGenderGate> createState() => _MemberGenderGateState();
+}
+
+class _MemberGenderGateState extends State<_MemberGenderGate> {
+  late Future<String?> _gender;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadGender();
+  }
+
+  void _loadGender() {
+    _gender = Supabase.instance.client
+        .from('profiles')
+        .select('gender')
+        .eq('id', widget.userId)
+        .maybeSingle()
+        .then((row) => row?['gender'] as String?);
+  }
+
+  void _completed() {
+    setState(_loadGender);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String?>(
+      future: _gender,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
+        if (snapshot.hasError) {
+          return Scaffold(
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text('تعذر تحميل بيانات الحساب: ${snapshot.error}'),
+              ),
+            ),
+          );
+        }
+        if (snapshot.data != 'male' && snapshot.data != 'female') {
+          return GenderOnboardingScreen(onCompleted: _completed);
+        }
+        return const HomeScreen();
       },
     );
   }
