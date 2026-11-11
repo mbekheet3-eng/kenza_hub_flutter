@@ -41,10 +41,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          base64 --decode assets/logos/kenza_mark.png.base64 > assets/logos/logo.png
+          base64 --decode assets/logos/kenza_mark.png.base64 > /tmp/kenza_logo.png
           mkdir -p android/app/src/main/res/mipmap-mdpi android/app/src/main/res/mipmap-hdpi android/app/src/main/res/mipmap-xhdpi android/app/src/main/res/mipmap-xxhdpi android/app/src/main/res/mipmap-xxxhdpi
           for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
-            cp assets/logos/logo.png "android/app/src/main/res/mipmap-${density}/ic_launcher.png"
+            cp /tmp/kenza_logo.png "android/app/src/main/res/mipmap-${density}/ic_launcher.png"
           done
           python3 - <<'PY'
           from pathlib import Path
