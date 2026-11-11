@@ -61,7 +61,21 @@ Add the exact callback to Supabase Authentication → URL Configuration → Redi
 
 The app uses the existing private `product-images` bucket. It uploads JPEG, PNG, or WebP files (maximum 10 MiB each) and generates signed URLs for display. Do not make the bucket public.
 
-## 6. Android release signing (manual only)
+## 6. Gemini product-image moderation
+
+The active Supabase project uses the Edge Function `review-product-images` to review every uploaded listing image before publication.
+
+- The function requires a signed-in member JWT and verifies that the member owns the draft product.
+- It downloads the product images from the private `product-images` bucket on the server and sends them to Google Gemini 2.5 Flash using the Supabase Edge Function secret `GEMINI_API_KEY`.
+- The Gemini key and Supabase service-role key are server-only. Never place either key in Flutter, GitHub source, build arguments, or client logs.
+- The function records its decision in the private `product_moderation` table. Only the service role can access that table.
+- A database trigger blocks publication unless the server has recorded an approved result. Changing listing title, description, category, or product images resets the approval and returns a published product to draft before another review.
+- Clear rejection keeps the product unpublished; uncertain results or service failures also keep it unpublished and can be retried. There is no automatic approval fallback.
+- Product photos and the associated listing title/description are sent to Google Gemini for this review. The privacy policy now discloses this processing; legal review of Google processing terms, transfer locations and any required notices/consents is still required before public launch.
+
+The review function is deployed with JWT verification enabled. Do not disable it.
+
+## 7. Android release signing (manual only)
 
 The app keeps the Android application ID `com.kenza.hub`. To install an update over an existing app, the release must use the exact same original upload/signing keystore and credentials.
 
