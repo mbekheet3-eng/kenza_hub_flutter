@@ -15,12 +15,16 @@ class AuthService {
     required String displayName,
     required String email,
     required String password,
+    required String gender,
   }) async {
+    if (gender != 'male' && gender != 'female') {
+      throw ArgumentError('يجب اختيار النوع');
+    }
     await _client.auth.signUp(
       email: email.trim(),
       password: password,
       emailRedirectTo: _authRedirectUrl,
-      data: {'display_name': displayName.trim()},
+      data: {'display_name': displayName.trim(), 'gender': gender},
     );
   }
 

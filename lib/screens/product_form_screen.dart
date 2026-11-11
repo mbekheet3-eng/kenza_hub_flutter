@@ -25,6 +25,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   final _price = TextEditingController();
   List<Category> _categories = [];
   String? _categoryId;
+  String? _gender;
+  String _audience = 'all';
   final List<File> _images = [];
   bool _loading = false;
   bool _saving = false;
@@ -41,6 +43,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       _description.text = product.description;
       _price.text = product.price.toStringAsFixed(0);
       _categoryId = product.categoryId;
+      _audience = product.audience;
     }
     _loadCategories();
   }
@@ -56,10 +59,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   Future<void> _loadCategories() async {
     setState(() => _loading = true);
     try {
-      final categories = await _service.getCategories();
+      final results = await Future.wait([_service.getCategories(), _service.getMyGender()]);
+      final categories = results[0] as List<Category>;
+      final gender = results[1] as String?;
       if (!mounted) return;
       setState(() {
         _categories = categories;
+        _gender = gender;
+        if (gender == null) _error = 'يجب تحديد النوع قبل نشر المنتجات.';
+        if (gender == 'female' && _audience == 'men_only' || gender == 'male' && _audience == 'women_only') _audience = 'all';
         _categoryId ??= categories.isNotEmpty ? categories.first.id : null;
       });
     } catch (error) {
@@ -120,6 +128,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           description: _description.text,
           price: price,
           categoryId: _categoryId!,
+          audience: _audience,
         );
       } else {
         await _service.publishProduct(
@@ -128,6 +137,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           description: _description.text,
           price: price,
           images: _images,
+          audience: _audience,
         );
       }
       if (mounted) Navigator.of(context).pop(true);
@@ -162,6 +172,21 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     validator: (value) => value == null ? 'اختر الفئة' : null,
                   ),
                   const SizedBox(height: 14),
+                  if (_gender != null) ...[
+                    DropdownButtonFormField<String>(
+                      initialValue: _audience,
+                      decoration: const InputDecoration(labelText: 'الجمهور المسموح له بمشاهدة الإعلان'),
+                      items: [
+                        const DropdownMenuItem(value: 'all', child: Text('للجميع')),
+                        if (_gender == 'female')
+                          const DropdownMenuItem(value: 'women_only', child: Text('للنساء فقط')),
+                        if (_gender == 'male')
+                          const DropdownMenuItem(value: 'men_only', child: Text('للرجال فقط')),
+                      ],
+                      onChanged: (value) => setState(() => _audience = value ?? 'all'),
+                    ),
+                    const SizedBox(height: 14),
+                  ],
                   TextFormField(
                     controller: _title,
                     maxLength: 100,
@@ -247,7 +272,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   ],
                   const SizedBox(height: 24),
                   FilledButton(
-                    onPressed: _saving || _loading ? null : _save,
+                    onPressed: _saving || _loading || _gender == null ? null : _save,
                     child: _saving
                         ? const SizedBox(
                             height: 20,

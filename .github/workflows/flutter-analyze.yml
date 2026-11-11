@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - phase-1/implementation
+      - feature/audience-gender-restrictions
+      - test/all-latest-changes
     paths:
       - 'lib/**'
       - 'pubspec.yaml'
@@ -21,7 +23,7 @@ jobs:
       - name: Check out implementation branch
         uses: actions/checkout@v4
         with:
-          ref: phase-1/implementation
+          ref: ${{ github.ref }}
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2

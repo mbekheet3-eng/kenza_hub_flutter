@@ -18,6 +18,7 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _busy = false;
   bool _acceptedTerms = false;
   bool _hidePassword = true;
+  String? _gender;
 
   @override
   void dispose() {
@@ -33,10 +34,11 @@ class _SignupScreenState extends State<SignupScreen> {
         _email.text.trim().isEmpty ||
         _password.text.length < 8 ||
         _password.text != _confirm.text ||
+        _gender == null ||
         !_acceptedTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('راجع الاسم والبريد وكلمة المرور (8 أحرف على الأقل) والموافقة على الشروط'),
+          content: Text('أكمل البيانات واختر النوع ووافق على الشروط'),
         ),
       );
       return;
@@ -48,6 +50,7 @@ class _SignupScreenState extends State<SignupScreen> {
         displayName: _name.text,
         email: _email.text,
         password: _password.text,
+        gender: _gender!,
       );
       if (mounted) {
         showDialog<void>(
@@ -95,7 +98,8 @@ class _SignupScreenState extends State<SignupScreen> {
               controller: _name,
               textCapitalization: TextCapitalization.words,
               decoration: const InputDecoration(
-                labelText: 'الاسم الذي سيظهر للآخرين',
+                labelText: 'الاسم (الاسم الأول يكفي)',
+                helperText: 'يمكنك كتابة اسمك الأول فقط أو الاسم بالكامل.',
                 prefixIcon: Icon(Icons.person_outline),
               ),
             ),
@@ -109,7 +113,24 @@ class _SignupScreenState extends State<SignupScreen> {
                 prefixIcon: Icon(Icons.email_outlined),
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 18),
+            Text('النوع (إلزامي)', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 6),
+            RadioListTile<String>(
+              value: 'male',
+              groupValue: _gender,
+              onChanged: _busy ? null : (value) => setState(() => _gender = value),
+              title: const Text('رجل'),
+              contentPadding: EdgeInsets.zero,
+            ),
+            RadioListTile<String>(
+              value: 'female',
+              groupValue: _gender,
+              onChanged: _busy ? null : (value) => setState(() => _gender = value),
+              title: const Text('امرأة'),
+              contentPadding: EdgeInsets.zero,
+            ),
+            const SizedBox(height: 8),
             TextField(
               controller: _password,
               obscureText: _hidePassword,
