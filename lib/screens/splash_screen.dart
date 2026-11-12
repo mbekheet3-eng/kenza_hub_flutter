@@ -52,16 +52,6 @@ class _KenzaSplashScreenState extends State<KenzaSplashScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   KenzaLogo(width: logoSize, height: logoSize),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Kenza',
-                    style: TextStyle(
-                      color: Color(0xFF17366F),
-                      fontSize: 28,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
                 ],
               ),
             );
