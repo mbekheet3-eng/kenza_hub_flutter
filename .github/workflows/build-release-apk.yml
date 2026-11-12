@@ -85,17 +85,8 @@ jobs:
               </item>
           </layer-list>
           XML
-          mkdir -p android/app/src/main/res/values-v31
-          cat > android/app/src/main/res/values-v31/styles.xml <<'XML'
-          <?xml version="1.0" encoding="utf-8"?>
-          <resources>
-              <style name="LaunchTheme" parent="@android:style/Theme.SplashScreen">
-                  <item name="android:windowSplashScreenBackground">#FFFFFF</item>
-                  <item name="android:windowSplashScreenAnimatedIcon">@drawable/kenza_splash</item>
-                  <item name="android:postSplashScreenTheme">@style/NormalTheme</item>
-              </style>
-          </resources>
-          XML
+          # Android 12+ uses the app launcher icon for its system splash.
+          # The launcher icon above is the approved Kenza logo; older Android uses launch_background.xml.
           # Use normalized legacy launcher PNGs; remove adaptive resources that reference a foreground layer.
           rm -rf android/app/src/main/res/mipmap-anydpi-v26
           python3 - <<'PY'
