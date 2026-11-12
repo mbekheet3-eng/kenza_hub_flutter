@@ -63,6 +63,39 @@ jobs:
               output.parent.mkdir(parents=True, exist_ok=True)
               source.resize((size, size), Image.Resampling.LANCZOS).save(output, format="PNG", optimize=True)
           PY
+          # Prepare the same approved brand mark for the native Android launch splash.
+          mkdir -p android/app/src/main/res/drawable-nodpi android/app/src/main/res/drawable
+          python3 - <<'PY'
+          from PIL import Image
+          source = Image.open("/tmp/kenza_logo_source.png").convert("RGBA")
+          source.resize((512, 512), Image.Resampling.LANCZOS).save(
+              "android/app/src/main/res/drawable-nodpi/kenza_splash.png",
+              format="PNG",
+              optimize=True,
+          )
+          PY
+          cat > android/app/src/main/res/drawable/launch_background.xml <<'XML'
+          <?xml version="1.0" encoding="utf-8"?>
+          <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+              <item android:drawable="@android:color/white" />
+              <item>
+                  <bitmap
+                      android:gravity="center"
+                      android:src="@drawable/kenza_splash" />
+              </item>
+          </layer-list>
+          XML
+          mkdir -p android/app/src/main/res/values-v31
+          cat > android/app/src/main/res/values-v31/styles.xml <<'XML'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <style name="LaunchTheme" parent="@android:style/Theme.SplashScreen">
+                  <item name="android:windowSplashScreenBackground">#FFFFFF</item>
+                  <item name="android:windowSplashScreenAnimatedIcon">@drawable/kenza_splash</item>
+                  <item name="android:postSplashScreenTheme">@style/NormalTheme</item>
+              </style>
+          </resources>
+          XML
           # Use normalized legacy launcher PNGs; remove adaptive resources that reference a foreground layer.
           rm -rf android/app/src/main/res/mipmap-anydpi-v26
           python3 - <<'PY'
