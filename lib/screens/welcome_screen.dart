@@ -190,21 +190,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const KenzaLogo(width: 48, height: 48),
-                            const SizedBox(width: 9),
-                            Text(
-                              'Kenza',
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: const Color(0xFF17366F),
-                                fontSize: 22,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ],
-                        ),
+                        const KenzaLogo(width: 52, height: 52),
                         PopupMenuButton<String>(
                           tooltip: strings.languageChange,
                           onSelected: AppLocale.setLanguage,
