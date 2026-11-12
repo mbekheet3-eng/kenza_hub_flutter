@@ -41,12 +41,30 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          base64 --decode assets/logos/kenza_mark.png.base64 > /tmp/kenza_logo.png
-          mkdir -p android/app/src/main/res/mipmap-mdpi android/app/src/main/res/mipmap-hdpi android/app/src/main/res/mipmap-xhdpi android/app/src/main/res/mipmap-xxhdpi android/app/src/main/res/mipmap-xxxhdpi
-          for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
-            cp /tmp/kenza_logo.png "android/app/src/main/res/mipmap-${density}/ic_launcher.png"
-                  done
-          # Use the generated legacy launcher PNGs; remove adaptive resources that reference the raw source as a foreground layer.
+          base64 --decode assets/logos/kenza_mark.png.base64 > /tmp/kenza_logo_source.png
+          python3 -m pip install --user Pillow
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+
+          source = Image.open("/tmp/kenza_logo_source.png")
+          source.load()
+          # Normalize the source to a conventional RGBA PNG and generate correctly sized launcher assets.
+          source = source.convert("RGBA")
+          sizes = {
+              "mdpi": 48,
+              "hdpi": 72,
+              "xhdpi": 96,
+              "xxhdpi": 144,
+              "xxxhdpi": 192,
+          }
+          for density, size in sizes.items():
+              output = Path(f"android/app/src/main/res/mipmap-{density}/ic_launcher.png")
+              output.parent.mkdir(parents=True, exist_ok=True)
+              source.resize((size, size), Image.Resampling.LANCZOS).save(output, format="PNG", optimize=True)
+          PY
+          # Use normalized legacy launcher PNGs; remove adaptive resources that reference a foreground layer.
+          rm -rf android/app/src/main/res/mipmap-anydpi-v26
           rm -rf android/app/src/main/res/mipmap-anydpi-v26
           python3 - <<'PY'
           from pathlib import Path
