@@ -182,7 +182,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Supabase.instance.client.auth.currentUser;
     final languageCode = Localizations.localeOf(context).languageCode;
     return Scaffold(
       body: SafeArea(
