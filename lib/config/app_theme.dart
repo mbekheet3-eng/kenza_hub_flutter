@@ -132,6 +132,8 @@ final class AppTheme {
       iconButtonTheme: IconButtonThemeData(
         style: IconButton.styleFrom(
           foregroundColor: scheme.primary,
+          backgroundColor: Colors.white,
+          side: BorderSide(color: scheme.primary),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
