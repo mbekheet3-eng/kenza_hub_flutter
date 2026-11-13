@@ -601,7 +601,11 @@ class MarketplaceService {
             .delete()
             .eq('product_id', productId)
             .inFilter('storage_path', removedPaths.toList());
-        await _client.storage.from(bucket).remove(removedPaths.toList());
+        try {
+          await _client.storage.from(bucket).remove(removedPaths.toList());
+        } catch (_) {
+          // The database no longer references these files; orphan cleanup is best-effort.
+        }
       }
     } catch (_) {
       if (insertedPaths.isNotEmpty) {
