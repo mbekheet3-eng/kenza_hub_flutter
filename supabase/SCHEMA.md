@@ -103,3 +103,12 @@ The three November 13 migrations were approved and applied to the active Supabas
 - The RPC is `SECURITY INVOKER`; product visibility and men/women/all audience restrictions remain enforced by the existing `products` RLS policy. The RPC returns IDs and scores only; Flutter fetches product details and images through the existing RLS-protected product query.
 - Guests need SELECT privilege on `profiles` for the existing product audience RLS predicate to evaluate. The `profiles` RLS policy still exposes zero profile rows to guests; authenticated members remain owner-scoped. This grant is recorded in migration `20261113164421`.
 - Search location/radius, color, size, brand, and vector embeddings are not part of this phase. Do not add them without a separate data-model decision.
+
+
+## Visual image search pipeline
+
+- Edge Function `visual-product-search` was restored from the deployed source and is tracked at `supabase/functions/visual-product-search/index.ts`.
+- Deployed version 6 uses Gemini only to analyze the selected JPEG/PNG/WebP image and return product search terms, a category hint, and a short description. It does not search the public web or external stores.
+- Flutter sends the returned terms to `public.search_products` using the active Supabase client session. The database remains the only source of product results and enforces audience RLS.
+- The Edge Function keeps `verify_jwt = true`, reads `GEMINI_API_KEY` only from server secrets, limits the encoded image payload, and applies a best-effort per-isolate request throttle. A durable distributed rate limiter remains a pre-launch hardening item.
+- The camera entry on Home now offers camera or gallery selection. Flutter compresses the chosen image and displays database search results through the same search screen and pagination flow.
