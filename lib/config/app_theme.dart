@@ -16,22 +16,16 @@ final class AppTheme {
     final scheme = base.copyWith(
       primary: AppColors.primary,
       onPrimary: AppColors.onPrimary,
-      primaryContainer: isLight
-          ? const Color(0xFFE5E5E5)
-          : const Color(0xFF424242),
-      onPrimaryContainer: isLight ? const Color(0xFF212121) : Colors.white,
+      primaryContainer: isLight ? Colors.white : const Color(0xFF424242),
+      onPrimaryContainer: isLight ? AppColors.primary : Colors.white,
       secondary: AppColors.secondary,
       onSecondary: AppColors.onSecondary,
-      secondaryContainer: isLight
-          ? const Color(0xFFF0F0F0)
-          : const Color(0xFF383838),
-      onSecondaryContainer: isLight ? const Color(0xFF303030) : Colors.white,
+      secondaryContainer: isLight ? Colors.white : const Color(0xFF383838),
+      onSecondaryContainer: isLight ? AppColors.primary : Colors.white,
       tertiary: AppColors.secondary,
       onTertiary: AppColors.onSecondary,
-      tertiaryContainer: isLight
-          ? const Color(0xFFEAEAEA)
-          : const Color(0xFF333333),
-      onTertiaryContainer: isLight ? const Color(0xFF303030) : Colors.white,
+      tertiaryContainer: isLight ? Colors.white : const Color(0xFF333333),
+      onTertiaryContainer: isLight ? AppColors.primary : Colors.white,
       surface: isLight ? AppColors.background : const Color(0xFF171717),
       onSurface: isLight ? AppColors.onSurface : Colors.white,
       outline: isLight ? AppColors.outline : const Color(0xFF616161),
@@ -124,7 +118,7 @@ final class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: scheme.primary,
-          side: BorderSide(color: scheme.outline),
+          side: BorderSide(color: scheme.primary),
           shape: const RoundedRectangleBorder(
             borderRadius: AppRadius.medium,
           ),
@@ -133,6 +127,11 @@ final class AppTheme {
             horizontal: AppSpacing.lg,
             vertical: AppSpacing.sm,
           ),
+        ),
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          foregroundColor: scheme.primary,
         ),
       ),
       textButtonTheme: TextButtonThemeData(
