@@ -222,13 +222,22 @@ class MarketplaceService {
       throw Exception('Only JPEG, PNG, and WebP images are supported');
     }
 
-    final response = await _client.functions.invoke(
-      'visual-product-search',
-      body: {
-        'image_base64': base64Encode(bytes),
-        'mime_type': mimeType,
-      },
-    );
+    FunctionResponse response;
+    try {
+      response = await _client.functions.invoke(
+        'visual-product-search',
+        body: {
+          'image_base64': base64Encode(bytes),
+          'mime_type': mimeType,
+        },
+      );
+    } on FunctionException catch (error) {
+      final details = error.details;
+      if (details is Map && details['error_code'] == 'temporary_unavailable') {
+        throw const ImageSearchUnavailableException();
+      }
+      rethrow;
+    }
     if (response.status < 200 || response.status >= 300) {
       final data = response.data;
       if (data is Map && data['error_code'] == 'temporary_unavailable') {
