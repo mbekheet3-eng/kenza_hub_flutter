@@ -267,6 +267,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(product.title, style: Theme.of(context).textTheme.headlineSmall),
+                    if (product.customCategoryName?.isNotEmpty == true) ...[
+                      const SizedBox(height: 6),
+                      Text('النوع: ${product.customCategoryName}'),
+                    ],
                     const SizedBox(height: 10),
                     Text(
                       '${product.price.toStringAsFixed(2)} ج.م',
