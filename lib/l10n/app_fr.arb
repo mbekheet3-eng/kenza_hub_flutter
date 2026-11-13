@@ -510,6 +510,7 @@
   "retryAction": "Réessayer",
   "searchTitle": "Rechercher des produits",
   "searchHint": "Rechercher un produit",
+  "relevanceLabel": "Les plus pertinents",
   "newestLabel": "Plus récents",
   "priceLowLabel": "Prix : croissant",
   "priceHighLabel": "Prix : décroissant",
