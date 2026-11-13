@@ -35,6 +35,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   final List<String> _existingImagePaths = [];
   final List<String> _existingImageUrls = [];
   final List<String> _removedImagePaths = [];
+  int _primaryImageIndex = 0;
   bool _loading = false;
   bool _saving = false;
   String? _error;
@@ -303,7 +304,41 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     setState(() {
       _removedImagePaths.add(_existingImagePaths.removeAt(index));
       _existingImageUrls.removeAt(index);
+      if (_primaryImageIndex == index) {
+        _primaryImageIndex = 0;
+      } else if (_primaryImageIndex > index) {
+        _primaryImageIndex--;
+      }
     });
+  }
+
+  void _setPrimaryImage(int index) {
+    setState(() => _primaryImageIndex = index);
+  }
+
+  Widget _primaryImageMarker({required bool selected, required VoidCallback onTap}) {
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+    return Positioned(
+      bottom: 0,
+      right: 0,
+      child: Material(
+        color: selected ? Theme.of(context).colorScheme.primary : Colors.white,
+        shape: const CircleBorder(),
+        child: IconButton(
+          tooltip: selected
+              ? (isArabic ? 'الصورة الرئيسية' : 'Main photo')
+              : (isArabic ? 'تعيين كصورة رئيسية' : 'Set as main photo'),
+          visualDensity: VisualDensity.compact,
+          constraints: const BoxConstraints.tightFor(width: 34, height: 34),
+          onPressed: _saving ? null : onTap,
+          icon: Icon(
+            selected ? Icons.star : Icons.star_border,
+            size: 18,
+            color: selected ? Colors.white : Theme.of(context).colorScheme.primary,
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _save() async {
@@ -335,6 +370,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           customCategoryName: _isOtherCategory ? _customCategoryName.text.trim() : null,
           images: _images,
           removedImagePaths: _removedImagePaths,
+          primaryImageIndex: _primaryImageIndex,
         );
       } else {
         await _service.publishProduct(
@@ -465,6 +501,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                     icon: const Icon(Icons.close, size: 16),
                                   ),
                                 ),
+                                _primaryImageMarker(
+                                  selected: _primaryImageIndex == i,
+                                  onTap: () => _setPrimaryImage(i),
+                                ),
                                 Positioned(
                                   bottom: 0,
                                   left: 0,
@@ -501,7 +541,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                 right: 0,
                                 child: IconButton.filled(
                                   visualDensity: VisualDensity.compact,
-                                  onPressed: () => setState(() => _images.removeAt(i)),
+                                  onPressed: () => setState(() {
+                                    _images.removeAt(i);
+                                    final remainingCount = _currentImageCount;
+                                    if (_primaryImageIndex == _existingImagePaths.length + i) {
+                                      _primaryImageIndex = 0;
+                                    } else if (_primaryImageIndex > _existingImagePaths.length + i) {
+                                      _primaryImageIndex--;
+                                    }
+                                  }),
                                   icon: const Icon(Icons.close, size: 16),
                                 ),
                               ),
