@@ -762,5 +762,18 @@
   "selectGenderTitle": "حدد النوع",
   "genderAudienceExplanation": "هذا الاختيار مطلوب لتحديد الإعلانات التي يمكنك مشاهدتها والتواصل مع أصحابها.",
   "confirmAndContinue": "تأكيد ومتابعة",
-  "saveSelectionFailed": "تعذر حفظ الاختيار"
+  "saveSelectionFailed": "تعذر حفظ الاختيار",
+  "imageTooLarge": "يجب ألا يتجاوز حجم الصورة 10 ميجابايت",
+  "unsupportedImageFormat": "الصيغ المسموحة: JPG وPNG وWebP فقط",
+  "selectAtLeastOnePhoto": "اختر صورة واحدة على الأقل وبحد أقصى 8 صور",
+  "productTitleAndPriceRequired": "أدخل عنوانًا وسعرًا صحيحًا للمنتج",
+  "imageReviewReadError": "تعذر قراءة نتيجة مراجعة الصور. لم يتم نشر المنتج؛ حاول مرة أخرى.",
+  "imageReviewRejected": "لم تتم الموافقة على الصور. لم يتم نشر المنتج.",
+  "imageReviewUnavailable": "تعذر إكمال مراجعة الصور الآن. لم يتم نشر المنتج؛ حاول مرة أخرى لاحقًا.",
+  "productNotFoundOrNoEditPermission": "لم يتم العثور على المنتج أو لا تملك صلاحية تعديله",
+  "productNotFoundOrNoDeletePermission": "لم يتم العثور على المنتج أو لا تملك صلاحية حذفه",
+  "productDeleteFailed": "لم يتم حذف المنتج",
+  "cannotOfferOwnProduct": "لا يمكنك تقديم عرض على منتجك",
+  "cannotMessageSelf": "لا يمكنك مراسلة نفسك",
+  "genderSelectionRequired": "يجب اختيار النوع"
 }
