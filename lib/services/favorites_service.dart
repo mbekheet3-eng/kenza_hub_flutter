@@ -41,7 +41,7 @@ class FavoritesService {
     await _client
         .from('favorites')
         .delete()
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .eq('product_id', productId);
   }
 }
