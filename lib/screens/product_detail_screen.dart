@@ -467,7 +467,7 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
                 shape: BoxShape.circle,
               ),
               child: IconButton(
-                tooltip: 'تكبير الصورة',
+                tooltip: AppStrings.of(context)!.zoomImageLabel,
                 onPressed: _openFullScreen,
                 icon: const Icon(Icons.zoom_in, color: Colors.white),
               ),
