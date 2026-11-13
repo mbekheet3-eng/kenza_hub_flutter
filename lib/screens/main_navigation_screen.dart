@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -18,13 +20,45 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
+  late final StreamSubscription<AuthState> _authSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _authSubscription =
+        Supabase.instance.client.auth.onAuthStateChange.listen((state) {
+      if (!mounted) return;
+      setState(() {
+        if (state.session == null && _selectedIndex >= 3) {
+          _selectedIndex = 0;
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _authSubscription.cancel();
+    super.dispose();
+  }
 
   Future<bool> _ensureSignedIn() async {
     if (Supabase.instance.client.auth.currentUser != null) return true;
 
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => const LoginScreen()),
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const FractionallySizedBox(
+        heightFactor: 0.94,
+        child: ClipRRect(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          child: LoginScreen(),
+        ),
+      ),
     );
+
     return mounted && Supabase.instance.client.auth.currentUser != null;
   }
 
