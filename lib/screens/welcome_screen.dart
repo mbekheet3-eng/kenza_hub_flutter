@@ -4,7 +4,7 @@ import '../config/app_locale.dart';
 import '../l10n/app_strings.dart';
 import '../widgets/kenza_logo.dart';
 
-import 'home_screen.dart';
+import 'main_navigation_screen.dart';
 import 'login_screen.dart';
 import 'signup_screen.dart';
 import 'about_kenza_screen.dart';
@@ -327,7 +327,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         TextButton(
                           onPressed: () => Navigator.of(context).pushReplacement(
                             MaterialPageRoute<void>(
-                              builder: (_) => const HomeScreen(),
+                              builder: (_) => const MainNavigationScreen(),
                             ),
                           ),
                           style: TextButton.styleFrom(

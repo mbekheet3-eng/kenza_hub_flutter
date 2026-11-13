@@ -3,7 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../services/auth_service.dart';
 import 'gender_onboarding_screen.dart';
-import 'home_screen.dart';
+import 'main_navigation_screen.dart';
 import 'password_recovery_screen.dart';
 import 'welcome_screen.dart';
 
@@ -81,7 +81,7 @@ class _MemberGenderGateState extends State<_MemberGenderGate> {
         if (snapshot.data != 'male' && snapshot.data != 'female') {
           return GenderOnboardingScreen(onCompleted: _completed);
         }
-        return const HomeScreen();
+        return const MainNavigationScreen();
       },
     );
   }

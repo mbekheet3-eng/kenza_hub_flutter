@@ -441,56 +441,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: SafeArea(
-        top: false,
-        child: Container(
-          height: 76,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            border: Border(
-              top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
-            ),
-          ),
-          child: Row(
-            children: [
-              Expanded(child: IconButton(
-                tooltip: 'الرئيسية',
-                onPressed: () {},
-                icon: Icon(Icons.home_rounded, size: 27, color: Theme.of(context).colorScheme.primary),
-              )),
-              Expanded(child: IconButton(
-                tooltip: 'الأقسام',
-                onPressed: _openCategories,
-                icon: const Icon(Icons.grid_view_rounded, size: 26),
-              )),
-              Expanded(child: Center(child: Material(
-                color: Theme.of(context).colorScheme.primary,
-                elevation: 5,
-                shape: const CircleBorder(),
-                child: InkWell(
-                  customBorder: const CircleBorder(),
-                  onTap: _openSell,
-                  child: const SizedBox(
-                    width: 56, height: 56,
-                    child: Icon(Icons.add_rounded, color: Colors.white, size: 32),
-                  ),
-                ),
-              ))),
-              Expanded(child: IconButton(
-                tooltip: 'المفضلة',
-                onPressed: _openFavorites,
-                icon: const Icon(Icons.favorite_border_rounded, size: 26),
-              )),
-              Expanded(child: IconButton(
-                tooltip: 'حسابي',
-                onPressed: _openProfile,
-                icon: const Icon(Icons.person_outline_rounded, size: 27),
-              )),
-            ],
-          ),
-        ),
-      ),
+      bottomNavigationBar: const SizedBox.shrink(),
     );
   }
 }
