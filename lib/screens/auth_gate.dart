@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../l10n/app_strings.dart';
 import '../services/auth_service.dart';
 import 'gender_onboarding_screen.dart';
 import 'main_navigation_screen.dart';
@@ -73,7 +74,7 @@ class _MemberGenderGateState extends State<_MemberGenderGate> {
             body: Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text('تعذر تحميل بيانات الحساب: ${snapshot.error}'),
+                child: Text('${AppStrings.of(context)!.accountDataLoadFailed}: ${snapshot.error}'),
               ),
             ),
           );
