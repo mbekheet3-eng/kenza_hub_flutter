@@ -344,6 +344,7 @@ class MarketplaceService {
     required List<File> images,
     required String audience,
     String? customCategoryName,
+    int primaryImageIndex = 0,
   }) async {
     final strings = await _localizedStrings();
     final user = _client.auth.currentUser;
@@ -413,6 +414,12 @@ class MarketplaceService {
         });
       }
 
+      final safePrimaryIndex = primaryImageIndex.clamp(0, imageRows.length - 1).toInt();
+      final primaryImageRow = imageRows.removeAt(safePrimaryIndex);
+      imageRows.insert(0, primaryImageRow);
+      for (var index = 0; index < imageRows.length; index++) {
+        imageRows[index]['sort_order'] = index;
+      }
       await _client.from('product_images').insert(imageRows);
 
       try {
@@ -616,7 +623,7 @@ class MarketplaceService {
         ...insertedPaths,
       ];
       if (orderedPaths.isNotEmpty) {
-        final safePrimaryIndex = primaryImageIndex.clamp(0, orderedPaths.length - 1);
+        final safePrimaryIndex = primaryImageIndex.clamp(0, orderedPaths.length - 1).toInt();
         final primaryPath = orderedPaths.removeAt(safePrimaryIndex);
         orderedPaths.insert(0, primaryPath);
         for (var index = 0; index < orderedPaths.length; index++) {
