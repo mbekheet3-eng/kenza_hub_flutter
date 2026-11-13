@@ -36,6 +36,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   final List<String> _existingImageUrls = [];
   final List<String> _removedImagePaths = [];
   int _primaryImageIndex = 0;
+  int _selectedImageIndex = 0;
   bool _loading = false;
   bool _saving = false;
   String? _error;
@@ -242,7 +243,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         if (!mounted) return;
       }
       if (mounted && croppedFiles.isNotEmpty) {
-        setState(() => _images.addAll(croppedFiles));
+        setState(() {
+          final wasEmpty = _currentImageCount == 0;
+          _images.addAll(croppedFiles);
+          if (wasEmpty) _selectedImageIndex = 0;
+        });
       }
     } catch (_) {
       _showCropError();
@@ -267,55 +272,247 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     try {
       final cropped = await _cropFile(File(picked.path));
       if (mounted && cropped != null) {
-        setState(() => _images.add(cropped));
+        setState(() {
+          final wasEmpty = _currentImageCount == 0;
+          _images.add(cropped);
+          if (wasEmpty) _selectedImageIndex = 0;
+        });
       }
     } catch (_) {
       _showCropError();
     }
   }
 
-  Future<void> _cropExistingImage(int index) async {
-    final storagePath = _existingImagePaths[index];
-    File? temporarySource;
+  Future<void> _cropImageAt(int index) async {
+    if (index < 0 || index >= _currentImageCount) return;
+
+    if (index < _existingImagePaths.length) {
+      final storagePath = _existingImagePaths[index];
+      File? temporarySource;
+      try {
+        temporarySource = await _service.downloadImageForEditing(storagePath);
+        final cropped = await _cropFile(temporarySource);
+        if (!mounted || cropped == null) return;
+        setState(() {
+          final wasPrimary = _primaryImageIndex == index;
+          _removedImagePaths.add(storagePath);
+          _existingImagePaths.removeAt(index);
+          _existingImageUrls.removeAt(index);
+          if (_primaryImageIndex > index) {
+            _primaryImageIndex--;
+          } else if (wasPrimary) {
+            _primaryImageIndex = _currentImageCount;
+          }
+          _images.add(cropped);
+          _selectedImageIndex = _currentImageCount - 1;
+        });
+      } catch (_) {
+        _showCropError();
+      } finally {
+        if (temporarySource != null) {
+          try {
+            await temporarySource.parent.delete(recursive: true);
+          } catch (_) {
+            // Temporary crop source cleanup is best-effort.
+          }
+        }
+      }
+      return;
+    }
+
+    final localIndex = index - _existingImagePaths.length;
     try {
-      temporarySource = await _service.downloadImageForEditing(storagePath);
-      final cropped = await _cropFile(temporarySource);
+      final cropped = await _cropFile(_images[localIndex]);
       if (!mounted || cropped == null) return;
       setState(() {
-        final wasPrimary = _primaryImageIndex == index;
-        _removedImagePaths.add(storagePath);
-        _existingImagePaths.removeAt(index);
-        _existingImageUrls.removeAt(index);
-        if (wasPrimary) {
-          _primaryImageIndex = _existingImagePaths.length + _images.length;
-        } else if (_primaryImageIndex > index) {
-          _primaryImageIndex--;
-        }
-        _images.add(cropped);
+        _images[localIndex] = cropped;
+        _selectedImageIndex = index;
       });
     } catch (_) {
       _showCropError();
-    } finally {
-      if (temporarySource != null) {
-        try {
-          await temporarySource.parent.delete(recursive: true);
-        } catch (_) {
-          // Temporary crop source cleanup is best-effort.
-        }
-      }
     }
   }
 
-  void _removeExistingImage(int index) {
+  void _removeImageAt(int index) {
+    if (index < 0 || index >= _currentImageCount) return;
     setState(() {
-      _removedImagePaths.add(_existingImagePaths.removeAt(index));
-      _existingImageUrls.removeAt(index);
+      if (index < _existingImagePaths.length) {
+        _removedImagePaths.add(_existingImagePaths.removeAt(index));
+        _existingImageUrls.removeAt(index);
+      } else {
+        _images.removeAt(index - _existingImagePaths.length);
+      }
+
       if (_primaryImageIndex == index) {
         _primaryImageIndex = 0;
       } else if (_primaryImageIndex > index) {
         _primaryImageIndex--;
       }
+
+      if (_currentImageCount == 0) {
+        _selectedImageIndex = 0;
+        _primaryImageIndex = 0;
+      } else if (_selectedImageIndex == index) {
+        _selectedImageIndex = index >= _currentImageCount ? _currentImageCount - 1 : index;
+      } else if (_selectedImageIndex > index) {
+        _selectedImageIndex--;
+      }
     });
+  }
+
+  Widget _buildImageAt(int index, {double? width, double? height}) {
+    if (index < _existingImagePaths.length) {
+      return Image.network(
+        _existingImageUrls[index],
+        width: width,
+        height: height,
+        fit: BoxFit.contain,
+        errorBuilder: (_, __, ___) => Container(
+          width: width,
+          height: height,
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+          child: const Icon(Icons.broken_image_outlined),
+        ),
+      );
+    }
+    return Image.file(
+      _images[index - _existingImagePaths.length],
+      width: width,
+      height: height,
+      fit: BoxFit.contain,
+    );
+  }
+
+  Widget _buildImageEditor() {
+    final strings = AppStrings.of(context)!;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+    final count = _currentImageCount;
+    if (count == 0) return const SizedBox.shrink();
+
+    final selected = _selectedImageIndex.clamp(0, count - 1);
+    final isPrimary = _primaryImageIndex == selected;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: AspectRatio(
+            aspectRatio: 4 / 3,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Container(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  alignment: Alignment.center,
+                  child: _buildImageAt(selected),
+                ),
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _primaryImageMarker(
+                        selected: isPrimary,
+                        onTap: () => _setPrimaryImage(selected),
+                      ),
+                      const SizedBox(width: 8),
+                      _imageActionButton(
+                        icon: Icons.crop_rotate,
+                        tooltip: strings.cropImageTitle,
+                        onTap: () => _cropImageAt(selected),
+                      ),
+                      const SizedBox(width: 8),
+                      _imageActionButton(
+                        icon: Icons.delete_outline,
+                        tooltip: strings.removeImage,
+                        onTap: () => _removeImageAt(selected),
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  bottom: 10,
+                  right: 10,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      child: Text(
+                        isPrimary
+                            ? (isArabic ? 'الصورة الرئيسية' : 'Main photo')
+                            : (isArabic ? 'اختر النجمة لتعيينها رئيسية' : 'Tap the star to set as main'),
+                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ),
+                  ),
+                ),
+                if (_saving)
+                  const ColoredBox(
+                    color: Color(0x55000000),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(isArabic ? 'اضغط على صورة لمعاينتها' : 'Tap a photo to preview it',
+            style: Theme.of(context).textTheme.bodySmall),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 76,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: count,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              final active = index == selected;
+              return GestureDetector(
+                onTap: _saving ? null : () => setState(() => _selectedImageIndex = index),
+                child: Container(
+                  width: 76,
+                  height: 76,
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: active ? Theme.of(context).colorScheme.primary : Colors.transparent,
+                      width: 2,
+                    ),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(7),
+                    child: _buildImageAt(index, width: 72, height: 72),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _imageActionButton({
+    required IconData icon,
+    required String tooltip,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.white,
+      shape: const CircleBorder(),
+      child: IconButton(
+        tooltip: tooltip,
+        onPressed: _saving ? null : onTap,
+        color: Theme.of(context).colorScheme.primary,
+        icon: Icon(icon),
+      ),
+    );
   }
 
   void _setPrimaryImage(int index) {
@@ -469,105 +666,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    if (_existingImageUrls.isNotEmpty)
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: [
-                          for (var i = 0; i < _existingImageUrls.length; i++)
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.network(
-                                    _existingImageUrls[i],
-                                    width: 88,
-                                    height: 88,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => Container(
-                                      width: 88,
-                                      height: 88,
-                                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                                      child: const Icon(Icons.broken_image_outlined),
-                                    ),
-                                  ),
-                                ),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    _primaryImageMarker(
-                                      selected: _primaryImageIndex == i,
-                                      onTap: () => _setPrimaryImage(i),
-                                    ),
-                                    IconButton(
-                                      tooltip: AppStrings.of(context)!.cropImageTitle,
-                                      visualDensity: VisualDensity.compact,
-                                      constraints: const BoxConstraints.tightFor(width: 36, height: 36),
-                                      padding: EdgeInsets.zero,
-                                      onPressed: _saving ? null : () => _cropExistingImage(i),
-                                      icon: const Icon(Icons.crop, size: 18),
-                                    ),
-                                    IconButton(
-                                      tooltip: AppStrings.of(context)!.removeImage,
-                                      visualDensity: VisualDensity.compact,
-                                      constraints: const BoxConstraints.tightFor(width: 36, height: 36),
-                                      padding: EdgeInsets.zero,
-                                      onPressed: _saving ? null : () => _removeExistingImage(i),
-                                      icon: const Icon(Icons.close, size: 18),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                        ],
-                      ),
-                    if (_existingImageUrls.isNotEmpty) const SizedBox(height: 10),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        for (var i = 0; i < _images.length; i++)
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.file(
-                                  _images[i],
-                                  width: 88,
-                                  height: 88,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  _primaryImageMarker(
-                                    selected: _primaryImageIndex == _existingImagePaths.length + i,
-                                    onTap: () => _setPrimaryImage(_existingImagePaths.length + i),
-                                  ),
-                                  IconButton(
-                                    tooltip: AppStrings.of(context)!.removeImage,
-                                    visualDensity: VisualDensity.compact,
-                                    constraints: const BoxConstraints.tightFor(width: 36, height: 36),
-                                    padding: EdgeInsets.zero,
-                                    onPressed: _saving ? null : () => setState(() {
-                                      _images.removeAt(i);
-                                      if (_primaryImageIndex == _existingImagePaths.length + i) {
-                                        _primaryImageIndex = 0;
-                                      } else if (_primaryImageIndex > _existingImagePaths.length + i) {
-                                        _primaryImageIndex--;
-                                      }
-                                    }),
-                                    icon: const Icon(Icons.close, size: 18),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                      ],
-                    ),
+                    _buildImageEditor(),
                   ],
                   if (_error != null) ...[
                     const SizedBox(height: 16),
