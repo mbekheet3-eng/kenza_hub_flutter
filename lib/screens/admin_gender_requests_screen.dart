@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../l10n/app_strings.dart';
+
 class AdminGenderRequestsScreen extends StatefulWidget {
   const AdminGenderRequestsScreen({super.key});
 
@@ -32,13 +34,13 @@ class _AdminGenderRequestsScreenState extends State<AdminGenderRequestsScreen> {
           .order('created_at');
       if (mounted) setState(() => _requests = rows);
     } catch (error) {
-      if (mounted) setState(() => _error = 'تعذر تحميل الطلبات: $error');
+      if (mounted) setState(() => _error = '${AppStrings.of(context)!.adminRequestsLoadFailed}: $error');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  String _gender(String value) => value == 'female' ? 'امرأة' : 'رجل';
+  String _gender(BuildContext context, String value) => value == 'female' ? AppStrings.of(context)!.genderWoman : AppStrings.of(context)!.genderMan;
 
   Future<void> _review(Map<String, dynamic> request, bool approve) async {
     final admin = Supabase.instance.client.auth.currentUser;
@@ -47,17 +49,17 @@ class _AdminGenderRequestsScreenState extends State<AdminGenderRequestsScreen> {
     final note = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(approve ? 'الموافقة على الطلب' : 'رفض الطلب'),
+        title: Text(approve ? AppStrings.of(ctx)!.approveRequestTitle : AppStrings.of(ctx)!.rejectRequestTitle),
         content: TextField(
           controller: noteController,
           maxLines: 3,
-          decoration: const InputDecoration(labelText: 'ملاحظة للعضو (اختياري)'),
+          decoration: InputDecoration(labelText: AppStrings.of(ctx)!.memberOptionalNote),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('إلغاء')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppStrings.of(ctx)!.cancel)),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, noteController.text.trim()),
-            child: const Text('تأكيد'),
+            child: Text(AppStrings.of(ctx)!.confirmAction),
           ),
         ],
       ),
@@ -80,7 +82,7 @@ class _AdminGenderRequestsScreenState extends State<AdminGenderRequestsScreen> {
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذر حفظ القرار: $error')),
+          SnackBar(content: Text('${AppStrings.of(context)!.saveDecisionFailed}: $error')),
         );
       }
     }
@@ -89,13 +91,13 @@ class _AdminGenderRequestsScreenState extends State<AdminGenderRequestsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('طلبات تغيير النوع')),
+      appBar: AppBar(title: Text(AppStrings.of(context)!.genderRequestsTitle)),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(child: Text(_error!))
               : _requests.isEmpty
-                  ? const Center(child: Text('لا توجد طلبات معلقة.'))
+                  ? Center(child: Text(AppStrings.of(context)!.noPendingRequests))
                   : RefreshIndicator(
                       onRefresh: _load,
                       child: ListView.builder(
@@ -110,7 +112,7 @@ class _AdminGenderRequestsScreenState extends State<AdminGenderRequestsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '${_gender(request['current_gender'] as String)} ← ${_gender(request['requested_gender'] as String)}',
+                                    '${_gender(context, request['current_gender'] as String)} ← ${_gender(context, request['requested_gender'] as String)}',
                                     style: Theme.of(context).textTheme.titleMedium,
                                   ),
                                   if ((request['reason'] as String?)?.isNotEmpty == true)
@@ -118,7 +120,7 @@ class _AdminGenderRequestsScreenState extends State<AdminGenderRequestsScreen> {
                                       padding: const EdgeInsets.symmetric(vertical: 8),
                                       child: Text(request['reason'] as String),
                                     ),
-                                  Text('معرّف العضو: ${request['member_id']}',
+                                  Text('${AppStrings.of(context)!.memberIdLabel}: ${request['member_id']}',
                                       style: Theme.of(context).textTheme.bodySmall),
                                   const SizedBox(height: 12),
                                   Row(
@@ -126,14 +128,14 @@ class _AdminGenderRequestsScreenState extends State<AdminGenderRequestsScreen> {
                                       Expanded(
                                         child: FilledButton(
                                           onPressed: () => _review(request, true),
-                                          child: const Text('موافقة'),
+                                          child: Text(AppStrings.of(context)!.approveAction),
                                         ),
                                       ),
                                       const SizedBox(width: 8),
                                       Expanded(
                                         child: OutlinedButton(
                                           onPressed: () => _review(request, false),
-                                          child: const Text('رفض'),
+                                          child: Text(AppStrings.of(context)!.rejectAction),
                                         ),
                                       ),
                                     ],
