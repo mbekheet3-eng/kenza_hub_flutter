@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../l10n/app_strings.dart';
+
 class GenderOnboardingScreen extends StatefulWidget {
   const GenderOnboardingScreen({super.key, required this.onCompleted});
 
@@ -29,7 +31,7 @@ class _GenderOnboardingScreenState extends State<GenderOnboardingScreen> {
           .upsert({'id': user.id, 'gender': _gender}, onConflict: 'id');
       widget.onCompleted();
     } catch (error) {
-      if (mounted) setState(() => _error = 'تعذر حفظ الاختيار: $error');
+      if (mounted) setState(() => _error = '${AppStrings.of(context)!.saveSelectionFailed}: $error');
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -38,16 +40,16 @@ class _GenderOnboardingScreenState extends State<GenderOnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('استكمال بيانات الحساب'), automaticallyImplyLeading: false),
+      appBar: AppBar(title: Text(AppStrings.of(context)!.accountSetupTitle), automaticallyImplyLeading: false),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('حدد النوع', style: Theme.of(context).textTheme.headlineSmall),
+              Text(AppStrings.of(context)!.selectGenderTitle, style: Theme.of(context).textTheme.headlineSmall),
               const SizedBox(height: 8),
-              const Text('هذا الاختيار مطلوب لتحديد الإعلانات التي يمكنك مشاهدتها والتواصل مع أصحابها.'),
+              Text(AppStrings.of(context)!.genderAudienceExplanation),
               const SizedBox(height: 20),
               RadioGroup<String>(
                 groupValue: _gender,
@@ -59,13 +61,13 @@ class _GenderOnboardingScreenState extends State<GenderOnboardingScreen> {
                   children: [
                     RadioListTile<String>(
                       value: 'male',
-                      title: const Text('رجل'),
+                      title: Text(AppStrings.of(context)!.genderMan),
                       contentPadding: EdgeInsets.zero,
                       enabled: !_saving,
                     ),
                     RadioListTile<String>(
                       value: 'female',
-                      title: const Text('امرأة'),
+                      title: Text(AppStrings.of(context)!.genderWoman),
                       contentPadding: EdgeInsets.zero,
                       enabled: !_saving,
                     ),
@@ -83,7 +85,7 @@ class _GenderOnboardingScreenState extends State<GenderOnboardingScreen> {
                   onPressed: _saving || _gender == null ? null : _save,
                   child: _saving
                       ? const CircularProgressIndicator()
-                      : const Text('تأكيد ومتابعة'),
+                      : Text(AppStrings.of(context)!.confirmAndContinue),
                 ),
               ),
             ],
