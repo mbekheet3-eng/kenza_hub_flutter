@@ -278,7 +278,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = _user;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('حسابي'),
+        title: Text(AppStrings.of(context)!.profileTitle),
         actions: [
           IconButton(
             onPressed: _signOut,
@@ -566,7 +566,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('منتجاتي')),
+      appBar: AppBar(title: Text(AppStrings.of(context)!.myProductsTitle)),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
