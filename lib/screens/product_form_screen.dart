@@ -339,7 +339,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           style: IconButton.styleFrom(
             backgroundColor: selected ? Theme.of(context).colorScheme.primary : Colors.white,
             foregroundColor: selected ? Colors.white : Theme.of(context).colorScheme.primary,
-            side: BorderSide(color: Theme.of(context).colorScheme.primary),
           ),
           onPressed: _saving ? null : onTap,
           icon: Icon(
