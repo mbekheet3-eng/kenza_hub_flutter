@@ -11,12 +11,8 @@ import '../services/notification_service.dart';
 import '../widgets/product_card.dart';
 import 'login_screen.dart';
 import 'product_detail_screen.dart';
-import 'product_form_screen.dart';
-import 'profile_screen.dart';
 import 'search_screen.dart';
 import 'notifications_screen.dart';
-import 'favorites_screen.dart';
-import 'categories_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -138,34 +134,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _openSell() async {
-    if (Supabase.instance.client.auth.currentUser == null) {
-      await Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
-      if (!mounted || Supabase.instance.client.auth.currentUser == null) return;
-    }
-    await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const ProductFormScreen()),
-    );
-    if (mounted) _load();
-  }
-
-  Future<void> _openProfile() async {
-    if (Supabase.instance.client.auth.currentUser == null) {
-      await Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
-    } else {
-      await Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const ProfileScreen()),
-      );
-    }
-    if (mounted) {
-      setState(_bindNotificationStream);
-    }
-  }
-
   Future<void> _openNotifications() async {
     if (Supabase.instance.client.auth.currentUser == null) {
       await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LoginScreen()));
@@ -177,28 +145,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> _openFavorites() async {
-    if (Supabase.instance.client.auth.currentUser == null) {
-      await Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
-      if (!mounted || Supabase.instance.client.auth.currentUser == null) return;
-    }
-    await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const FavoritesScreen()),
-    );
-  }
-
   List<Category> get _rootCategories =>
       _categories.where((category) => category.parentId == null).toList()
         ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
-
-  Future<void> _openCategories() async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const CategoriesScreen()),
-    );
-    if (mounted) _load();
-  }
 
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -408,7 +357,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 )
               else
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 100),
+                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 24),
                   sliver: SliverGrid(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
