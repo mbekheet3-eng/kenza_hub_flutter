@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../l10n/app_strings.dart';
+
 import 'categories_screen.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
@@ -101,32 +103,32 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: _selectDestination,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
             selectedIcon: Icon(Icons.home_rounded),
-            label: 'الرئيسية',
+            label: '',
           ),
           NavigationDestination(
             icon: Icon(Icons.grid_view_outlined),
             selectedIcon: Icon(Icons.grid_view_rounded),
-            label: 'الأقسام',
+            label: '',
           ),
           NavigationDestination(
             icon: Icon(Icons.add_circle_outline_rounded, size: 30),
             selectedIcon: Icon(Icons.add_circle_rounded, size: 30),
-            label: 'أضف منتجًا',
+            label: '',
           ),
           NavigationDestination(
             icon: Icon(Icons.chat_bubble_outline_rounded),
             selectedIcon: Icon(Icons.chat_bubble_rounded),
-            label: 'الرسائل',
+            label: '',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outline_rounded),
             selectedIcon: Icon(Icons.person_rounded),
-            label: 'حسابي',
+            label: '',
           ),
         ],
       ),
