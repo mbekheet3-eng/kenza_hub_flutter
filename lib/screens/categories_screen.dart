@@ -87,18 +87,18 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       children: [
                         const Icon(Icons.cloud_off_outlined, size: 40),
                         const SizedBox(height: 12),
-                        const Text('تعذر تحميل الأقسام'),
+                        Text(AppStrings.of(context)!.categoriesLoadScreenError),
                         const SizedBox(height: 12),
                         FilledButton(
                           onPressed: _loadCategories,
-                          child: const Text('إعادة المحاولة'),
+                          child: Text(AppStrings.of(context)!.retryAction),
                         ),
                       ],
                     ),
                   ),
                 )
               : _childrenOf(null).isEmpty
-                  ? const Center(child: Text('لا توجد أقسام متاحة حالياً'))
+                  ? Center(child: Text(AppStrings.of(context)!.noCategoriesAvailable))
                   : ListView(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       children: [
