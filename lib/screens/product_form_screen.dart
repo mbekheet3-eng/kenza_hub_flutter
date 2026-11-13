@@ -153,7 +153,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         TextFormField(
           controller: _customCategoryName,
           maxLength: 80,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: AppStrings.of(context)!.customProductType,
             hintText: AppStrings.of(context)!.customProductTypeHint,
           ),
@@ -288,7 +288,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   TextFormField(
                     controller: _price,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: AppStrings.of(context)!.priceEgpLabel,
                       suffixText: AppStrings.of(context)!.currency,
                     ),
@@ -354,7 +354,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   ],
                   if (_saving) ...[
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       AppStrings.of(context)!.moderationInProgress,
                       textAlign: TextAlign.center,
                     ),
