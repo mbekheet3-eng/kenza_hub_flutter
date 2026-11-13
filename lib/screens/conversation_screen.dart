@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../l10n/app_strings.dart';
 import '../services/marketplace_transaction_service.dart';
 import '../widgets/member_avatar.dart';
 
@@ -81,7 +82,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'تم إرسال الرسالة، لكن تعذر تحديث المحادثة: $error',
+                '${AppStrings.of(context)!.messageSentConversationRefreshFailed}: $error',
               ),
             ),
           );
@@ -90,7 +91,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذر إرسال الرسالة: $error')),
+          SnackBar(content: Text('${AppStrings.of(context)!.sendMessageFailed}: $error')),
         );
       }
     } finally {
@@ -118,7 +119,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  firstName?.isNotEmpty == true ? firstName! : 'المحادثة',
+                  firstName?.isNotEmpty == true ? firstName! : AppStrings.of(context)!.conversationFallback,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -137,13 +138,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 }
                 if (snapshot.hasError) {
                   return Center(
-                    child: Text('تعذر تحميل المحادثة: ${snapshot.error}'),
+                    child: Text('${AppStrings.of(context)!.conversationLoadFailed}: ${snapshot.error}'),
                   );
                 }
                 final rows = snapshot.data ?? [];
                 if (rows.isEmpty) {
-                  return const Center(
-                    child: Text('ابدأ المحادثة برسالة للبائع'),
+                  return Center(
+                    child: Text(AppStrings.of(context)!.startConversationHint),
                   );
                 }
                 return ListView.builder(
@@ -194,8 +195,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       maxLines: 4,
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => _send(),
-                      decoration: const InputDecoration(
-                        hintText: 'اكتب رسالتك',
+                      decoration: InputDecoration(
+                        hintText: AppStrings.of(context)!.messageInputHint,
                       ),
                     ),
                   ),
