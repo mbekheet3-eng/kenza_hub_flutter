@@ -77,7 +77,7 @@ class MarketplaceTransactionService {
         .from('conversations')
         .insert({
           'product_id': productId,
-          'buyer_id': _userId,
+          'buyer_id': userId,
           'seller_id': sellerId,
         })
         .select('id')
