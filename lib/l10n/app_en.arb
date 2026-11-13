@@ -661,5 +661,9 @@
   "specialMarketsProSellerNote": "Special markets are intended for Pro Sellers. This is a UI preview; products and store management will be connected after the database setup is finalized.",
   "specialMarketExplore": "Explore",
   "specialMarketHighlightsTitle": "What will you find here?",
-  "specialMarketPreviewNote": "This is a preview of the market design. Product listings and store data are not connected yet; that will follow database approval."
+  "specialMarketPreviewNote": "This is a preview of the market design. Product listings and store data are not connected yet; that will follow database approval.",
+  "customCategoryLabel": "Type",
+  "audienceAll": "All",
+  "audienceMenOnly": "Men only",
+  "audienceWomenOnly": "Women only"
 }
