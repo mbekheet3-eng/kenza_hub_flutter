@@ -277,7 +277,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ],
                     const SizedBox(height: 10),
                     Text(
-                      '${product.price.toStringAsFixed(2)} ج.م',
+                      '${product.price.toStringAsFixed(2)} ${_l10n.currency}',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             color: const Color(0xFF5558C9),
                             fontWeight: FontWeight.bold,
