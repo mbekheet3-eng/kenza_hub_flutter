@@ -762,5 +762,18 @@
   "selectGenderTitle": "Select your gender",
   "genderAudienceExplanation": "This selection is required to determine which listings you can view and which sellers you can contact.",
   "confirmAndContinue": "Confirm and continue",
-  "saveSelectionFailed": "Could not save your selection"
+  "saveSelectionFailed": "Could not save your selection",
+  "imageTooLarge": "The image must not exceed 10 MB",
+  "unsupportedImageFormat": "Allowed formats: JPG, PNG and WebP only",
+  "selectAtLeastOnePhoto": "Choose at least one photo, up to 8 photos",
+  "productTitleAndPriceRequired": "Enter a valid product title and price",
+  "imageReviewReadError": "Could not read the image review result. The product was not published; please try again.",
+  "imageReviewRejected": "The images were not approved. The product was not published.",
+  "imageReviewUnavailable": "Image review could not be completed. The product was not published; please try again later.",
+  "productNotFoundOrNoEditPermission": "Product not found or you do not have permission to edit it",
+  "productNotFoundOrNoDeletePermission": "Product not found or you do not have permission to delete it",
+  "productDeleteFailed": "The product could not be deleted",
+  "cannotOfferOwnProduct": "You cannot make an offer on your own product",
+  "cannotMessageSelf": "You cannot message yourself",
+  "genderSelectionRequired": "Gender must be selected"
 }
