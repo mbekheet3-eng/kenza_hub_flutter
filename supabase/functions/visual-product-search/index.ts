@@ -57,24 +57,40 @@ Deno.serve(async (req: Request) => {
       return json({ error: "Image is too large. Please choose a smaller image." }, 413);
     }
 
-    const geminiResponse = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              {
-                text: "Analyze this product photo for search inside the Kenza marketplace only. Return ONLY JSON with keys: terms (array of 5-10 short product search terms; include Arabic and English terms where useful), category (short product category), description (one concise sentence). Focus only on the visible item. Do not identify people. Do not invent a brand, size, or attribute that is not clearly visible. Do not search the web or suggest external products.",
-              },
-              { inline_data: { mime_type: mimeType, data: imageBase64 } },
-            ],
-          }],
-          generationConfig: { responseMimeType: "application/json", temperature: 0.1 },
-        }),
-      },
-    );
+    const geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent";
+    const geminiRequest = {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            {
+              text: "Analyze this product photo for search inside the Kenza marketplace only. Return ONLY JSON with keys: terms (array of 5-10 short product search terms; include Arabic and English terms where useful), category (short product category), description (one concise sentence). Focus only on the visible item. Do not identify people. Do not invent a brand, size, or attribute that is not clearly visible. Do not search the web or suggest external products.",
+            },
+            { inline_data: { mime_type: mimeType, data: imageBase64 } },
+          ],
+        }],
+        generationConfig: { responseMimeType: "application/json", temperature: 0.1 },
+      }),
+    };
+
+    let geminiResponse: Response | null = null;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        geminiResponse = await fetch(geminiUrl, geminiRequest);
+      } catch (error) {
+        if (attempt === 1) throw error;
+      }
+      if (geminiResponse?.ok) break;
+      if (
+        geminiResponse &&
+        ![429, 500, 502, 503, 504].includes(geminiResponse.status)
+      ) break;
+      if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+    if (!geminiResponse) {
+      return json({ error: "Image analysis service is temporarily unavailable. Please try again." }, 503);
+    }
 
     if (!geminiResponse.ok) {
       const details = await geminiResponse.text();
