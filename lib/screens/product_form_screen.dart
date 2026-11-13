@@ -324,30 +324,20 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   Widget _primaryImageMarker({required bool selected, required VoidCallback onTap}) {
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
-    return Positioned(
-      bottom: 0,
-      right: 0,
-      child: Material(
-        color: selected ? Theme.of(context).colorScheme.primary : Colors.white,
-        shape: const CircleBorder(),
-        child: IconButton(
-          tooltip: selected
-              ? (isArabic ? 'الصورة الرئيسية' : 'Main photo')
-              : (isArabic ? 'تعيين كصورة رئيسية' : 'Set as main photo'),
-          visualDensity: VisualDensity.compact,
-          constraints: const BoxConstraints.tightFor(width: 34, height: 34),
-          style: IconButton.styleFrom(
-            backgroundColor: selected ? Theme.of(context).colorScheme.primary : Colors.white,
-            foregroundColor: selected ? Colors.white : Theme.of(context).colorScheme.primary,
-          ),
-          onPressed: _saving ? null : onTap,
-          icon: Icon(
-            selected ? Icons.star : Icons.star_border,
-            size: 18,
-            color: selected ? Colors.white : Theme.of(context).colorScheme.primary,
-          ),
-        ),
+    return IconButton(
+      tooltip: selected
+          ? (isArabic ? 'الصورة الرئيسية' : 'Main photo')
+          : (isArabic ? 'تعيين كصورة رئيسية' : 'Set as main photo'),
+      visualDensity: VisualDensity.compact,
+      constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+      padding: EdgeInsets.zero,
+      style: IconButton.styleFrom(
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        backgroundColor: selected ? Theme.of(context).colorScheme.primary : Colors.white,
+        foregroundColor: selected ? Colors.white : Theme.of(context).colorScheme.primary,
       ),
+      onPressed: _saving ? null : onTap,
+      icon: Icon(selected ? Icons.star : Icons.star_border, size: 19),
     );
   }
 
@@ -485,7 +475,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                         runSpacing: 8,
                         children: [
                           for (var i = 0; i < _existingImageUrls.length; i++)
-                            Stack(
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
@@ -502,29 +493,30 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                     ),
                                   ),
                                 ),
-                                Positioned(
-                                  top: 0,
-                                  right: 0,
-                                  child: IconButton.filled(
-                                    tooltip: AppStrings.of(context)!.removeImage,
-                                    visualDensity: VisualDensity.compact,
-                                    onPressed: _saving ? null : () => _removeExistingImage(i),
-                                    icon: const Icon(Icons.close, size: 16),
-                                  ),
-                                ),
-                                _primaryImageMarker(
-                                  selected: _primaryImageIndex == i,
-                                  onTap: () => _setPrimaryImage(i),
-                                ),
-                                Positioned(
-                                  bottom: 0,
-                                  left: 0,
-                                  child: IconButton.filled(
-                                    tooltip: AppStrings.of(context)!.cropImageTitle,
-                                    visualDensity: VisualDensity.compact,
-                                    onPressed: _saving ? null : () => _cropExistingImage(i),
-                                    icon: const Icon(Icons.crop, size: 16),
-                                  ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    _primaryImageMarker(
+                                      selected: _primaryImageIndex == i,
+                                      onTap: () => _setPrimaryImage(i),
+                                    ),
+                                    IconButton(
+                                      tooltip: AppStrings.of(context)!.cropImageTitle,
+                                      visualDensity: VisualDensity.compact,
+                                      constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+                                      padding: EdgeInsets.zero,
+                                      onPressed: _saving ? null : () => _cropExistingImage(i),
+                                      icon: const Icon(Icons.crop, size: 18),
+                                    ),
+                                    IconButton(
+                                      tooltip: AppStrings.of(context)!.removeImage,
+                                      visualDensity: VisualDensity.compact,
+                                      constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+                                      padding: EdgeInsets.zero,
+                                      onPressed: _saving ? null : () => _removeExistingImage(i),
+                                      icon: const Icon(Icons.close, size: 18),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -536,7 +528,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       runSpacing: 8,
                       children: [
                         for (var i = 0; i < _images.length; i++)
-                          Stack(
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
@@ -547,25 +540,29 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                   fit: BoxFit.cover,
                                 ),
                               ),
-                              Positioned(
-                                top: 0,
-                                right: 0,
-                                child: IconButton.filled(
-                                  visualDensity: VisualDensity.compact,
-                                  onPressed: () => setState(() {
-                                    _images.removeAt(i);
-                                    if (_primaryImageIndex == _existingImagePaths.length + i) {
-                                      _primaryImageIndex = 0;
-                                    } else if (_primaryImageIndex > _existingImagePaths.length + i) {
-                                      _primaryImageIndex--;
-                                    }
-                                  }),
-                                  icon: const Icon(Icons.close, size: 16),
-                                ),
-                              ),
-                              _primaryImageMarker(
-                                selected: _primaryImageIndex == _existingImagePaths.length + i,
-                                onTap: () => _setPrimaryImage(_existingImagePaths.length + i),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _primaryImageMarker(
+                                    selected: _primaryImageIndex == _existingImagePaths.length + i,
+                                    onTap: () => _setPrimaryImage(_existingImagePaths.length + i),
+                                  ),
+                                  IconButton(
+                                    tooltip: AppStrings.of(context)!.removeImage,
+                                    visualDensity: VisualDensity.compact,
+                                    constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+                                    padding: EdgeInsets.zero,
+                                    onPressed: _saving ? null : () => setState(() {
+                                      _images.removeAt(i);
+                                      if (_primaryImageIndex == _existingImagePaths.length + i) {
+                                        _primaryImageIndex = 0;
+                                      } else if (_primaryImageIndex > _existingImagePaths.length + i) {
+                                        _primaryImageIndex--;
+                                      }
+                                    }),
+                                    icon: const Icon(Icons.close, size: 18),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
