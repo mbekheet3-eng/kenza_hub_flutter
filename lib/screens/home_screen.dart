@@ -7,12 +7,10 @@ import '../models/category.dart';
 import '../models/product.dart';
 import '../services/marketplace_service.dart';
 import '../services/favorites_service.dart';
-import '../services/notification_service.dart';
 import '../widgets/product_card.dart';
 import 'login_screen.dart';
 import 'product_detail_screen.dart';
 import 'search_screen.dart';
-import 'notifications_screen.dart';
 import 'special_markets_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -78,27 +76,10 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _categoryId;
   bool _loading = true;
   String? _error;
-  Stream<List<Map<String, dynamic>>>? _notificationStream;
-
-  void _bindNotificationStream() {
-    final userId = Supabase.instance.client.auth.currentUser?.id;
-    _notificationStream = userId == null ? null : NotificationService().watchNotifications();
-  }
-
-  String get _firstName {
-    final user = Supabase.instance.client.auth.currentUser;
-    final metadataName = user?.userMetadata?['display_name']?.toString().trim();
-    if (metadataName != null && metadataName.isNotEmpty) {
-      return metadataName.split(RegExp(r'\s+')).first;
-    }
-    final emailName = user?.email?.split('@').first;
-    return emailName == null || emailName.isEmpty ? 'بك' : emailName;
-  }
 
   @override
   void initState() {
     super.initState();
-    _bindNotificationStream();
     _load();
   }
 
@@ -182,16 +163,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _openNotifications() async {
-    if (Supabase.instance.client.auth.currentUser == null) {
-      await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LoginScreen()));
-      if (!mounted || Supabase.instance.client.auth.currentUser == null) return;
-      setState(_bindNotificationStream);
-    }
-    await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const NotificationsScreen()),
-    );
-  }
 
   List<Category> get _rootCategories =>
       _categories.where((category) => category.parentId == null).toList()
@@ -223,77 +194,27 @@ class _HomeScreenState extends State<HomeScreen> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-                  child: StreamBuilder<List<Map<String, dynamic>>>(
-                    stream: _notificationStream,
-                    builder: (context, snapshot) {
-                      final unread = (snapshot.data ?? [])
-                          .where((item) => item['is_read'] != true)
-                          .length;
-                      return Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: _search,
-                              textInputAction: TextInputAction.search,
-                              onSubmitted: (_) => Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => SearchScreen(
-                                    query: _search.text.trim(),
-                                    categoryId: _categoryId,
-                                  ),
-                                ),
-                              ),
-                              decoration: InputDecoration(
-                                hintText: AppStrings.of(context)!.searchProductHint,
-                                prefixIcon: const Icon(Icons.search),
-                                suffixIcon: IconButton(
-                                  tooltip: AppStrings.of(context)!.imageSearch,
-                                  onPressed: () => _showComingSoon('البحث بالصور'),
-                                  icon: const Icon(Icons.camera_alt_outlined),
-                                ),
-                              ),
-                            ),
-                          ),
-                          if (user != null) ...[
-                            const SizedBox(width: 4),
-                            IconButton(
-                              tooltip: 'الإشعارات',
-                              onPressed: _openNotifications,
-                              icon: Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  const Icon(Icons.notifications_none_rounded, size: 26),
-                                  if (unread > 0)
-                                    Positioned(
-                                      top: -5,
-                                      right: -7,
-                                      child: Container(
-                                        constraints: const BoxConstraints(minWidth: 17, minHeight: 17),
-                                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                        decoration: const BoxDecoration(
-                                          color: Colors.red,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          unread > 99 ? '99+' : '$unread',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 9,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ],
-                      );
-                    },
+                  child: TextField(
+                    controller: _search,
+                    textInputAction: TextInputAction.search,
+                    onSubmitted: (_) => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => SearchScreen(
+                          query: _search.text.trim(),
+                          categoryId: _categoryId,
+                        ),
+                      ),
+                    ),
+                    decoration: InputDecoration(
+                      hintText: AppStrings.of(context)!.searchProductHint,
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: IconButton(
+                        tooltip: AppStrings.of(context)!.imageSearch,
+                        onPressed: () => _showComingSoon('البحث بالصور'),
+                        icon: const Icon(Icons.camera_alt_outlined),
+                      ),
+                    ),
                   ),
-                ),
               ),
               SliverToBoxAdapter(
                 child: SizedBox(
