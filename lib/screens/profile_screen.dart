@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../config/app_locale.dart';
+import '../l10n/app_strings.dart';
 import '../models/product.dart';
 import '../services/auth_service.dart';
 import '../services/marketplace_service.dart';
@@ -377,6 +379,69 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: TextStyle(color: Colors.grey),
                       ),
                       const Divider(height: 28),
+                      Builder(
+                        builder: (context) {
+                          final strings = AppStrings.of(context)!;
+                          final languageCode = Localizations.localeOf(context).languageCode;
+                          final languageName = languageCode == 'ar'
+                              ? 'العربية'
+                              : languageCode == 'fr'
+                                  ? 'Français'
+                                  : 'English';
+                          return ListTile(
+                            leading: const Icon(Icons.language_rounded),
+                            title: Text(strings.languageSettingsTitle),
+                            subtitle: Text('$languageName · ${strings.languageSettingsSubtitle}'),
+                            trailing: const Icon(Icons.chevron_right),
+                            onTap: () => showModalBottomSheet<void>(
+                              context: context,
+                              showDragHandle: true,
+                              builder: (sheetContext) => SafeArea(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child: Text(
+                                        strings.chooseLanguage,
+                                        style: Theme.of(context).textTheme.titleLarge,
+                                      ),
+                                    ),
+                                    ListTile(
+                                      leading: const Text('🇪🇬', style: TextStyle(fontSize: 24)),
+                                      title: const Text('العربية'),
+                                      trailing: languageCode == 'ar' ? const Icon(Icons.check) : null,
+                                      onTap: () async {
+                                        await AppLocale.setLanguage('ar');
+                                        if (sheetContext.mounted) Navigator.pop(sheetContext);
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: const Text('🇬🇧', style: TextStyle(fontSize: 24)),
+                                      title: const Text('English'),
+                                      trailing: languageCode == 'en' ? const Icon(Icons.check) : null,
+                                      onTap: () async {
+                                        await AppLocale.setLanguage('en');
+                                        if (sheetContext.mounted) Navigator.pop(sheetContext);
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: const Text('🇫🇷', style: TextStyle(fontSize: 24)),
+                                      title: const Text('Français'),
+                                      trailing: languageCode == 'fr' ? const Icon(Icons.check) : null,
+                                      onTap: () async {
+                                        await AppLocale.setLanguage('fr');
+                                        if (sheetContext.mounted) Navigator.pop(sheetContext);
+                                      },
+                                    ),
+                                    const SizedBox(height: 12),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                       ListTile(
                         leading: const Icon(Icons.notifications_none_rounded),
                         title: const Text('الإشعارات'),
