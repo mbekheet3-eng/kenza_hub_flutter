@@ -151,14 +151,14 @@ class _HomeScreenState extends State<HomeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(wasFavorite
-              ? 'تمت إزالة المنتج من المفضلة'
-              : 'تمت إضافة المنتج للمفضلة'),
+              ? AppStrings.of(context)!.favoriteRemoved
+              : AppStrings.of(context)!.favoriteAdded),
         ),
       );
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تعذر تحديث المفضلة: $error')),
+        SnackBar(content: Text('${AppStrings.of(context)!.favoriteUpdateFailed}: $error')),
       );
     }
   }
@@ -209,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       prefixIcon: const Icon(Icons.search),
                       suffixIcon: IconButton(
                         tooltip: AppStrings.of(context)!.imageSearch,
-                        onPressed: () => _showComingSoon('البحث بالصور'),
+                        onPressed: () => _showComingSoon(AppStrings.of(context)!.imageSearch),
                         icon: const Icon(Icons.camera_alt_outlined),
                       ),
                     ),
@@ -291,13 +291,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           const Icon(Icons.cloud_off_outlined, size: 42),
                           const SizedBox(height: 12),
-                          const Text('تعذر تحميل المنتجات'),
+                          Text(AppStrings.of(context)!.homeProductsLoadError),
                           const SizedBox(height: 8),
                           Text(_error!, textAlign: TextAlign.center),
                           const SizedBox(height: 12),
                           FilledButton(
                             onPressed: _load,
-                            child: const Text('إعادة المحاولة'),
+                            child: Text(AppStrings.of(context)!.retryAction),
                           ),
                         ],
                       ),
@@ -307,7 +307,7 @@ class _HomeScreenState extends State<HomeScreen> {
               else if (_products.isEmpty)
                 const SliverFillRemaining(
                   hasScrollBody: false,
-                  child: Center(child: Text('لا توجد منتجات منشورة حتى الآن')),
+                  child: Center(child: Text(AppStrings.of(context)!.noPublishedProducts)),
                 )
               else
                 SliverPadding(
