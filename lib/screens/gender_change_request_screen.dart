@@ -161,8 +161,8 @@ class _GenderChangeRequestScreenState extends State<GenderChangeRequestScreen> {
                 const Divider(height: 32),
                 Text(AppStrings.of(context)!.requestHistory, style: Theme.of(context).textTheme.titleLarge),
                 if (_requests.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     child: Text(AppStrings.of(context)!.noPreviousRequests),
                   ),
                 for (final request in _requests)
