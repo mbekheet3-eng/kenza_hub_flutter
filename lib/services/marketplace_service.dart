@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../config/app_locale.dart';
 import '../data/category_labels.dart';
+import '../l10n/app_strings.dart';
 import '../models/category.dart';
 import '../models/product.dart';
 
@@ -21,6 +23,9 @@ class MarketplaceService {
       : _client = client ?? Supabase.instance.client;
 
   final SupabaseClient _client;
+
+  Future<AppStrings> _localizedStrings() =>
+      AppStrings.delegate.load(AppLocale.notifier.value);
   Future<List<Category>>? _categoriesCache;
   static const String bucket = 'product-images';
   static const int maxImageBytes = 10 * 1024 * 1024;
@@ -201,13 +206,14 @@ class MarketplaceService {
     required String audience,
     String? customCategoryName,
   }) async {
+    final strings = await _localizedStrings();
     final user = _client.auth.currentUser;
-    if (user == null) throw Exception('يجب تسجيل الدخول أولاً');
+    if (user == null) throw Exception(strings.loginRequired);
     if (images.isEmpty || images.length > maxImages) {
-      throw Exception('اختر صورة واحدة على الأقل وبحد أقصى 8 صور');
+      throw Exception(strings.selectAtLeastOnePhoto);
     }
     if (title.trim().isEmpty || price <= 0) {
-      throw Exception('أدخل عنوانًا وسعرًا صحيحًا للمنتج');
+      throw Exception(strings.productTitleAndPriceRequired);
     }
 
     final created = await _client
@@ -237,7 +243,7 @@ class MarketplaceService {
         final file = images[index];
         final bytes = await file.readAsBytes();
         if (bytes.length > maxImageBytes) {
-          throw Exception('حجم الصورة يجب ألا يتجاوز 10 ميجابايت');
+          throw Exception(strings.imageTooLarge);
         }
 
         final extension = file.path.split('.').last.toLowerCase();
@@ -245,7 +251,7 @@ class MarketplaceService {
           'jpg' || 'jpeg' => 'image/jpeg',
           'png' => 'image/png',
           'webp' => 'image/webp',
-          _ => throw Exception('الصيغ المسموحة: JPG وPNG وWebP فقط'),
+          _ => throw Exception(strings.unsupportedImageFormat),
         };
 
         final path =
@@ -300,6 +306,7 @@ class MarketplaceService {
   }
 
   Future<void> _reviewProductImages(String productId) async {
+    final strings = await _localizedStrings();
     try {
       final response = await _client.functions.invoke(
         'review-product-images',
@@ -308,16 +315,16 @@ class MarketplaceService {
       final data = response.data;
       if (data is! Map) {
         throw const _ProductImageReviewException(
-          'تعذر قراءة نتيجة مراجعة الصور. لم يتم نشر المنتج؛ حاول مرة أخرى.',
+          strings.imageReviewReadError,
           retryable: true,
         );
       }
 
       if (data['status'] == 'approved') return;
 
-      final message = data['message_ar'] is String
-          ? data['message_ar'] as String
-          : 'لم تتم الموافقة على الصور. لم يتم نشر المنتج.';
+      final message = data['status'] == 'rejected'
+          ? strings.imageReviewRejected
+          : strings.imageReviewUnavailable;
       throw _ProductImageReviewException(
         message,
         retryable: data['status'] != 'rejected',
@@ -326,7 +333,7 @@ class MarketplaceService {
       rethrow;
     } catch (_) {
       throw const _ProductImageReviewException(
-        'تعذر إكمال مراجعة الصور الآن. لم يتم نشر المنتج؛ حاول مرة أخرى لاحقًا.',
+        strings.imageReviewUnavailable,
         retryable: true,
       );
     }
@@ -341,8 +348,9 @@ class MarketplaceService {
     required String audience,
     String? customCategoryName,
   }) async {
+    final strings = await _localizedStrings();
     final user = _client.auth.currentUser;
-    if (user == null) throw Exception('يجب تسجيل الدخول أولاً');
+    if (user == null) throw Exception(strings.loginRequired);
 
     final previous = await _client
         .from('products')
@@ -352,7 +360,7 @@ class MarketplaceService {
         .maybeSingle();
 
     if (previous == null) {
-      throw Exception('لم يتم العثور على المنتج أو لا تملك صلاحية تعديله');
+      throw Exception(strings.productNotFoundOrNoEditPermission);
     }
 
     final needsImageReview = previous['status'] == 'draft' ||
@@ -384,8 +392,9 @@ class MarketplaceService {
   }
 
   Future<void> deleteProduct(String productId) async {
+    final strings = await _localizedStrings();
     final user = _client.auth.currentUser;
-    if (user == null) throw Exception('يجب تسجيل الدخول أولاً');
+    if (user == null) throw Exception(strings.loginRequired);
 
     final ownedProduct = await _client
         .from('products')
@@ -395,7 +404,7 @@ class MarketplaceService {
         .maybeSingle();
 
     if (ownedProduct == null) {
-      throw Exception('لم يتم العثور على المنتج أو لا تملك صلاحية حذفه');
+      throw Exception(strings.productNotFoundOrNoDeletePermission);
     }
 
     final rows = await _client
@@ -415,6 +424,6 @@ class MarketplaceService {
         .eq('owner_id', user.id)
         .select('id');
 
-    if (deleted.isEmpty) throw Exception('لم يتم حذف المنتج');
+    if (deleted.isEmpty) throw Exception(strings.productDeleteFailed);
   }
 }
