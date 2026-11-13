@@ -110,7 +110,7 @@ The three November 13 migrations were approved and applied to the active Supabas
 ## Visual image search pipeline
 
 - Edge Function `visual-product-search` was restored from the deployed source and is tracked at `supabase/functions/visual-product-search/index.ts`.
-- Deployed version 6 uses Gemini only to analyze the selected JPEG/PNG/WebP image and return product search terms, a category hint, and a short description. It does not search the public web or external stores.
+- Deployed version 7 uses Gemini only to analyze the selected JPEG/PNG/WebP image and return product search terms, a category hint, and a short description. It does not search the public web or external stores.
 - Flutter sends the returned terms to `public.search_products` using the active Supabase client session. The database remains the only source of product results and enforces audience RLS.
 - The Edge Function keeps `verify_jwt = true`, reads `GEMINI_API_KEY` only from server secrets, limits the encoded image payload, and applies a best-effort per-isolate request throttle. A durable distributed rate limiter remains a pre-launch hardening item.
 - The camera entry on Home now offers camera or gallery selection. Flutter compresses the chosen image and displays database search results through the same search screen and pagination flow.
