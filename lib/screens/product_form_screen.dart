@@ -389,7 +389,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     final count = _currentImageCount;
     if (count == 0) return const SizedBox.shrink();
 
-    final selected = _selectedImageIndex.clamp(0, count - 1);
+    final selected = _selectedImageIndex.clamp(0, count - 1).toInt();
     final isPrimary = _primaryImageIndex == selected;
 
     return Column(
