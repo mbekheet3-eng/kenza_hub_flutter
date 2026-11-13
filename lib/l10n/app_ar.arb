@@ -776,5 +776,6 @@
   "productDeleteFailed": "لم يتم حذف المنتج",
   "cannotOfferOwnProduct": "لا يمكنك تقديم عرض على منتجك",
   "cannotMessageSelf": "لا يمكنك مراسلة نفسك",
-  "genderSelectionRequired": "يجب اختيار النوع"
+  "genderSelectionRequired": "يجب اختيار النوع",
+  "imageSearchTemporarilyUnavailable": "خدمة البحث بالصورة مشغولة مؤقتًا. حاول مرة أخرى بعد قليل."
 }
