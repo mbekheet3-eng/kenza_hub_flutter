@@ -81,24 +81,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final name = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('تعديل الاسم'),
+        title: Text(AppStrings.of(dialogContext)!.editNameTitle),
         content: TextField(
           controller: controller,
           maxLength: 60,
           textCapitalization: TextCapitalization.words,
           decoration: const InputDecoration(
-            labelText: 'اسمك',
-            helperText: 'يمكنك كتابة الاسم الأول فقط أو الاسم بالكامل.',
+            labelText: AppStrings.of(dialogContext)!.yourName,
+            helperText: AppStrings.of(dialogContext)!.displayNameHelper,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('إلغاء'),
+            child: Text(AppStrings.of(dialogContext)!.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, controller.text.trim()),
-            child: const Text('حفظ'),
+            child: Text(AppStrings.of(dialogContext)!.saveChanges),
           ),
         ],
       ),
@@ -115,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذر تحديث الاسم: $error')),
+          SnackBar(content: Text('${AppStrings.of(context)!.updateNameFailed}: $error')),
         );
       }
     }
@@ -131,22 +131,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('الصورة الشخصية', style: Theme.of(context).textTheme.titleLarge),
+              Text(AppStrings.of(sheetContext)!.avatarTitle, style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 8),
-              const Text('اختر صورة من جهازك أو Avatar جاهزًا.'),
+              Text(AppStrings.of(sheetContext)!.avatarChooseHint),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: () => Navigator.pop(sheetContext, 'photo'),
                   icon: const Icon(Icons.photo_library_outlined),
-                  label: const Text('اختيار صورة من الجهاز'),
+                  label: Text(AppStrings.of(sheetContext)!.choosePhotoFromDevice),
                 ),
               ),
               const SizedBox(height: 12),
               Align(
                 alignment: AlignmentDirectional.centerStart,
-                child: Text('اختيار Avatar', style: Theme.of(context).textTheme.titleMedium),
+                child: Text(AppStrings.of(sheetContext)!.chooseAvatar, style: Theme.of(context).textTheme.titleMedium),
               ),
               const SizedBox(height: 10),
               Wrap(
@@ -168,7 +168,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () => Navigator.pop(sheetContext, 'default'),
-                child: const Text('استخدام الصورة الافتراضية'),
+                child: Text(AppStrings.of(sheetContext)!.useDefaultAvatar),
               ),
             ],
           ),
@@ -201,7 +201,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final file = File(picked.path);
       final bytes = await file.readAsBytes();
       if (bytes.length > 5 * 1024 * 1024) {
-        throw Exception('حجم الصورة بعد ضغطها يجب ألا يتجاوز 5 ميجابايت');
+        throw Exception(AppStrings.of(context)!.avatarTooLarge);
       }
 
       final extension = picked.path.split('.').last.toLowerCase();
@@ -225,7 +225,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذر تحديث الصورة: $error')),
+          SnackBar(content: Text('${AppStrings.of(context)!.updateAvatarFailed}: $error')),
         );
       }
     } finally {
@@ -282,13 +282,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           IconButton(
             onPressed: _signOut,
-            tooltip: 'تسجيل الخروج',
+            tooltip: AppStrings.of(context)!.logout,
             icon: const Icon(Icons.logout),
           ),
         ],
       ),
       body: user == null
-          ? const Center(child: Text('سجّل الدخول لعرض حسابك'))
+          ? Center(child: Text(AppStrings.of(context)!.loginToViewAccount))
           : _loading
               ? const Center(child: CircularProgressIndicator())
               : RefreshIndicator(
@@ -306,7 +306,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'تعذر تحميل بعض بيانات الحساب: $_error',
+                                  '${AppStrings.of(context)!.profileDataLoadError}: $_error',
                                   style: TextStyle(
                                     color: Theme.of(context).colorScheme.onErrorContainer,
                                   ),
@@ -315,7 +315,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   alignment: AlignmentDirectional.centerEnd,
                                   child: TextButton(
                                     onPressed: _load,
-                                    child: const Text('إعادة المحاولة'),
+                                    child: Text(AppStrings.of(context)!.retryAction),
                                   ),
                                 ),
                               ],
@@ -339,7 +339,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   Text(
                                     (_profile?['display_name'] as String?)?.isNotEmpty == true
                                         ? _profile!['display_name'] as String
-                                        : 'عضو كنزة هب',
+                                        : AppStrings.of(context)!.memberFallback,
                                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                           fontWeight: FontWeight.w800,
                                         ),
@@ -356,7 +356,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             IconButton(
                               onPressed: _editName,
-                              tooltip: 'تعديل الاسم',
+                              tooltip: AppStrings.of(context)!.editNameTooltip,
                               icon: const Icon(Icons.edit_outlined),
                             ),
                           ],
@@ -371,11 +371,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: CircularProgressIndicator(strokeWidth: 2),
                               )
                             : const Icon(Icons.camera_alt_outlined),
-                        label: const Text('تغيير الصورة الشخصية أو اختيار Avatar'),
+                        label: Text(AppStrings.of(context)!.changeProfilePhoto),
                       ),
                       const SizedBox(height: 12),
                       const Text(
-                        'الاسم الكامل، إذا كتبته، يظهر لك وحدك. الأعضاء الآخرون يرون الاسم الأول فقط.',
+                        AppStrings.of(context)!.profileNamePrivacy,
                         style: TextStyle(color: Colors.grey),
                       ),
                       const Divider(height: 28),
@@ -444,8 +444,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       ListTile(
                         leading: const Icon(Icons.notifications_none_rounded),
-                        title: const Text('الإشعارات'),
-                        subtitle: const Text('تنبيهات الرسائل والعروض وطلبات الشراء'),
+                        title: Text(AppStrings.of(context)!.notificationsTitle),
+                        subtitle: Text(AppStrings.of(context)!.notificationsSubtitle),
                         trailing: const Icon(Icons.chevron_left),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const NotificationsScreen()),
@@ -453,8 +453,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       ListTile(
                         leading: const Icon(Icons.mail_outline_rounded),
-                        title: const Text('الرسائل والعروض وطلبات الشراء'),
-                        subtitle: const Text('محادثاتك والطلبات الواردة والصادرة'),
+                        title: Text(AppStrings.of(context)!.messagesOffersOrdersTitle),
+                        subtitle: Text(AppStrings.of(context)!.messagesOffersOrdersSubtitle),
                         trailing: const Icon(Icons.chevron_left),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const MessagesInboxScreen()),
@@ -462,7 +462,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       ListTile(
                         leading: const Icon(Icons.favorite_border_rounded),
-                        title: const Text('المفضلة'),
+                        title: Text(AppStrings.of(context)!.favoritesTitle),
                         trailing: const Icon(Icons.chevron_left),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const FavoritesScreen()),
@@ -471,7 +471,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       if (user.appMetadata['role'] == 'admin')
                         ListTile(
                           leading: const Icon(Icons.admin_panel_settings_outlined),
-                          title: const Text('مراجعة طلبات تغيير النوع'),
+                          title: Text(AppStrings.of(context)!.reviewGenderRequests),
                           trailing: const Icon(Icons.chevron_left),
                           onTap: () => Navigator.of(context).push(
                             MaterialPageRoute(builder: (_) => const AdminGenderRequestsScreen()),
@@ -479,8 +479,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ListTile(
                         leading: const Icon(Icons.manage_accounts_outlined),
-                        title: const Text('النوع المسجل'),
-                        subtitle: const Text('طلب تغيير النوع من خلال الإدارة فقط'),
+                        title: Text(AppStrings.of(context)!.registeredGender),
+                        subtitle: Text(AppStrings.of(context)!.genderChangeAdminOnly),
                         trailing: const Icon(Icons.chevron_left),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const GenderChangeRequestScreen()),
@@ -488,7 +488,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       ListTile(
                         leading: const Icon(Icons.lock_reset_outlined),
-                        title: const Text('تغيير كلمة المرور'),
+                        title: Text(AppStrings.of(context)!.changePassword),
                         trailing: const Icon(Icons.chevron_left),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const PasswordRecoveryScreen()),
@@ -496,7 +496,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       ListTile(
                         leading: const Icon(Icons.info_outline),
-                        title: const Text('عن كنزة هب'),
+                        title: Text(AppStrings.of(context)!.aboutKenzaTitle),
                         trailing: const Icon(Icons.chevron_left),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const AboutKenzaScreen()),
@@ -504,7 +504,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       ListTile(
                         leading: const Icon(Icons.policy_outlined),
-                        title: const Text('الشروط والسياسات'),
+                        title: Text(AppStrings.of(context)!.policiesAndTerms),
                         trailing: const Icon(Icons.chevron_left),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const PoliciesScreen()),
@@ -514,7 +514,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ListTile(
                         leading: const Icon(Icons.inventory_2_outlined),
                         title: Text('منتجاتي (${_products.length})'),
-                        subtitle: const Text('عرض وإدارة المنتجات التي أضفتها'),
+                        subtitle: Text(AppStrings.of(context)!.myProductsSubtitle),
                         trailing: const Icon(Icons.chevron_left),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
@@ -573,15 +573,15 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
               ? Center(child: Padding(
                   padding: const EdgeInsets.all(24),
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    const Text('تعذر تحميل منتجاتك'),
+                    Text(AppStrings.of(context)!.myProductsLoadError),
                     const SizedBox(height: 12),
                     Text(_error!, textAlign: TextAlign.center),
                     const SizedBox(height: 12),
-                    FilledButton(onPressed: _load, child: const Text('إعادة المحاولة')),
+                    FilledButton(onPressed: _load, child: Text(AppStrings.of(context)!.retryAction)),
                   ]),
                 ))
               : _products.isEmpty
-                  ? const Center(child: Text('لم تضف أي منتجات بعد'))
+                  ? Center(child: Text(AppStrings.of(context)!.noProductsYet))
                   : RefreshIndicator(
                       onRefresh: _load,
                       child: GridView.builder(
