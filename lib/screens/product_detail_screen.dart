@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../l10n/app_strings.dart';
+
 import '../widgets/member_avatar.dart';
 
 import '../models/product.dart';
@@ -24,6 +26,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final _transactionService = MarketplaceTransactionService();
   late Future<Product> _product;
   final Map<String, Future<Map<String, dynamic>?>> _publicMemberProfiles = {};
+
+  AppStrings get _l10n => AppStrings.of(context)!;
 
   Future<Map<String, dynamic>?> _publicProfileFor(String memberId) {
     return _publicMemberProfiles.putIfAbsent(
@@ -51,16 +55,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('حذف المنتج'),
-        content: const Text('هل أنت متأكد من حذف المنتج وصوره؟ لا يمكن التراجع عن هذا الإجراء.'),
+        title: Text(_l10n.deleteProductConfirmTitle),
+        content: Text(_l10n.deleteProductConfirmBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('إلغاء'),
+            child: Text(_l10n.cancelLabel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('حذف'),
+            child: Text(_l10n.deleteLabel),
           ),
         ],
       ),
@@ -73,7 +77,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذر حذف المنتج: $error')),
+          SnackBar(content: Text('${_l10n.deleteProductFailed}: $error')),
         );
       }
     }
@@ -94,11 +98,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('تأكيد طلب الشراء'),
-        content: Text('سيتم إرسال طلب للبائع بالسعر الحالي ${product.price.toStringAsFixed(2)} ج.م. لا يوجد دفع إلكتروني الآن.'),
+        title: Text(_l10n.confirmPurchaseTitle),
+        content: Text(_l10n.purchaseConfirmMessage),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('رجوع')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('إرسال الطلب')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(_l10n.backLabel)),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(_l10n.sendOrderLabel)),
         ],
       ),
     );
@@ -111,13 +115,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم إرسال طلبك للبائع، وفي انتظار موافقته')),
+          SnackBar(content: Text(_l10n.orderSentWaiting)),
         );
       }
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذر إرسال الطلب: $error')),
+          SnackBar(content: Text('${_l10n.orderSendFailed}: $error')),
         );
       }
     }
@@ -132,7 +136,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('تقديم عرض سعر'),
+        title: Text(_l10n.offerDialogTitle),
         content: Form(
           key: formKey,
           child: Column(
@@ -141,27 +145,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               TextFormField(
                 controller: priceController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(labelText: 'السعر المقترح بالجنيه'),
+                decoration: InputDecoration(labelText: _l10n.proposedPriceLabel),
                 validator: (value) {
                   final price = double.tryParse((value ?? '').trim());
-                  return price == null || price <= 0 ? 'أدخل سعرًا صحيحًا' : null;
+                  return price == null || price <= 0 ? _l10n.invalidPrice : null;
                 },
               ),
               TextField(
                 controller: noteController,
                 maxLines: 2,
-                decoration: const InputDecoration(labelText: 'رسالة للبائع (اختياري)'),
+                decoration: InputDecoration(labelText: _l10n.sellerMessageOptional),
               ),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('إلغاء')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(_l10n.cancelLabel)),
           FilledButton(
             onPressed: () {
               if (formKey.currentState!.validate()) Navigator.pop(ctx, true);
             },
-            child: const Text('إرسال العرض'),
+            child: Text(_l10n.sendOfferLabel),
           ),
         ],
       ),
@@ -176,13 +180,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('تم إرسال عرض السعر للبائع')),
+            SnackBar(content: Text(_l10n.offerSent)),
           );
         }
       } catch (error) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('تعذر إرسال العرض: $error')),
+            SnackBar(content: Text('${_l10n.offerSendFailed}: $error')),
           );
         }
       }
@@ -207,7 +211,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذر فتح المحادثة: $error')),
+          SnackBar(content: Text('${_l10n.conversationOpenFailed}: $error')),
         );
       }
     }
@@ -217,7 +221,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Widget build(BuildContext context) {
     final userId = Supabase.instance.client.auth.currentUser?.id;
     return Scaffold(
-      appBar: AppBar(title: const Text('تفاصيل المنتج')),
+      appBar: AppBar(title: Text(_l10n.productDetailsTitle)),
       body: FutureBuilder<Product>(
         future: _product,
         builder: (context, snapshot) {
@@ -228,7 +232,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text('تعذر تحميل المنتج: ${snapshot.error ?? ''}'),
+                child: Text('${_l10n.productLoadError}: ${snapshot.error ?? ''}'),
               ),
             );
           }
@@ -269,7 +273,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Text(product.title, style: Theme.of(context).textTheme.headlineSmall),
                     if (product.customCategoryName?.isNotEmpty == true) ...[
                       const SizedBox(height: 6),
-                      Text('النوع: ${product.customCategoryName}'),
+                      Text('${_l10n.customCategoryLabel}: ${product.customCategoryName}'),
                     ],
                     const SizedBox(height: 10),
                     Text(
@@ -293,9 +297,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           title: Text(
                             (publicProfile?['first_name'] as String?)?.isNotEmpty == true
                                 ? publicProfile!['first_name'] as String
-                                : 'عضو كنزة هب',
+                                : _l10n.memberFallbackName,
                           ),
-                          subtitle: const Text('البائع'),
+                          subtitle: Text(_l10n.seller),
                         );
                       },
                     ),
@@ -303,18 +307,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Chip(
                       avatar: const Icon(Icons.groups_outlined, size: 18),
                       label: Text(product.audience == 'women_only'
-                          ? 'للنساء فقط'
+                          ? _l10n.audienceWomenOnly
                           : product.audience == 'men_only'
-                              ? 'للرجال فقط'
-                              : 'للجميع'),
+                              ? _l10n.audienceMenOnly
+                              : _l10n.audienceAll),
                     ),
                     const SizedBox(height: 20),
-                    Text('الوصف', style: Theme.of(context).textTheme.titleMedium),
+                    Text(_l10n.descriptionLabel, style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 8),
-                    Text(product.description.isEmpty ? 'لا يوجد وصف' : product.description),
+                    Text(product.description.isEmpty ? _l10n.noDescription : product.description),
                     const SizedBox(height: 18),
                     Text(
-                      'تاريخ النشر: ${MaterialLocalizations.of(context).formatMediumDate(product.createdAt.toLocal())}',
+                      '${_l10n.publishedDateLabel}: ${MaterialLocalizations.of(context).formatMediumDate(product.createdAt.toLocal())}',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
 
@@ -325,7 +329,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         child: FilledButton.icon(
                           onPressed: () => _buy(product),
                           icon: const Icon(Icons.shopping_bag_outlined),
-                          label: const Text('شراء الآن'),
+                          label: Text(_l10n.buyNowLabel),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -335,7 +339,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             child: OutlinedButton.icon(
                               onPressed: () => _makeOffer(product),
                               icon: const Icon(Icons.local_offer_outlined),
-                              label: const Text('تقديم عرض'),
+                              label: Text(_l10n.offerLabel),
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -343,7 +347,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             child: OutlinedButton.icon(
                               onPressed: () => _contactSeller(product),
                               icon: const Icon(Icons.chat_bubble_outline),
-                              label: const Text('التواصل مع البائع'),
+                              label: Text(_l10n.contactSellerLabel),
                             ),
                           ),
                         ],
@@ -357,7 +361,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             child: OutlinedButton.icon(
                               onPressed: () => _edit(product),
                               icon: const Icon(Icons.edit_outlined),
-                              label: const Text('تعديل'),
+                              label: Text(_l10n.editLabel),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -365,7 +369,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             child: FilledButton.tonalIcon(
                               onPressed: _delete,
                               icon: const Icon(Icons.delete_outline),
-                              label: const Text('حذف'),
+                              label: Text(_l10n.deleteLabel),
                             ),
                           ),
                         ],
