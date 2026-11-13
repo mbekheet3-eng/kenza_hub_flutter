@@ -324,6 +324,18 @@ class MarketplaceService {
     );
   }
 
+  Future<File> downloadImageForEditing(String storagePath) async {
+    final bytes = await _client.storage.from(bucket).download(storagePath);
+    final directory = await Directory.systemTemp.createTemp('kenza-image-edit-');
+    final extension = storagePath.split('.').last.toLowerCase();
+    final safeExtension = ['jpg', 'jpeg', 'png', 'webp'].contains(extension)
+        ? extension
+        : 'jpg';
+    final file = File('${directory.path}/source.$safeExtension');
+    await file.writeAsBytes(bytes, flush: true);
+    return file;
+  }
+
   Future<String> publishProduct({
     required String categoryId,
     required String title,
@@ -474,6 +486,8 @@ class MarketplaceService {
     required String categoryId,
     required String audience,
     String? customCategoryName,
+    List<File> images = const [],
+    List<String> removedImagePaths = const [],
   }) async {
     final strings = await _localizedStrings();
     final user = _client.auth.currentUser;
@@ -490,27 +504,125 @@ class MarketplaceService {
       throw Exception(strings.productNotFoundOrNoEditPermission);
     }
 
+    final currentImageRows = await _client
+        .from('product_images')
+        .select('storage_path,sort_order')
+        .eq('product_id', productId)
+        .order('sort_order');
+    final currentPaths = currentImageRows
+        .map((row) => row['storage_path'] as String)
+        .toSet();
+    final removedPaths = removedImagePaths.toSet();
+    if (!currentPaths.containsAll(removedPaths)) {
+      throw Exception(strings.productNotFoundOrNoEditPermission);
+    }
+
+    final finalImageCount = currentPaths.length - removedPaths.length + images.length;
+    if (finalImageCount < 1 || finalImageCount > maxImages) {
+      throw Exception(strings.selectAtLeastOnePhoto);
+    }
+
     final needsImageReview = previous['status'] == 'draft' ||
         previous['title'] != title.trim() ||
         (previous['description'] ?? '') != description.trim() ||
-        previous['category_id'] != categoryId;
+        previous['category_id'] != categoryId ||
+        images.isNotEmpty ||
+        removedPaths.isNotEmpty;
 
-    final rows = await _client
-        .from('products')
-        .update({
-          'title': title.trim(),
-          'description': description.trim(),
-          'price': price,
-          'category_id': categoryId,
-          'custom_category_name': customCategoryName?.trim().isEmpty == true ? null : customCategoryName?.trim(),
-          'audience': audience,
-        })
-        .eq('id', productId)
-        .eq('owner_id', user.id)
-        .select('id');
+    final uploadedPaths = <String>[];
+    final insertedPaths = <String>[];
+    try {
+      var nextSortOrder = currentImageRows.isEmpty
+          ? 0
+          : currentImageRows
+                  .map((row) => (row['sort_order'] as num).toInt())
+                  .reduce((a, b) => a > b ? a : b) +
+              1;
+      final imageRows = <Map<String, dynamic>>[];
 
-    if (rows.isEmpty) {
-      throw Exception(strings.productNotFoundOrNoEditPermission);
+      for (final file in images) {
+        final bytes = await file.readAsBytes();
+        if (bytes.isEmpty || bytes.length > maxImageBytes) {
+          throw Exception(strings.imageTooLarge);
+        }
+
+        final extension = file.path.split('.').last.toLowerCase();
+        final contentType = switch (extension) {
+          'jpg' || 'jpeg' => 'image/jpeg',
+          'png' => 'image/png',
+          'webp' => 'image/webp',
+          _ => throw Exception(strings.unsupportedImageFormat),
+        };
+        final path =
+            '${user.id}/$productId/${DateTime.now().microsecondsSinceEpoch}_$nextSortOrder.$extension';
+
+        await _client.storage.from(bucket).uploadBinary(
+              path,
+              bytes,
+              fileOptions: FileOptions(contentType: contentType, upsert: false),
+            );
+        uploadedPaths.add(path);
+        insertedPaths.add(path);
+        imageRows.add({
+          'product_id': productId,
+          'storage_path': path,
+          'sort_order': nextSortOrder,
+        });
+        nextSortOrder++;
+      }
+
+      if (imageRows.isNotEmpty) {
+        await _client.from('product_images').insert(imageRows);
+      }
+
+      final rows = await _client
+          .from('products')
+          .update({
+            'title': title.trim(),
+            'description': description.trim(),
+            'price': price,
+            'category_id': categoryId,
+            'custom_category_name': customCategoryName?.trim().isEmpty == true
+                ? null
+                : customCategoryName?.trim(),
+            'audience': audience,
+          })
+          .eq('id', productId)
+          .eq('owner_id', user.id)
+          .select('id');
+
+      if (rows.isEmpty) {
+        throw Exception(strings.productNotFoundOrNoEditPermission);
+      }
+
+      if (removedPaths.isNotEmpty) {
+        await _client
+            .from('product_images')
+            .delete()
+            .eq('product_id', productId)
+            .inFilter('storage_path', removedPaths.toList());
+        await _client.storage.from(bucket).remove(removedPaths.toList());
+      }
+    } catch (_) {
+      if (insertedPaths.isNotEmpty) {
+        try {
+          await _client
+              .from('product_images')
+              .delete()
+              .eq('product_id', productId)
+              .inFilter('storage_path', insertedPaths);
+        } catch (_) {
+          // Preserve the original failure; storage cleanup can be retried.
+        }
+      }
+      if (uploadedPaths.isNotEmpty) {
+        try {
+          await _client.storage.from(bucket).remove(uploadedPaths);
+        } catch (_) {
+          // Preserve the original failure; storage cleanup can be retried.
+        }
+      }
+      rethrow;
     }
 
     if (needsImageReview) {
