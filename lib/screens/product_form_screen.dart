@@ -387,6 +387,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           images: _images,
           audience: _audience,
           customCategoryName: _isOtherCategory ? _customCategoryName.text.trim() : null,
+          primaryImageIndex: _primaryImageIndex,
         );
       }
       if (mounted) Navigator.of(context).pop(true);
