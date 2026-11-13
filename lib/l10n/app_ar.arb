@@ -777,5 +777,9 @@
   "cannotOfferOwnProduct": "لا يمكنك تقديم عرض على منتجك",
   "cannotMessageSelf": "لا يمكنك مراسلة نفسك",
   "genderSelectionRequired": "يجب اختيار النوع",
-  "imageSearchTemporarilyUnavailable": "خدمة البحث بالصورة مشغولة مؤقتًا. حاول مرة أخرى بعد قليل."
+  "imageSearchTemporarilyUnavailable": "خدمة البحث بالصورة مشغولة مؤقتًا. حاول مرة أخرى بعد قليل.",
+  "cropImageTitle": "قص الصورة وتعديلها",
+  "cropImageFailed": "تعذر تعديل الصورة. حاول مرة أخرى.",
+  "removeImage": "حذف الصورة",
+  "zoomImageLabel": "تكبير الصورة"
 }
