@@ -38,7 +38,7 @@ class _SignupScreenState extends State<SignupScreen> {
         _gender == null ||
         !_acceptedTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(AppStrings.of(context)!.signupIncomplete),
         ),
       );
