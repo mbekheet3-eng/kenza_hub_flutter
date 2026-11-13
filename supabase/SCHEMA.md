@@ -7,7 +7,7 @@ Project: `mxdcfewkajwvtwtjoeia`
 - `profiles`: one private row per Auth user; only the owner can read or update it. The full saved name and email remain private.
 - `member_public_profiles`: a restricted public projection containing only the first name and avatar URL; it never contains email or the full name.
 - `categories`: active categories are readable by guests and members. Every row must provide non-empty `name_ar`, `name_en`, and `name_fr`; the app selects the matching label using the member's chosen language. `id` and `slug` remain language-independent and stable.
-- `products`: `owner_id`, `category_id`, `title`, `description`, `price`, `currency`, `status`, `created_at`.
+- `products`: `owner_id`, `category_id`, `title`, `description`, `custom_category_name` (optional seller-entered type when selecting an `*-other` leaf, max 80 characters), `price`, `currency`, `status`, `created_at`.
 - `product_images`: `product_id`, `storage_path`, `alt_text`, `sort_order`, `created_at`.
 
 ## Product publication workflow
@@ -44,14 +44,17 @@ This is immediate publication after a successful upload, not an admin review que
 - shoes — أحذية / Shoes / Chaussures
 - children-supplies — مستلزمات الأطفال / Children Supplies / Articles pour enfants
 - home-supplies — مستلزمات المنزل / Home Supplies / Articles pour la maison
+- bags-accessories — شنط وإكسسوارات / Bags & Accessories / Sacs et accessoires
 
-The more specialized store/agency sections and additional marketplace features remain outside phase one.
+The active catalog contains 225 categories across five roots and never exceeds three levels. Electronics, general sports, and general books remain future expansion categories and are not enabled.
 
 ## Category hierarchy
 
 - Categories use `parent_id` to form a tree; root categories have `parent_id = null`.
 - `sort_order` controls ordering among siblings.
 - Product creation requires selecting a leaf category. Selecting a parent category filters products across its descendants.
+- Every `*-other` category is a final leaf with no children. When selected, the seller must enter a custom product type in `products.custom_category_name` (1–80 characters); sellers cannot create shared categories.
+- The four specialist clothing categories (uniforms, workwear, costumes, special-occasion wear) are retained and moved out from under `clothes-other` into their appropriate branches.
 - Stable slugs are used by Flutter for category translations and category-intent search; category IDs remain unchanged.
 
 ## Category localization contract
@@ -83,5 +86,8 @@ The repository contains these source-controlled migrations for the current phase
 - `20261111010641_optimize_gender_change_rls.sql`
 - `20261111010822_enforce_gender_audience_in_existing_chats.sql`
 - `20261111010854_limit_profile_updates_to_owner.sql`
+- `20261113121243_add_bags_accessories_and_reorganize_clothes_other.sql`
+- `20261113121424_add_custom_category_name_to_products.sql`
+- `20261113121440_constrain_custom_category_name_length.sql`
 
-The category expansion migrations add the nested catalog and the required French translations. Do not apply these migrations directly to the live Supabase project until the database plan is approved and the migrations have been validated against a disposable project. The first four core migration files are a source-controlled reconstruction of the verified deployed schema and policies; before using them to provision another project, replay them against a clean disposable Supabase project and compare the resulting schema, RLS policies, grants, and Storage policies with this contract.
+The three November 13 migrations were approved and applied to the active Supabase project `mxdcfewkajwvtwtjoeia`. The first four core migration files are a source-controlled reconstruction of the verified deployed schema and policies; before using them to provision another project, replay them against a clean disposable Supabase project and compare the resulting schema, RLS policies, grants, and Storage policies with this contract.
