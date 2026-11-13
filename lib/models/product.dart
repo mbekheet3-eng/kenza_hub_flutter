@@ -8,6 +8,7 @@ class Product {
     required this.price,
     required this.currency,
     required this.audience,
+    this.customCategoryName,
     required this.createdAt,
     required this.imagePaths,
     required this.imageUrls,
@@ -21,6 +22,7 @@ class Product {
   final double price;
   final String currency;
   final String audience;
+  final String? customCategoryName;
   final DateTime createdAt;
   final List<String> imagePaths;
   final List<String> imageUrls;
@@ -41,6 +43,7 @@ class Product {
       price: (map['price'] as num).toDouble(),
       currency: (map['currency'] as String?) ?? 'EGP',
       audience: (map['audience'] as String?) ?? 'all',
+      customCategoryName: map['custom_category_name'] as String?,
       createdAt: DateTime.parse(map['created_at'] as String),
       imagePaths: paths,
       imageUrls: signedImageUrls,
