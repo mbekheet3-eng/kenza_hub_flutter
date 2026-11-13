@@ -777,5 +777,9 @@
   "cannotOfferOwnProduct": "You cannot make an offer on your own product",
   "cannotMessageSelf": "You cannot message yourself",
   "genderSelectionRequired": "Gender must be selected",
-  "imageSearchTemporarilyUnavailable": "Image search is temporarily busy. Please try again shortly."
+  "imageSearchTemporarilyUnavailable": "Image search is temporarily busy. Please try again shortly.",
+  "cropImageTitle": "Crop and edit image",
+  "cropImageFailed": "Could not edit the image. Please try again.",
+  "removeImage": "Remove image",
+  "zoomImageLabel": "Zoom image"
 }
