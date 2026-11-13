@@ -76,19 +76,23 @@ Deno.serve(async (req: Request) => {
 
     const requestModel = async (model: string): Promise<Response | null> => {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 14_000);
       try {
-        return await fetch(url, geminiRequest);
+        return await fetch(url, { ...geminiRequest, signal: controller.signal });
       } catch (error) {
         console.error("Gemini request failed", model, String(error).slice(0, 200));
         return null;
+      } finally {
+        clearTimeout(timeout);
       }
     };
 
-    // Try the primary model once, then switch models during provider overload.
+    // Use a different, lighter multimodal model as fallback to avoid correlated overload.
     let geminiResponse = await requestModel("gemini-3.8-flash");
     if (!geminiResponse?.ok) {
       const firstStatus = geminiResponse?.status ?? 0;
-      const firstDetails = geminiResponse ? await geminiResponse.text() : "network error";
+      const firstDetails = geminiResponse ? await geminiResponse.text() : "network error or timeout";
       console.error("Primary Gemini model failed", firstStatus, firstDetails.slice(0, 200));
 
       if ([400, 401, 403].includes(firstStatus)) {
@@ -98,23 +102,23 @@ Deno.serve(async (req: Request) => {
         }, 503);
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 600));
-      geminiResponse = await requestModel("gemini-3.7-flash");
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      geminiResponse = await requestModel("gemini-3.5-flash-lite");
 
-      // One retry on the fallback model for temporary capacity/network errors.
+      // Retry the independent fallback once only for temporary failures.
       if (!geminiResponse?.ok && (
         !geminiResponse || [408, 429, 500, 502, 503, 504].includes(geminiResponse.status)
       )) {
-        const fallbackDetails = geminiResponse ? await geminiResponse.text() : "network error";
-        console.error("Fallback Gemini model failed; retrying", geminiResponse?.status ?? 0, fallbackDetails.slice(0, 200));
-        await new Promise((resolve) => setTimeout(resolve, 1200));
-        geminiResponse = await requestModel("gemini-3.7-flash");
+        const fallbackDetails = geminiResponse ? await geminiResponse.text() : "network error or timeout";
+        console.error("Gemini Flash-Lite fallback failed; retrying once", geminiResponse?.status ?? 0, fallbackDetails.slice(0, 200));
+        await new Promise((resolve) => setTimeout(resolve, 700));
+        geminiResponse = await requestModel("gemini-3.5-flash-lite");
       }
     }
 
     if (!geminiResponse?.ok) {
       const status = geminiResponse?.status ?? 0;
-      const details = geminiResponse ? await geminiResponse.text() : "network error";
+      const details = geminiResponse ? await geminiResponse.text() : "network error or timeout";
       console.error("Gemini image analysis unavailable", status, details.slice(0, 300));
       return json({
         error_code: "temporary_unavailable",
