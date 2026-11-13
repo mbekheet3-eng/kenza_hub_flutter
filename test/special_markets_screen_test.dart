@@ -33,10 +33,10 @@ void main() {
       await tester.pumpAndSettle();
 
       if (locale.languageCode == 'en') {
-        expect(find.text('Agency Corner'), findsOneWidget);
+        expect(find.text('Wekala Corner'), findsOneWidget);
         expect(find.text('Online Stores'), findsOneWidget);
       } else {
-        expect(find.text('Coin de l’Agence'), findsOneWidget);
+        expect(find.text('Coin Wekala'), findsOneWidget);
         expect(find.text('Boutiques en ligne'), findsOneWidget);
       }
     }
