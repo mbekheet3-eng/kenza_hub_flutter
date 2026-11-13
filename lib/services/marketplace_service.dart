@@ -383,7 +383,7 @@ class MarketplaceService {
         .select('id');
 
     if (rows.isEmpty) {
-      throw Exception('لم يتم العثور على المنتج أو لا تملك صلاحية تعديله');
+      throw Exception(strings.productNotFoundOrNoEditPermission);
     }
 
     if (needsImageReview) {
