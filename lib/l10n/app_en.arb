@@ -776,5 +776,6 @@
   "productDeleteFailed": "The product could not be deleted",
   "cannotOfferOwnProduct": "You cannot make an offer on your own product",
   "cannotMessageSelf": "You cannot message yourself",
-  "genderSelectionRequired": "Gender must be selected"
+  "genderSelectionRequired": "Gender must be selected",
+  "imageSearchTemporarilyUnavailable": "Image search is temporarily busy. Please try again shortly."
 }
