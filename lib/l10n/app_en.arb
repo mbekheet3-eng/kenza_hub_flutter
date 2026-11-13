@@ -510,6 +510,7 @@
   "retryAction": "Try again",
   "searchTitle": "Search products",
   "searchHint": "Search for a product",
+  "relevanceLabel": "Best match",
   "newestLabel": "Newest",
   "priceLowLabel": "Price: low to high",
   "priceHighLabel": "Price: high to low",
