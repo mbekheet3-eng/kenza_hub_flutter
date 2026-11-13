@@ -1,5 +1,8 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../config/app_locale.dart';
+import '../l10n/app_strings.dart';
+
 import 'push_notification_service.dart';
 
 class AuthService {
@@ -18,7 +21,8 @@ class AuthService {
     required String gender,
   }) async {
     if (gender != 'male' && gender != 'female') {
-      throw ArgumentError('يجب اختيار النوع');
+      final strings = await AppStrings.delegate.load(AppLocale.notifier.value);
+      throw ArgumentError(strings.genderSelectionRequired);
     }
     await _client.auth.signUp(
       email: email.trim(),
