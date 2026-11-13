@@ -762,5 +762,18 @@
   "selectGenderTitle": "Sélectionnez votre genre",
   "genderAudienceExplanation": "Ce choix est nécessaire pour déterminer les annonces que vous pouvez voir et les vendeurs que vous pouvez contacter.",
   "confirmAndContinue": "Confirmer et continuer",
-  "saveSelectionFailed": "Impossible d’enregistrer votre choix"
+  "saveSelectionFailed": "Impossible d’enregistrer votre choix",
+  "imageTooLarge": "L’image ne doit pas dépasser 10 Mo",
+  "unsupportedImageFormat": "Formats autorisés : JPG, PNG et WebP uniquement",
+  "selectAtLeastOnePhoto": "Choisissez au moins une photo, jusqu’à 8 photos",
+  "productTitleAndPriceRequired": "Saisissez un titre et un prix valides pour le produit",
+  "imageReviewReadError": "Impossible de lire le résultat de la vérification des images. Le produit n’a pas été publié ; réessayez.",
+  "imageReviewRejected": "Les images n’ont pas été approuvées. Le produit n’a pas été publié.",
+  "imageReviewUnavailable": "La vérification des images n’a pas pu être terminée. Le produit n’a pas été publié ; réessayez plus tard.",
+  "productNotFoundOrNoEditPermission": "Produit introuvable ou vous n’avez pas l’autorisation de le modifier",
+  "productNotFoundOrNoDeletePermission": "Produit introuvable ou vous n’avez pas l’autorisation de le supprimer",
+  "productDeleteFailed": "Le produit n’a pas pu être supprimé",
+  "cannotOfferOwnProduct": "Vous ne pouvez pas faire une offre sur votre propre produit",
+  "cannotMessageSelf": "Vous ne pouvez pas vous envoyer de message",
+  "genderSelectionRequired": "Le genre doit être sélectionné"
 }
