@@ -13,12 +13,60 @@ import 'login_screen.dart';
 import 'product_detail_screen.dart';
 import 'search_screen.dart';
 import 'notifications_screen.dart';
+import 'special_markets_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _SpecialMarketEntry extends StatelessWidget {
+  const _SpecialMarketEntry({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Material(
+      color: colors.surfaceContainerHighest.withValues(alpha: 0.55),
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: colors.primary, size: 21),
+              const SizedBox(width: 7),
+              Flexible(
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: colors.onSurface,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -149,6 +197,12 @@ class _HomeScreenState extends State<HomeScreen> {
       _categories.where((category) => category.parentId == null).toList()
         ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
 
+  Future<void> _openSpecialMarkets() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const SpecialMarketsScreen()),
+    );
+  }
+
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(AppStrings.of(context)!.featureComingSoon)),
@@ -158,7 +212,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final user = Supabase.instance.client.auth.currentUser;
-    final colors = Theme.of(context).colorScheme;
     final languageCode = Localizations.localeOf(context).languageCode;
     return Scaffold(
       body: SafeArea(
@@ -170,96 +223,75 @@ class _HomeScreenState extends State<HomeScreen> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'أهلاً',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: colors.onSurfaceVariant,
+                  child: StreamBuilder<List<Map<String, dynamic>>>(
+                    stream: _notificationStream,
+                    builder: (context, snapshot) {
+                      final unread = (snapshot.data ?? [])
+                          .where((item) => item['is_read'] != true)
+                          .length;
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _search,
+                              textInputAction: TextInputAction.search,
+                              onSubmitted: (_) => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => SearchScreen(
+                                    query: _search.text.trim(),
+                                    categoryId: _categoryId,
                                   ),
+                                ),
+                              ),
+                              decoration: InputDecoration(
+                                hintText: AppStrings.of(context)!.searchProductHint,
+                                prefixIcon: const Icon(Icons.search),
+                                suffixIcon: IconButton(
+                                  tooltip: AppStrings.of(context)!.imageSearch,
+                                  onPressed: () => _showComingSoon('البحث بالصور'),
+                                  icon: const Icon(Icons.camera_alt_outlined),
+                                ),
+                              ),
                             ),
-                            Text(
-                              user == null ? 'بك في كنزة' : _firstName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      StreamBuilder<List<Map<String, dynamic>>>(
-                        stream: _notificationStream,
-                        builder: (context, snapshot) {
-                          final unread = (snapshot.data ?? [])
-                              .where((item) => item['is_read'] != true)
-                              .length;
-                          return IconButton(
-                            tooltip: 'الإشعارات',
-                            onPressed: _openNotifications,
-                            icon: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                const Icon(Icons.notifications_none_rounded, size: 27),
-                                if (unread > 0)
-                                  Positioned(
-                                    top: -5,
-                                    right: -7,
-                                    child: Container(
-                                      constraints: const BoxConstraints(minWidth: 17, minHeight: 17),
-                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.red,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        unread > 99 ? '99+' : '$unread',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 9,
-                                          fontWeight: FontWeight.bold,
+                          ),
+                          if (user != null) ...[
+                            const SizedBox(width: 4),
+                            IconButton(
+                              tooltip: 'الإشعارات',
+                              onPressed: _openNotifications,
+                              icon: Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  const Icon(Icons.notifications_none_rounded, size: 26),
+                                  if (unread > 0)
+                                    Positioned(
+                                      top: -5,
+                                      right: -7,
+                                      child: Container(
+                                        constraints: const BoxConstraints(minWidth: 17, minHeight: 17),
+                                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          unread > 99 ? '99+' : '$unread',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                              ],
+                                ],
+                              ),
                             ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-                  child: TextField(
-                    controller: _search,
-                    textInputAction: TextInputAction.search,
-                    onSubmitted: (_) => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => SearchScreen(
-                          query: _search.text.trim(),
-                          categoryId: _categoryId,
-                        ),
-                      ),
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'ابحث عن منتج',
-                      prefixIcon: const Icon(Icons.search),
-                      suffixIcon: IconButton(
-                        tooltip: 'البحث بالصور',
-                        onPressed: () => _showComingSoon('البحث بالصور'),
-                        icon: const Icon(Icons.camera_alt_outlined),
-                      ),
-                    ),
+                          ],
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),
@@ -300,22 +332,23 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
                   child: Row(
                     children: [
                       Expanded(
-                        child: Text(
-                          'أحدث المنتجات',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w800,
-                              ),
+                        child: _SpecialMarketEntry(
+                          icon: Icons.storefront_outlined,
+                          title: AppStrings.of(context)!.agencyCornerTitle,
+                          onTap: _openSpecialMarkets,
                         ),
                       ),
-                      Text(
-                        'تسوّق واكتشف',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: colors.onSurfaceVariant,
-                            ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _SpecialMarketEntry(
+                          icon: Icons.shopping_bag_outlined,
+                          title: AppStrings.of(context)!.onlineStoresTitle,
+                          onTap: _openSpecialMarkets,
+                        ),
                       ),
                     ],
                   ),
