@@ -222,7 +222,7 @@ class MarketplaceService {
       throw Exception('Only JPEG, PNG, and WebP images are supported');
     }
 
-    FunctionResponse response;
+    late final dynamic response;
     try {
       response = await _client.functions.invoke(
         'visual-product-search',
