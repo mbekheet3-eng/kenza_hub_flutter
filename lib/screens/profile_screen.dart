@@ -513,7 +513,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const Divider(height: 28),
                       ListTile(
                         leading: const Icon(Icons.inventory_2_outlined),
-                        title: Text('منتجاتي (${_products.length})'),
+                        title: Text('${AppStrings.of(context)!.myProductsTitle} (${_products.length})'),
                         subtitle: Text(AppStrings.of(context)!.myProductsSubtitle),
                         trailing: const Icon(Icons.chevron_left),
                         onTap: () => Navigator.of(context).push(
