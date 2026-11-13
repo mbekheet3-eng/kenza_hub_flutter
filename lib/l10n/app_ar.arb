@@ -510,6 +510,7 @@
   "retryAction": "إعادة المحاولة",
   "searchTitle": "البحث عن المنتجات",
   "searchHint": "ابحث عن منتج",
+  "relevanceLabel": "الأكثر صلة",
   "newestLabel": "الأحدث",
   "priceLowLabel": "السعر: الأقل أولاً",
   "priceHighLabel": "السعر: الأعلى أولاً",
