@@ -19,14 +19,17 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
+    final strings = AppStrings.of(context)!;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AspectRatio(
+            aspectRatio: 1,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
               child: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -45,21 +48,23 @@ class ProductCard extends StatelessWidget {
                         ),
                   if (onFavoriteTap != null)
                     Positioned(
-                      top: 8,
                       right: 8,
+                      bottom: 8,
                       child: Material(
-                        color: Colors.white.withValues(alpha: 0.94),
+                        color: Colors.white.withValues(alpha: 0.96),
                         shape: const CircleBorder(),
-                        elevation: 2,
+                        elevation: 1,
                         child: IconButton(
                           tooltip: isFavorite
-                              ? AppStrings.of(context)!.removeFavoriteTooltip
-                              : AppStrings.of(context)!.addFavoriteTooltip,
+                              ? strings.removeFavoriteTooltip
+                              : strings.addFavoriteTooltip,
                           visualDensity: VisualDensity.compact,
                           onPressed: onFavoriteTap,
                           icon: Icon(
-                            isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                            color: isFavorite ? Colors.red : Colors.black87,
+                            isFavorite
+                                ? Icons.favorite_rounded
+                                : Icons.favorite_border_rounded,
+                            color: isFavorite ? Colors.red : Colors.blueGrey,
                           ),
                         ),
                       ),
@@ -67,30 +72,29 @@ class ProductCard extends StatelessWidget {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '${product.price.toStringAsFixed(0)} ${AppStrings.of(context)!.currency}',
-                    style: const TextStyle(
-                      color: Color(0xFF5558C9),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
+          ),
+          const SizedBox(height: 7),
+          Text(
+            product.title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              height: 1.25,
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '${product.price.toStringAsFixed(0)} ${strings.currency}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
       ),
     );
   }
