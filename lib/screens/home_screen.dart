@@ -236,13 +236,21 @@ class _HomeScreenState extends State<HomeScreen> {
       await Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => SearchScreen(query: query)),
       );
-    } catch (_) {
+    } catch (error) {
       if (!mounted) return;
       if (loadingDialogOpen) {
         Navigator.of(context, rootNavigator: true).pop();
       }
+      final language = Localizations.localeOf(context).languageCode;
+      final message = error is ImageSearchUnavailableException
+          ? switch (language) {
+              'ar' => 'خدمة البحث بالصورة مشغولة مؤقتًا. حاول مرة أخرى بعد قليل.',
+              'fr' => 'La recherche par image est temporairement occupée. Réessayez dans un instant.',
+              _ => 'Image search is temporarily busy. Please try again shortly.',
+            }
+          : AppStrings.of(context)!.searchLoadError;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppStrings.of(context)!.searchLoadError)),
+        SnackBar(content: Text(message)),
       );
     }
   }
