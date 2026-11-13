@@ -282,9 +282,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       final cropped = await _cropFile(temporarySource);
       if (!mounted || cropped == null) return;
       setState(() {
+        final wasPrimary = _primaryImageIndex == index;
         _removedImagePaths.add(storagePath);
         _existingImagePaths.removeAt(index);
         _existingImageUrls.removeAt(index);
+        if (wasPrimary) {
+          _primaryImageIndex = _existingImagePaths.length + _images.length;
+        } else if (_primaryImageIndex > index) {
+          _primaryImageIndex--;
+        }
         _images.add(cropped);
       });
     } catch (_) {
@@ -543,7 +549,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                   visualDensity: VisualDensity.compact,
                                   onPressed: () => setState(() {
                                     _images.removeAt(i);
-                                    final remainingCount = _currentImageCount;
                                     if (_primaryImageIndex == _existingImagePaths.length + i) {
                                       _primaryImageIndex = 0;
                                     } else if (_primaryImageIndex > _existingImagePaths.length + i) {
@@ -552,6 +557,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                   }),
                                   icon: const Icon(Icons.close, size: 16),
                                 ),
+                              ),
+                              _primaryImageMarker(
+                                selected: _primaryImageIndex == _existingImagePaths.length + i,
+                                onTap: () => _setPrimaryImage(_existingImagePaths.length + i),
                               ),
                             ],
                           ),
