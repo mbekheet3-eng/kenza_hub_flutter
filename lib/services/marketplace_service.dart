@@ -11,6 +11,13 @@ import '../l10n/app_strings.dart';
 import '../models/category.dart';
 import '../models/product.dart';
 
+class ImageSearchUnavailableException implements Exception {
+  const ImageSearchUnavailableException();
+
+  @override
+  String toString() => 'Image search temporarily unavailable';
+}
+
 class MarketplaceSearchPage {
   const MarketplaceSearchPage({
     required this.products,
@@ -223,6 +230,10 @@ class MarketplaceService {
       },
     );
     if (response.status < 200 || response.status >= 300) {
+      final data = response.data;
+      if (data is Map && data['error_code'] == 'temporary_unavailable') {
+        throw const ImageSearchUnavailableException();
+      }
       throw Exception('Image analysis failed');
     }
 
