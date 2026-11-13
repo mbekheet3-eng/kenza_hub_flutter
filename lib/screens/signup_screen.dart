@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_strings.dart';
 import '../services/auth_service.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -38,7 +39,7 @@ class _SignupScreenState extends State<SignupScreen> {
         !_acceptedTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('أكمل البيانات واختر النوع ووافق على الشروط'),
+          content: Text(AppStrings.of(context)!.signupIncomplete),
         ),
       );
       return;
@@ -57,15 +58,15 @@ class _SignupScreenState extends State<SignupScreen> {
           context: context,
           barrierDismissible: false,
           builder: (dialogContext) => AlertDialog(
-            title: const Text('تم إنشاء الحساب'),
-            content: const Text('إذا كان تأكيد البريد مفعّلاً، افتح رسالة التأكيد التي أرسلناها إليك ثم سجّل الدخول.'),
+            title: Text(AppStrings.of(dialogContext)!.accountCreated),
+            content: Text(AppStrings.of(dialogContext)!.emailConfirmationNext),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(dialogContext).pop();
                   Navigator.of(context).pop();
                 },
-                child: const Text('حسنًا'),
+                child: Text(AppStrings.of(dialogContext)!.signupSuccessOk),
               ),
             ],
           ),
@@ -74,7 +75,7 @@ class _SignupScreenState extends State<SignupScreen> {
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذر إنشاء الحساب: $error')),
+          SnackBar(content: Text('${AppStrings.of(context)!.signupFailed}: $error')),
         );
       }
     } finally {
@@ -85,21 +86,21 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('إنشاء حساب')),
+      appBar: AppBar(title: Text(AppStrings.of(context)!.signupTitle)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            Text('انضم إلى كنزة هب', style: Theme.of(context).textTheme.headlineMedium),
+            Text(AppStrings.of(context)!.signupJoinTitle, style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 8),
-            const Text('حساب واحد للتصفح والبيع وإدارة منتجاتك.'),
+            Text(AppStrings.of(context)!.signupIntro),
             const SizedBox(height: 24),
             TextField(
               controller: _name,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(
-                labelText: 'الاسم (الاسم الأول يكفي)',
-                helperText: 'يمكنك كتابة اسمك الأول فقط أو الاسم بالكامل.',
+              decoration: InputDecoration(
+                labelText: AppStrings.of(context)!.signupNameLabel,
+                helperText: AppStrings.of(context)!.signupNameHint,
                 prefixIcon: Icon(Icons.person_outline),
               ),
             ),
@@ -108,13 +109,13 @@ class _SignupScreenState extends State<SignupScreen> {
               controller: _email,
               keyboardType: TextInputType.emailAddress,
               autocorrect: false,
-              decoration: const InputDecoration(
-                labelText: 'البريد الإلكتروني',
+              decoration: InputDecoration(
+                labelText: AppStrings.of(context)!.email,
                 prefixIcon: Icon(Icons.email_outlined),
               ),
             ),
             const SizedBox(height: 18),
-            Text('النوع (إلزامي)', style: Theme.of(context).textTheme.titleMedium),
+            Text(AppStrings.of(context)!.signupGenderRequired, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 6),
             RadioGroup<String>(
               groupValue: _gender,
@@ -126,13 +127,13 @@ class _SignupScreenState extends State<SignupScreen> {
                 children: [
                   RadioListTile<String>(
                     value: 'male',
-                    title: const Text('رجل'),
+                    title: Text(AppStrings.of(context)!.male),
                     contentPadding: EdgeInsets.zero,
                     enabled: !_busy,
                   ),
                   RadioListTile<String>(
                     value: 'female',
-                    title: const Text('امرأة'),
+                    title: Text(AppStrings.of(context)!.female),
                     contentPadding: EdgeInsets.zero,
                     enabled: !_busy,
                   ),
@@ -144,7 +145,7 @@ class _SignupScreenState extends State<SignupScreen> {
               controller: _password,
               obscureText: _hidePassword,
               decoration: InputDecoration(
-                labelText: 'كلمة المرور (8 أحرف على الأقل)',
+                labelText: AppStrings.of(context)!.passwordMinEight,
                 prefixIcon: const Icon(Icons.lock_outline),
                 suffixIcon: IconButton(
                   onPressed: () => setState(() => _hidePassword = !_hidePassword),
@@ -156,8 +157,8 @@ class _SignupScreenState extends State<SignupScreen> {
             TextField(
               controller: _confirm,
               obscureText: _hidePassword,
-              decoration: const InputDecoration(
-                labelText: 'تأكيد كلمة المرور',
+              decoration: InputDecoration(
+                labelText: AppStrings.of(context)!.confirmPassword,
                 prefixIcon: Icon(Icons.lock_outline),
               ),
             ),
@@ -166,13 +167,13 @@ class _SignupScreenState extends State<SignupScreen> {
               contentPadding: EdgeInsets.zero,
               value: _acceptedTerms,
               onChanged: _busy ? null : (value) => setState(() => _acceptedTerms = value ?? false),
-              title: const Text('أوافق على شروط الاستخدام وسياسة الخصوصية'),
+              title: Text(AppStrings.of(context)!.signupAcceptTerms),
               controlAffinity: ListTileControlAffinity.leading,
             ),
             const SizedBox(height: 12),
             FilledButton(
               onPressed: _busy ? null : _submit,
-              child: _busy ? const CircularProgressIndicator() : const Text('إنشاء الحساب'),
+              child: _busy ? const CircularProgressIndicator() : Text(AppStrings.of(context)!.createAccount),
             ),
           ],
         ),
