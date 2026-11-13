@@ -777,5 +777,9 @@
   "cannotOfferOwnProduct": "Vous ne pouvez pas faire une offre sur votre propre produit",
   "cannotMessageSelf": "Vous ne pouvez pas vous envoyer de message",
   "genderSelectionRequired": "Le genre doit être sélectionné",
-  "imageSearchTemporarilyUnavailable": "La recherche par image est temporairement occupée. Réessayez dans un instant."
+  "imageSearchTemporarilyUnavailable": "La recherche par image est temporairement occupée. Réessayez dans un instant.",
+  "cropImageTitle": "Recadrer et modifier l’image",
+  "cropImageFailed": "Impossible de modifier l’image. Réessayez.",
+  "removeImage": "Supprimer l’image",
+  "zoomImageLabel": "Agrandir l’image"
 }
