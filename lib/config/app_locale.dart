@@ -12,7 +12,8 @@ final class AppLocale {
   static Future<void> initialize() async {
     final preferences = await SharedPreferences.getInstance();
     final savedLanguage = preferences.getString(_storageKey);
-    if (savedLanguage == 'ar' || savedLanguage == 'en' || savedLanguage == 'fr') {
+    if (savedLanguage != null &&
+        (savedLanguage == 'ar' || savedLanguage == 'en' || savedLanguage == 'fr')) {
       notifier.value = Locale(savedLanguage);
     }
   }
