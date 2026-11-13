@@ -661,5 +661,9 @@
   "specialMarketsProSellerNote": "Les marchés spécialisés sont destinés aux vendeurs professionnels. Ceci est un aperçu de l’interface ; les produits et la gestion des boutiques seront reliés après la finalisation de la base de données.",
   "specialMarketExplore": "Explorer",
   "specialMarketHighlightsTitle": "Que trouverez-vous ici ?",
-  "specialMarketPreviewNote": "Ceci est un aperçu du marché. Les produits et les données des boutiques ne sont pas encore reliés ; cela suivra l’approbation de la base de données."
+  "specialMarketPreviewNote": "Ceci est un aperçu du marché. Les produits et les données des boutiques ne sont pas encore reliés ; cela suivra l’approbation de la base de données.",
+  "customCategoryLabel": "Type",
+  "audienceAll": "Tout le monde",
+  "audienceMenOnly": "Hommes uniquement",
+  "audienceWomenOnly": "Femmes uniquement"
 }
