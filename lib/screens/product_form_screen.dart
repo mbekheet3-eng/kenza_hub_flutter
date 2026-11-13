@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 import '../l10n/app_strings.dart';
 
@@ -31,6 +32,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   String? _gender;
   String _audience = 'all';
   final List<File> _images = [];
+  final List<String> _existingImagePaths = [];
+  final List<String> _existingImageUrls = [];
+  final List<String> _removedImagePaths = [];
   bool _loading = false;
   bool _saving = false;
   String? _error;
@@ -47,6 +51,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       _price.text = product.price.toStringAsFixed(0);
       _audience = product.audience;
       _customCategoryName.text = product.customCategoryName ?? '';
+      _existingImagePaths.addAll(product.imagePaths);
+      _existingImageUrls.addAll(product.imageUrls);
     }
     _loadCategories();
   }
@@ -167,31 +173,137 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     return fields;
   }
 
-  Future<void> _pickGallery() async {
-    final picked = await _picker.pickMultiImage(imageQuality: 85, maxWidth: 1800);
-    if (!mounted || picked.isEmpty) return;
-    setState(() {
-      _images.addAll(picked.map((file) => File(file.path)));
-      if (_images.length > MarketplaceService.maxImages) {
-        _images.removeRange(MarketplaceService.maxImages, _images.length);
-      }
-    });
+  int get _currentImageCount => _existingImagePaths.length + _images.length;
+
+  Future<File?> _cropFile(File source) async {
+    final strings = AppStrings.of(context)!;
+    final cropped = await ImageCropper().cropImage(
+      sourcePath: source.path,
+      maxWidth: 2000,
+      maxHeight: 2000,
+      compressFormat: ImageCompressFormat.jpg,
+      compressQuality: 92,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: strings.cropImageTitle,
+          toolbarColor: Theme.of(context).colorScheme.surface,
+          toolbarWidgetColor: Theme.of(context).colorScheme.onSurface,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio16x9,
+          ],
+        ),
+        IOSUiSettings(
+          title: strings.cropImageTitle,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio16x9,
+          ],
+        ),
+      ],
+    );
+    return cropped == null ? null : File(cropped.path);
   }
 
-  Future<void> _pickCamera() async {
-    final picked = await _picker.pickImage(
-      source: ImageSource.camera,
-      imageQuality: 85,
-      maxWidth: 1800,
+  void _showCropError() {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppStrings.of(context)!.cropImageFailed)),
     );
-    if (!mounted || picked == null) return;
-    if (_images.length >= MarketplaceService.maxImages) {
+  }
+
+  Future<void> _pickGallery() async {
+    final picked = await _picker.pickMultiImage(
+      imageQuality: 95,
+      maxWidth: 2400,
+    );
+    if (!mounted || picked.isEmpty) return;
+
+    final available = MarketplaceService.maxImages - _currentImageCount;
+    if (available <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppStrings.of(context)!.maxEightPhotos)),
       );
       return;
     }
-    setState(() => _images.add(File(picked.path)));
+
+    final croppedFiles = <File>[];
+    try {
+      for (final image in picked.take(available)) {
+        final cropped = await _cropFile(File(image.path));
+        if (cropped != null) croppedFiles.add(cropped);
+        if (!mounted) return;
+      }
+      if (mounted && croppedFiles.isNotEmpty) {
+        setState(() => _images.addAll(croppedFiles));
+      }
+    } catch (_) {
+      _showCropError();
+    }
+  }
+
+  Future<void> _pickCamera() async {
+    if (_currentImageCount >= MarketplaceService.maxImages) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.of(context)!.maxEightPhotos)),
+      );
+      return;
+    }
+
+    final picked = await _picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 95,
+      maxWidth: 2400,
+    );
+    if (!mounted || picked == null) return;
+
+    try {
+      final cropped = await _cropFile(File(picked.path));
+      if (mounted && cropped != null) {
+        setState(() => _images.add(cropped));
+      }
+    } catch (_) {
+      _showCropError();
+    }
+  }
+
+  Future<void> _cropExistingImage(int index) async {
+    final storagePath = _existingImagePaths[index];
+    File? temporarySource;
+    try {
+      temporarySource = await _service.downloadImageForEditing(storagePath);
+      final cropped = await _cropFile(temporarySource);
+      if (!mounted || cropped == null) return;
+      setState(() {
+        _removedImagePaths.add(storagePath);
+        _existingImagePaths.removeAt(index);
+        _existingImageUrls.removeAt(index);
+        _images.add(cropped);
+      });
+    } catch (_) {
+      _showCropError();
+    } finally {
+      if (temporarySource != null) {
+        try {
+          await temporarySource.parent.delete(recursive: true);
+        } catch (_) {
+          // Temporary crop source cleanup is best-effort.
+        }
+      }
+    }
+  }
+
+  void _removeExistingImage(int index) {
+    setState(() {
+      _removedImagePaths.add(_existingImagePaths.removeAt(index));
+      _existingImageUrls.removeAt(index);
+    });
   }
 
   Future<void> _save() async {
@@ -201,7 +313,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       setState(() => _error = AppStrings.of(context)!.noCategoriesTryLater);
       return;
     }
-    if (!_isEditing && _images.isEmpty) {
+    if (_currentImageCount == 0) {
       setState(() => _error = AppStrings.of(context)!.addAtLeastOnePhoto);
       return;
     }
@@ -221,6 +333,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           categoryId: categoryId,
           audience: _audience,
           customCategoryName: _isOtherCategory ? _customCategoryName.text.trim() : null,
+          images: _images,
+          removedImagePaths: _removedImagePaths,
         );
       } else {
         await _service.publishProduct(
@@ -297,7 +411,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       return price == null || price <= 0 ? AppStrings.of(context)!.priceMustBePositive : null;
                     },
                   ),
-                  if (!_isEditing) ...[
+                  ...[
                     const SizedBox(height: 20),
                     Text(AppStrings.of(context)!.productPhotosLimit, style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 8),
@@ -306,18 +420,66 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       runSpacing: 8,
                       children: [
                         OutlinedButton.icon(
-                          onPressed: _saving ? null : _pickGallery,
+                          onPressed: _saving || _currentImageCount >= MarketplaceService.maxImages ? null : _pickGallery,
                           icon: const Icon(Icons.photo_library_outlined),
                           label: Text(AppStrings.of(context)!.gallery),
                         ),
                         OutlinedButton.icon(
-                          onPressed: _saving ? null : _pickCamera,
+                          onPressed: _saving || _currentImageCount >= MarketplaceService.maxImages ? null : _pickCamera,
                           icon: const Icon(Icons.camera_alt_outlined),
                           label: Text(AppStrings.of(context)!.camera),
                         ),
                       ],
                     ),
                     const SizedBox(height: 10),
+                    if (_existingImageUrls.isNotEmpty)
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          for (var i = 0; i < _existingImageUrls.length; i++)
+                            Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                    _existingImageUrls[i],
+                                    width: 88,
+                                    height: 88,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Container(
+                                      width: 88,
+                                      height: 88,
+                                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                                      child: const Icon(Icons.broken_image_outlined),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: IconButton.filled(
+                                    tooltip: AppStrings.of(context)!.removeImage,
+                                    visualDensity: VisualDensity.compact,
+                                    onPressed: _saving ? null : () => _removeExistingImage(i),
+                                    icon: const Icon(Icons.close, size: 16),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  left: 0,
+                                  child: IconButton.filled(
+                                    tooltip: AppStrings.of(context)!.cropImageTitle,
+                                    visualDensity: VisualDensity.compact,
+                                    onPressed: _saving ? null : () => _cropExistingImage(i),
+                                    icon: const Icon(Icons.crop, size: 16),
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    if (_existingImageUrls.isNotEmpty) const SizedBox(height: 10),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
