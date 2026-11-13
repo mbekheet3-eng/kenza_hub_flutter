@@ -1,14 +1,20 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../config/app_locale.dart';
+import '../l10n/app_strings.dart';
+
 class MarketplaceTransactionService {
   MarketplaceTransactionService({SupabaseClient? client})
       : _client = client ?? Supabase.instance.client;
 
   final SupabaseClient _client;
 
-  String get _userId {
+  Future<String> _requireUserId() async {
     final id = _client.auth.currentUser?.id;
-    if (id == null) throw Exception('يجب تسجيل الدخول أولاً');
+    if (id == null) {
+      final strings = await AppStrings.delegate.load(AppLocale.notifier.value);
+      throw Exception(strings.loginRequired);
+    }
     return id;
   }
 
@@ -17,10 +23,12 @@ class MarketplaceTransactionService {
     required String sellerId,
     required double price,
   }) async {
-    if (_userId == sellerId) throw Exception('لا يمكنك طلب منتجك');
+    final userId = await _requireUserId();
+    final strings = await AppStrings.delegate.load(AppLocale.notifier.value);
+    if (userId == sellerId) throw Exception(strings.ownProductCannotBuy);
     await _client.from('product_orders').insert({
       'product_id': productId,
-      'buyer_id': _userId,
+      'buyer_id': userId,
       'seller_id': sellerId,
       'agreed_price': price,
       'currency': 'EGP',
@@ -34,11 +42,13 @@ class MarketplaceTransactionService {
     required double offeredPrice,
     String? message,
   }) async {
-    if (_userId == sellerId) throw Exception('لا يمكنك تقديم عرض على منتجك');
-    if (offeredPrice <= 0) throw Exception('أدخل سعرًا صحيحًا');
+    final userId = await _requireUserId();
+    final strings = await AppStrings.delegate.load(AppLocale.notifier.value);
+    if (userId == sellerId) throw Exception(strings.cannotOfferOwnProduct);
+    if (offeredPrice <= 0) throw Exception(strings.priceMustBePositive);
     await _client.from('product_offers').insert({
       'product_id': productId,
-      'buyer_id': _userId,
+      'buyer_id': userId,
       'seller_id': sellerId,
       'offered_price': offeredPrice,
       'currency': 'EGP',
@@ -51,12 +61,14 @@ class MarketplaceTransactionService {
     required String productId,
     required String sellerId,
   }) async {
-    if (_userId == sellerId) throw Exception('لا يمكنك مراسلة نفسك');
+    final userId = await _requireUserId();
+    final strings = await AppStrings.delegate.load(AppLocale.notifier.value);
+    if (userId == sellerId) throw Exception(strings.cannotMessageSelf);
     final existing = await _client
         .from('conversations')
         .select('id')
         .eq('product_id', productId)
-        .eq('buyer_id', _userId)
+        .eq('buyer_id', userId)
         .eq('seller_id', sellerId)
         .maybeSingle();
     if (existing != null) return existing['id'] as String;
@@ -87,7 +99,7 @@ class MarketplaceTransactionService {
     if (text.isEmpty) return;
     await _client.from('messages').insert({
       'conversation_id': conversationId,
-      'sender_id': _userId,
+      'sender_id': await _requireUserId(),
       'body': text,
     });
   }
