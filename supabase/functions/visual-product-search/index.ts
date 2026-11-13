@@ -16,7 +16,8 @@ function json(data: unknown, status = 200) {
 const recentRequests = new Map<string, number[]>();
 
 function isRateLimited(req: Request): boolean {
-  const key = req.headers.get("cf-connecting-ip") ?? "shared-client";
+  const key = req.headers.get("cf-connecting-ip") ?? req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  if (!key) return false;
   const now = Date.now();
   const recent = (recentRequests.get(key) ?? []).filter((time) => now - time < 60_000);
   if (recent.length >= 12) {
@@ -52,7 +53,7 @@ Deno.serve(async (req: Request) => {
     ) {
       return json({ error: "A JPEG, PNG, or WebP image is required" }, 400);
     }
-    if (imageBase64.length > 12_000_000) {
+    if (imageBase64.length > 14_000_000) {
       return json({ error: "Image is too large. Please choose a smaller image." }, 413);
     }
 
