@@ -92,7 +92,7 @@ class MarketplaceService {
     var request = _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
+          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
         )
         .eq('status', 'published');
 
@@ -136,7 +136,7 @@ class MarketplaceService {
     final rows = await _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
+          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
         )
         .eq('owner_id', user.id)
         .order('created_at', ascending: false);
@@ -150,7 +150,7 @@ class MarketplaceService {
     final rows = await _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
+          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
         )
         .inFilter('id', productIds)
         .eq('status', 'published')
@@ -163,7 +163,7 @@ class MarketplaceService {
     final row = await _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
+          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
         )
         .eq('id', productId)
         .single();
@@ -199,6 +199,7 @@ class MarketplaceService {
     required double price,
     required List<File> images,
     required String audience,
+    String? customCategoryName,
   }) async {
     final user = _client.auth.currentUser;
     if (user == null) throw Exception('يجب تسجيل الدخول أولاً');
@@ -216,6 +217,7 @@ class MarketplaceService {
           'category_id': categoryId,
           'title': title.trim(),
           'description': description.trim(),
+          'custom_category_name': customCategoryName?.trim().isEmpty == true ? null : customCategoryName?.trim(),
           'price': price,
           'currency': 'EGP',
           'status': 'draft',
@@ -337,6 +339,7 @@ class MarketplaceService {
     required double price,
     required String categoryId,
     required String audience,
+    String? customCategoryName,
   }) async {
     final user = _client.auth.currentUser;
     if (user == null) throw Exception('يجب تسجيل الدخول أولاً');
@@ -364,6 +367,7 @@ class MarketplaceService {
           'description': description.trim(),
           'price': price,
           'category_id': categoryId,
+          'custom_category_name': customCategoryName?.trim().isEmpty == true ? null : customCategoryName?.trim(),
           'audience': audience,
         })
         .eq('id', productId)
