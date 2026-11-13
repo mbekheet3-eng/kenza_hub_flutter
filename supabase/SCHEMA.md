@@ -89,6 +89,8 @@ The repository contains these source-controlled migrations for the current phase
 - `20261113121243_add_bags_accessories_and_reorganize_clothes_other.sql`
 - `20261113121424_add_custom_category_name_to_products.sql`
 - `20261113121440_constrain_custom_category_name_length.sql`
+- `20261113164341_add_multilingual_marketplace_search.sql`
+- `20261113164421_fix_guest_search_access_and_synonym_policies.sql`
 
 The three November 13 migrations were approved and applied to the active Supabase project `mxdcfewkajwvtwtjoeia`. The first four core migration files are a source-controlled reconstruction of the verified deployed schema and policies; before using them to provision another project, replay them against a clean disposable Supabase project and compare the resulting schema, RLS policies, grants, and Storage policies with this contract.
 
@@ -98,7 +100,7 @@ The three November 13 migrations were approved and applied to the active Supabas
 - `products` stores generated normalized search columns for title, description, and seller-entered custom category type. `categories` stores generated normalized columns for Arabic, English, and French names.
 - `public.normalize_search_text(text)` normalizes Arabic alef variants, alif maksura, ta marbuta, tatweel, Arabic diacritics, Latin case, and common French accented letters. Original display fields are never modified.
 - `pg_trgm` GIN indexes support partial matching on normalized product fields, category names, and active synonym aliases.
-- `public.search_synonyms` stores canonical terms and aliases in Arabic, English, or French. Active aliases are readable for search; only admins (via `app_metadata.role = admin`) can manage them.
+- `public.search_synonyms` stores canonical terms and aliases in Arabic, English, or French. The table starts empty; curated synonyms can be added as real search vocabulary is collected. Active aliases are readable for search; only admins (via `app_metadata.role = admin`) can manage them.
 - `public.search_products(search_query, p_category_id, p_min_price, p_max_price, p_sort, p_limit, p_offset)` returns JSON containing ordered product IDs, relevance scores, `total_count`, and `has_more`. It supports category descendants, price bounds, relevance/newest/price ordering, and server-side pagination (maximum 50 rows per page).
 - The RPC is `SECURITY INVOKER`; product visibility and men/women/all audience restrictions remain enforced by the existing `products` RLS policy. The RPC returns IDs and scores only; Flutter fetches product details and images through the existing RLS-protected product query.
 - Guests need SELECT privilege on `profiles` for the existing product audience RLS predicate to evaluate. The `profiles` RLS policy still exposes zero profile rows to guests; authenticated members remain owner-scoped. This grant is recorded in migration `20261113164421`.
