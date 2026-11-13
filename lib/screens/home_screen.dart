@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../l10n/app_strings.dart';
@@ -174,10 +175,76 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showComingSoon(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppStrings.of(context)!.featureComingSoon)),
+  Future<void> _showImageSearchOptions() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined),
+              title: Text(AppStrings.of(context)!.imageTakeCamera),
+              onTap: () => Navigator.pop(sheetContext, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: Text(AppStrings.of(context)!.imagePickGallery),
+              onTap: () => Navigator.pop(sheetContext, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
     );
+    if (source != null && mounted) {
+      await _startImageSearch(source);
+    }
+  }
+
+  Future<void> _startImageSearch(ImageSource source) async {
+    var loadingDialogOpen = false;
+    try {
+      final image = await ImagePicker().pickImage(
+        source: source,
+        imageQuality: 85,
+        maxWidth: 1600,
+        maxHeight: 1600,
+      );
+      if (image == null || !mounted) return;
+
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => AlertDialog(
+          content: Row(
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(width: 16),
+              Expanded(child: Text(AppStrings.of(dialogContext)!.imageSearch)),
+            ],
+          ),
+        ),
+      );
+      loadingDialogOpen = true;
+
+      final query = await _service.analyzeImageForSearch(image);
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+      loadingDialogOpen = false;
+
+      await Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => SearchScreen(query: query)),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      if (loadingDialogOpen) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.of(context)!.searchLoadError)),
+      );
+    }
   }
 
   @override
@@ -209,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       prefixIcon: const Icon(Icons.search),
                       suffixIcon: IconButton(
                         tooltip: AppStrings.of(context)!.imageSearch,
-                        onPressed: () => _showComingSoon(AppStrings.of(context)!.imageSearch),
+                        onPressed: _showImageSearchOptions,
                         icon: const Icon(Icons.camera_alt_outlined),
                       ),
                     ),
