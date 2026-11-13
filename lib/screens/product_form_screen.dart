@@ -336,6 +336,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               : (isArabic ? 'تعيين كصورة رئيسية' : 'Set as main photo'),
           visualDensity: VisualDensity.compact,
           constraints: const BoxConstraints.tightFor(width: 34, height: 34),
+          style: IconButton.styleFrom(
+            backgroundColor: selected ? Theme.of(context).colorScheme.primary : Colors.white,
+            foregroundColor: selected ? Colors.white : Theme.of(context).colorScheme.primary,
+            side: BorderSide(color: Theme.of(context).colorScheme.primary),
+          ),
           onPressed: _saving ? null : onTap,
           icon: Icon(
             selected ? Icons.star : Icons.star_border,
