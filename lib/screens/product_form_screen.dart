@@ -25,6 +25,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   final _title = TextEditingController();
   final _description = TextEditingController();
   final _price = TextEditingController();
+  final _customCategoryName = TextEditingController();
   List<Category> _categories = [];
   final List<Category> _selectionPath = [];
   String? _gender;
@@ -45,6 +46,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       _description.text = product.description;
       _price.text = product.price.toStringAsFixed(0);
       _audience = product.audience;
+      _customCategoryName.text = product.customCategoryName ?? '';
     }
     _loadCategories();
   }
@@ -54,6 +56,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     _title.dispose();
     _description.dispose();
     _price.dispose();
+    _customCategoryName.dispose();
     super.dispose();
   }
 
@@ -98,6 +101,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       .toList()
     ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
 
+  bool get _isOtherCategory =>
+      _selectionPath.isNotEmpty && _selectionPath.last.slug.endsWith('-other');
+
   String? get _selectedLeafCategoryId {
     if (_selectionPath.isEmpty) return null;
     final selected = _selectionPath.last;
@@ -138,6 +144,22 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   ))
               .toList(),
           onChanged: _saving ? null : (value) => _selectCategory(depth, value),
+        ),
+      );
+      fields.add(const SizedBox(height: 12));
+    }
+    if (_isOtherCategory) {
+      fields.add(
+        TextFormField(
+          controller: _customCategoryName,
+          maxLength: 80,
+          decoration: const InputDecoration(
+            labelText: 'نوع المنتج',
+            hintText: 'اكتب نوع المنتج الذي لم تجده في التصنيفات',
+          ),
+          validator: (value) => value == null || value.trim().isEmpty
+              ? 'اكتب نوع المنتج'
+              : null,
         ),
       );
       fields.add(const SizedBox(height: 12));
@@ -198,6 +220,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           price: price,
           categoryId: categoryId,
           audience: _audience,
+          customCategoryName: _isOtherCategory ? _customCategoryName.text.trim() : null,
         );
       } else {
         await _service.publishProduct(
@@ -207,6 +230,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           price: price,
           images: _images,
           audience: _audience,
+          customCategoryName: _isOtherCategory ? _customCategoryName.text.trim() : null,
         );
       }
       if (mounted) Navigator.of(context).pop(true);
