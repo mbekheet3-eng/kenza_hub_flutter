@@ -83,7 +83,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           ..clear()
           ..addAll(path.reversed);
         _gender = gender;
-        if (gender == null) _error = 'يجب تحديد النوع قبل نشر المنتجات.';
+        if (gender == null) _error = AppStrings.of(context)!.genderRequiredToPublish;
         if ((gender == 'female' && _audience == 'men_only') ||
             (gender == 'male' && _audience == 'women_only')) {
           _audience = 'all';
@@ -154,11 +154,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           controller: _customCategoryName,
           maxLength: 80,
           decoration: const InputDecoration(
-            labelText: 'نوع المنتج',
-            hintText: 'اكتب نوع المنتج الذي لم تجده في التصنيفات',
+            labelText: AppStrings.of(context)!.customProductType,
+            hintText: AppStrings.of(context)!.customProductTypeHint,
           ),
           validator: (value) => value == null || value.trim().isEmpty
-              ? 'اكتب نوع المنتج'
+              ? AppStrings.of(context)!.customProductTypeRequired
               : null,
         ),
       );
@@ -187,7 +187,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     if (!mounted || picked == null) return;
     if (_images.length >= MarketplaceService.maxImages) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('الحد الأقصى 8 صور')),
+        SnackBar(content: Text(AppStrings.of(context)!.maxEightPhotos)),
       );
       return;
     }
@@ -198,11 +198,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     if (!_formKey.currentState!.validate()) return;
     final categoryId = _selectedLeafCategoryId;
     if (categoryId == null) {
-      setState(() => _error = 'لا توجد فئات متاحة. حاول لاحقًا.');
+      setState(() => _error = AppStrings.of(context)!.noCategoriesTryLater);
       return;
     }
     if (!_isEditing && _images.isEmpty) {
-      setState(() => _error = 'أضف صورة واحدة على الأقل');
+      setState(() => _error = AppStrings.of(context)!.addAtLeastOnePhoto);
       return;
     }
 
@@ -244,7 +244,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isEditing ? 'تعديل المنتج' : 'إضافة منتج')),
+      appBar: AppBar(title: Text(_isEditing ? AppStrings.of(context)!.editProductTitle : AppStrings.of(context)!.addProductTitle)),
       body: _loading && _categories.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : Form(
@@ -257,13 +257,13 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   if (_gender != null) ...[
                     DropdownButtonFormField<String>(
                       initialValue: _audience,
-                      decoration: const InputDecoration(labelText: 'الجمهور المسموح له بمشاهدة الإعلان'),
+                      decoration: InputDecoration(labelText: AppStrings.of(context)!.allowedAudience),
                       items: [
-                        const DropdownMenuItem(value: 'all', child: Text('للجميع')),
+                        DropdownMenuItem(value: 'all', child: Text(AppStrings.of(context)!.audienceEveryone)),
                         if (_gender == 'female')
-                          const DropdownMenuItem(value: 'women_only', child: Text('للنساء فقط')),
+                          DropdownMenuItem(value: 'women_only', child: Text(AppStrings.of(context)!.audienceWomenOnly)),
                         if (_gender == 'male')
-                          const DropdownMenuItem(value: 'men_only', child: Text('للرجال فقط')),
+                          DropdownMenuItem(value: 'men_only', child: Text(AppStrings.of(context)!.audienceMenOnly)),
                       ],
                       onChanged: (value) => setState(() => _audience = value ?? 'all'),
                     ),
@@ -272,9 +272,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   TextFormField(
                     controller: _title,
                     maxLength: 100,
-                    decoration: const InputDecoration(labelText: 'عنوان المنتج'),
+                    decoration: InputDecoration(labelText: AppStrings.of(context)!.productTitleLabel),
                     validator: (value) => value == null || value.trim().isEmpty
-                        ? 'اكتب عنوان المنتج'
+                        ? AppStrings.of(context)!.productTitleRequired
                         : null,
                   ),
                   const SizedBox(height: 8),
@@ -282,24 +282,24 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     controller: _description,
                     maxLines: 4,
                     maxLength: 1000,
-                    decoration: const InputDecoration(labelText: 'وصف المنتج (اختياري)'),
+                    decoration: InputDecoration(labelText: AppStrings.of(context)!.productDescriptionOptional),
                   ),
                   const SizedBox(height: 14),
                   TextFormField(
                     controller: _price,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     decoration: const InputDecoration(
-                      labelText: 'السعر بالجنيه المصري',
-                      suffixText: 'ج.م',
+                      labelText: AppStrings.of(context)!.priceEgpLabel,
+                      suffixText: AppStrings.of(context)!.currency,
                     ),
                     validator: (value) {
                       final price = double.tryParse(value ?? '');
-                      return price == null || price <= 0 ? 'أدخل سعرًا أكبر من صفر' : null;
+                      return price == null || price <= 0 ? AppStrings.of(context)!.priceMustBePositive : null;
                     },
                   ),
                   if (!_isEditing) ...[
                     const SizedBox(height: 20),
-                    Text('صور المنتج (حتى 8 صور)', style: Theme.of(context).textTheme.titleMedium),
+                    Text(AppStrings.of(context)!.productPhotosLimit, style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
@@ -308,12 +308,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                         OutlinedButton.icon(
                           onPressed: _saving ? null : _pickGallery,
                           icon: const Icon(Icons.photo_library_outlined),
-                          label: const Text('المعرض'),
+                          label: Text(AppStrings.of(context)!.gallery),
                         ),
                         OutlinedButton.icon(
                           onPressed: _saving ? null : _pickCamera,
                           icon: const Icon(Icons.camera_alt_outlined),
-                          label: const Text('الكاميرا'),
+                          label: Text(AppStrings.of(context)!.camera),
                         ),
                       ],
                     ),
@@ -355,7 +355,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   if (_saving) ...[
                     const SizedBox(height: 8),
                     const Text(
-                      'جاري رفع الصور وفحص جودتها وملاءمتها قبل النشر...',
+                      AppStrings.of(context)!.moderationInProgress,
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -368,7 +368,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                             width: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : Text(_isEditing ? 'حفظ التعديلات' : 'نشر المنتج'),
+                        : Text(_isEditing ? AppStrings.of(context)!.publishProductChanges : AppStrings.of(context)!.publishNewProduct),
                   ),
                 ],
               ),
