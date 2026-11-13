@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../l10n/app_strings.dart';
 
 import 'categories_screen.dart';
 import 'home_screen.dart';
