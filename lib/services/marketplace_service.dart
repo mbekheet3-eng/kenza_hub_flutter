@@ -488,6 +488,7 @@ class MarketplaceService {
     String? customCategoryName,
     List<File> images = const [],
     List<String> removedImagePaths = const [],
+    int primaryImageIndex = 0,
   }) async {
     final strings = await _localizedStrings();
     final user = _client.auth.currentUser;
@@ -605,6 +606,25 @@ class MarketplaceService {
           await _client.storage.from(bucket).remove(removedPaths.toList());
         } catch (_) {
           // The database no longer references these files; orphan cleanup is best-effort.
+        }
+      }
+
+      final orderedPaths = <String>[
+        ...currentImageRows
+            .map((row) => row['storage_path'] as String)
+            .where((path) => !removedPaths.contains(path)),
+        ...insertedPaths,
+      ];
+      if (orderedPaths.isNotEmpty) {
+        final safePrimaryIndex = primaryImageIndex.clamp(0, orderedPaths.length - 1);
+        final primaryPath = orderedPaths.removeAt(safePrimaryIndex);
+        orderedPaths.insert(0, primaryPath);
+        for (var index = 0; index < orderedPaths.length; index++) {
+          await _client
+              .from('product_images')
+              .update({'sort_order': index})
+              .eq('product_id', productId)
+              .eq('storage_path', orderedPaths[index]);
         }
       }
     } catch (_) {
