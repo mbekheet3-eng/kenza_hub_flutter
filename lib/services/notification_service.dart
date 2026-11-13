@@ -42,7 +42,7 @@ class NotificationService {
     await _client
         .from('notifications')
         .update({'is_read': true, 'read_at': DateTime.now().toUtc().toIso8601String()})
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .eq('is_read', false);
   }
 }
