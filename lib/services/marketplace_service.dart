@@ -314,7 +314,7 @@ class MarketplaceService {
       );
       final data = response.data;
       if (data is! Map) {
-        throw const _ProductImageReviewException(
+        throw _ProductImageReviewException(
           strings.imageReviewReadError,
           retryable: true,
         );
@@ -332,7 +332,7 @@ class MarketplaceService {
     } on _ProductImageReviewException {
       rethrow;
     } catch (_) {
-      throw const _ProductImageReviewException(
+      throw _ProductImageReviewException(
         strings.imageReviewUnavailable,
         retryable: true,
       );
