@@ -446,7 +446,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         leading: const Icon(Icons.notifications_none_rounded),
                         title: Text(AppStrings.of(context)!.notificationsTitle),
                         subtitle: Text(AppStrings.of(context)!.notificationsSubtitle),
-                        trailing: const Icon(Icons.chevron_left),
+                        trailing: const Icon(Icons.chevron_right),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const NotificationsScreen()),
                         ),
@@ -455,7 +455,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         leading: const Icon(Icons.mail_outline_rounded),
                         title: Text(AppStrings.of(context)!.messagesOffersOrdersTitle),
                         subtitle: Text(AppStrings.of(context)!.messagesOffersOrdersSubtitle),
-                        trailing: const Icon(Icons.chevron_left),
+                        trailing: const Icon(Icons.chevron_right),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const MessagesInboxScreen()),
                         ),
@@ -463,7 +463,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ListTile(
                         leading: const Icon(Icons.favorite_border_rounded),
                         title: Text(AppStrings.of(context)!.favoritesTitle),
-                        trailing: const Icon(Icons.chevron_left),
+                        trailing: const Icon(Icons.chevron_right),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const FavoritesScreen()),
                         ),
@@ -472,7 +472,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ListTile(
                           leading: const Icon(Icons.admin_panel_settings_outlined),
                           title: Text(AppStrings.of(context)!.reviewGenderRequests),
-                          trailing: const Icon(Icons.chevron_left),
+                          trailing: const Icon(Icons.chevron_right),
                           onTap: () => Navigator.of(context).push(
                             MaterialPageRoute(builder: (_) => const AdminGenderRequestsScreen()),
                           ),
@@ -481,7 +481,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         leading: const Icon(Icons.manage_accounts_outlined),
                         title: Text(AppStrings.of(context)!.registeredGender),
                         subtitle: Text(AppStrings.of(context)!.genderChangeAdminOnly),
-                        trailing: const Icon(Icons.chevron_left),
+                        trailing: const Icon(Icons.chevron_right),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const GenderChangeRequestScreen()),
                         ).then((_) => _load()),
@@ -489,7 +489,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ListTile(
                         leading: const Icon(Icons.lock_reset_outlined),
                         title: Text(AppStrings.of(context)!.changePassword),
-                        trailing: const Icon(Icons.chevron_left),
+                        trailing: const Icon(Icons.chevron_right),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const PasswordRecoveryScreen()),
                         ),
@@ -497,7 +497,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ListTile(
                         leading: const Icon(Icons.info_outline),
                         title: Text(AppStrings.of(context)!.aboutKenzaTitle),
-                        trailing: const Icon(Icons.chevron_left),
+                        trailing: const Icon(Icons.chevron_right),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const AboutKenzaScreen()),
                         ),
@@ -505,7 +505,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ListTile(
                         leading: const Icon(Icons.policy_outlined),
                         title: Text(AppStrings.of(context)!.policiesAndTerms),
-                        trailing: const Icon(Icons.chevron_left),
+                        trailing: const Icon(Icons.chevron_right),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const PoliciesScreen()),
                         ),
@@ -515,7 +515,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         leading: const Icon(Icons.inventory_2_outlined),
                         title: Text('${AppStrings.of(context)!.myProductsTitle} (${_products.length})'),
                         subtitle: Text(AppStrings.of(context)!.myProductsSubtitle),
-                        trailing: const Icon(Icons.chevron_left),
+                        trailing: const Icon(Icons.chevron_right),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (_) => MyProductsScreen(initialProducts: _products),
