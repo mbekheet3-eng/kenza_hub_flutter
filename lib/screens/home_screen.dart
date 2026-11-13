@@ -305,7 +305,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 )
               else if (_products.isEmpty)
-                const SliverFillRemaining(
+                SliverFillRemaining(
                   hasScrollBody: false,
                   child: Center(child: Text(AppStrings.of(context)!.noPublishedProducts)),
                 )
