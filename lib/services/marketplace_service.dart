@@ -1,4 +1,7 @@
 import 'dart:io';
+import 'dart:convert';
+
+import 'package:image_picker/image_picker.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -7,6 +10,18 @@ import '../data/category_labels.dart';
 import '../l10n/app_strings.dart';
 import '../models/category.dart';
 import '../models/product.dart';
+
+class MarketplaceSearchPage {
+  const MarketplaceSearchPage({
+    required this.products,
+    required this.totalCount,
+    required this.hasMore,
+  });
+
+  final List<Product> products;
+  final int totalCount;
+  final bool hasMore;
+}
 
 class _ProductImageReviewException implements Exception {
   const _ProductImageReviewException(this.message, {required this.retryable});
@@ -132,6 +147,98 @@ class MarketplaceService {
 
     final rows = await request.order('created_at', ascending: false).limit(limit);
     return Future.wait(rows.map(_mapProduct));
+  }
+
+  Future<MarketplaceSearchPage> searchProducts({
+    String query = '',
+    String? categoryId,
+    double? minPrice,
+    double? maxPrice,
+    String sort = 'relevance',
+    int limit = 20,
+    int offset = 0,
+  }) async {
+    final response = await _client.rpc(
+      'search_products',
+      params: {
+        'search_query': query,
+        'p_category_id': categoryId,
+        'p_min_price': minPrice,
+        'p_max_price': maxPrice,
+        'p_sort': sort,
+        'p_limit': limit,
+        'p_offset': offset,
+      },
+    );
+
+    if (response is! Map) {
+      throw Exception('Invalid search response');
+    }
+    final payload = Map<String, dynamic>.from(response);
+    final itemRows = (payload['items'] as List<dynamic>? ?? []);
+    final ids = itemRows
+        .whereType<Map>()
+        .map((item) => item['id'])
+        .whereType<String>()
+        .toList();
+
+    final loadedProducts = await getProductsByIds(ids);
+    final byId = {for (final product in loadedProducts) product.id: product};
+    final orderedProducts = ids
+        .map((id) => byId[id])
+        .whereType<Product>()
+        .toList();
+
+    return MarketplaceSearchPage(
+      products: orderedProducts,
+      totalCount: (payload['total_count'] as num?)?.toInt() ??
+          orderedProducts.length,
+      hasMore: payload['has_more'] == true,
+    );
+  }
+
+  Future<String> analyzeImageForSearch(XFile image) async {
+    final bytes = await image.readAsBytes();
+    if (bytes.isEmpty || bytes.length > maxImageBytes) {
+      throw Exception('Image must be smaller than 10 MB');
+    }
+
+    final extension = image.name.toLowerCase().split('.').last;
+    final mimeType = extension == 'png'
+        ? 'image/png'
+        : extension == 'webp'
+            ? 'image/webp'
+            : (extension == 'jpg' || extension == 'jpeg')
+                ? 'image/jpeg'
+                : null;
+    if (mimeType == null) {
+      throw Exception('Only JPEG, PNG, and WebP images are supported');
+    }
+
+    final response = await _client.functions.invoke(
+      'visual-product-search',
+      body: {
+        'image_base64': base64Encode(bytes),
+        'mime_type': mimeType,
+      },
+    );
+    if (response.status < 200 || response.status >= 300) {
+      throw Exception('Image analysis failed');
+    }
+
+    final data = response.data;
+    if (data is! Map) throw Exception('Invalid image analysis response');
+    final terms = (data['terms'] as List<dynamic>? ?? [])
+        .whereType<String>()
+        .map((term) => term.trim())
+        .where((term) => term.length >= 2)
+        .toSet()
+        .take(10)
+        .toList();
+    if (terms.isEmpty) {
+      throw Exception('No product could be identified in this image');
+    }
+    return terms.join(' ');
   }
 
   Future<List<Product>> getMyProducts() async {
