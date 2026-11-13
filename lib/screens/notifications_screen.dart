@@ -179,9 +179,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 isThreeLine: true,
-                trailing: unread
-                    ? Icon(Icons.circle, size: 10, color: Theme.of(context).colorScheme.primary)
-                    : null,
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (unread)
+                      Icon(Icons.circle, size: 10, color: Theme.of(context).colorScheme.primary),
+                    const SizedBox(width: 10),
+                    const Icon(Icons.chevron_right),
+                  ],
+                ),
               );
             },
           );
