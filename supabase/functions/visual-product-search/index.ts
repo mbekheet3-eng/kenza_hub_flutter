@@ -74,28 +74,52 @@ Deno.serve(async (req: Request) => {
       }),
     };
 
-    let geminiResponse: Response | null = null;
-    for (let attempt = 0; attempt < 2; attempt++) {
+    const requestModel = async (model: string): Promise<Response | null> => {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
       try {
-        geminiResponse = await fetch(geminiUrl, geminiRequest);
+        return await fetch(url, geminiRequest);
       } catch (error) {
-        if (attempt === 1) throw error;
+        console.error("Gemini request failed", model, String(error).slice(0, 200));
+        return null;
       }
-      if (geminiResponse?.ok) break;
-      if (
-        geminiResponse &&
-        ![429, 500, 502, 503, 504].includes(geminiResponse.status)
-      ) break;
-      if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 500));
-    }
-    if (!geminiResponse) {
-      return json({ error: "Image analysis service is temporarily unavailable. Please try again." }, 503);
+    };
+
+    // Try the primary model once, then switch models during provider overload.
+    let geminiResponse = await requestModel("gemini-3.8-flash");
+    if (!geminiResponse?.ok) {
+      const firstStatus = geminiResponse?.status ?? 0;
+      const firstDetails = geminiResponse ? await geminiResponse.text() : "network error";
+      console.error("Primary Gemini model failed", firstStatus, firstDetails.slice(0, 200));
+
+      if ([400, 401, 403].includes(firstStatus)) {
+        return json({
+          error_code: "analysis_configuration_error",
+          error: "Image analysis could not be completed. Please try again later.",
+        }, 503);
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      geminiResponse = await requestModel("gemini-3.7-flash");
+
+      // One retry on the fallback model for temporary capacity/network errors.
+      if (!geminiResponse?.ok && (
+        !geminiResponse || [408, 429, 500, 502, 503, 504].includes(geminiResponse.status)
+      )) {
+        const fallbackDetails = geminiResponse ? await geminiResponse.text() : "network error";
+        console.error("Fallback Gemini model failed; retrying", geminiResponse?.status ?? 0, fallbackDetails.slice(0, 200));
+        await new Promise((resolve) => setTimeout(resolve, 1200));
+        geminiResponse = await requestModel("gemini-3.7-flash");
+      }
     }
 
-    if (!geminiResponse.ok) {
-      const details = await geminiResponse.text();
-      console.error("Gemini image analysis failed", geminiResponse.status, details.slice(0, 300));
-      return json({ error: "Could not analyze this image. Please try another photo." }, 502);
+    if (!geminiResponse?.ok) {
+      const status = geminiResponse?.status ?? 0;
+      const details = geminiResponse ? await geminiResponse.text() : "network error";
+      console.error("Gemini image analysis unavailable", status, details.slice(0, 300));
+      return json({
+        error_code: "temporary_unavailable",
+        error: "Image search is temporarily busy. Please try again in a moment.",
+      }, 503);
     }
 
     const geminiData = await geminiResponse.json();
