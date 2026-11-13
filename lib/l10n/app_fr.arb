@@ -776,5 +776,6 @@
   "productDeleteFailed": "Le produit n’a pas pu être supprimé",
   "cannotOfferOwnProduct": "Vous ne pouvez pas faire une offre sur votre propre produit",
   "cannotMessageSelf": "Vous ne pouvez pas vous envoyer de message",
-  "genderSelectionRequired": "Le genre doit être sélectionné"
+  "genderSelectionRequired": "Le genre doit être sélectionné",
+  "imageSearchTemporarilyUnavailable": "La recherche par image est temporairement occupée. Réessayez dans un instant."
 }
