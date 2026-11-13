@@ -661,5 +661,9 @@
   "specialMarketsProSellerNote": "الأسواق الخاصة مخصصة للبائع المحترف. هذه معاينة للواجهة، وسيتم ربط المنتجات وإدارة المتاجر بعد استكمال إعداد قاعدة البيانات.",
   "specialMarketExplore": "استكشف",
   "specialMarketHighlightsTitle": "ماذا ستجد هنا؟",
-  "specialMarketPreviewNote": "هذه معاينة لتصميم السوق. لم يتم ربط المنتجات أو بيانات المتاجر بعد، وسيتم ذلك بعد اعتماد جداول قاعدة البيانات."
+  "specialMarketPreviewNote": "هذه معاينة لتصميم السوق. لم يتم ربط المنتجات أو بيانات المتاجر بعد، وسيتم ذلك بعد اعتماد جداول قاعدة البيانات.",
+  "customCategoryLabel": "النوع",
+  "audienceAll": "للجميع",
+  "audienceMenOnly": "للرجال فقط",
+  "audienceWomenOnly": "للنساء فقط"
 }
