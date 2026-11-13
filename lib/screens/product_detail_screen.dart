@@ -244,26 +244,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             padding: const EdgeInsets.only(bottom: 24),
             children: [
               if (product.imageUrls.isNotEmpty)
-                SizedBox(
-                  height: 320,
-                  child: PageView(
-                    children: product.imageUrls
-                        .map(
-                          (url) => Image.network(
-                            url,
-                            fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) => const Center(
-                              child: Icon(Icons.broken_image_outlined, size: 48),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                )
+                ProductImageCarousel(imageUrls: product.imageUrls)
               else
-                const SizedBox(
-                  height: 220,
-                  child: Center(child: Icon(Icons.image_outlined, size: 60)),
+                SizedBox(
+                  height: MediaQuery.sizeOf(context).height * 0.58,
+                  child: const Center(child: Icon(Icons.image_outlined, size: 60)),
                 ),
               Padding(
                 padding: const EdgeInsets.all(18),
@@ -381,6 +366,207 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+
+class ProductImageCarousel extends StatefulWidget {
+  const ProductImageCarousel({super.key, required this.imageUrls});
+
+  final List<String> imageUrls;
+
+  @override
+  State<ProductImageCarousel> createState() => _ProductImageCarouselState();
+}
+
+class _ProductImageCarouselState extends State<ProductImageCarousel> {
+  late final PageController _pageController;
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _openFullScreen() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => _FullScreenProductGallery(
+          imageUrls: widget.imageUrls,
+          initialIndex: _currentPage,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final imageHeight = (screenHeight * 0.58).clamp(300.0, 620.0).toDouble();
+
+    return SizedBox(
+      height: imageHeight,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          PageView.builder(
+            controller: _pageController,
+            itemCount: widget.imageUrls.length,
+            onPageChanged: (index) => setState(() => _currentPage = index),
+            itemBuilder: (context, index) => GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: _openFullScreen,
+              child: ColoredBox(
+                color: Theme.of(context).colorScheme.surface,
+                child: Image.network(
+                  widget.imageUrls[index],
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => const Center(
+                    child: Icon(Icons.broken_image_outlined, size: 48),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (widget.imageUrls.length > 1)
+            Positioned(
+              bottom: 14,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Text(
+                      '${_currentPage + 1} / ${widget.imageUrls.length}',
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          Positioned(
+            top: 12,
+            right: 12,
+            child: DecoratedBox(
+              decoration: const BoxDecoration(
+                color: Colors.black54,
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                tooltip: 'تكبير الصورة',
+                onPressed: _openFullScreen,
+                icon: const Icon(Icons.zoom_in, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FullScreenProductGallery extends StatefulWidget {
+  const _FullScreenProductGallery({
+    required this.imageUrls,
+    required this.initialIndex,
+  });
+
+  final List<String> imageUrls;
+  final int initialIndex;
+
+  @override
+  State<_FullScreenProductGallery> createState() => _FullScreenProductGalleryState();
+}
+
+class _FullScreenProductGalleryState extends State<_FullScreenProductGallery> {
+  late final PageController _pageController;
+  late final List<TransformationController> _transformControllers;
+  int _currentPage = 0;
+  bool _isZoomed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentPage = widget.initialIndex;
+    _pageController = PageController(initialPage: widget.initialIndex);
+    _transformControllers = List.generate(
+      widget.imageUrls.length,
+      (_) => TransformationController(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    for (final controller in _transformControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  void _updateZoomState() {
+    final scale = _transformControllers[_currentPage].value.getMaxScaleOnAxis();
+    final zoomed = scale > 1.02;
+    if (zoomed != _isZoomed && mounted) {
+      setState(() => _isZoomed = zoomed);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: Text('${_currentPage + 1} / ${widget.imageUrls.length}'),
+      ),
+      body: PageView.builder(
+        controller: _pageController,
+        itemCount: widget.imageUrls.length,
+        physics: _isZoomed
+            ? const NeverScrollableScrollPhysics()
+            : const PageScrollPhysics(),
+        onPageChanged: (index) => setState(() {
+          _currentPage = index;
+          _isZoomed = _transformControllers[index].value.getMaxScaleOnAxis() > 1.02;
+        }),
+        itemBuilder: (context, index) => Center(
+          child: InteractiveViewer(
+            transformationController: _transformControllers[index],
+            minScale: 1,
+            maxScale: 5,
+            panEnabled: true,
+            scaleEnabled: true,
+            onInteractionEnd: (_) => _updateZoomState(),
+            child: Image.network(
+              widget.imageUrls[index],
+              fit: BoxFit.contain,
+              width: MediaQuery.sizeOf(context).width,
+              height: MediaQuery.sizeOf(context).height,
+              errorBuilder: (_, __, ___) => const Icon(
+                Icons.broken_image_outlined,
+                color: Colors.white,
+                size: 56,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
