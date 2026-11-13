@@ -86,7 +86,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           controller: controller,
           maxLength: 60,
           textCapitalization: TextCapitalization.words,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: AppStrings.of(dialogContext)!.yourName,
             helperText: AppStrings.of(dialogContext)!.displayNameHelper,
           ),
@@ -374,7 +374,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         label: Text(AppStrings.of(context)!.changeProfilePhoto),
                       ),
                       const SizedBox(height: 12),
-                      const Text(
+                      Text(
                         AppStrings.of(context)!.profileNamePrivacy,
                         style: TextStyle(color: Colors.grey),
                       ),
