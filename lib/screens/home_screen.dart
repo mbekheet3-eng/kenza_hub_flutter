@@ -226,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: ChoiceChip(
-                          label: const Text('الكل'),
+                          label: Text(AppStrings.of(context)!.allLabel),
                           selected: _categoryId == null,
                           onSelected: (_) {
                             setState(() => _categoryId = null);
