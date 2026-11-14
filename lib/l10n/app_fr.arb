@@ -781,5 +781,6 @@
   "cropImageTitle": "Recadrer et modifier l’image",
   "cropImageFailed": "Impossible de modifier l’image. Réessayez.",
   "removeImage": "Supprimer l’image",
-  "zoomImageLabel": "Agrandir l’image"
+  "zoomImageLabel": "Agrandir l’image",
+  "shareProduct": "Partager le produit"
 }
