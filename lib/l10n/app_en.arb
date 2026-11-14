@@ -800,5 +800,21 @@
   "verifiedIdentityBadge": "Identity verified",
   "verifiedStoreBadge": "Verified store",
   "sellerPublicProfile": "Public seller profile",
-  "aiProductSuggestionNote": "AI suggestions are editable and optional. The price is indicative only."
+  "aiProductSuggestionNote": "AI suggestions are editable and optional. The price is indicative only.",
+  "accountTypeBuyer": "Buyer",
+  "accountTypeProSeller": "Pro Seller",
+  "adminProSellerRequests": "Pro Seller upgrade requests",
+  "proSellerRequestTitle": "Request Pro Seller access",
+  "proSellerRequestIntro": "Enter your business details. The administration will review your request before enabling seller access and creating your store.",
+  "storeNameLabel": "Store or business name",
+  "storeNameRequired": "Enter a name with at least 2 characters",
+  "storeDescriptionOptional": "About the business (optional)",
+  "storeTypeIndividual": "Individual seller",
+  "storeTypePhysicalShop": "Physical shop",
+  "storeTypeWekala": "Wekala Corner",
+  "storeTypeOnline": "Online store",
+  "submitProSellerRequest": "Submit upgrade request",
+  "proSellerRequestSent": "Your upgrade request was sent to the administration",
+  "proSellerRequestFailed": "Could not submit the upgrade request",
+  "noPendingProSellerRequests": "There are no pending upgrade requests"
 }
