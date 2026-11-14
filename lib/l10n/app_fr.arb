@@ -798,5 +798,6 @@
   "sellerReviewTitle": "Avis des acheteurs",
   "verifiedPhoneBadge": "Téléphone confirmé",
   "verifiedIdentityBadge": "Identité vérifiée",
-  "verifiedStoreBadge": "Boutique vérifiée"
+  "verifiedStoreBadge": "Boutique vérifiée",
+  "sellerPublicProfile": "Profil public du vendeur"
 }
