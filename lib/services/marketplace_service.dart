@@ -296,10 +296,11 @@ class MarketplaceService {
   Future<int> getPublishedProductCountBySeller(String sellerId) async {
     final response = await _client
         .from('products')
-        .select('id', const FetchOptions(count: CountOption.exact, head: true))
+        .select('id')
         .eq('owner_id', sellerId)
-        .eq('status', 'published');
-    return response.count ?? 0;
+        .eq('status', 'published')
+        .count(CountOption.exact);
+    return response.count;
   }
 
   Future<List<Product>> getProductsByIds(List<String> productIds) async {
