@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../l10n/app_strings.dart';
 
 import '../widgets/member_avatar.dart';
 
 import '../models/product.dart';
+import '../models/category.dart';
+import '../services/favorites_service.dart';
 import '../services/marketplace_service.dart';
 import 'product_form_screen.dart';
 import 'conversation_screen.dart';
 import '../services/marketplace_transaction_service.dart';
 import 'login_screen.dart';
+import 'seller_profile_screen.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({super.key, required this.productId});
@@ -24,7 +28,11 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final _service = MarketplaceService();
   final _transactionService = MarketplaceTransactionService();
+  final _favoritesService = FavoritesService();
   late Future<Product> _product;
+  late Future<List<Category>> _categories;
+  bool _isFavorite = false;
+  bool _favoriteLoading = false;
   final Map<String, Future<Map<String, dynamic>?>> _publicMemberProfiles = {};
 
   AppStrings get _l10n => AppStrings.of(context)!;
@@ -40,9 +48,56 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   void initState() {
     super.initState();
     _product = _service.getProduct(widget.productId);
+    _categories = _service.getCategories();
+    _loadFavoriteStatus();
   }
 
-  void _reload() => setState(() => _product = _service.getProduct(widget.productId));
+  void _reload() => setState(() {
+        _product = _service.getProduct(widget.productId);
+        _categories = _service.getCategories();
+      });
+
+  Future<void> _loadFavoriteStatus() async {
+    if (Supabase.instance.client.auth.currentUser == null) return;
+    try {
+      final ids = await _favoritesService.getFavoriteProductIds();
+      if (mounted) setState(() => _isFavorite = ids.contains(widget.productId));
+    } catch (_) {
+      // Favorite status is optional; product details remain available.
+    }
+  }
+
+  Future<void> _toggleFavorite(Product product) async {
+    if (!await _ensureLogin() || !mounted || _favoriteLoading) return;
+    setState(() => _favoriteLoading = true);
+    try {
+      if (_isFavorite) {
+        await _favoritesService.removeFavorite(product.id);
+      } else {
+        await _favoritesService.addFavorite(product.id);
+      }
+      if (!mounted) return;
+      setState(() => _isFavorite = !_isFavorite);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_isFavorite ? _l10n.favoriteAddedToast : _l10n.favoriteRemoved),
+        ),
+      );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(_l10n.favoriteUpdateFailed)),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _favoriteLoading = false);
+    }
+  }
+
+  Future<void> _shareProduct(Product product) async {
+    final text = '${product.title}\\n${product.price.toStringAsFixed(0)} ${_l10n.currency}\\nKenza';
+    await SharePlus.instance.share(ShareParams(text: text));
+  }
 
   Future<void> _edit(Product product) async {
     final changed = await Navigator.of(context).push<bool>(
@@ -264,9 +319,31 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Text(
                       '${product.price.toStringAsFixed(2)} ${_l10n.currency}',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: const Color(0xFF5558C9),
+                            color: Theme.of(context).colorScheme.primary,
                             fontWeight: FontWeight.bold,
                           ),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: _favoriteLoading ? null : () => _toggleFavorite(product),
+                          icon: _favoriteLoading
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : Icon(_isFavorite ? Icons.favorite : Icons.favorite_border),
+                          label: Text(_isFavorite ? _l10n.removeFavoriteTooltip : _l10n.addFavoriteTooltip),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: () => _shareProduct(product),
+                          icon: const Icon(Icons.share_outlined),
+                          label: Text(_l10n.shareProduct),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 12),
                     FutureBuilder<Map<String, dynamic>?>(
@@ -285,6 +362,31 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 : _l10n.memberFallbackName,
                           ),
                           subtitle: Text(_l10n.seller),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => SellerProfileScreen(sellerId: product.ownerId),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    FutureBuilder<List<Category>>(
+                      future: _categories,
+                      builder: (context, categorySnapshot) {
+                        if (!categorySnapshot.hasData) return const SizedBox.shrink();
+                        Category? category;
+                        for (final item in categorySnapshot.data!) {
+                          if (item.id == product.categoryId) {
+                            category = item;
+                            break;
+                          }
+                        }
+                        if (category == null) return const SizedBox.shrink();
+                        return Chip(
+                          avatar: const Icon(Icons.category_outlined, size: 18),
+                          label: Text('${_l10n.categoryLabel}: ${category.nameFor(Localizations.localeOf(context).languageCode)}'),
                         );
                       },
                     ),
