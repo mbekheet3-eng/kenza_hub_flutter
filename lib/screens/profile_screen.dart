@@ -20,6 +20,7 @@ import 'favorites_screen.dart';
 import 'notifications_screen.dart';
 import 'gender_change_request_screen.dart';
 import 'admin_gender_requests_screen.dart';
+import 'seller_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -458,6 +459,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const MessagesInboxScreen()),
+                        ),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.storefront_outlined),
+                        title: Text(AppStrings.of(context)!.sellerPublicProfile),
+                        subtitle: Text(AppStrings.of(context)!.sellerLocationPrivacy),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => SellerProfileScreen(sellerId: user.id),
+                          ),
                         ),
                       ),
                       ListTile(
