@@ -798,5 +798,6 @@
   "sellerReviewTitle": "آراء المشترين",
   "verifiedPhoneBadge": "رقم الهاتف مؤكد",
   "verifiedIdentityBadge": "هوية موثقة",
-  "verifiedStoreBadge": "متجر موثق"
+  "verifiedStoreBadge": "متجر موثق",
+  "sellerPublicProfile": "الملف العام للبائع"
 }
