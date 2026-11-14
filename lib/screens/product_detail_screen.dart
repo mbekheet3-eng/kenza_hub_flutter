@@ -97,7 +97,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Future<void> _shareProduct(Product product) async {
-    final text = '${product.title}\\n${product.price.toStringAsFixed(0)} ${_l10n.currency}\\nKenza';
+    final text = '${product.title}\n${product.price.toStringAsFixed(0)} ${_l10n.currency}\nKenza';
     await SharePlus.instance.share(ShareParams(text: text));
   }
 
