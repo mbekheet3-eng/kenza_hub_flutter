@@ -167,7 +167,7 @@ class MarketplaceService {
     var request = _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
+          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,status,created_at,product_images(id,storage_path,sort_order)',
         )
         .eq('status', 'published');
 
@@ -309,29 +309,6 @@ class MarketplaceService {
     return terms.join(' ');
   }
 
-
-  Future<Map<String, dynamic>> suggestProductDetails({
-    required List<File> images,
-    required String language,
-  }) async {
-    if (images.isEmpty) throw Exception('Add at least one photo first');
-    final encodedImages = <Map<String, String>>[];
-    for (final image in images.take(3)) {
-      final bytes = await image.readAsBytes();
-      if (bytes.isEmpty || bytes.length > 5 * 1024 * 1024) {
-        throw Exception('AI suggestion photos must be 5 MB or smaller');
-      }
-      final extension = image.path.split('.').last.toLowerCase();
-      final mimeType = extension == 'png' ? 'image/png' : extension == 'webp' ? 'image/webp' : (extension == 'jpg' || extension == 'jpeg') ? 'image/jpeg' : null;
-      if (mimeType == null) throw Exception('Unsupported image format');
-      encodedImages.add({'mime_type': mimeType, 'data': base64Encode(bytes)});
-    }
-    final response = await _client.functions.invoke('suggest-product-details', body: {'images': encodedImages, 'language': language});
-    if (response.status < 200 || response.status >= 300 || response.data is! Map) {
-      throw Exception('AI suggestions are temporarily unavailable');
-    }
-    return Map<String, dynamic>.from(response.data as Map);
-  }
 
   Future<List<Product>> getMyProducts() async {
     final user = _client.auth.currentUser;
