@@ -1,0 +1,12 @@
+-- ARCHIVED SOURCE COPY FROM SUPABASE V2 (klkcroynomxuajggqqqx)
+-- Historical reference only. DO NOT APPLY DIRECTLY TO Marketplace.
+-- Review and adapt to the Marketplace schema before creating any executable migration.
+
+
+drop policy if exists temp_product_read_all on public.products;
+drop policy if exists temp_product_images_read_all on public.product_images;
+drop policy if exists temp_product_image_storage_read on storage.objects;
+drop policy if exists temp_product_image_storage_insert on storage.objects;
+drop policy if exists temp_product_image_storage_update on storage.objects;
+drop policy if exists temp_product_image_storage_delete on storage.objects;
+
