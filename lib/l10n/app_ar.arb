@@ -782,5 +782,21 @@
   "cropImageFailed": "تعذر تعديل الصورة. حاول مرة أخرى.",
   "removeImage": "حذف الصورة",
   "zoomImageLabel": "تكبير الصورة",
-  "shareProduct": "مشاركة المنتج"
+  "shareProduct": "مشاركة المنتج",
+  "sellerLocationTitle": "موقع البائع",
+  "sellerLocationNotShared": "لم يحدد البائع منطقة عامة",
+  "sellerLocationEdit": "تعديل المنطقة الظاهرة",
+  "sellerLocationGovernorate": "المحافظة",
+  "sellerLocationCity": "المدينة",
+  "sellerLocationAreaOptional": "المنطقة أو الحي (اختياري)",
+  "sellerLocationPrivacy": "سيظهر للآخرين اسم المحافظة والمدينة والمنطقة فقط. لن يظهر عنوان المنزل أو رقم الهاتف أو الموقع الدقيق. حفظ البيانات يعني الموافقة على عرضها علنًا.",
+  "sellerLocationSave": "حفظ وإظهار المنطقة",
+  "sellerLocationHide": "إخفاء المنطقة",
+  "sellerLocationSaved": "تم تحديث إعدادات المنطقة",
+  "sellerLocationSaveFailed": "تعذر تحديث المنطقة. حاول مرة أخرى.",
+  "sellerNoReviews": "لا توجد تقييمات بعد",
+  "sellerReviewTitle": "آراء المشترين",
+  "verifiedPhoneBadge": "رقم الهاتف مؤكد",
+  "verifiedIdentityBadge": "هوية موثقة",
+  "verifiedStoreBadge": "متجر موثق"
 }
