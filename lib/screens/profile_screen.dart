@@ -24,6 +24,7 @@ import 'admin_gender_requests_screen.dart';
 import 'admin_pro_seller_requests_screen.dart';
 import 'pro_seller_request_screen.dart';
 import 'seller_profile_screen.dart';
+import 'store_management_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -543,6 +544,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           onTap: () => Navigator.of(context).push(
                             MaterialPageRoute(builder: (_) => const AdminGenderRequestsScreen()),
                           ),
+                        ),
+                      if (_accountRole == 'pro_seller' && _store != null)
+                        ListTile(
+                          leading: const Icon(Icons.store_mall_directory_outlined),
+                          title: Text(Localizations.localeOf(context).languageCode == 'ar'
+                              ? 'إدارة متجري'
+                              : Localizations.localeOf(context).languageCode == 'fr'
+                                  ? 'Gérer ma boutique'
+                                  : 'Manage my store'),
+                          subtitle: Text(_store?['store_name'] as String? ?? ''),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () async {
+                            await Navigator.of(context).push(
+                              MaterialPageRoute(builder: (_) => const StoreManagementScreen()),
+                            );
+                            if (mounted) await _load();
+                          },
                         ),
                       ListTile(
                         leading: const Icon(Icons.manage_accounts_outlined),
