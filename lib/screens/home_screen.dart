@@ -169,9 +169,15 @@ class _HomeScreenState extends State<HomeScreen> {
       _categories.where((category) => category.parentId == null).toList()
         ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
 
-  Future<void> _openSpecialMarkets() async {
+  Future<void> _openSpecialMarkets(String storeType) async {
+    final strings = AppStrings.of(context)!;
+    final title = storeType == 'wekala_corner'
+        ? strings.agencyCornerTitle
+        : strings.onlineStoresTitle;
     await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const SpecialMarketsScreen()),
+      MaterialPageRoute(
+        builder: (_) => StoreDirectoryScreen(storeType: storeType, title: title),
+      ),
     );
   }
 
