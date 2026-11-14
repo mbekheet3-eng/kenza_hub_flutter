@@ -102,9 +102,55 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                         ),
                         itemBuilder: (context, index) {
                           final product = _products[index];
-                          return ProductCard(
-                            product: product,
-                            onTap: () => _openProduct(product),
+                          final languageCode =
+                              Localizations.localeOf(context).languageCode;
+                          final statusLabel = product.status == 'draft'
+                              ? (languageCode == 'ar'
+                                  ? 'لم يُنشر بعد'
+                                  : languageCode == 'fr'
+                                      ? 'Non publié'
+                                      : 'Not published')
+                              : product.status == 'archived'
+                                  ? strings.inactive
+                                  : null;
+                          return Stack(
+                            children: [
+                              ProductCard(
+                                product: product,
+                                onTap: () => _openProduct(product),
+                              ),
+                              if (statusLabel != null)
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: IgnorePointer(
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surface
+                                            .withValues(alpha: 0.96),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 5,
+                                        ),
+                                        child: Text(
+                                          statusLabel,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelSmall
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
                           );
                         },
                       ),
