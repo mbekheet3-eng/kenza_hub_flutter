@@ -26,7 +26,7 @@ class AccountAccessService {
 
     final store = await _client
         .from('stores')
-        .select('id,store_name,store_type,description,status')
+        .select('id,store_name,store_type,description,logo_url,banner_url,status')
         .eq('owner_id', user.id)
         .maybeSingle();
 
