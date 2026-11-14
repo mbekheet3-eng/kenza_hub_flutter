@@ -1,0 +1,73 @@
+// ARCHIVED SOURCE FROM SUPABASE V2 (klkcroynomxuajggqqqx)
+// Historical reference only. This file is NOT deployed to Marketplace.
+// Review schema dependencies and security before any adaptation.
+
+import { createClient } from "npm:@supabase/supabase-js@2.95.0";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
+Deno.serve(async (req: Request) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+  if (req.method !== "POST") {
+    return Response.json({ error: "METHOD_NOT_ALLOWED" }, { status: 405, headers: corsHeaders });
+  }
+
+  const authorization = req.headers.get("Authorization");
+  if (!authorization?.startsWith("Bearer ")) {
+    return Response.json({ error: "AUTH_REQUIRED" }, { status: 401, headers: corsHeaders });
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    if (!supabaseUrl || !anonKey) throw new Error("FUNCTION_ENVIRONMENT_NOT_CONFIGURED");
+
+    const supabase = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authorization } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+
+    const token = authorization.slice("Bearer ".length);
+    const { data: authData, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !authData.user) {
+      return Response.json({ error: "INVALID_SESSION" }, { status: 401, headers: corsHeaders });
+    }
+
+    const payload = await req.json().catch(() => null);
+    if (!payload || typeof payload.display_name !== "string") {
+      return Response.json({ error: "DISPLAY_NAME_REQUIRED" }, { status: 400, headers: corsHeaders });
+    }
+
+    const displayName = payload.display_name.trim();
+    const bio = typeof payload.bio === "string" ? payload.bio.trim() : null;
+    if (displayName.length < 3 || displayName.length > 60) {
+      return Response.json({ error: "INVALID_DISPLAY_NAME" }, { status: 400, headers: corsHeaders });
+    }
+
+    const { data: profileId, error } = await supabase.rpc("create_seller_profile", {
+      p_display_name: displayName,
+      p_bio: bio,
+    });
+
+    if (error) {
+      const conflict = error.message.includes("SELLER_PROFILE_ALREADY_EXISTS");
+      return Response.json(
+        { error: conflict ? "SELLER_PROFILE_ALREADY_EXISTS" : "SELLER_PROFILE_CREATE_FAILED" },
+        { status: conflict ? 409 : 400, headers: corsHeaders },
+      );
+    }
+
+    return Response.json(
+      { seller_profile_id: profileId, member_role: "owner" },
+      { status: 201, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  } catch {
+    return Response.json({ error: "INTERNAL_ERROR" }, { status: 500, headers: corsHeaders });
+  }
+});
