@@ -667,6 +667,23 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     ),
                     const SizedBox(height: 14),
                   ],
+                  OutlinedButton.icon(
+                    onPressed: _saving || _suggesting || _images.isEmpty ? null : _suggestDetails,
+                    icon: _suggesting
+                        ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                        : const Icon(Icons.auto_awesome),
+                    label: Text(Localizations.localeOf(context).languageCode == 'ar'
+                        ? 'اقترح بيانات المنتج بالذكاء الاصطناعي'
+                        : Localizations.localeOf(context).languageCode == 'fr'
+                            ? 'Suggérer les détails avec l’IA'
+                            : 'Suggest product details with AI'),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    AppStrings.of(context)!.aiProductSuggestionNote,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 12),
                   TextFormField(
                     controller: _title,
                     maxLength: 100,
