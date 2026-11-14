@@ -57,7 +57,6 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context)!;
-    final languageCode = Localizations.localeOf(context).languageCode;
     final sellerName = (_profile?['first_name'] as String?)?.trim();
     return Scaffold(
       appBar: AppBar(title: Text(strings.sellerOnKenza)),
