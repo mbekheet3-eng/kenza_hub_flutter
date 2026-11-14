@@ -782,5 +782,21 @@
   "cropImageFailed": "Could not edit the image. Please try again.",
   "removeImage": "Remove image",
   "zoomImageLabel": "Zoom image",
-  "shareProduct": "Share product"
+  "shareProduct": "Share product",
+  "sellerLocationTitle": "Seller location",
+  "sellerLocationNotShared": "The seller has not shared a public area",
+  "sellerLocationEdit": "Edit public area",
+  "sellerLocationGovernorate": "Governorate",
+  "sellerLocationCity": "City",
+  "sellerLocationAreaOptional": "Area or neighborhood (optional)",
+  "sellerLocationPrivacy": "Only the governorate, city and area will be public. Your home address, phone number and precise location will not be shown. Saving means you agree to display these details publicly.",
+  "sellerLocationSave": "Save and show area",
+  "sellerLocationHide": "Hide area",
+  "sellerLocationSaved": "Location visibility updated",
+  "sellerLocationSaveFailed": "Could not update the location. Please try again.",
+  "sellerNoReviews": "No reviews yet",
+  "sellerReviewTitle": "Buyer reviews",
+  "verifiedPhoneBadge": "Phone confirmed",
+  "verifiedIdentityBadge": "Identity verified",
+  "verifiedStoreBadge": "Verified store"
 }
