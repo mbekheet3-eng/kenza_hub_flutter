@@ -781,5 +781,6 @@
   "cropImageTitle": "قص الصورة وتعديلها",
   "cropImageFailed": "تعذر تعديل الصورة. حاول مرة أخرى.",
   "removeImage": "حذف الصورة",
-  "zoomImageLabel": "تكبير الصورة"
+  "zoomImageLabel": "تكبير الصورة",
+  "shareProduct": "مشاركة المنتج"
 }
