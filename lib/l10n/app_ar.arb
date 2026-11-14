@@ -800,5 +800,21 @@
   "verifiedIdentityBadge": "هوية موثقة",
   "verifiedStoreBadge": "متجر موثق",
   "sellerPublicProfile": "الملف العام للبائع",
-  "aiProductSuggestionNote": "اقتراحات الذكاء الاصطناعي قابلة للتعديل وليست إلزامية. السعر استرشادي فقط."
+  "aiProductSuggestionNote": "اقتراحات الذكاء الاصطناعي قابلة للتعديل وليست إلزامية. السعر استرشادي فقط.",
+  "accountTypeBuyer": "مشتري",
+  "accountTypeProSeller": "بائع محترف",
+  "adminProSellerRequests": "طلبات ترقية البائعين",
+  "proSellerRequestTitle": "طلب الترقية إلى بائع محترف",
+  "proSellerRequestIntro": "املأ بيانات نشاطك. ستراجع الإدارة الطلب قبل تفعيل حساب البائع وإنشاء متجرك.",
+  "storeNameLabel": "اسم المتجر أو النشاط",
+  "storeNameRequired": "اكتب اسمًا لا يقل عن حرفين",
+  "storeDescriptionOptional": "نبذة عن النشاط (اختياري)",
+  "storeTypeIndividual": "بائع فردي",
+  "storeTypePhysicalShop": "محل فعلي",
+  "storeTypeWekala": "ركن الوكالة",
+  "storeTypeOnline": "متجر إلكتروني",
+  "submitProSellerRequest": "إرسال طلب الترقية",
+  "proSellerRequestSent": "تم إرسال طلب الترقية للإدارة",
+  "proSellerRequestFailed": "تعذر إرسال طلب الترقية",
+  "noPendingProSellerRequests": "لا توجد طلبات ترقية معلقة حاليًا"
 }
