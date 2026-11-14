@@ -12,7 +12,7 @@ import '../widgets/product_card.dart';
 import 'login_screen.dart';
 import 'product_detail_screen.dart';
 import 'search_screen.dart';
-import 'special_markets_screen.dart';
+import 'store_directory_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -331,7 +331,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: _SpecialMarketEntry(
                           icon: Icons.storefront_outlined,
                           title: AppStrings.of(context)!.agencyCornerTitle,
-                          onTap: _openSpecialMarkets,
+                          onTap: () => _openSpecialMarkets('wekala_corner'),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -339,7 +339,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: _SpecialMarketEntry(
                           icon: Icons.shopping_bag_outlined,
                           title: AppStrings.of(context)!.onlineStoresTitle,
-                          onTap: _openSpecialMarkets,
+                          onTap: () => _openSpecialMarkets('online_store'),
                         ),
                       ),
                     ],
