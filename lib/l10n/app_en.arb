@@ -781,5 +781,6 @@
   "cropImageTitle": "Crop and edit image",
   "cropImageFailed": "Could not edit the image. Please try again.",
   "removeImage": "Remove image",
-  "zoomImageLabel": "Zoom image"
+  "zoomImageLabel": "Zoom image",
+  "shareProduct": "Share product"
 }
