@@ -1,0 +1,5 @@
+// ARCHIVED SOURCE FROM SUPABASE V2 (klkcroynomxuajggqqqx)
+// Historical reference only. This file is NOT deployed to Marketplace.
+// Review schema dependencies and security before any adaptation.
+
+{"imports":{"@supabase/supabase-js":"npm:@supabase/supabase-js@2.95.0"}}
