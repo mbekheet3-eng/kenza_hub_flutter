@@ -9,6 +9,7 @@ class Product {
     required this.currency,
     required this.audience,
     this.customCategoryName,
+    this.status = 'published',
     required this.createdAt,
     required this.imagePaths,
     required this.imageUrls,
@@ -23,6 +24,7 @@ class Product {
   final String currency;
   final String audience;
   final String? customCategoryName;
+  final String status;
   final DateTime createdAt;
   final List<String> imagePaths;
   final List<String> imageUrls;
@@ -44,6 +46,7 @@ class Product {
       currency: (map['currency'] as String?) ?? 'EGP',
       audience: (map['audience'] as String?) ?? 'all',
       customCategoryName: map['custom_category_name'] as String?,
+      status: (map['status'] as String?) ?? 'published',
       createdAt: DateTime.parse(map['created_at'] as String),
       imagePaths: paths,
       imageUrls: signedImageUrls,
