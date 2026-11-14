@@ -39,8 +39,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   int _selectedImageIndex = 0;
   bool _loading = false;
   bool _saving = false;
-  bool _suggesting = false;
-  String? _aiPriceNote;
   String? _error;
 
   bool get _isEditing => widget.product != null;
@@ -541,55 +539,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   }
 
 
-  Future<void> _suggestDetails() async {
-    if (_images.isEmpty) {
-      setState(() => _error = Localizations.localeOf(context).languageCode == 'ar'
-          ? 'أضف صورة جديدة واحدة على الأقل لاستخدام اقتراحات الذكاء الاصطناعي.'
-          : 'Add at least one new photo to use AI suggestions.');
-      return;
-    }
-    setState(() { _suggesting = true; _error = null; _aiPriceNote = null; });
-    try {
-      final result = await _service.suggestProductDetails(
-        images: _images,
-        language: Localizations.localeOf(context).languageCode,
-      );
-      if (!mounted) return;
-      final suggestedTitle = result['title'] as String?;
-      final suggestedDescription = result['description'] as String?;
-      final suggestedCategoryId = result['category_id'] as String?;
-      final suggestedPrice = result['suggested_price_egp'];
-      final nextPath = <Category>[];
-      Category? current;
-      for (final category in _categories) {
-        if (category.id == suggestedCategoryId) { current = category; break; }
-      }
-      while (current != null) {
-        nextPath.add(current);
-        final parentId = current.parentId;
-        current = null;
-        if (parentId != null) {
-          for (final category in _categories) {
-            if (category.id == parentId) { current = category; break; }
-          }
-        }
-      }
-      setState(() {
-        if (suggestedTitle != null && suggestedTitle.isNotEmpty) _title.text = suggestedTitle;
-        if (suggestedDescription != null) _description.text = suggestedDescription;
-        if (suggestedPrice is num) _price.text = suggestedPrice.toStringAsFixed(0);
-        if (nextPath.isNotEmpty) _selectionPath..clear()..addAll(nextPath.reversed);
-        _aiPriceNote = result['price_note'] as String?;
-      });
-    } catch (_) {
-      if (mounted) setState(() => _error = Localizations.localeOf(context).languageCode == 'ar'
-          ? 'تعذر الحصول على اقتراحات الآن. يمكنك إدخال البيانات يدويًا.'
-          : 'Suggestions are unavailable right now. You can enter details manually.');
-    } finally {
-      if (mounted) setState(() => _suggesting = false);
-    }
-  }
-
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     final categoryId = _selectedLeafCategoryId;
@@ -669,22 +618,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     ),
                     const SizedBox(height: 14),
                   ],
-                  OutlinedButton.icon(
-                    onPressed: _saving || _suggesting || _images.isEmpty ? null : _suggestDetails,
-                    icon: _suggesting
-                        ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                        : const Icon(Icons.auto_awesome),
-                    label: Text(Localizations.localeOf(context).languageCode == 'ar'
-                        ? 'اقترح بيانات المنتج بالذكاء الاصطناعي'
-                        : Localizations.localeOf(context).languageCode == 'fr'
-                            ? 'Suggérer les détails avec l’IA'
-                            : 'Suggest product details with AI'),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    AppStrings.of(context)!.aiProductSuggestionNote,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _title,
