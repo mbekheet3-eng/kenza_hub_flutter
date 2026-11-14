@@ -276,6 +276,32 @@ class MarketplaceService {
     return Future.wait(rows.map(_mapProduct));
   }
 
+  Future<List<Product>> getPublishedProductsBySeller(
+    String sellerId, {
+    int limit = 40,
+  }) async {
+    final rows = await _client
+        .from('products')
+        .select(
+          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
+        )
+        .eq('owner_id', sellerId)
+        .eq('status', 'published')
+        .order('created_at', ascending: false)
+        .limit(limit);
+
+    return Future.wait(rows.map(_mapProduct));
+  }
+
+  Future<int> getPublishedProductCountBySeller(String sellerId) async {
+    final response = await _client
+        .from('products')
+        .select('id', const FetchOptions(count: CountOption.exact, head: true))
+        .eq('owner_id', sellerId)
+        .eq('status', 'published');
+    return response.count ?? 0;
+  }
+
   Future<List<Product>> getProductsByIds(List<String> productIds) async {
     if (productIds.isEmpty) return [];
 
