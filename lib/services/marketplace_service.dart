@@ -317,7 +317,7 @@ class MarketplaceService {
     final rows = await _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
+          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,status,created_at,product_images(id,storage_path,sort_order)',
         )
         .eq('owner_id', user.id)
         .order('created_at', ascending: false);
