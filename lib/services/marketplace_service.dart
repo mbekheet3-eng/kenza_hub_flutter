@@ -72,6 +72,54 @@ class MarketplaceService {
         .maybeSingle();
   }
 
+  Future<Map<String, dynamic>> getSellerPublicDetails(String sellerId) async {
+    final results = await Future.wait<dynamic>([
+      _client.from('seller_public_locations')
+          .select('governorate,city,area')
+          .eq('seller_id', sellerId)
+          .maybeSingle(),
+      _client.from('seller_review_summaries')
+          .select('average_rating,review_count')
+          .eq('seller_id', sellerId)
+          .maybeSingle(),
+      _client.from('seller_public_reviews')
+          .select('id,rating,comment,created_at')
+          .eq('seller_id', sellerId)
+          .order('created_at', ascending: false)
+          .limit(20),
+      _client.from('seller_public_badges')
+          .select('badge_type,verified_at')
+          .eq('seller_id', sellerId),
+    ]);
+    return {
+      'location': results[0] as Map<String, dynamic>?,
+      'summary': results[1] as Map<String, dynamic>?,
+      'reviews': (results[2] as List).cast<Map<String, dynamic>>(),
+      'badges': (results[3] as List).cast<Map<String, dynamic>>(),
+    };
+  }
+
+  Future<void> saveSellerPublicLocation({
+    required String governorate,
+    required String city,
+    String? area,
+  }) async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) throw Exception('Authentication required');
+    await _client.from('seller_public_locations').upsert({
+      'seller_id': userId,
+      'governorate': governorate.trim(),
+      'city': city.trim(),
+      'area': area?.trim().isEmpty == true ? null : area?.trim(),
+    }, onConflict: 'seller_id');
+  }
+
+  Future<void> removeSellerPublicLocation() async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) throw Exception('Authentication required');
+    await _client.from('seller_public_locations').delete().eq('seller_id', userId);
+  }
+
   Future<List<Category>> getCategories() async {
     final cached = _categoriesCache;
     if (cached != null) return cached;
