@@ -348,7 +348,7 @@ class MarketplaceService {
         .eq('owner_id', sellerId)
         .eq('status', 'published')
         .count(CountOption.exact);
-    return response.count ?? 0;
+    return response.count;
   }
 
   Future<List<Product>> getProductsByIds(List<String> productIds) async {
