@@ -798,5 +798,6 @@
   "sellerReviewTitle": "Buyer reviews",
   "verifiedPhoneBadge": "Phone confirmed",
   "verifiedIdentityBadge": "Identity verified",
-  "verifiedStoreBadge": "Verified store"
+  "verifiedStoreBadge": "Verified store",
+  "sellerPublicProfile": "Public seller profile"
 }
