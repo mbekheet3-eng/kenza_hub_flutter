@@ -38,7 +38,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   int _primaryImageIndex = 0;
   int _selectedImageIndex = 0;
   bool _loading = false;
-  bool _saving = false;
+  bool _saving = false;\n  bool _suggesting = false;\n  String? _aiPriceNote;
   String? _error;
 
   bool get _isEditing => widget.product != null;
@@ -536,6 +536,56 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       onPressed: _saving ? null : onTap,
       icon: Icon(selected ? Icons.star : Icons.star_border, size: 19),
     );
+  }
+
+
+  Future<void> _suggestDetails() async {
+    if (_images.isEmpty) {
+      setState(() => _error = Localizations.localeOf(context).languageCode == 'ar'
+          ? 'أضف صورة جديدة واحدة على الأقل لاستخدام اقتراحات الذكاء الاصطناعي.'
+          : 'Add at least one new photo to use AI suggestions.');
+      return;
+    }
+    setState(() { _suggesting = true; _error = null; _aiPriceNote = null; });
+    try {
+      final result = await _service.suggestProductDetails(
+        images: _images,
+        language: Localizations.localeOf(context).languageCode,
+      );
+      if (!mounted) return;
+      final suggestedTitle = result['title'] as String?;
+      final suggestedDescription = result['description'] as String?;
+      final suggestedCategoryId = result['category_id'] as String?;
+      final suggestedPrice = result['suggested_price_egp'];
+      final nextPath = <Category>[];
+      Category? current;
+      for (final category in _categories) {
+        if (category.id == suggestedCategoryId) { current = category; break; }
+      }
+      while (current != null) {
+        nextPath.add(current);
+        final parentId = current.parentId;
+        current = null;
+        if (parentId != null) {
+          for (final category in _categories) {
+            if (category.id == parentId) { current = category; break; }
+          }
+        }
+      }
+      setState(() {
+        if (suggestedTitle != null && suggestedTitle.isNotEmpty) _title.text = suggestedTitle;
+        if (suggestedDescription != null) _description.text = suggestedDescription;
+        if (suggestedPrice is num) _price.text = suggestedPrice.toStringAsFixed(0);
+        if (nextPath.isNotEmpty) _selectionPath..clear()..addAll(nextPath.reversed);
+        _aiPriceNote = result['price_note'] as String?;
+      });
+    } catch (_) {
+      if (mounted) setState(() => _error = Localizations.localeOf(context).languageCode == 'ar'
+          ? 'تعذر الحصول على اقتراحات الآن. يمكنك إدخال البيانات يدويًا.'
+          : 'Suggestions are unavailable right now. You can enter details manually.');
+    } finally {
+      if (mounted) setState(() => _suggesting = false);
+    }
   }
 
   Future<void> _save() async {
