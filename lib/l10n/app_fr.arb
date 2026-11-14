@@ -782,5 +782,21 @@
   "cropImageFailed": "Impossible de modifier l’image. Réessayez.",
   "removeImage": "Supprimer l’image",
   "zoomImageLabel": "Agrandir l’image",
-  "shareProduct": "Partager le produit"
+  "shareProduct": "Partager le produit",
+  "sellerLocationTitle": "Emplacement du vendeur",
+  "sellerLocationNotShared": "Le vendeur n’a pas partagé de zone publique",
+  "sellerLocationEdit": "Modifier la zone publique",
+  "sellerLocationGovernorate": "Gouvernorat",
+  "sellerLocationCity": "Ville",
+  "sellerLocationAreaOptional": "Quartier (facultatif)",
+  "sellerLocationPrivacy": "Seuls le gouvernorat, la ville et le quartier seront publics. Votre adresse personnelle, votre téléphone et votre position précise ne seront pas affichés. En enregistrant, vous acceptez l’affichage public de ces informations.",
+  "sellerLocationSave": "Enregistrer et afficher",
+  "sellerLocationHide": "Masquer la zone",
+  "sellerLocationSaved": "La visibilité de l’emplacement a été mise à jour",
+  "sellerLocationSaveFailed": "Impossible de modifier l’emplacement. Réessayez.",
+  "sellerNoReviews": "Aucun avis pour le moment",
+  "sellerReviewTitle": "Avis des acheteurs",
+  "verifiedPhoneBadge": "Téléphone confirmé",
+  "verifiedIdentityBadge": "Identité vérifiée",
+  "verifiedStoreBadge": "Boutique vérifiée"
 }
