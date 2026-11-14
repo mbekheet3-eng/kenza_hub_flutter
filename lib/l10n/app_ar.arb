@@ -799,5 +799,6 @@
   "verifiedPhoneBadge": "رقم الهاتف مؤكد",
   "verifiedIdentityBadge": "هوية موثقة",
   "verifiedStoreBadge": "متجر موثق",
-  "sellerPublicProfile": "الملف العام للبائع"
+  "sellerPublicProfile": "الملف العام للبائع",
+  "aiProductSuggestionNote": "اقتراحات الذكاء الاصطناعي قابلة للتعديل وليست إلزامية. السعر استرشادي فقط."
 }
