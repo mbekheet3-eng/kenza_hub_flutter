@@ -38,7 +38,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   int _primaryImageIndex = 0;
   int _selectedImageIndex = 0;
   bool _loading = false;
-  bool _saving = false;\n  bool _suggesting = false;\n  String? _aiPriceNote;
+  bool _saving = false;
+  bool _suggesting = false;
+  String? _aiPriceNote;
   String? _error;
 
   bool get _isEditing => widget.product != null;
