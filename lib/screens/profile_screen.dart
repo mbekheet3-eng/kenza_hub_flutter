@@ -8,6 +8,7 @@ import '../config/app_locale.dart';
 import '../l10n/app_strings.dart';
 import '../models/product.dart';
 import '../services/auth_service.dart';
+import '../services/account_access_service.dart';
 import '../services/marketplace_service.dart';
 import '../widgets/member_avatar.dart';
 import '../widgets/product_card.dart';
@@ -20,6 +21,8 @@ import 'favorites_screen.dart';
 import 'notifications_screen.dart';
 import 'gender_change_request_screen.dart';
 import 'admin_gender_requests_screen.dart';
+import 'admin_pro_seller_requests_screen.dart';
+import 'pro_seller_request_screen.dart';
 import 'seller_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -34,12 +37,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   final _auth = AuthService();
   final _service = MarketplaceService();
+  final _accountAccess = AccountAccessService();
   final _imagePicker = ImagePicker();
   Map<String, dynamic>? _profile;
   List<Product> _products = [];
   bool _loading = true;
   bool _savingAvatar = false;
   String? _error;
+  String _accountRole = 'buyer';
+  bool _isKenzaAdmin = false;
+  Map<String, dynamic>? _latestProSellerRequest;
+  Map<String, dynamic>? _store;
 
   User? get _user => Supabase.instance.client.auth.currentUser;
 
@@ -63,10 +71,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           .eq('id', user.id)
           .maybeSingle();
       final products = await _service.getMyProducts();
+      final accountAccess = await _accountAccess.loadCurrentAccount();
       if (!mounted) return;
       setState(() {
         _profile = profile;
         _products = products;
+        _accountRole = accountAccess['role'] as String;
+        _isKenzaAdmin = accountAccess['isAdmin'] as bool;
+        _latestProSellerRequest = accountAccess['request'] as Map<String, dynamic>?;
+        _store = accountAccess['store'] as Map<String, dynamic>?;
       });
     } catch (error) {
       if (mounted) setState(() => _error = error.toString());
@@ -480,7 +493,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           MaterialPageRoute(builder: (_) => const FavoritesScreen()),
                         ),
                       ),
-                      if (user.appMetadata['role'] == 'admin')
+                      const Divider(height: 28),
+                      ListTile(
+                        leading: Icon(_accountRole == 'pro_seller'
+                            ? Icons.storefront_rounded
+                            : Icons.person_outline_rounded),
+                        title: Text(_accountRole == 'pro_seller'
+                            ? AppStrings.of(context)!.accountTypeProSeller
+                            : AppStrings.of(context)!.accountTypeBuyer),
+                        subtitle: Text(
+                          _accountRole == 'pro_seller'
+                              ? (_store?['store_name'] as String?) ?? AppStrings.of(context)!.myStore
+                              : _latestProSellerRequest?['status'] == 'pending'
+                                  ? AppStrings.of(context)!.upgradeRequestPending
+                                  : _latestProSellerRequest?['status'] == 'approved'
+                                      ? AppStrings.of(context)!.requestApproved
+                                      : _latestProSellerRequest?['status'] == 'rejected'
+                                          ? AppStrings.of(context)!.requestRejected
+                                          : AppStrings.of(context)!.upgradeProSeller,
+                        ),
+                        trailing: _accountRole == 'buyer' &&
+                                _latestProSellerRequest?['status'] != 'pending'
+                            ? const Icon(Icons.chevron_right)
+                            : null,
+                        onTap: _accountRole == 'buyer' &&
+                                _latestProSellerRequest?['status'] != 'pending'
+                            ? () async {
+                                final submitted = await Navigator.of(context).push<bool>(
+                                  MaterialPageRoute(builder: (_) => const ProSellerRequestScreen()),
+                                );
+                                if (submitted == true) await _load();
+                              }
+                            : null,
+                      ),
+                      if (_isKenzaAdmin)
+                        ListTile(
+                          leading: const Icon(Icons.admin_panel_settings_outlined),
+                          title: Text(AppStrings.of(context)!.adminProSellerRequests),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const AdminProSellerRequestsScreen()),
+                          ).then((_) => _load()),
+                        ),
+                      if (_isKenzaAdmin)
                         ListTile(
                           leading: const Icon(Icons.admin_panel_settings_outlined),
                           title: Text(AppStrings.of(context)!.reviewGenderRequests),
