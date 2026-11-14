@@ -325,6 +325,19 @@ class MarketplaceService {
     return Future.wait(rows.map(_mapProduct));
   }
 
+  Future<List<Map<String, dynamic>>> getActiveStoresByType(String storeType) async {
+    if (storeType != 'wekala_corner' && storeType != 'online_store') {
+      throw ArgumentError.value(storeType, 'storeType');
+    }
+    final rows = await _client
+        .from('stores')
+        .select('id,owner_id,store_name,store_type,description,logo_url,banner_url,created_at')
+        .eq('store_type', storeType)
+        .eq('status', 'active')
+        .order('created_at', ascending: false);
+    return rows.map((row) => Map<String, dynamic>.from(row)).toList();
+  }
+
   Future<List<Product>> getPublishedProductsBySeller(
     String sellerId, {
     int limit = 40,
