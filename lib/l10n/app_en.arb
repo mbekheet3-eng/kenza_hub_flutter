@@ -799,5 +799,6 @@
   "verifiedPhoneBadge": "Phone confirmed",
   "verifiedIdentityBadge": "Identity verified",
   "verifiedStoreBadge": "Verified store",
-  "sellerPublicProfile": "Public seller profile"
+  "sellerPublicProfile": "Public seller profile",
+  "aiProductSuggestionNote": "AI suggestions are editable and optional. The price is indicative only."
 }
