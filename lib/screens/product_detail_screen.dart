@@ -71,13 +71,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     if (!await _ensureLogin() || !mounted || _favoriteLoading) return;
     setState(() => _favoriteLoading = true);
     try {
-      if (_isFavorite) {
+      final favoriteIds = await _favoritesService.getFavoriteProductIds();
+      final currentlyFavorite = favoriteIds.contains(product.id);
+      if (currentlyFavorite) {
         await _favoritesService.removeFavorite(product.id);
       } else {
         await _favoritesService.addFavorite(product.id);
       }
       if (!mounted) return;
-      setState(() => _isFavorite = !_isFavorite);
+      setState(() => _isFavorite = !currentlyFavorite);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(_isFavorite ? _l10n.favoriteAddedToast : _l10n.favoriteRemoved),
