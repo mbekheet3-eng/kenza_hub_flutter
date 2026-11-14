@@ -1,0 +1,21 @@
+// ARCHIVED SOURCE FROM SUPABASE V2 (klkcroynomxuajggqqqx)
+// Historical reference only. This file is NOT deployed to Marketplace.
+// Review schema dependencies and security before any adaptation.
+
+Deno.serve(async (req: Request) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+    }});
+  }
+  return Response.json(
+    { code: "ORDER_AGREEMENT_FLOW_NOT_READY", message: "Order creation is not enabled until the buyer/seller agreement and OTP confirmation workflow is approved and complete." },
+    { status: 503, headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+      "Content-Type": "application/json",
+    }}
+  );
+});
