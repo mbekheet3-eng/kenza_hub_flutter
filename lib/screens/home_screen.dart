@@ -43,21 +43,21 @@ class _SpecialMarketEntry extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
-          child: Row(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: colors.primary, size: 21),
-              const SizedBox(width: 7),
-              Flexible(
-                child: Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: colors.onSurface,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 13,
-                  ),
+              Icon(icon, color: colors.primary, size: 22),
+              const SizedBox(height: 7),
+              Text(
+                title,
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
                 ),
               ),
             ],
@@ -171,9 +171,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _openSpecialMarkets(String storeType) async {
     final strings = AppStrings.of(context)!;
+    final languageCode = Localizations.localeOf(context).languageCode;
     final title = storeType == 'wekala_corner'
         ? strings.agencyCornerTitle
-        : strings.onlineStoresTitle;
+        : storeType == 'online_store'
+            ? strings.onlineStoresTitle
+            : languageCode == 'ar'
+                ? 'المحلات والمتاجر'
+                : languageCode == 'fr'
+                    ? 'Magasins et boutiques'
+                    : 'Shops & Stores';
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => StoreDirectoryScreen(storeType: storeType, title: title),
@@ -340,12 +347,24 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () => _openSpecialMarkets('wekala_corner'),
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: _SpecialMarketEntry(
                           icon: Icons.shopping_bag_outlined,
                           title: AppStrings.of(context)!.onlineStoresTitle,
                           onTap: () => _openSpecialMarkets('online_store'),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _SpecialMarketEntry(
+                          icon: Icons.store_mall_directory_outlined,
+                          title: Localizations.localeOf(context).languageCode == 'ar'
+                              ? 'المحلات والمتاجر'
+                              : Localizations.localeOf(context).languageCode == 'fr'
+                                  ? 'Magasins et boutiques'
+                                  : 'Shops & Stores',
+                          onTap: () => _openSpecialMarkets('physical_shop'),
                         ),
                       ),
                     ],
