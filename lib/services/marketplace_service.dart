@@ -326,7 +326,9 @@ class MarketplaceService {
   }
 
   Future<List<Map<String, dynamic>>> getActiveStoresByType(String storeType) async {
-    if (storeType != 'wekala_corner' && storeType != 'online_store') {
+    if (storeType != 'wekala_corner' &&
+        storeType != 'online_store' &&
+        storeType != 'physical_shop') {
       throw ArgumentError.value(storeType, 'storeType');
     }
     final rows = await _client
