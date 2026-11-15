@@ -562,21 +562,6 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
                 ),
               ),
             ),
-          Positioned(
-            top: 12,
-            right: 12,
-            child: DecoratedBox(
-              decoration: const BoxDecoration(
-                color: Colors.black54,
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                tooltip: AppStrings.of(context)!.zoomImageLabel,
-                onPressed: _openFullScreen,
-                icon: const Icon(Icons.zoom_in, color: Colors.white),
-              ),
-            ),
-          ),
         ],
       ),
     );
