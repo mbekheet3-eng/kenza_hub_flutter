@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -8,8 +10,10 @@ import '../models/category.dart';
 import '../models/product.dart';
 import '../services/marketplace_service.dart';
 import '../services/favorites_service.dart';
+import '../services/notification_service.dart';
 import '../widgets/product_card.dart';
 import 'login_screen.dart';
+import 'notifications_screen.dart';
 import 'product_detail_screen.dart';
 import 'search_screen.dart';
 import 'store_directory_screen.dart';
@@ -70,6 +74,9 @@ class _SpecialMarketEntry extends StatelessWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _service = MarketplaceService();
+  final _notificationService = NotificationService();
+  late Stream<List<Map<String, dynamic>>> _notificationStream;
+  late final StreamSubscription<AuthState> _authSubscription;
   final _search = TextEditingController();
   List<Category> _categories = [];
   List<Product> _products = [];
@@ -81,11 +88,49 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _notificationStream = _currentNotificationStream();
+    _authSubscription = Supabase.instance.client.auth.onAuthStateChange.listen((state) {
+      if (!mounted) return;
+      setState(() {
+        _notificationStream = state.session == null
+            ? Stream.value(const <Map<String, dynamic>>[])
+            : _notificationService.watchNotifications();
+      });
+    });
     _load();
+  }
+
+  Stream<List<Map<String, dynamic>>> _currentNotificationStream() {
+    return Supabase.instance.client.auth.currentUser == null
+        ? Stream.value(const <Map<String, dynamic>>[])
+        : _notificationService.watchNotifications();
+  }
+
+  Future<void> _openNotifications() async {
+    if (Supabase.instance.client.auth.currentUser == null) {
+      await showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        backgroundColor: Colors.transparent,
+        builder: (_) => const FractionallySizedBox(
+          heightFactor: 0.94,
+          child: ClipRRect(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            child: LoginScreen(),
+          ),
+        ),
+      );
+      if (!mounted || Supabase.instance.client.auth.currentUser == null) return;
+    }
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+    );
   }
 
   @override
   void dispose() {
+    _authSubscription.cancel();
     _search.dispose();
     super.dispose();
   }
@@ -276,7 +321,55 @@ class _HomeScreenState extends State<HomeScreen> {
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+                  padding: const EdgeInsets.fromLTRB(12, 2, 12, 0),
+                  child: Align(
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: StreamBuilder<List<Map<String, dynamic>>>(
+                      stream: _notificationStream,
+                      builder: (context, snapshot) {
+                        final unreadCount = (snapshot.data ?? const [])
+                            .where((notification) => notification['is_read'] != true)
+                            .length;
+                        return IconButton(
+                          tooltip: AppStrings.of(context)!.notificationsTitle,
+                          onPressed: _openNotifications,
+                          icon: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              const Icon(Icons.notifications_none_rounded),
+                              if (unreadCount > 0)
+                                PositionedDirectional(
+                                  top: -3,
+                                  end: -4,
+                                  child: Container(
+                                    constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).colorScheme.error,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      unreadCount > 99 ? '99+' : '$unreadCount',
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onError,
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 2, 16, 12),
                   child: TextField(
                     controller: _search,
                     textInputAction: TextInputAction.search,
