@@ -2,15 +2,6 @@ name: Resolve Flutter dependencies
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - phase-1/implementation
-    paths:
-      - pubspec.yaml
-      - .github/workflows/resolve-flutter-dependencies.yml
-      - lib/**/*.dart
-      - android/**/*.gradle.kts
-      - android/app/src/main/AndroidManifest.xml
 
 permissions:
   contents: write
