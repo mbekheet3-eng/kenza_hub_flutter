@@ -4,11 +4,6 @@ on:
   push:
     branches:
       - phase-1/implementation
-      - feature/audience-gender-restrictions
-      - test/all-latest-changes
-      - fix/radio-group-flutter-347
-      - feature/category-trilingual-localization
-      - feature/special-markets-ui
     paths:
       - 'lib/**'
       - 'test/**'
