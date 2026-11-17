@@ -6,6 +6,63 @@ import '../services/marketplace_service.dart';
 import 'search_screen.dart';
 import 'store_directory_screen.dart';
 
+IconData _categoryIconForSlug(String slug) {
+  if (slug == 'bags-accessories' || slug.contains('bag')) {
+    return Icons.shopping_bag_outlined;
+  }
+
+  if (slug.startsWith('clothes')) {
+    if (slug.contains('jeans') ||
+        slug.contains('trousers') ||
+        slug.contains('shorts') ||
+        slug.contains('skirts')) {
+      return Icons.straighten_outlined;
+    }
+    return Icons.checkroom_outlined;
+  }
+
+  if (slug.startsWith('shoes')) {
+    if (slug.contains('sneakers') ||
+        slug.contains('running') ||
+        slug.contains('sports')) {
+      return Icons.directions_run;
+    }
+    if (slug.contains('boots')) return Icons.hiking_outlined;
+    return Icons.directions_walk_outlined;
+  }
+
+  if (slug.startsWith('children-supplies') || slug.startsWith('kids-')) {
+    if (slug.contains('stroller')) return Icons.child_friendly;
+    if (slug.contains('car-seats')) return Icons.event_seat_outlined;
+    if (slug.contains('furniture') || slug.contains('bedding')) {
+      return Icons.bed_outlined;
+    }
+    if (slug.contains('feeding')) return Icons.restaurant_outlined;
+    if (slug.contains('toys')) return Icons.toys;
+    if (slug.contains('school')) return Icons.school_outlined;
+    if (slug.contains('bathing')) return Icons.bathtub_outlined;
+    if (slug.contains('safety')) return Icons.health_and_safety_outlined;
+    if (slug.contains('carriers')) return Icons.backpack_outlined;
+    return Icons.child_friendly;
+  }
+
+  if (slug.startsWith('home-supplies') || slug.startsWith('home-')) {
+    if (slug.contains('furniture')) return Icons.weekend_outlined;
+    if (slug.contains('decor')) return Icons.palette_outlined;
+    if (slug.contains('kitchen')) return Icons.kitchen_outlined;
+    if (slug.contains('appliances')) return Icons.electrical_services_outlined;
+    if (slug.contains('textiles')) return Icons.bed_outlined;
+    if (slug.contains('lighting')) return Icons.lightbulb_outline;
+    if (slug.contains('storage')) return Icons.inventory_2_outlined;
+    if (slug.contains('cleaning')) return Icons.cleaning_services_outlined;
+    if (slug.contains('bathroom')) return Icons.bathtub_outlined;
+    if (slug.contains('garden')) return Icons.yard_outlined;
+    return Icons.chair_outlined;
+  }
+
+  return Icons.category_outlined;
+}
+
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
 
@@ -47,22 +104,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       .toList()
     ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
 
-  IconData _iconForCategory(Category category) {
-    switch (category.slug) {
-      case 'clothes':
-        return Icons.checkroom_outlined;
-      case 'shoes':
-        return Icons.directions_walk_outlined;
-      case 'children-supplies':
-        return Icons.child_friendly;
-      case 'home-supplies':
-        return Icons.chair_outlined;
-      case 'bags-accessories':
-        return Icons.shopping_bag_outlined;
-      default:
-        return Icons.category_outlined;
-    }
-  }
+
 
   Future<void> _openCategory(Category category) async {
     final children = _childrenOf(category.id);
@@ -182,42 +224,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           ),
                           SliverToBoxAdapter(
                             child: Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-                              child: Text(
-                                strings.discoverCategoriesTitle,
-                                style: Theme.of(context).textTheme.titleMedium
-                                    ?.copyWith(fontWeight: FontWeight.w800),
-                              ),
-                            ),
-                          ),
-                          SliverPadding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            sliver: SliverGrid(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) {
-                                  final category = rootCategories[index];
-                                  return _DiscoverCategoryCard(
-                                    category: category,
-                                    languageCode: languageCode,
-                                    icon: _iconForCategory(category),
-                                    hasChildren:
-                                        _childrenOf(category.id).isNotEmpty,
-                                    onTap: () => _openCategory(category),
-                                  );
-                                },
-                                childCount: rootCategories.length,
-                              ),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 10,
-                                mainAxisSpacing: 10,
-                                childAspectRatio: 1.85,
-                              ),
-                            ),
-                          ),
-                          SliverToBoxAdapter(
-                            child: Padding(
                               padding: const EdgeInsets.fromLTRB(16, 24, 16, 10),
                               child: Text(
                                 strings.discoverStoresTitle,
@@ -257,6 +263,42 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                   ),
                                 ),
                               ]),
+                            ),
+                          ),
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+                              child: Text(
+                                strings.discoverCategoriesTitle,
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.w800),
+                              ),
+                            ),
+                          ),
+                          SliverPadding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            sliver: SliverGrid(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  final category = rootCategories[index];
+                                  return _DiscoverCategoryCard(
+                                    category: category,
+                                    languageCode: languageCode,
+                                    icon: _categoryIconForSlug(category.slug),
+                                    hasChildren:
+                                        _childrenOf(category.id).isNotEmpty,
+                                    onTap: () => _openCategory(category),
+                                  );
+                                },
+                                childCount: rootCategories.length,
+                              ),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                childAspectRatio: 1.85,
+                              ),
                             ),
                           ),
                         ],
@@ -450,7 +492,7 @@ class _CategoryTile extends StatelessWidget {
       leading: CircleAvatar(
         backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
         child: Icon(
-          hasChildren ? Icons.folder_outlined : Icons.category_outlined,
+          _categoryIconForSlug(category.slug),
           color: Theme.of(context).colorScheme.onSecondaryContainer,
         ),
       ),
