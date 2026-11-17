@@ -52,11 +52,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       case 'clothes':
         return Icons.checkroom_outlined;
       case 'shoes':
-        return Icons.hiking_outlined;
+        return Icons.directions_walk_outlined;
       case 'children-supplies':
-        return Icons.child_care_outlined;
+        return Icons.child_friendly;
       case 'home-supplies':
-        return Icons.chair_alt_outlined;
+        return Icons.chair_outlined;
       case 'bags-accessories':
         return Icons.shopping_bag_outlined;
       default:
