@@ -195,35 +195,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                         slivers: [
                           SliverToBoxAdapter(
                             child: Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                              child: Card(
-                                margin: EdgeInsets.zero,
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: Theme.of(context)
-                                        .colorScheme
-                                        .secondaryContainer,
-                                    child: Icon(
-                                      Icons.grid_view_rounded,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondaryContainer,
-                                    ),
-                                  ),
-                                  title: Text(
-                                    strings.allProducts,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  trailing: const Icon(Icons.chevron_right_rounded),
-                                  onTap: _openAllProducts,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SliverToBoxAdapter(
-                            child: Padding(
                               padding: const EdgeInsets.fromLTRB(16, 24, 16, 10),
                               child: Text(
                                 strings.discoverStoresTitle,
@@ -263,6 +234,35 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                   ),
                                 ),
                               ]),
+                            ),
+                          ),
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                              child: Card(
+                                margin: EdgeInsets.zero,
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .secondaryContainer,
+                                    child: Icon(
+                                      Icons.grid_view_rounded,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondaryContainer,
+                                    ),
+                                  ),
+                                  title: Text(
+                                    strings.allProducts,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  trailing: const Icon(Icons.chevron_right_rounded),
+                                  onTap: _openAllProducts,
+                                ),
+                              ),
                             ),
                           ),
                           SliverToBoxAdapter(
