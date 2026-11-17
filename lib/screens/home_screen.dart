@@ -309,6 +309,23 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  String _homeGreeting(String languageCode) {
+    final metadata = Supabase.instance.client.auth.currentUser?.userMetadata;
+    final displayName = metadata?['display_name'] as String?;
+    final trimmedName = displayName?.trim();
+    final firstName = trimmedName == null || trimmedName.isEmpty
+        ? null
+        : trimmedName.split(RegExp(r'\\s+')).first;
+
+    if (languageCode == 'ar') {
+      return firstName == null ? 'أهلاً' : 'أهلاً $firstName';
+    }
+    if (languageCode == 'fr') {
+      return firstName == null ? 'Bonjour' : 'Bonjour $firstName';
+    }
+    return firstName == null ? 'Hello' : 'Hello $firstName';
+  }
+
   @override
   Widget build(BuildContext context) {
     final languageCode = Localizations.localeOf(context).languageCode;
@@ -321,49 +338,60 @@ class _HomeScreenState extends State<HomeScreen> {
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 2, 12, 0),
-                  child: Align(
-                    alignment: AlignmentDirectional.centerEnd,
-                    child: StreamBuilder<List<Map<String, dynamic>>>(
-                      stream: _notificationStream,
-                      builder: (context, snapshot) {
-                        final unreadCount = (snapshot.data ?? const [])
-                            .where((notification) => notification['is_read'] != true)
-                            .length;
-                        return IconButton(
-                          tooltip: AppStrings.of(context)!.notificationsTitle,
-                          onPressed: _openNotifications,
-                          icon: Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              const Icon(Icons.notifications_none_rounded),
-                              if (unreadCount > 0)
-                                PositionedDirectional(
-                                  top: -3,
-                                  end: -4,
-                                  child: Container(
-                                    constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-                                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).colorScheme.error,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      unreadCount > 99 ? '99+' : '$unreadCount',
-                                      style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onError,
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.bold,
+                  padding: const EdgeInsets.fromLTRB(16, 4, 12, 0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _homeGreeting(languageCode),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                        ),
+                      ),
+                      StreamBuilder<List<Map<String, dynamic>>>(
+                        stream: _notificationStream,
+                        builder: (context, snapshot) {
+                          final unreadCount = (snapshot.data ?? const [])
+                              .where((notification) => notification['is_read'] != true)
+                              .length;
+                          return IconButton(
+                            tooltip: AppStrings.of(context)!.notificationsTitle,
+                            onPressed: _openNotifications,
+                            icon: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                const Icon(Icons.notifications_none_rounded),
+                                if (unreadCount > 0)
+                                  PositionedDirectional(
+                                    top: -3,
+                                    end: -4,
+                                    child: Container(
+                                      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).colorScheme.error,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        unreadCount > 99 ? '99+' : '$unreadCount',
+                                        style: TextStyle(
+                                          color: Theme.of(context).colorScheme.onError,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
