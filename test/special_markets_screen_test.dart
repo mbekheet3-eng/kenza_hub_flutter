@@ -27,7 +27,7 @@ void main() {
         MaterialApp(
           locale: locale,
           supportedLocales: AppStrings.supportedLocales,
-          localizationsDelegates: AppStrings.localizationsDelegates,
+          localizationsDelegates: KenzaLocalizations.delegates,
           home: const SpecialMarketsScreen(),
         ),
       );
