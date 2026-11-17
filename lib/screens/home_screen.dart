@@ -315,7 +315,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final trimmedName = displayName?.trim();
     final firstName = trimmedName == null || trimmedName.isEmpty
         ? null
-        : trimmedName.split(RegExp(r'\\s+')).first;
+        : trimmedName.split(RegExp(r'\s+')).first;
 
     if (languageCode == 'ar') {
       return firstName == null ? 'أهلاً' : 'أهلاً $firstName';
