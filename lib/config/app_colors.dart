@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Kenza Hub brand palette: red, white, navy, and neutral greys.
 final class AppColors {

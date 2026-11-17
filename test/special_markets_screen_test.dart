@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kenza_hub_marketplace/l10n/app_strings.dart';
+import 'package:kenza_hub_marketplace/l10n/kenza_localizations.dart';
 import 'package:kenza_hub_marketplace/screens/special_markets_screen.dart';
 
 void main() {
@@ -9,7 +10,7 @@ void main() {
       const MaterialApp(
         locale: Locale('ar'),
         supportedLocales: AppStrings.supportedLocales,
-        localizationsDelegates: AppStrings.localizationsDelegates,
+        localizationsDelegates: KenzaLocalizations.delegates,
         home: SpecialMarketsScreen(),
       ),
     );

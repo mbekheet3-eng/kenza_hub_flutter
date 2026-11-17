@@ -1,6 +1,12 @@
 name: Resolve Flutter dependencies
 
 on:
+  push:
+    branches:
+      - phase-1/implementation
+    paths:
+      - 'pubspec.yaml'
+      - '.github/workflows/resolve-flutter-dependencies.yml'
   workflow_dispatch:
 
 permissions:
@@ -35,6 +41,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "pubspec.lock is already up to date."
           else
-            git commit -m "chore: resolve Firebase messaging dependencies"
+            git commit -m "chore: sync Flutter dependency lockfile"
             git push origin HEAD:phase-1/implementation
           fi

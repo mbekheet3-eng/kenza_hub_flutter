@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'config/app_locale.dart';
 import 'config/app_theme.dart';
 import 'l10n/app_strings.dart';
+import 'l10n/kenza_localizations.dart';
 import 'screens/splash_screen.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey =
@@ -24,7 +25,7 @@ class KenzaHubApp extends StatelessWidget {
         themeMode: ThemeMode.light,
         locale: locale,
         supportedLocales: AppStrings.supportedLocales,
-        localizationsDelegates: AppStrings.localizationsDelegates,
+        localizationsDelegates: KenzaLocalizations.delegates,
         home: const KenzaSplashScreen(),
       ),
     );

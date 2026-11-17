@@ -1,12 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app.dart';
 import 'config/app_locale.dart';
 import 'l10n/app_strings.dart';
+import 'l10n/kenza_localizations.dart';
 import 'services/push_notification_service.dart';
 
 Future<void> main() async {
@@ -52,7 +53,7 @@ class MissingConfigurationApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      localizationsDelegates: AppStrings.localizationsDelegates,
+      localizationsDelegates: KenzaLocalizations.delegates,
       supportedLocales: AppStrings.supportedLocales,
       home: Builder(
         builder: (context) => Scaffold(
