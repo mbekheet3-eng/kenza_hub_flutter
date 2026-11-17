@@ -140,7 +140,7 @@ class _GenderChangeRequestScreenState extends State<GenderChangeRequestScreen> {
                     maxLength: 500,
                     decoration: InputDecoration(
                       labelText: AppStrings.of(context)!.requestReasonOptional,
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 12),

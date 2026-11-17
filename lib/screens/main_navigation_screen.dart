@@ -115,28 +115,28 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         }),
         destinations: [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home_rounded),
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home_rounded),
             label: strings.mainHome,
           ),
           NavigationDestination(
-            icon: Icon(Icons.explore_outlined),
-            selectedIcon: Icon(Icons.explore_rounded),
+            icon: const Icon(Icons.explore_outlined),
+            selectedIcon: const Icon(Icons.explore_rounded),
             label: strings.discoverTitle,
           ),
           NavigationDestination(
-            icon: Icon(Icons.add_circle_outline_rounded, size: 30),
-            selectedIcon: Icon(Icons.add_circle_rounded, size: 30),
+            icon: const Icon(Icons.add_circle_outline_rounded, size: 30),
+            selectedIcon: const Icon(Icons.add_circle_rounded, size: 30),
             label: strings.addProduct,
           ),
           NavigationDestination(
-            icon: Icon(Icons.chat_bubble_outline_rounded),
-            selectedIcon: Icon(Icons.chat_bubble_rounded),
+            icon: const Icon(Icons.chat_bubble_outline_rounded),
+            selectedIcon: const Icon(Icons.chat_bubble_rounded),
             label: strings.messages,
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline_rounded),
-            selectedIcon: Icon(Icons.person_rounded),
+            icon: const Icon(Icons.person_outline_rounded),
+            selectedIcon: const Icon(Icons.person_rounded),
             label: strings.accountTab,
           ),
         ],

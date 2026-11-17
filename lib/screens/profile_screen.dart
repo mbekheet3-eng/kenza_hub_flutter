@@ -215,6 +215,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       final file = File(picked.path);
       final bytes = await file.readAsBytes();
+      if (!mounted) return;
       if (bytes.length > 5 * 1024 * 1024) {
         throw Exception(AppStrings.of(context)!.avatarTooLarge);
       }
@@ -391,7 +392,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: 12),
                       Text(
                         AppStrings.of(context)!.profileNamePrivacy,
-                        style: TextStyle(color: Colors.grey),
+                        style: const TextStyle(color: Colors.grey),
                       ),
                       const Divider(height: 28),
                       Builder(

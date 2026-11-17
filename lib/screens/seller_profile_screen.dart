@@ -146,7 +146,7 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
         ]),
         Row(children: [
           const Icon(Icons.star, color: Colors.amber), const SizedBox(width: 6),
-          Text(average == null ? strings.sellerNoReviews : average.toStringAsFixed(1) + ' / 5 (' + count.toString() + ')'),
+          Text(average == null ? strings.sellerNoReviews : '${average.toStringAsFixed(1)} / 5 ($count)'),
         ]),
         if (reviews.isNotEmpty) ...[
           const SizedBox(height: 12),
@@ -161,7 +161,7 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
               title: Row(children: List.generate(5, (i) => Icon(i < rating ? Icons.star : Icons.star_border, size: 16, color: Colors.amber))),
               subtitle: comment.isEmpty ? null : Text(comment, maxLines: 4, overflow: TextOverflow.ellipsis),
               trailing: date == null ? null : Text(
-                date.day.toString() + '/' + date.month.toString() + '/' + date.year.toString(),
+                '${date.day}/${date.month}/${date.year}',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             );
@@ -198,7 +198,7 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
                             Text(sellerName?.isNotEmpty == true ? sellerName! : strings.memberFallbackName,
                               style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
                             const SizedBox(height: 5), Text(strings.sellerOnKenza),
-                            const SizedBox(height: 5), Text(_productCount.toString() + ' ' + strings.productsCount),
+                            const SizedBox(height: 5), Text('$_productCount ${strings.productsCount}'),
                           ])),
                         ]),
                       ),

@@ -101,7 +101,7 @@ class _SignupScreenState extends State<SignupScreen> {
               decoration: InputDecoration(
                 labelText: AppStrings.of(context)!.signupNameLabel,
                 helperText: AppStrings.of(context)!.signupNameHint,
-                prefixIcon: Icon(Icons.person_outline),
+                prefixIcon: const Icon(Icons.person_outline),
               ),
             ),
             const SizedBox(height: 14),
@@ -111,7 +111,7 @@ class _SignupScreenState extends State<SignupScreen> {
               autocorrect: false,
               decoration: InputDecoration(
                 labelText: AppStrings.of(context)!.email,
-                prefixIcon: Icon(Icons.email_outlined),
+                prefixIcon: const Icon(Icons.email_outlined),
               ),
             ),
             const SizedBox(height: 18),
@@ -159,7 +159,7 @@ class _SignupScreenState extends State<SignupScreen> {
               obscureText: _hidePassword,
               decoration: InputDecoration(
                 labelText: AppStrings.of(context)!.confirmPassword,
-                prefixIcon: Icon(Icons.lock_outline),
+                prefixIcon: const Icon(Icons.lock_outline),
               ),
             ),
             const SizedBox(height: 12),
