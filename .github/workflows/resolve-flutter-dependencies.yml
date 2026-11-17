@@ -6,7 +6,6 @@ on:
       - phase-1/implementation
     paths:
       - 'pubspec.yaml'
-      - 'test/special_markets_screen_test.dart'
       - '.github/workflows/resolve-flutter-dependencies.yml'
   workflow_dispatch:
 
