@@ -52,11 +52,8 @@ class ProductCard extends StatelessWidget {
                       bottom: 8,
                       child: IconButton(
                           style: IconButton.styleFrom(
-                            backgroundColor: Colors.white.withValues(alpha: 0.88),
-                            foregroundColor: isFavorite ? Colors.red : Colors.blueGrey,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
-                            ),
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: isFavorite ? Colors.red : Colors.white,
                             side: BorderSide.none,
                           ),
                           tooltip: isFavorite
