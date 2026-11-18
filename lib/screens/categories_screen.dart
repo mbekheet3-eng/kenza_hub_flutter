@@ -336,18 +336,13 @@ class _DiscoverCategoryCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           child: Row(
             children: [
-              Container(
-                width: 42,
+              SizedBox(
+                width: 38,
                 height: 42,
-                decoration: BoxDecoration(
-                  color: colors.secondaryContainer,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                alignment: Alignment.center,
                 child: Icon(
                   icon,
-                  color: colors.onSecondaryContainer,
-                  size: 23,
+                  color: colors.primary,
+                  size: 29,
                 ),
               ),
               const SizedBox(width: 10),
