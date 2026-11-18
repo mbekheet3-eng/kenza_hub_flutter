@@ -8,7 +8,7 @@ Flutter marketplace app, rebuilt for a simple and extensible phase one.
 - Email/password registration and login.
 - Google and Apple OAuth entry points with brand marks.
 - Profile name management.
-- Product creation, immediate publication after successful image upload, editing, and deletion.
+- Product creation with server-side Gemini image moderation before publication, editing, and deletion. Rejected or uncertain submissions remain unpublished for correction and resubmission.
 - Private Supabase product-image storage with signed URLs.
 
 ## Development
