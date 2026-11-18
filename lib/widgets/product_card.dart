@@ -50,11 +50,15 @@ class ProductCard extends StatelessWidget {
                     Positioned(
                       right: 8,
                       bottom: 8,
-                      child: Material(
-                        color: Colors.white.withValues(alpha: 0.96),
-                        shape: const CircleBorder(),
-                        elevation: 1,
-                        child: IconButton(
+                      child: IconButton(
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.white.withValues(alpha: 0.88),
+                            foregroundColor: isFavorite ? Colors.red : Colors.blueGrey,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                            ),
+                            side: BorderSide.none,
+                          ),
                           tooltip: isFavorite
                               ? strings.removeFavoriteTooltip
                               : strings.addFavoriteTooltip,
@@ -66,7 +70,6 @@ class ProductCard extends StatelessWidget {
                                 : Icons.favorite_border_rounded,
                             color: isFavorite ? Colors.red : Colors.blueGrey,
                           ),
-                        ),
                       ),
                     ),
                 ],
