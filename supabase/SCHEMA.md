@@ -16,10 +16,12 @@ Project: `mxdcfewkajwvtwtjoeia`
 2. Upload every image to the private `product-images` bucket using:
    `{user_id}/{product_id}/{filename}`.
 3. Insert the matching `product_images` rows.
-4. Only after all images and rows succeed, update the product to `status = 'published'`.
-5. If any step fails, remove uploaded files and delete the draft product.
+4. Invoke the authenticated Edge Function `review-product-images` with the product ID. The function verifies the member session and product ownership, then reviews the uploaded images with Gemini 2.5 Flash using the server-only `GEMINI_API_KEY`.
+5. The function records the result in the private `product_moderation` table. It changes the product to `status = 'published'` only when every image is approved.
+6. Rejected or uncertain images, missing review configuration, and review-service failures do not publish the product. The draft and its uploaded images are preserved so the owner can correct the listing and submit it again.
+7. If upload or image-row creation fails before moderation, the client attempts to remove uploaded files and delete the incomplete draft.
 
-This is immediate publication after a successful upload, not an admin review queue. Draft status is an internal safety state while the upload is in progress.
+Publication is gated by the server-side moderation result; successful upload alone is never sufficient. This is automated image moderation, not an admin review queue.
 
 ## Member profiles and avatars
 
