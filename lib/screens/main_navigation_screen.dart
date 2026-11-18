@@ -103,6 +103,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         children: destinations,
       ),
       bottomNavigationBar: NavigationBar(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        indicatorColor: Colors.transparent,
         selectedIndex: _selectedIndex,
         onDestinationSelected: _selectDestination,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
@@ -125,8 +129,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             label: strings.discoverTitle,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.add_circle_outline_rounded, size: 30),
-            selectedIcon: const Icon(Icons.add_circle_rounded, size: 30),
+            icon: const Icon(Icons.add_rounded, size: 28),
+            selectedIcon: const Icon(Icons.add_rounded, size: 28),
             label: strings.addProduct,
           ),
           NavigationDestination(
