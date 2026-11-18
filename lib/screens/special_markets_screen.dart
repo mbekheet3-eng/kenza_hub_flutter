@@ -27,7 +27,7 @@ class SpecialMarketsScreen extends StatelessWidget {
       SpecialMarket(
         title: strings.agencyCornerTitle,
         description: strings.agencyCornerDescription,
-        icon: Icons.storefront_outlined,
+        icon: Icons.checkroom_outlined,
         highlights: [
           strings.agencyCornerHighlight1,
           strings.agencyCornerHighlight2,
