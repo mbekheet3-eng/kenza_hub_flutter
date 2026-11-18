@@ -85,6 +85,9 @@ jobs:
               </item>
           </layer-list>
           XML
+          cp android/app/src/main/res/drawable/launch_background.xml android/app/src/main/res/drawable-v21/launch_background.xml
+          # Remove the obsolete PNG that previously failed AAPT2 resource compilation.
+          rm -f android/app/src/main/res/drawable-nodpi/kenza_logo.png
           # Android 12+ uses the app launcher icon for its system splash.
           # The launcher icon above is the approved Kenza logo; older Android uses launch_background.xml.
           # Use normalized legacy launcher PNGs; remove adaptive resources that reference a foreground layer.
