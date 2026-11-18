@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter/services.dart';
 
 class KenzaLogo extends StatelessWidget {
   const KenzaLogo({
@@ -15,33 +12,22 @@ class KenzaLogo extends StatelessWidget {
   final double height;
   final BoxFit fit;
 
-  static final Future<String> _encodedLogo = rootBundle.loadString(
-    'assets/logos/kenza_mark.png.base64',
-  );
-
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-      future: _encodedLogo,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return Image.memory(
-            base64Decode(snapshot.data!),
-            width: width,
-            height: height,
-            fit: fit,
-          );
-        }
-        return SizedBox(
-          width: width,
-          height: height,
-          child: const Icon(
-            Icons.storefront_rounded,
-            size: 72,
-            color: Color(0xFF17366F),
-          ),
-        );
-      },
+    return Image.asset(
+      'assets/logos/kenza_mark.png',
+      width: width,
+      height: height,
+      fit: fit,
+      errorBuilder: (context, error, stackTrace) => SizedBox(
+        width: width,
+        height: height,
+        child: const Icon(
+          Icons.storefront_rounded,
+          size: 72,
+          color: Color(0xFF17366F),
+        ),
+      ),
     );
   }
 }
