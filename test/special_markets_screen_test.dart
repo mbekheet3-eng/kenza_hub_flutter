@@ -22,8 +22,8 @@ void main() {
       ),
     );
 
-    expect(find.text('ركن الوكالة'), findsOneWidget);
-    expect(find.text('المتاجر الإلكترونية'), findsOneWidget);
+    expect(find.text('محلات الوكالة'), findsOneWidget);
+    expect(find.text('صفحات السوشيال'), findsOneWidget);
     expect(find.text('الأنتيكات والتحف'), findsNothing);
     expect(find.text('الهاند ميد'), findsNothing);
     expect(find.byIcon(Icons.checkroom_outlined), findsOneWidget);
@@ -57,11 +57,11 @@ void main() {
       await tester.pumpAndSettle();
 
       if (locale.languageCode == 'en') {
-        expect(find.text('Wekala Corner'), findsOneWidget);
-        expect(find.text('Online Stores'), findsOneWidget);
+        expect(find.text('Wekala Shops'), findsOneWidget);
+        expect(find.text('Social Pages'), findsOneWidget);
       } else {
-        expect(find.text('Coin Wekala'), findsOneWidget);
-        expect(find.text('Boutiques en ligne'), findsOneWidget);
+        expect(find.text('Magasins Wekala'), findsOneWidget);
+        expect(find.text('Pages sociales'), findsOneWidget);
       }
     }
   });
