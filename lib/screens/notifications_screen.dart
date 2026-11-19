@@ -51,8 +51,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
         );
       } else {
+        final type = row['type']?.toString();
+        final initialTab = switch (type) {
+          'new_offer' || 'offer_accepted' || 'offer_rejected' => 1,
+          'new_order' || 'order_accepted' || 'order_rejected' || 'order_updated' => 2,
+          _ => 0,
+        };
         await Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const MessagesInboxScreen()),
+          MaterialPageRoute(
+            builder: (_) => MessagesInboxScreen(initialTab: initialTab),
+          ),
         );
       }
     } catch (error) {
