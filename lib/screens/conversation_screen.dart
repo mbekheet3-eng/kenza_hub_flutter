@@ -18,13 +18,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
   final _service = MarketplaceTransactionService();
   final _messageController = TextEditingController();
   bool _sending = false;
-  late Future<List<Map<String, dynamic>>> _messages;
+  late Stream<List<Map<String, dynamic>>> _messages;
   late Future<Map<String, dynamic>?> _otherMember;
 
   @override
   void initState() {
     super.initState();
-    _messages = _service.getMessages(widget.conversationId);
+    _messages = _service.watchMessages(widget.conversationId);
     _otherMember = _loadOtherMemberProfile();
   }
 
@@ -56,12 +56,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
         .maybeSingle();
   }
 
-  Future<void> _refresh() async {
-    final future = _service.getMessages(widget.conversationId);
-    setState(() => _messages = future);
-    await future;
-  }
-
   Future<void> _send() async {
     final text = _messageController.text.trim();
     if (text.isEmpty || _sending) return;
@@ -74,20 +68,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
       if (!mounted) return;
 
-      // A refresh failure must not be reported as a message-send failure.
-      try {
-        await _refresh();
-      } catch (error) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                '${AppStrings.of(context)!.messageSentConversationRefreshFailed}: $error',
-              ),
-            ),
-          );
-        }
-      }
+      // Incoming and outgoing messages are reflected by the realtime stream.
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -130,8 +111,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
       body: Column(
         children: [
           Expanded(
-            child: FutureBuilder<List<Map<String, dynamic>>>(
-              future: _messages,
+            child: StreamBuilder<List<Map<String, dynamic>>>(
+              stream: _messages,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
