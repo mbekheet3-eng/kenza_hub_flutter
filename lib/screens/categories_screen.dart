@@ -6,6 +6,21 @@ import '../services/marketplace_service.dart';
 import 'search_screen.dart';
 import 'store_directory_screen.dart';
 
+String _categoryImageForSlug(String slug) {
+  switch (slug) {
+    case 'clothes':
+      return 'assets/icons/clothing.png';
+    case 'shoes':
+      return 'assets/icons/shoes.png';
+    case 'children-supplies':
+      return 'assets/icons/children_supplies.png';
+    case 'home-supplies':
+      return 'assets/icons/home_supplies.png';
+    default:
+      return 'assets/icons/clothing.png';
+  }
+}
+
 IconData _categoryIconForSlug(String slug) {
   if (slug.startsWith('clothes')) return Icons.checkroom_outlined;
   if (slug.startsWith('shoes')) return Icons.directions_walk_outlined;
@@ -228,7 +243,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               return _DiscoverCategoryCard(
                                 category: category,
                                 languageCode: languageCode,
-                                icon: _categoryIconForSlug(category.slug),
+                                imageAsset: _categoryImageForSlug(category.slug),
                                 hasChildren: _childrenOf(category.id).isNotEmpty,
                                 onTap: () => _openCategory(category),
                               );
@@ -259,7 +274,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                         sliver: SliverGrid(
                           delegate: SliverChildListDelegate([
                             _DiscoverStoreCard(
-                              icon: Icons.storefront_rounded,
+                              imageAsset: 'assets/icons/wekala_markets.png',
                               title: _storeName('wekala', languageCode),
                               subtitle: _storeSubtitle('wekala', languageCode),
                               onTap: () => _openStoreDirectory(
@@ -268,7 +283,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               ),
                             ),
                             _DiscoverStoreCard(
-                              icon: Icons.shopping_bag_rounded,
+                              imageAsset: 'assets/icons/social_stores.png',
                               title: _storeName('social', languageCode),
                               subtitle: _storeSubtitle('social', languageCode),
                               onTap: () => _openStoreDirectory(
@@ -277,7 +292,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               ),
                             ),
                             _DiscoverStoreCard(
-                              icon: Icons.inventory_2_rounded,
+                              imageAsset: 'assets/icons/kenza_stock.png',
                               title: _storeName('stock', languageCode),
                               subtitle: _storeSubtitle('stock', languageCode),
                               onTap: () => _openStoreDirectory(
@@ -286,7 +301,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               ),
                             ),
                             _DiscoverStoreCard(
-                              icon: Icons.workspace_premium_rounded,
+                              imageAsset: 'assets/icons/local_brands.png',
                               title: _storeName('local', languageCode),
                               subtitle: _storeSubtitle('local', languageCode),
                               onTap: () => _openStoreDirectory(
@@ -344,14 +359,14 @@ class _DiscoverCategoryCard extends StatelessWidget {
   const _DiscoverCategoryCard({
     required this.category,
     required this.languageCode,
-    required this.icon,
+    required this.imageAsset,
     required this.hasChildren,
     required this.onTap,
   });
 
   final Category category;
   final String languageCode;
-  final IconData icon;
+  final String imageAsset;
   final bool hasChildren;
   final VoidCallback onTap;
 
@@ -368,7 +383,7 @@ class _DiscoverCategoryCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           child: Row(
             children: [
-              Icon(icon, color: colors.primary, size: 30),
+              Image.asset(imageAsset, width: 46, height: 46, fit: BoxFit.contain),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -395,13 +410,13 @@ class _DiscoverCategoryCard extends StatelessWidget {
 
 class _DiscoverStoreCard extends StatelessWidget {
   const _DiscoverStoreCard({
-    required this.icon,
+    required this.imageAsset,
     required this.title,
     required this.subtitle,
     this.onTap,
   });
 
-  final IconData icon;
+  final String imageAsset;
   final String title;
   final String subtitle;
   final VoidCallback? onTap;
@@ -419,7 +434,13 @@ class _DiscoverStoreCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 34, color: colors.primary),
+              ClipRect(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  heightFactor: 0.5,
+                  child: Image.asset(imageAsset, width: 76, fit: BoxFit.contain),
+                ),
+              ),
               const SizedBox(height: 8),
               Text(
                 title,
