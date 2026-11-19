@@ -7,59 +7,17 @@ import 'search_screen.dart';
 import 'store_directory_screen.dart';
 
 IconData _categoryIconForSlug(String slug) {
+  if (slug.startsWith('clothes')) return Icons.checkroom_outlined;
+  if (slug.startsWith('shoes')) return Icons.directions_walk_outlined;
+  if (slug.startsWith('children-supplies') || slug.startsWith('kids-')) {
+    return Icons.child_friendly;
+  }
+  if (slug.startsWith('home-supplies') || slug.startsWith('home-')) {
+    return Icons.chair_outlined;
+  }
   if (slug == 'bags-accessories' || slug.contains('bag')) {
     return Icons.shopping_bag_outlined;
   }
-
-  if (slug.startsWith('clothes')) {
-    if (slug.contains('jeans') ||
-        slug.contains('trousers') ||
-        slug.contains('shorts') ||
-        slug.contains('skirts')) {
-      return Icons.straighten_outlined;
-    }
-    return Icons.checkroom_outlined;
-  }
-
-  if (slug.startsWith('shoes')) {
-    if (slug.contains('sneakers') ||
-        slug.contains('running') ||
-        slug.contains('sports')) {
-      return Icons.directions_run;
-    }
-    if (slug.contains('boots')) return Icons.hiking_outlined;
-    return Icons.directions_walk_outlined;
-  }
-
-  if (slug.startsWith('children-supplies') || slug.startsWith('kids-')) {
-    if (slug.contains('stroller')) return Icons.child_friendly;
-    if (slug.contains('car-seats')) return Icons.event_seat_outlined;
-    if (slug.contains('furniture') || slug.contains('bedding')) {
-      return Icons.bed_outlined;
-    }
-    if (slug.contains('feeding')) return Icons.restaurant_outlined;
-    if (slug.contains('toys')) return Icons.toys;
-    if (slug.contains('school')) return Icons.school_outlined;
-    if (slug.contains('bathing')) return Icons.bathtub_outlined;
-    if (slug.contains('safety')) return Icons.health_and_safety_outlined;
-    if (slug.contains('carriers')) return Icons.backpack_outlined;
-    return Icons.child_friendly;
-  }
-
-  if (slug.startsWith('home-supplies') || slug.startsWith('home-')) {
-    if (slug.contains('furniture')) return Icons.weekend_outlined;
-    if (slug.contains('decor')) return Icons.palette_outlined;
-    if (slug.contains('kitchen')) return Icons.kitchen_outlined;
-    if (slug.contains('appliances')) return Icons.electrical_services_outlined;
-    if (slug.contains('textiles')) return Icons.bed_outlined;
-    if (slug.contains('lighting')) return Icons.lightbulb_outline;
-    if (slug.contains('storage')) return Icons.inventory_2_outlined;
-    if (slug.contains('cleaning')) return Icons.cleaning_services_outlined;
-    if (slug.contains('bathroom')) return Icons.bathtub_outlined;
-    if (slug.contains('garden')) return Icons.yard_outlined;
-    return Icons.chair_outlined;
-  }
-
   return Icons.category_outlined;
 }
 
@@ -71,6 +29,13 @@ class CategoriesScreen extends StatefulWidget {
 }
 
 class _CategoriesScreenState extends State<CategoriesScreen> {
+  static const _discoverCategoryOrder = [
+    'clothes',
+    'shoes',
+    'children-supplies',
+    'home-supplies',
+  ];
+
   final _service = MarketplaceService();
   List<Category> _categories = [];
   bool _loading = true;
@@ -104,8 +69,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       .toList()
     ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
 
-
-
   Future<void> _openCategory(Category category) async {
     final children = _childrenOf(category.id);
     if (children.isNotEmpty) {
@@ -125,9 +88,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   void _showProducts(Category category) {
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => SearchScreen(categoryId: category.id),
-      ),
+      MaterialPageRoute(builder: (_) => SearchScreen(categoryId: category.id)),
     );
   }
 
@@ -148,11 +109,68 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     );
   }
 
+  String _storeName(String key, String languageCode) {
+    switch (key) {
+      case 'wekala':
+        return 'Wekala Markets';
+      case 'social':
+        return 'Social Stores';
+      case 'stock':
+        return 'Kenza Stock';
+      default:
+        return 'Local Brands';
+    }
+  }
+
+  String _storeSubtitle(String key, String languageCode) {
+    if (languageCode == 'ar') {
+      switch (key) {
+        case 'wekala':
+          return 'سوق الوكالة';
+        case 'social':
+          return 'متاجر وصفحات البيع أونلاين';
+        case 'stock':
+          return 'كنزا ستوك';
+        default:
+          return 'العلامات التجارية المحلية';
+      }
+    }
+    if (languageCode == 'fr') {
+      switch (key) {
+        case 'wekala':
+          return 'Marché Wekala';
+        case 'social':
+          return 'Boutiques et pages en ligne';
+        case 'stock':
+          return 'Stock Kenza';
+        default:
+          return 'Marques locales';
+      }
+    }
+    switch (key) {
+      case 'wekala':
+        return 'Wekala market';
+      case 'social':
+        return 'Online stores and social pages';
+      case 'stock':
+        return 'Kenza stock';
+      default:
+        return 'Local brands';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context)!;
     final languageCode = Localizations.localeOf(context).languageCode;
     final rootCategories = _childrenOf(null);
+    final categoriesBySlug = {
+      for (final category in rootCategories) category.slug: category,
+    };
+    final discoverCategories = _discoverCategoryOrder
+        .map((slug) => categoriesBySlug[slug])
+        .whereType<Category>()
+        .toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -186,124 +204,132 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     ),
                   ),
                 )
-              : rootCategories.isEmpty
-                  ? Center(child: Text(strings.noCategoriesAvailable))
-                  : RefreshIndicator(
-                      onRefresh: _loadCategories,
-                      child: CustomScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        slivers: [
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 24, 16, 10),
-                              child: Text(
-                                strings.discoverStoresTitle,
-                                style: Theme.of(context).textTheme.titleMedium
-                                    ?.copyWith(fontWeight: FontWeight.w800),
-                              ),
-                            ),
+              : RefreshIndicator(
+                  onRefresh: _loadCategories,
+                  child: CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
+                          child: Text(
+                            strings.discoverCategoriesTitle,
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w800),
                           ),
-                          SliverPadding(
-                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                            sliver: SliverList(
-                              delegate: SliverChildListDelegate([
-                                _DiscoverStoreTile(
-                                  icon: Icons.storefront_outlined,
-                                  title: strings.agencyCornerTitle,
-                                  onTap: () => _openStoreDirectory(
-                                    storeType: 'wekala_corner',
-                                    title: strings.agencyCornerTitle,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                _DiscoverStoreTile(
-                                  icon: Icons.language_rounded,
-                                  title: strings.onlineStoresTitle,
-                                  onTap: () => _openStoreDirectory(
-                                    storeType: 'online_store',
-                                    title: strings.onlineStoresTitle,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                _DiscoverStoreTile(
-                                  icon: Icons.store_mall_directory_outlined,
-                                  title: strings.localShopsTitle,
-                                  onTap: () => _openStoreDirectory(
-                                    storeType: 'physical_shop',
-                                    title: strings.localShopsTitle,
-                                  ),
-                                ),
-                              ]),
-                            ),
-                          ),
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                              child: Card(
-                                margin: EdgeInsets.zero,
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: Theme.of(context)
-                                        .colorScheme
-                                        .secondaryContainer,
-                                    child: Icon(
-                                      Icons.grid_view_rounded,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondaryContainer,
-                                    ),
-                                  ),
-                                  title: Text(
-                                    strings.allProducts,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  trailing: const Icon(Icons.chevron_right_rounded),
-                                  onTap: _openAllProducts,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-                              child: Text(
-                                strings.discoverCategoriesTitle,
-                                style: Theme.of(context).textTheme.titleMedium
-                                    ?.copyWith(fontWeight: FontWeight.w800),
-                              ),
-                            ),
-                          ),
-                          SliverPadding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            sliver: SliverGrid(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) {
-                                  final category = rootCategories[index];
-                                  return _DiscoverCategoryCard(
-                                    category: category,
-                                    languageCode: languageCode,
-                                    icon: _categoryIconForSlug(category.slug),
-                                    hasChildren:
-                                        _childrenOf(category.id).isNotEmpty,
-                                    onTap: () => _openCategory(category),
-                                  );
-                                },
-                                childCount: rootCategories.length,
-                              ),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 10,
-                                mainAxisSpacing: 10,
-                                childAspectRatio: 1.85,
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                      SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        sliver: SliverGrid(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final category = discoverCategories[index];
+                              return _DiscoverCategoryCard(
+                                category: category,
+                                languageCode: languageCode,
+                                icon: _categoryIconForSlug(category.slug),
+                                hasChildren: _childrenOf(category.id).isNotEmpty,
+                                onTap: () => _openCategory(category),
+                              );
+                            },
+                            childCount: discoverCategories.length,
+                          ),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 1.75,
+                          ),
+                        ),
+                      ),
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 24, 16, 10),
+                          child: Text(
+                            strings.discoverStoresTitle,
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                      ),
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        sliver: SliverGrid(
+                          delegate: SliverChildListDelegate([
+                            _DiscoverStoreCard(
+                              icon: Icons.storefront_rounded,
+                              title: _storeName('wekala', languageCode),
+                              subtitle: _storeSubtitle('wekala', languageCode),
+                              onTap: () => _openStoreDirectory(
+                                storeType: 'wekala_corner',
+                                title: _storeName('wekala', languageCode),
+                              ),
+                            ),
+                            _DiscoverStoreCard(
+                              icon: Icons.shopping_bag_rounded,
+                              title: _storeName('social', languageCode),
+                              subtitle: _storeSubtitle('social', languageCode),
+                              onTap: () => _openStoreDirectory(
+                                storeType: 'online_store',
+                                title: _storeName('social', languageCode),
+                              ),
+                            ),
+                            _DiscoverStoreCard(
+                              icon: Icons.inventory_2_rounded,
+                              title: _storeName('stock', languageCode),
+                              subtitle: _storeSubtitle('stock', languageCode),
+                              comingSoon: true,
+                            ),
+                            _DiscoverStoreCard(
+                              icon: Icons.workspace_premium_rounded,
+                              title: _storeName('local', languageCode),
+                              subtitle: _storeSubtitle('local', languageCode),
+                              comingSoon: true,
+                            ),
+                          ]),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 1.35,
+                          ),
+                        ),
+                      ),
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                          child: Card(
+                            margin: EdgeInsets.zero,
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .secondaryContainer,
+                                child: Icon(
+                                  Icons.grid_view_rounded,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondaryContainer,
+                                ),
+                              ),
+                              title: Text(
+                                strings.allProducts,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              trailing: const Icon(Icons.chevron_right_rounded),
+                              onTap: _openAllProducts,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
     );
   }
 }
@@ -336,15 +362,7 @@ class _DiscoverCategoryCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           child: Row(
             children: [
-              SizedBox(
-                width: 38,
-                height: 42,
-                child: Icon(
-                  icon,
-                  color: colors.primary,
-                  size: 29,
-                ),
-              ),
+              Icon(icon, color: colors.primary, size: 30),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -369,16 +387,20 @@ class _DiscoverCategoryCard extends StatelessWidget {
   }
 }
 
-class _DiscoverStoreTile extends StatelessWidget {
-  const _DiscoverStoreTile({
+class _DiscoverStoreCard extends StatelessWidget {
+  const _DiscoverStoreCard({
     required this.icon,
     required this.title,
-    required this.onTap,
+    required this.subtitle,
+    this.onTap,
+    this.comingSoon = false,
   });
 
   final IconData icon;
   final String title;
-  final VoidCallback onTap;
+  final String subtitle;
+  final VoidCallback? onTap;
+  final bool comingSoon;
 
   @override
   Widget build(BuildContext context) {
@@ -386,14 +408,45 @@ class _DiscoverStoreTile extends StatelessWidget {
     return Card(
       margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: colors.secondaryContainer,
-          child: Icon(icon, color: colors.onSecondaryContainer),
-        ),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
-        trailing: const Icon(Icons.chevron_right_rounded),
+      child: InkWell(
         onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 34, color: colors.primary),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              if (comingSoon) ...[
+                const SizedBox(height: 5),
+                Text(
+                  Localizations.localeOf(context).languageCode == 'ar'
+                      ? 'قريبًا'
+                      : 'Coming soon',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -493,7 +546,9 @@ class _CategoryTile extends StatelessWidget {
       ),
       title: Text(category.nameFor(languageCode)),
       trailing: Icon(
-        hasChildren ? Icons.chevron_right_rounded : Icons.arrow_forward_ios_rounded,
+        hasChildren
+            ? Icons.chevron_right_rounded
+            : Icons.arrow_forward_ios_rounded,
         size: hasChildren ? 24 : 16,
       ),
       onTap: onTap,
