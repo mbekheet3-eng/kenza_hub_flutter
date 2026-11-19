@@ -399,14 +399,12 @@ class _DiscoverStoreCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     this.onTap,
-    this.comingSoon = false,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
   final VoidCallback? onTap;
-  final bool comingSoon;
 
   @override
   Widget build(BuildContext context) {
@@ -438,18 +436,6 @@ class _DiscoverStoreCard extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
-              if (comingSoon) ...[
-                const SizedBox(height: 5),
-                Text(
-                  Localizations.localeOf(context).languageCode == 'ar'
-                      ? 'قريبًا'
-                      : 'Coming soon',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                        fontWeight: FontWeight.w700,
-                      ),
-                ),
-              ],
             ],
           ),
         ),

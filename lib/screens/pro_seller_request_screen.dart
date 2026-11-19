@@ -103,7 +103,7 @@ class _ProSellerRequestScreenState extends State<ProSellerRequestScreen> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _storeType,
+                initialValue: _storeType,
                 decoration: InputDecoration(
                   labelText: strings.businessTypeRequested,
                   border: const OutlineInputBorder(),
