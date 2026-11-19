@@ -44,14 +44,20 @@ class _AdminProSellerRequestsScreenState
 
   String _storeTypeLabel(AppStrings strings, String value) {
     switch (value) {
-      case 'physical_shop':
-        return strings.storeTypePhysicalShop;
+      case 'wekala_markets':
       case 'wekala_corner':
         return strings.storeTypeWekala;
+      case 'social_stores':
       case 'online_store':
         return strings.storeTypeOnline;
-      default:
+      case 'kenza_stock':
+      case 'individual_seller':
         return strings.storeTypeIndividual;
+      case 'local_brands':
+      case 'physical_shop':
+        return strings.storeTypePhysicalShop;
+      default:
+        return value;
     }
   }
 

@@ -15,7 +15,7 @@ class _ProSellerRequestScreenState extends State<ProSellerRequestScreen> {
   final _storeNameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _service = AccountAccessService();
-  String _storeType = 'individual_seller';
+  String? _storeType;
   bool _submitting = false;
 
   @override
@@ -31,7 +31,7 @@ class _ProSellerRequestScreenState extends State<ProSellerRequestScreen> {
     try {
       await _service.submitProSellerRequest(
         storeName: _storeNameController.text,
-        storeType: _storeType,
+        storeType: _storeType!,
         description: _descriptionController.text,
       );
       if (!mounted) return;
@@ -51,14 +51,16 @@ class _ProSellerRequestScreenState extends State<ProSellerRequestScreen> {
 
   String _storeTypeLabel(AppStrings strings, String value) {
     switch (value) {
-      case 'physical_shop':
-        return strings.storeTypePhysicalShop;
-      case 'wekala_corner':
+      case 'wekala_markets':
         return strings.storeTypeWekala;
-      case 'online_store':
+      case 'social_stores':
         return strings.storeTypeOnline;
-      default:
+      case 'kenza_stock':
         return strings.storeTypeIndividual;
+      case 'local_brands':
+        return strings.storeTypePhysicalShop;
+      default:
+        return value;
     }
   }
 
@@ -66,10 +68,10 @@ class _ProSellerRequestScreenState extends State<ProSellerRequestScreen> {
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context)!;
     final types = const [
-      'individual_seller',
-      'physical_shop',
-      'wekala_corner',
-      'online_store',
+      'wekala_markets',
+      'social_stores',
+      'kenza_stock',
+      'local_brands',
     ];
 
     return Scaffold(
@@ -101,11 +103,13 @@ class _ProSellerRequestScreenState extends State<ProSellerRequestScreen> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                initialValue: _storeType,
+                value: _storeType,
                 decoration: InputDecoration(
                   labelText: strings.businessTypeRequested,
                   border: const OutlineInputBorder(),
                 ),
+                validator: (value) =>
+                    value == null ? strings.businessTypeRequested : null,
                 items: types
                     .map((type) => DropdownMenuItem(
                           value: type,

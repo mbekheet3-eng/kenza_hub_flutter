@@ -263,7 +263,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               title: _storeName('wekala', languageCode),
                               subtitle: _storeSubtitle('wekala', languageCode),
                               onTap: () => _openStoreDirectory(
-                                storeType: 'wekala_corner',
+                                storeType: 'wekala_markets',
                                 title: _storeName('wekala', languageCode),
                               ),
                             ),
@@ -272,7 +272,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               title: _storeName('social', languageCode),
                               subtitle: _storeSubtitle('social', languageCode),
                               onTap: () => _openStoreDirectory(
-                                storeType: 'online_store',
+                                storeType: 'social_stores',
                                 title: _storeName('social', languageCode),
                               ),
                             ),
@@ -280,13 +280,19 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               icon: Icons.inventory_2_rounded,
                               title: _storeName('stock', languageCode),
                               subtitle: _storeSubtitle('stock', languageCode),
-                              comingSoon: true,
+                              onTap: () => _openStoreDirectory(
+                                storeType: 'kenza_stock',
+                                title: _storeName('stock', languageCode),
+                              ),
                             ),
                             _DiscoverStoreCard(
                               icon: Icons.workspace_premium_rounded,
                               title: _storeName('local', languageCode),
                               subtitle: _storeSubtitle('local', languageCode),
-                              comingSoon: true,
+                              onTap: () => _openStoreDirectory(
+                                storeType: 'local_brands',
+                                title: _storeName('local', languageCode),
+                              ),
                             ),
                           ]),
                           gridDelegate:

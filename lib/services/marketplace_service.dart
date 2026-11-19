@@ -326,15 +326,25 @@ class MarketplaceService {
   }
 
   Future<List<Map<String, dynamic>>> getActiveStoresByType(String storeType) async {
-    if (storeType != 'wekala_corner' &&
-        storeType != 'online_store' &&
-        storeType != 'physical_shop') {
+    const legacyTypes = {
+      'wekala_markets': 'wekala_corner',
+      'social_stores': 'online_store',
+      'kenza_stock': 'individual_seller',
+      'local_brands': 'physical_shop',
+    };
+    const supportedTypes = {
+      'wekala_markets',
+      'social_stores',
+      'kenza_stock',
+      'local_brands',
+    };
+    if (!supportedTypes.contains(storeType)) {
       throw ArgumentError.value(storeType, 'storeType');
     }
     final rows = await _client
         .from('stores')
         .select('id,owner_id,store_name,store_type,description,logo_url,banner_url,created_at')
-        .eq('store_type', storeType)
+        .inFilter('store_type', [storeType, legacyTypes[storeType]!])
         .eq('status', 'active')
         .order('created_at', ascending: false);
     return rows.map((row) => Map<String, dynamic>.from(row)).toList();
