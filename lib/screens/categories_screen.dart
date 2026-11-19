@@ -288,7 +288,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                         sliver: SliverGrid(
                           delegate: SliverChildListDelegate([
                             _DiscoverStoreCard(
-                              imageAsset: 'assets/icons/wekala_markets.png',
+                              imageAsset: 'assets/icons/1000206209.png',
                               title: _storeName('wekala', languageCode),
                               subtitle: _storeSubtitle('wekala', languageCode),
                               onTap: () => _openStoreDirectory(
@@ -297,7 +297,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               ),
                             ),
                             _DiscoverStoreCard(
-                              imageAsset: 'assets/icons/social_stores.png',
+                              imageAsset: 'assets/icons/1000206206.png',
                               title: _storeName('social', languageCode),
                               subtitle: _storeSubtitle('social', languageCode),
                               onTap: () => _openStoreDirectory(
@@ -306,7 +306,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               ),
                             ),
                             _DiscoverStoreCard(
-                              imageAsset: 'assets/icons/kenza_stock.png',
+                              imageAsset: 'assets/icons/1000206208.png',
                               title: _storeName('stock', languageCode),
                               subtitle: _storeSubtitle('stock', languageCode),
                               onTap: () => _openStoreDirectory(
@@ -315,7 +315,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               ),
                             ),
                             _DiscoverStoreCard(
-                              imageAsset: 'assets/icons/local_brands.png',
+                              imageAsset: 'assets/icons/1000206207.png',
                               title: _storeName('local', languageCode),
                               subtitle: _storeSubtitle('local', languageCode),
                               onTap: () => _openStoreDirectory(
