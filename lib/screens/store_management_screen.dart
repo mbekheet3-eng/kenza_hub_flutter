@@ -122,6 +122,7 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> {
         _ => throw Exception(_t('صيغة الصورة غير مدعومة', 'Unsupported image format', 'Format d’image non pris en charge')),
       };
       final safeExtension = extension == 'jpeg' ? 'jpg' : extension;
+      final previousUrl = store[field] as String?;
       final path = '${user.id}/${store['id']}/${field}_${DateTime.now().microsecondsSinceEpoch}.$safeExtension';
       setState(() => _saving = true);
       await _client.storage.from('store-media').uploadBinary(
@@ -132,12 +133,39 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> {
       final url = _client.storage.from('store-media').getPublicUrl(path);
       await _client.from('stores').update({field: url})
           .eq('id', store['id']).eq('owner_id', user.id);
+
+      // Remove only the previous file when it is a Kenza store-media object
+      // owned by this seller and this store. External URLs are left untouched.
+      final previousPath = _ownedStoreMediaPath(
+        previousUrl,
+        user.id,
+        store['id'] as String,
+      );
+      if (previousPath != null && previousPath != path) {
+        try {
+          await _client.storage.from('store-media').remove([previousPath]);
+        } catch (_) {
+          // The new image is already saved; old-file cleanup is best-effort.
+        }
+      }
       await _load();
     } catch (error) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$error')));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
+  }
+
+  String? _ownedStoreMediaPath(String? url, String userId, String storeId) {
+    if (url == null || url.isEmpty) return null;
+    final uri = Uri.tryParse(url);
+    if (uri == null) return null;
+    final segments = uri.pathSegments;
+    final bucketIndex = segments.indexOf('store-media');
+    if (bucketIndex < 0 || bucketIndex + 2 >= segments.length) return null;
+    final path = segments.skip(bucketIndex + 1).join('/');
+    if (!path.startsWith('$userId/$storeId/')) return null;
+    return path;
   }
 
   Widget _imageEditor(String field, String label, IconData icon) {
