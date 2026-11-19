@@ -85,6 +85,17 @@ class MarketplaceTransactionService {
     return created['id'] as String;
   }
 
+  Stream<List<Map<String, dynamic>>> watchMessages(String conversationId) {
+    return _client
+        .from('messages')
+        .stream(primaryKey: ['id'])
+        .eq('conversation_id', conversationId)
+        .order('created_at')
+        .map((rows) => rows
+            .map((row) => Map<String, dynamic>.from(row))
+            .toList(growable: false));
+  }
+
   Future<List<Map<String, dynamic>>> getMessages(String conversationId) async {
     final rows = await _client
         .from('messages')
