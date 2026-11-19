@@ -5,7 +5,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'conversation_screen.dart';
 
 class MessagesInboxScreen extends StatefulWidget {
-  const MessagesInboxScreen({super.key});
+  const MessagesInboxScreen({super.key, this.initialTab = 0});
+
+  final int initialTab;
 
   @override
   State<MessagesInboxScreen> createState() => _MessagesInboxScreenState();
@@ -24,7 +26,8 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 3, vsync: this);
+    final tabIndex = initialTab < 0 ? 0 : (initialTab > 2 ? 2 : initialTab);
+    _tabs = TabController(length: 3, vsync: this, initialIndex: tabIndex);
     _reload();
   }
 
