@@ -400,17 +400,25 @@ class MarketplaceService {
         )
         .eq('id', productId)
         .single();
-    return _mapProduct(row);
+    return _mapProduct(row, includeAllImages: true);
   }
 
-  Future<Product> _mapProduct(Map<String, dynamic> row) async {
+  Future<Product> _mapProduct(
+    Map<String, dynamic> row, {
+    bool includeAllImages = false,
+  }) async {
     final imageRows = (row['product_images'] as List<dynamic>? ?? [])
         .cast<Map<String, dynamic>>()
       ..sort(
         (a, b) => (a['sort_order'] as int).compareTo(b['sort_order'] as int),
       );
 
-    final paths = imageRows
+    // Listing cards use only the primary image. Full galleries are fetched
+    // when the product detail/editor screen requests the complete product.
+    final visibleImageRows = includeAllImages || imageRows.isEmpty
+        ? imageRows
+        : imageRows.take(1).toList();
+    final paths = visibleImageRows
         .map((image) => image['storage_path'] as String)
         .toList();
 
