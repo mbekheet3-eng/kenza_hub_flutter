@@ -269,7 +269,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             crossAxisCount: 2,
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
-                            childAspectRatio: 1.0,
+                            childAspectRatio: 0.9,
                           ),
                         ),
                       ),
@@ -366,8 +366,8 @@ class _DiscoverCategoryCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 108,
-                height: 108,
+                width: 124,
+                height: 124,
                 decoration: BoxDecoration(
                   color: _categoryBackgroundForSlug(category.slug),
                   borderRadius: BorderRadius.circular(20),
@@ -375,8 +375,8 @@ class _DiscoverCategoryCard extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Image.asset(
                   imageAsset,
-                  width: 82,
-                  height: 82,
+                  width: 96,
+                  height: 96,
                   fit: BoxFit.contain,
                 ),
               ),
