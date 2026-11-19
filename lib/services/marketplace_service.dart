@@ -695,6 +695,8 @@ class MarketplaceService {
                 ? null
                 : customCategoryName?.trim(),
             'audience': audience,
+            // Hide changed content until the image review approves it.
+            if (needsImageReview) 'status': 'draft',
           })
           .eq('id', productId)
           .eq('owner_id', user.id)
