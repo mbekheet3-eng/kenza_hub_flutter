@@ -6,6 +6,21 @@ import '../services/marketplace_service.dart';
 import 'search_screen.dart';
 import 'store_directory_screen.dart';
 
+Color _categoryBackgroundForSlug(String slug) {
+  switch (slug) {
+    case 'clothes':
+      return const Color(0xFFFCE8E8);
+    case 'shoes':
+      return const Color(0xFFE7F0FF);
+    case 'children-supplies':
+      return const Color(0xFFE8F5E9);
+    case 'home-supplies':
+      return const Color(0xFFFFF1D6);
+    default:
+      return const Color(0xFFF1EAFE);
+  }
+}
+
 String _categoryImageForSlug(String slug) {
   switch (slug) {
     case 'clothes':
@@ -244,7 +259,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                 category: category,
                                 languageCode: languageCode,
                                 imageAsset: _categoryImageForSlug(category.slug),
-                                hasChildren: _childrenOf(category.id).isNotEmpty,
                                 onTap: () => _openCategory(category),
                               );
                             },
@@ -255,7 +269,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             crossAxisCount: 2,
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
-                            childAspectRatio: 1.75,
+                            childAspectRatio: 1.0,
                           ),
                         ),
                       ),
@@ -319,35 +333,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           ),
                         ),
                       ),
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
-                          child: Card(
-                            margin: EdgeInsets.zero,
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .secondaryContainer,
-                                child: Icon(
-                                  Icons.grid_view_rounded,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSecondaryContainer,
-                                ),
-                              ),
-                              title: Text(
-                                strings.allProducts,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              trailing: const Icon(Icons.chevron_right_rounded),
-                              onTap: _openAllProducts,
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -360,45 +345,48 @@ class _DiscoverCategoryCard extends StatelessWidget {
     required this.category,
     required this.languageCode,
     required this.imageAsset,
-    required this.hasChildren,
     required this.onTap,
   });
 
   final Category category;
   final String languageCode;
   final String imageAsset;
-  final bool hasChildren;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     return Card(
       margin: EdgeInsets.zero,
-      color: colors.surfaceContainerLow,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          child: Row(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(imageAsset, width: 46, height: 46, fit: BoxFit.contain),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  category.nameFor(languageCode),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.w700),
+              Container(
+                width: 108,
+                height: 108,
+                decoration: BoxDecoration(
+                  color: _categoryBackgroundForSlug(category.slug),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                alignment: Alignment.center,
+                child: Image.asset(
+                  imageAsset,
+                  width: 82,
+                  height: 82,
+                  fit: BoxFit.contain,
                 ),
               ),
-              Icon(
-                hasChildren
-                    ? Icons.chevron_right_rounded
-                    : Icons.arrow_forward_ios_rounded,
-                size: hasChildren ? 20 : 14,
-                color: colors.onSurfaceVariant,
+              const SizedBox(height: 9),
+              Text(
+                category.nameFor(languageCode),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.w700),
               ),
             ],
           ),
