@@ -26,7 +26,9 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
   @override
   void initState() {
     super.initState();
-    final tabIndex = initialTab < 0 ? 0 : (initialTab > 2 ? 2 : initialTab);
+    final tabIndex = widget.initialTab < 0
+        ? 0
+        : (widget.initialTab > 2 ? 2 : widget.initialTab);
     _tabs = TabController(length: 3, vsync: this, initialIndex: tabIndex);
     _reload();
   }
