@@ -298,7 +298,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           IconButton(
             onPressed: _signOut,
             tooltip: AppStrings.of(context)!.logout,
-            icon: const Icon(Icons.logout),
+            icon: const Directionality(
+              textDirection: TextDirection.ltr,
+              child: Icon(Icons.logout),
+            ),
           ),
         ],
       ),
