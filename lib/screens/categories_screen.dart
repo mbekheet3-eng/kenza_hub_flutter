@@ -508,13 +508,8 @@ class _CategoryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-        child: Icon(
-          _categoryIconForSlug(category.slug),
-          color: Theme.of(context).colorScheme.onSecondaryContainer,
-        ),
-      ),
+      // Subcategory rows intentionally have no repeated generic icon.
+      // Keep the category names and navigation clear and uncluttered.
       title: Text(category.nameFor(languageCode)),
       trailing: Icon(
         hasChildren
