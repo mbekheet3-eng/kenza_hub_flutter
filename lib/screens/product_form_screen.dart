@@ -413,6 +413,29 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                  ...[
+                    const SizedBox(height: 20),
+                    Text(AppStrings.of(context)!.productPhotosLimit, style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: _saving || _currentImageCount >= MarketplaceService.maxImages ? null : _pickGallery,
+                          icon: const Icon(Icons.photo_library_outlined),
+                          label: Text(AppStrings.of(context)!.gallery),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: _saving || _currentImageCount >= MarketplaceService.maxImages ? null : _pickCamera,
+                          icon: const Icon(Icons.camera_alt_outlined),
+                          label: Text(AppStrings.of(context)!.camera),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    _buildImageEditor(),
+                  ],
                       _primaryImageMarker(
                         selected: isPrimary,
                         onTap: () => _setPrimaryImage(selected),
@@ -647,29 +670,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       return price == null || price <= 0 ? AppStrings.of(context)!.priceMustBePositive : null;
                     },
                   ),
-                  ...[
-                    const SizedBox(height: 20),
-                    Text(AppStrings.of(context)!.productPhotosLimit, style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        OutlinedButton.icon(
-                          onPressed: _saving || _currentImageCount >= MarketplaceService.maxImages ? null : _pickGallery,
-                          icon: const Icon(Icons.photo_library_outlined),
-                          label: Text(AppStrings.of(context)!.gallery),
-                        ),
-                        OutlinedButton.icon(
-                          onPressed: _saving || _currentImageCount >= MarketplaceService.maxImages ? null : _pickCamera,
-                          icon: const Icon(Icons.camera_alt_outlined),
-                          label: Text(AppStrings.of(context)!.camera),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    _buildImageEditor(),
-                  ],
                   if (_error != null) ...[
                     const SizedBox(height: 16),
                     Text(_error!, style: const TextStyle(color: Colors.red)),
