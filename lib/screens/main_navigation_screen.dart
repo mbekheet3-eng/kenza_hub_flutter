@@ -4,8 +4,6 @@ import 'package:material_ui/material_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../l10n/app_strings.dart';
-
-
 import 'categories_screen.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
@@ -14,6 +12,9 @@ import 'product_form_screen.dart';
 import 'profile_screen.dart';
 
 /// Persistent top-level navigation for the marketplace.
+///
+/// Each tab owns a nested Navigator so pages pushed from that tab keep the
+/// shared bottom navigation visible.
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
 
@@ -24,16 +25,25 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
   late final StreamSubscription<AuthState> _authSubscription;
+  late final List<GlobalKey<NavigatorState>> _navigatorKeys;
 
   @override
   void initState() {
     super.initState();
+    _navigatorKeys = List.generate(5, (_) => GlobalKey<NavigatorState>());
     _authSubscription =
         Supabase.instance.client.auth.onAuthStateChange.listen((state) {
       if (!mounted) return;
       setState(() {
-        if (state.session == null && _selectedIndex >= 3) {
+        if (state.session == null) {
           _selectedIndex = 0;
+          // Recreate the authenticated tab navigators so a later sign-in
+          // starts with fresh inbox/profile pages.
+          _navigatorKeys[3] = GlobalKey<NavigatorState>();
+          _navigatorKeys[4] = GlobalKey<NavigatorState>();
+        } else {
+          _navigatorKeys[3] = GlobalKey<NavigatorState>();
+          _navigatorKeys[4] = GlobalKey<NavigatorState>();
         }
       });
     });
@@ -67,9 +77,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   Future<void> _openSell() async {
     if (!await _ensureSignedIn() || !mounted) return;
-    await Navigator.of(context).push(
+
+    final previousIndex = _selectedIndex;
+    final navigator = _navigatorKeys[2].currentState;
+    if (navigator == null) return;
+
+    setState(() => _selectedIndex = 2);
+    navigator.popUntil((route) => route.isFirst);
+    await navigator.push<void>(
       MaterialPageRoute<void>(builder: (_) => const ProductFormScreen()),
     );
+
+    if (mounted) {
+      setState(() => _selectedIndex = previousIndex == 2 ? 0 : previousIndex);
+    }
   }
 
   Future<void> _selectDestination(int index) async {
@@ -85,16 +106,31 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     if (mounted) setState(() => _selectedIndex = index);
   }
 
+  Widget _tabNavigator(int index, Widget initialPage) {
+    return Navigator(
+      key: _navigatorKeys[index],
+      onGenerateRoute: (_) => MaterialPageRoute<void>(
+        builder: (_) => initialPage,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context)!;
     final signedIn = Supabase.instance.client.auth.currentUser != null;
     final destinations = <Widget>[
-      const HomeScreen(),
-      const CategoriesScreen(),
-      const SizedBox.shrink(),
-      signedIn ? const MessagesInboxScreen() : const SizedBox.shrink(),
-      signedIn ? const ProfileScreen() : const SizedBox.shrink(),
+      _tabNavigator(0, const HomeScreen()),
+      _tabNavigator(1, const CategoriesScreen()),
+      _tabNavigator(2, const SizedBox.shrink()),
+      _tabNavigator(
+        3,
+        signedIn ? const MessagesInboxScreen() : const SizedBox.shrink(),
+      ),
+      _tabNavigator(
+        4,
+        signedIn ? const ProfileScreen() : const SizedBox.shrink(),
+      ),
     ];
 
     return Scaffold(
