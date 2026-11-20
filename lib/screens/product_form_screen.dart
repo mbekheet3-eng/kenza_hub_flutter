@@ -413,25 +413,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                  ...[
-                    const SizedBox(height: 20),
-                    Text(AppStrings.of(context)!.productPhotosLimit, style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        OutlinedButton.icon(
-                          onPressed: _saving || _currentImageCount >= MarketplaceService.maxImages ? null : _pickGallery,
-                          icon: const Icon(Icons.photo_library_outlined),
-                          label: Text(AppStrings.of(context)!.gallery),
-                        ),
-                        OutlinedButton.icon(
-                          onPressed: _saving || _currentImageCount >= MarketplaceService.maxImages ? null : _pickCamera,
-                          icon: const Icon(Icons.camera_alt_outlined),
-                          label: Text(AppStrings.of(context)!.camera),
-                        ),
-                      ],
                     ),
                     const SizedBox(height: 10),
                     _buildImageEditor(),
@@ -624,6 +605,25 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
+                  ...[
+                    const SizedBox(height: 20),
+                    Text(AppStrings.of(context)!.productPhotosLimit, style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: _saving || _currentImageCount >= MarketplaceService.maxImages ? null : _pickGallery,
+                          icon: const Icon(Icons.photo_library_outlined),
+                          label: Text(AppStrings.of(context)!.gallery),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: _saving || _currentImageCount >= MarketplaceService.maxImages ? null : _pickCamera,
+                          icon: const Icon(Icons.camera_alt_outlined),
+                          label: Text(AppStrings.of(context)!.camera),
+                        ),
+                      ],
                   ..._buildCategoryFields(context),
                   const SizedBox(height: 14),
                   if (_gender != null) ...[
