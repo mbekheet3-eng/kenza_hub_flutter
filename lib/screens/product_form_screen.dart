@@ -547,6 +547,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   Future<void> _requestAiSuggestions() async {
     if (_currentImageCount == 0 || _aiLoading || _saving) return;
 
+    // Read inherited widget data before the first async gap.
+    final languageCode = Localizations.localeOf(context).languageCode;
+
     setState(() {
       _aiLoading = true;
       _aiError = null;
@@ -568,7 +571,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         categories: _categories,
         title: _title.text,
         description: _description.text,
-        languageCode: Localizations.localeOf(context).languageCode,
+        languageCode: languageCode,
       );
       if (mounted) setState(() => _aiSuggestion = suggestion);
     } catch (error) {
