@@ -418,10 +418,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                    ),
-                    const SizedBox(height: 10),
-                    _buildImageEditor(),
-                  ],
                       _primaryImageMarker(
                         selected: isPrimary,
                         onTap: () => _setPrimaryImage(selected),
