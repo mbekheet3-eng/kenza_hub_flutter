@@ -3,19 +3,9 @@ import '../l10n/app_strings.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'conversation_screen.dart';
-import 'transaction_details_screen.dart';
 
 class MessagesInboxScreen extends StatefulWidget {
-  const MessagesInboxScreen({
-    super.key,
-    this.initialTab = 0,
-    this.selectedOfferId,
-    this.selectedOrderId,
-  });
-
-  final int initialTab;
-  final String? selectedOfferId;
-  final String? selectedOrderId;
+  const MessagesInboxScreen({super.key});
 
   @override
   State<MessagesInboxScreen> createState() => _MessagesInboxScreenState();
@@ -34,18 +24,8 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
   @override
   void initState() {
     super.initState();
-    final tabIndex = widget.initialTab < 0
-        ? 0
-        : (widget.initialTab > 2 ? 2 : widget.initialTab);
-    _tabs = TabController(length: 3, vsync: this, initialIndex: tabIndex);
+    _tabs = TabController(length: 3, vsync: this);
     _reload();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.selectedOfferId != null && widget.selectedOfferId!.isNotEmpty) {
-        _openTransactionById(widget.selectedOfferId!, isOffer: true);
-      } else if (widget.selectedOrderId != null && widget.selectedOrderId!.isNotEmpty) {
-        _openTransactionById(widget.selectedOrderId!, isOffer: false);
-      }
-    });
   }
 
   @override
@@ -67,55 +47,6 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         .select('id,product_id,buyer_id,seller_id,agreed_price,currency,status,created_at,products(title)')
         .or('buyer_id.eq.$_userId,seller_id.eq.$_userId')
         .order('created_at', ascending: false);
-  }
-
-  Future<void> _openTransactionById(String id, {required bool isOffer}) async {
-    try {
-      final table = isOffer ? 'product_offers' : 'product_orders';
-      final columns = isOffer
-          ? 'id,product_id,buyer_id,seller_id,offered_price,currency,status,message,created_at,products(title)'
-          : 'id,product_id,buyer_id,seller_id,agreed_price,currency,status,created_at,products(title)';
-      final row = await _client
-          .from(table)
-          .select(columns)
-          .eq('id', id)
-          .maybeSingle();
-      if (!mounted) return;
-      if (row == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppStrings.of(context)!.inboxLoadError)),
-        );
-        return;
-      }
-      await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => TransactionDetailsScreen(
-            transaction: Map<String, dynamic>.from(row),
-            isOffer: isOffer,
-            currentUserId: _userId,
-          ),
-        ),
-      );
-      if (mounted) _refresh();
-    } catch (error) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppStrings.of(context)!.inboxLoadError)),
-      );
-    }
-  }
-
-  Future<void> _openTransaction(Map<String, dynamic> row, {required bool isOffer}) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => TransactionDetailsScreen(
-          transaction: row,
-          isOffer: isOffer,
-          currentUserId: _userId,
-        ),
-      ),
-    );
-    if (mounted) _refresh();
   }
 
   Future<void> _refresh() async {
@@ -241,7 +172,6 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         final price = row[isOffer ? 'offered_price' : 'agreed_price'];
         final currency = row['currency'] ?? 'EGP';
         return ListTile(
-          onTap: () => _openTransaction(row, isOffer: isOffer),
           isThreeLine: true,
           leading: CircleAvatar(child: Icon(isOffer ? Icons.local_offer_outlined : Icons.shopping_bag_outlined)),
           title: Text(_productTitle(row), maxLines: 1, overflow: TextOverflow.ellipsis),
