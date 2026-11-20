@@ -9,6 +9,7 @@ import '../l10n/app_strings.dart';
 import '../models/category.dart';
 import '../models/product.dart';
 import '../services/marketplace_service.dart';
+import '../services/product_ai_suggestion_service.dart';
 
 class ProductFormScreen extends StatefulWidget {
   const ProductFormScreen({super.key, this.product});
@@ -21,6 +22,7 @@ class ProductFormScreen extends StatefulWidget {
 
 class _ProductFormScreenState extends State<ProductFormScreen> {
   final _service = MarketplaceService();
+  final _aiService = ProductAiSuggestionService();
   final _picker = ImagePicker();
   final _formKey = GlobalKey<FormState>();
   final _title = TextEditingController();
@@ -39,6 +41,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   int _selectedImageIndex = 0;
   bool _loading = false;
   bool _saving = false;
+  bool _aiLoading = false;
+  Map<String, dynamic>? _aiSuggestion;
+  String? _aiError;
   String? _error;
 
   bool get _isEditing => widget.product != null;
@@ -543,6 +548,184 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   }
 
 
+  Future<void> _requestAiSuggestions() async {
+    if (_currentImageCount == 0 || _aiLoading || _saving) return;
+
+    setState(() {
+      _aiLoading = true;
+      _aiError = null;
+      _aiSuggestion = null;
+    });
+
+    final files = <File>[..._images];
+    final temporaryFiles = <File>[];
+    try {
+      for (final path in _existingImagePaths) {
+        if (files.length >= 3) break;
+        final temporary = await _service.downloadImageForEditing(path);
+        temporaryFiles.add(temporary);
+        files.add(temporary);
+      }
+
+      final suggestion = await _aiService.suggest(
+        images: files,
+        categories: _categories,
+        title: _title.text,
+        description: _description.text,
+        languageCode: Localizations.localeOf(context).languageCode,
+      );
+      if (mounted) setState(() => _aiSuggestion = suggestion);
+    } catch (error) {
+      if (mounted) {
+        setState(() => _aiError = error.toString().replaceFirst('Exception: ', ''));
+      }
+    } finally {
+      for (final file in temporaryFiles) {
+        try {
+          await file.parent.delete(recursive: true);
+        } catch (_) {
+          // Temporary image cleanup is best-effort.
+        }
+      }
+      if (mounted) setState(() => _aiLoading = false);
+    }
+  }
+
+  void _applyAiSuggestion() {
+    final suggestion = _aiSuggestion;
+    if (suggestion == null) return;
+
+    final categoryId = suggestion['category_id'];
+    final title = suggestion['suggested_title'];
+    final description = suggestion['suggested_description'];
+    final price = suggestion['recommended_price'];
+
+    final byId = {for (final category in _categories) category.id: category};
+    final nextPath = <Category>[];
+    var current = categoryId is String ? byId[categoryId] : null;
+    while (current != null) {
+      nextPath.add(current);
+      current = current.parentId == null ? null : byId[current.parentId];
+    }
+
+    setState(() {
+      if (title is String && title.trim().isNotEmpty) _title.text = title.trim();
+      if (description is String && description.trim().isNotEmpty) {
+        _description.text = description.trim();
+      }
+      if (nextPath.isNotEmpty) {
+        _selectionPath
+          ..clear()
+          ..addAll(nextPath.reversed);
+      }
+      if (price is num && price > 0) _price.text = price.round().toString();
+      _aiSuggestion = null;
+    });
+  }
+
+  Widget _buildAiSuggestionCard() {
+    final suggestion = _aiSuggestion!;
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final isArabic = languageCode == 'ar';
+    final isFrench = languageCode == 'fr';
+
+    String label(String ar, String en, String fr) =>
+        isArabic ? ar : isFrench ? fr : en;
+
+    String? categoryName;
+    final categoryId = suggestion['category_id'];
+    if (categoryId is String) {
+      for (final category in _categories) {
+        if (category.id == categoryId) {
+          categoryName = category.nameFor(languageCode);
+          break;
+        }
+      }
+    }
+
+    final title = suggestion['suggested_title'] as String? ?? '';
+    final description = suggestion['suggested_description'] as String? ?? '';
+    final minPrice = suggestion['price_min'];
+    final maxPrice = suggestion['price_max'];
+    final recommendedPrice = suggestion['recommended_price'];
+    final missingInfo = (suggestion['missing_info'] as List<dynamic>? ?? [])
+        .whereType<String>()
+        .toList();
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.auto_awesome),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    label('اقتراحات كنزا الذكية', 'Kenza AI suggestions', 'Suggestions IA Kenza'),
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+              ],
+            ),
+            if (categoryName != null && categoryName.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Text('${label('التصنيف المقترح', 'Suggested category', 'Catégorie suggérée')}: $categoryName'),
+            ],
+            if (title.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text('${label('العنوان', 'Title', 'Titre')}: $title'),
+            ],
+            if (description.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text('${label('الوصف', 'Description', 'Description')}: $description'),
+            ],
+            if (minPrice is num && maxPrice is num) ...[
+              const SizedBox(height: 8),
+              Text(
+                '${label('النطاق السعري الاسترشادي', 'Indicative price range', 'Fourchette de prix indicative')}: '
+                '${minPrice.round()} - ${maxPrice.round()} ${label('جنيه', 'EGP', 'EGP')}',
+              ),
+              if (recommendedPrice is num)
+                Text(
+                  '${label('السعر المقترح', 'Suggested price', 'Prix suggéré')}: '
+                  '${recommendedPrice.round()} ${label('جنيه', 'EGP', 'EGP')}',
+                ),
+              Text(
+                label(
+                  'السعر تقديري وليس سعرًا ملزمًا.',
+                  'This is an estimate, not a required price.',
+                  'Il s’agit d’une estimation, pas d’un prix imposé.',
+                ),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+            if (missingInfo.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Text(
+                label('معلومات ناقصة يُفضّل استكمالها:', 'Information to confirm:', 'Informations à confirmer:'),
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              ...missingInfo.map(
+                (item) => Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text('• $item'),
+                ),
+              ),
+            ],
+            const SizedBox(height: 12),
+            FilledButton.tonal(
+              onPressed: _saving ? null : _applyAiSuggestion,
+              child: Text(label('تطبيق الاقتراحات', 'Apply suggestions', 'Appliquer les suggestions')),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     final categoryId = _selectedLeafCategoryId;
@@ -624,6 +807,31 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                           label: Text(AppStrings.of(context)!.camera),
                         ),
                       ],
+                    ),
+                    _buildImageEditor(),
+                  ],
+                  if (_currentImageCount > 0) ...[
+                    OutlinedButton.icon(
+                      onPressed: _saving || _aiLoading ? null : _requestAiSuggestions,
+                      icon: _aiLoading
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.auto_awesome),
+                      label: Text(
+                        Localizations.localeOf(context).languageCode == 'ar'
+                            ? 'اقتراح التصنيف والوصف والسعر بالذكاء الاصطناعي'
+                            : Localizations.localeOf(context).languageCode == 'fr'
+                                ? 'Suggérer catégorie, description et prix avec l’IA'
+                                : 'Suggest category, description and price with AI',
+                      ),
+                    ),
+                    if (_aiError != null)
+                      Text(_aiError!, style: const TextStyle(color: Colors.red)),
+                    if (_aiSuggestion != null) _buildAiSuggestionCard(),
+                  ],
                   ..._buildCategoryFields(context),
                   const SizedBox(height: 14),
                   if (_gender != null) ...[
