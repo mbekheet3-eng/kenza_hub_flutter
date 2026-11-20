@@ -65,7 +65,7 @@ class ProductCard extends StatelessWidget {
                             isFavorite
                                 ? Icons.favorite_rounded
                                 : Icons.favorite_border_rounded,
-                            color: isFavorite ? Colors.red : Colors.blueGrey,
+                            color: Colors.red,
                           ),
                       ),
                     ),
