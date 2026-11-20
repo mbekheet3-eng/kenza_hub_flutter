@@ -140,29 +140,16 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   }
 
   String _storeName(String key, String languageCode) {
-    switch (key) {
-      case 'wekala':
-        return 'Wekala Markets';
-      case 'social':
-        return 'Social Stores';
-      case 'stock':
-        return 'Kenza Stock';
-      default:
-        return 'Local Brands';
-    }
-  }
-
-  String _storeSubtitle(String key, String languageCode) {
     if (languageCode == 'ar') {
       switch (key) {
         case 'wekala':
           return 'سوق الوكالة';
         case 'social':
-          return 'متاجر وصفحات البيع أونلاين';
+          return 'متاجر أونلاين';
         case 'stock':
           return 'كنزا ستوك';
         default:
-          return 'العلامات التجارية المحلية';
+          return 'متاجر محلية';
       }
     }
     if (languageCode == 'fr') {
@@ -170,22 +157,22 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         case 'wekala':
           return 'Marché Wekala';
         case 'social':
-          return 'Boutiques et pages en ligne';
+          return 'Boutiques en ligne';
         case 'stock':
           return 'Stock Kenza';
         default:
-          return 'Marques locales';
+          return 'Boutiques locales';
       }
     }
     switch (key) {
       case 'wekala':
-        return 'Wekala market';
+        return 'Wekala Markets';
       case 'social':
-        return 'Online stores and social pages';
+        return 'Online Stores';
       case 'stock':
-        return 'Kenza stock';
+        return 'Kenza Stock';
       default:
-        return 'Local brands';
+        return 'Local Stores';
     }
   }
 
@@ -269,28 +256,17 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             crossAxisCount: 2,
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
-                            childAspectRatio: 0.9,
-                          ),
-                        ),
-                      ),
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 24, 16, 10),
-                          child: Text(
-                            strings.discoverStoresTitle,
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.w800),
+                            childAspectRatio: 0.95,
                           ),
                         ),
                       ),
                       SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
                         sliver: SliverGrid(
                           delegate: SliverChildListDelegate([
                             _DiscoverStoreCard(
                               imageAsset: 'assets/icons/1000206209.png',
                               title: _storeName('wekala', languageCode),
-                              subtitle: _storeSubtitle('wekala', languageCode),
                               onTap: () => _openStoreDirectory(
                                 storeType: 'wekala_markets',
                                 title: _storeName('wekala', languageCode),
@@ -299,7 +275,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             _DiscoverStoreCard(
                               imageAsset: 'assets/icons/1000206206.png',
                               title: _storeName('social', languageCode),
-                              subtitle: _storeSubtitle('social', languageCode),
                               onTap: () => _openStoreDirectory(
                                 storeType: 'social_stores',
                                 title: _storeName('social', languageCode),
@@ -308,7 +283,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             _DiscoverStoreCard(
                               imageAsset: 'assets/icons/1000206208.png',
                               title: _storeName('stock', languageCode),
-                              subtitle: _storeSubtitle('stock', languageCode),
                               onTap: () => _openStoreDirectory(
                                 storeType: 'kenza_stock',
                                 title: _storeName('stock', languageCode),
@@ -317,7 +291,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             _DiscoverStoreCard(
                               imageAsset: 'assets/icons/1000206207.png',
                               title: _storeName('local', languageCode),
-                              subtitle: _storeSubtitle('local', languageCode),
                               onTap: () => _openStoreDirectory(
                                 storeType: 'local_brands',
                                 title: _storeName('local', languageCode),
@@ -329,7 +302,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             crossAxisCount: 2,
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
-                            childAspectRatio: 1.35,
+                            childAspectRatio: 0.95,
                           ),
                         ),
                       ),
@@ -366,8 +339,8 @@ class _DiscoverCategoryCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 124,
-                height: 124,
+                width: 108,
+                height: 108,
                 decoration: BoxDecoration(
                   color: _categoryBackgroundForSlug(category.slug),
                   borderRadius: BorderRadius.circular(20),
@@ -375,8 +348,8 @@ class _DiscoverCategoryCard extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Image.asset(
                   imageAsset,
-                  width: 96,
-                  height: 96,
+                  width: 88,
+                  height: 88,
                   fit: BoxFit.contain,
                 ),
               ),
@@ -400,13 +373,11 @@ class _DiscoverStoreCard extends StatelessWidget {
   const _DiscoverStoreCard({
     required this.imageAsset,
     required this.title,
-    required this.subtitle,
     this.onTap,
   });
 
   final String imageAsset;
   final String title;
-  final String subtitle;
   final VoidCallback? onTap;
 
   @override
@@ -435,14 +406,6 @@ class _DiscoverStoreCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
           ),
