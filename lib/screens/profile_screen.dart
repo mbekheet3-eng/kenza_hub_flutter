@@ -18,7 +18,6 @@ import 'policies_screen.dart';
 import 'password_recovery_screen.dart';
 import 'messages_inbox_screen.dart';
 import 'favorites_screen.dart';
-import 'notifications_screen.dart';
 import 'gender_change_request_screen.dart';
 import 'admin_gender_requests_screen.dart';
 import 'admin_pro_seller_requests_screen.dart';
@@ -299,7 +298,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           IconButton(
             onPressed: _signOut,
             tooltip: AppStrings.of(context)!.logout,
-            icon: const Icon(Icons.logout, textDirection: TextDirection.ltr),
+            icon: const Icon(Icons.logout),
           ),
         ],
       ),
@@ -459,18 +458,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                       ),
                       ListTile(
-                        leading: const Icon(Icons.notifications_none_rounded),
-                        title: Text(AppStrings.of(context)!.notificationsTitle),
-                        subtitle: Text(AppStrings.of(context)!.notificationsSubtitle),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const NotificationsScreen()),
-                        ),
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.mail_outline_rounded),
+                        leading: const Icon(Icons.forum_outlined),
                         title: Text(AppStrings.of(context)!.messagesOffersOrdersTitle),
-                        subtitle: Text(AppStrings.of(context)!.messagesOffersOrdersSubtitle),
+                        subtitle: Text(
+                          '${AppStrings.of(context)!.messagesOffersOrdersSubtitle} · '
+                          '${AppStrings.of(context)!.notificationsTitle}',
+                        ),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const MessagesInboxScreen()),
