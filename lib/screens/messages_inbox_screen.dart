@@ -61,6 +61,41 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
     await Future.wait([_conversations, _offers, _orders]);
   }
 
+  String _notificationTitle(Map<String, dynamic> row) {
+    final strings = AppStrings.of(context)!;
+    switch (row['type']?.toString()) {
+      case 'new_message':
+        return strings.notificationNewMessageTitle;
+      case 'new_offer':
+        return strings.notificationNewOfferTitle;
+      case 'offer_accepted':
+        return strings.notificationOfferAcceptedTitle;
+      case 'offer_rejected':
+        return strings.notificationOfferRejectedTitle;
+      case 'new_order':
+        return strings.notificationNewOrderTitle;
+      case 'order_accepted':
+        return strings.notificationOrderAcceptedTitle;
+      case 'order_rejected':
+        return strings.notificationOrderRejectedTitle;
+      case 'order_updated':
+        return strings.notificationOrderUpdatedTitle;
+      default:
+        return row['title']?.toString() ?? strings.newNotification;
+    }
+  }
+
+  Future<void> _markAllNotificationsRead() async {
+    try {
+      await _notificationService.markAllAsRead();
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.of(context)!.notificationsUpdateError)),
+      );
+    }
+  }
+
   Future<void> _openNotification(Map<String, dynamic> row) async {
     try {
       if (row['is_read'] != true) {
@@ -124,7 +159,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
                               : Icons.notifications_none_rounded),
                 ),
                 title: Text(
-                  row['title']?.toString() ?? AppStrings.of(context)!.newNotification,
+                  _notificationTitle(row),
                   style: TextStyle(fontWeight: unread ? FontWeight.w800 : FontWeight.w500),
                 ),
                 subtitle: Text(
@@ -296,6 +331,12 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text(AppStrings.of(context)!.messagesOrdersTitle),
+        actions: [
+          TextButton(
+            onPressed: _markAllNotificationsRead,
+            child: Text(AppStrings.of(context)!.readAll),
+          ),
+        ],
         bottom: TabBar(
           controller: _tabs,
           isScrollable: true,
