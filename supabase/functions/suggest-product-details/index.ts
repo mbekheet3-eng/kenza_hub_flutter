@@ -174,7 +174,10 @@ Deno.serve(async (request: Request) => {
           contents: [{ role: "user", parts }],
           generationConfig: {
             responseMimeType: "application/json",
-            maxOutputTokens: 1200,
+            maxOutputTokens: 800,
+            thinkingConfig: {
+              thinkingLevel: "minimal",
+            },
           },
         }),
         signal: AbortSignal.timeout(60000),
