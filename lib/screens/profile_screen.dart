@@ -489,105 +489,113 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       const Divider(height: 28),
-                      ListTile(
-                        leading: Icon(_accountRole == 'pro_seller'
-                            ? Icons.storefront_rounded
-                            : Icons.person_outline_rounded),
-                        title: Text(_accountRole == 'pro_seller'
-                            ? AppStrings.of(context)!.accountTypeProSeller
-                            : AppStrings.of(context)!.accountTypeBuyer),
-                        subtitle: Text(
-                          _accountRole == 'pro_seller'
-                              ? (_store?['store_name'] as String?) ?? AppStrings.of(context)!.myStore
-                              : _latestProSellerRequest?['status'] == 'pending'
-                                  ? AppStrings.of(context)!.upgradeRequestPending
-                                  : _latestProSellerRequest?['status'] == 'approved'
-                                      ? AppStrings.of(context)!.requestApproved
-                                      : _latestProSellerRequest?['status'] == 'rejected'
-                                          ? AppStrings.of(context)!.requestRejected
-                                          : AppStrings.of(context)!.upgradeProSeller,
-                        ),
-                        trailing: _accountRole == 'buyer' &&
-                                _latestProSellerRequest?['status'] != 'pending'
-                            ? const Icon(Icons.chevron_right)
-                            : null,
-                        onTap: _accountRole == 'buyer' &&
-                                _latestProSellerRequest?['status'] != 'pending'
-                            ? () async {
-                                final submitted = await Navigator.of(context).push<bool>(
-                                  MaterialPageRoute(builder: (_) => const ProSellerRequestScreen()),
-                                );
-                                if (submitted == true) await _load();
-                              }
-                            : null,
-                      ),
-                      if (_isKenzaAdmin)
+                      ExpansionTile(
+                        leading: const Icon(Icons.manage_accounts_outlined),
+                        title: Text(AppStrings.of(context)!.accountTab),
+                        initiallyExpanded: false,
+                        children: [
                         ListTile(
-                          leading: const Icon(Icons.admin_panel_settings_outlined),
-                          title: Text(AppStrings.of(context)!.adminProSellerRequests),
+                          leading: Icon(_accountRole == 'pro_seller'
+                              ? Icons.storefront_rounded
+                              : Icons.person_outline_rounded),
+                          title: Text(_accountRole == 'pro_seller'
+                              ? AppStrings.of(context)!.accountTypeProSeller
+                              : AppStrings.of(context)!.accountTypeBuyer),
+                          subtitle: Text(
+                            _accountRole == 'pro_seller'
+                                ? (_store?['store_name'] as String?) ?? AppStrings.of(context)!.myStore
+                                : _latestProSellerRequest?['status'] == 'pending'
+                                    ? AppStrings.of(context)!.upgradeRequestPending
+                                    : _latestProSellerRequest?['status'] == 'approved'
+                                        ? AppStrings.of(context)!.requestApproved
+                                        : _latestProSellerRequest?['status'] == 'rejected'
+                                            ? AppStrings.of(context)!.requestRejected
+                                            : AppStrings.of(context)!.upgradeProSeller,
+                          ),
+                          trailing: _accountRole == 'buyer' &&
+                                  _latestProSellerRequest?['status'] != 'pending'
+                              ? const Icon(Icons.chevron_right)
+                              : null,
+                          onTap: _accountRole == 'buyer' &&
+                                  _latestProSellerRequest?['status'] != 'pending'
+                              ? () async {
+                                  final submitted = await Navigator.of(context).push<bool>(
+                                    MaterialPageRoute(builder: (_) => const ProSellerRequestScreen()),
+                                  );
+                                  if (submitted == true) await _load();
+                                }
+                              : null,
+                        ),
+                        if (_isKenzaAdmin)
+                          ListTile(
+                            leading: const Icon(Icons.admin_panel_settings_outlined),
+                            title: Text(AppStrings.of(context)!.adminProSellerRequests),
+                            trailing: const Icon(Icons.chevron_right),
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(builder: (_) => const AdminProSellerRequestsScreen()),
+                            ).then((_) => _load()),
+                          ),
+                        if (_isKenzaAdmin)
+                          ListTile(
+                            leading: const Icon(Icons.admin_panel_settings_outlined),
+                            title: Text(AppStrings.of(context)!.reviewGenderRequests),
+                            trailing: const Icon(Icons.chevron_right),
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(builder: (_) => const AdminGenderRequestsScreen()),
+                            ),
+                          ),
+                        if (_accountRole == 'pro_seller' && _store != null)
+                          ListTile(
+                            leading: const Icon(Icons.store_mall_directory_outlined),
+                            title: Text(Localizations.localeOf(context).languageCode == 'ar'
+                                ? 'إدارة متجري'
+                                : Localizations.localeOf(context).languageCode == 'fr'
+                                    ? 'Gérer ma boutique'
+                                    : 'Manage my store'),
+                            subtitle: Text(_store?['store_name'] as String? ?? ''),
+                            trailing: const Icon(Icons.chevron_right),
+                            onTap: () async {
+                              await Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => const StoreManagementScreen()),
+                              );
+                              if (mounted) await _load();
+                            },
+                          ),
+                        ListTile(
+                          leading: const Icon(Icons.manage_accounts_outlined),
+                          title: Text(AppStrings.of(context)!.registeredGender),
+                          subtitle: Text(AppStrings.of(context)!.genderChangeAdminOnly),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => const AdminProSellerRequestsScreen()),
+                            MaterialPageRoute(builder: (_) => const GenderChangeRequestScreen()),
                           ).then((_) => _load()),
                         ),
-                      if (_isKenzaAdmin)
                         ListTile(
-                          leading: const Icon(Icons.admin_panel_settings_outlined),
-                          title: Text(AppStrings.of(context)!.reviewGenderRequests),
+                          leading: const Icon(Icons.lock_reset_outlined),
+                          title: Text(AppStrings.of(context)!.changePassword),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => const AdminGenderRequestsScreen()),
+                            MaterialPageRoute(builder: (_) => const PasswordRecoveryScreen()),
                           ),
                         ),
-                      if (_accountRole == 'pro_seller' && _store != null)
                         ListTile(
-                          leading: const Icon(Icons.store_mall_directory_outlined),
-                          title: Text(Localizations.localeOf(context).languageCode == 'ar'
-                              ? 'إدارة متجري'
-                              : Localizations.localeOf(context).languageCode == 'fr'
-                                  ? 'Gérer ma boutique'
-                                  : 'Manage my store'),
-                          subtitle: Text(_store?['store_name'] as String? ?? ''),
+                          leading: const Icon(Icons.info_outline),
+                          title: Text(AppStrings.of(context)!.aboutKenzaTitle),
                           trailing: const Icon(Icons.chevron_right),
-                          onTap: () async {
-                            await Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => const StoreManagementScreen()),
-                            );
-                            if (mounted) await _load();
-                          },
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const AboutKenzaScreen()),
+                          ),
                         ),
-                      ListTile(
-                        leading: const Icon(Icons.manage_accounts_outlined),
-                        title: Text(AppStrings.of(context)!.registeredGender),
-                        subtitle: Text(AppStrings.of(context)!.genderChangeAdminOnly),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const GenderChangeRequestScreen()),
-                        ).then((_) => _load()),
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.lock_reset_outlined),
-                        title: Text(AppStrings.of(context)!.changePassword),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const PasswordRecoveryScreen()),
+                        ListTile(
+                          leading: const Icon(Icons.policy_outlined),
+                          title: Text(AppStrings.of(context)!.policiesAndTerms),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const PoliciesScreen()),
+                          ),
                         ),
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.info_outline),
-                        title: Text(AppStrings.of(context)!.aboutKenzaTitle),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const AboutKenzaScreen()),
-                        ),
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.policy_outlined),
-                        title: Text(AppStrings.of(context)!.policiesAndTerms),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const PoliciesScreen()),
-                        ),
+  
+                        ],
                       ),
                       const Divider(height: 28),
                       ListTile(
