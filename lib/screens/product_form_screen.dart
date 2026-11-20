@@ -672,26 +672,26 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
             ),
             if (categoryName != null && categoryName.isNotEmpty) ...[
               const SizedBox(height: 10),
-              Text('${label('التصنيف المقترح', 'Suggested category', 'Catégorie suggérée')}: $categoryName'),
+              Text('${label("التصنيف المقترح", "Suggested category", "Catégorie suggérée")}: $categoryName'),
             ],
             if (title.isNotEmpty) ...[
               const SizedBox(height: 8),
-              Text('${label('العنوان', 'Title', 'Titre')}: $title'),
+              Text('${label("العنوان", "Title", "Titre")}: $title'),
             ],
             if (description.isNotEmpty) ...[
               const SizedBox(height: 8),
-              Text('${label('الوصف', 'Description', 'Description')}: $description'),
+              Text('${label("الوصف", "Description", "Description")}: $description'),
             ],
             if (minPrice is num && maxPrice is num) ...[
               const SizedBox(height: 8),
               Text(
-                '${label('النطاق السعري الاسترشادي', 'Indicative price range', 'Fourchette de prix indicative')}: '
-                '${minPrice.round()} - ${maxPrice.round()} ${label('جنيه', 'EGP', 'EGP')}',
+                '${label("النطاق السعري الاسترشادي", "Indicative price range", "Fourchette de prix indicative")}: '
+                '${minPrice.round()} - ${maxPrice.round()} ${label("جنيه", "EGP", "EGP")}',
               ),
               if (recommendedPrice is num)
                 Text(
-                  '${label('السعر المقترح', 'Suggested price', 'Prix suggéré')}: '
-                  '${recommendedPrice.round()} ${label('جنيه', 'EGP', 'EGP')}',
+                  '${label("السعر المقترح", "Suggested price", "Prix suggéré")}: '
+                  '${recommendedPrice.round()} ${label("جنيه", "EGP", "EGP")}',
                 ),
               Text(
                 label(
