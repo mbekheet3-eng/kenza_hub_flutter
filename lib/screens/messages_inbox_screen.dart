@@ -72,9 +72,12 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
   Future<void> _openTransactionById(String id, {required bool isOffer}) async {
     try {
       final table = isOffer ? 'product_offers' : 'product_orders';
+      final columns = isOffer
+          ? 'id,product_id,buyer_id,seller_id,offered_price,currency,status,message,created_at,products(title)'
+          : 'id,product_id,buyer_id,seller_id,agreed_price,currency,status,created_at,products(title)';
       final row = await _client
           .from(table)
-          .select('id,product_id,buyer_id,seller_id,${isOffer ? 'offered_price' : 'agreed_price'},currency,status,message,created_at,updated_at,products(title)')
+          .select(columns)
           .eq('id', id)
           .maybeSingle();
       if (!mounted) return;
