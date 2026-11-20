@@ -39,21 +39,6 @@ String _categoryImageForSlug(String slug) {
   }
 }
 
-IconData _categoryIconForSlug(String slug) {
-  if (slug.startsWith('clothes')) return Icons.checkroom_outlined;
-  if (slug.startsWith('shoes')) return Icons.directions_walk_outlined;
-  if (slug.startsWith('children-supplies') || slug.startsWith('kids-')) {
-    return Icons.child_friendly;
-  }
-  if (slug.startsWith('home-supplies') || slug.startsWith('home-')) {
-    return Icons.chair_outlined;
-  }
-  if (slug == 'bags-accessories' || slug.contains('bag')) {
-    return Icons.shopping_bag_outlined;
-  }
-  return Icons.category_outlined;
-}
-
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
 
