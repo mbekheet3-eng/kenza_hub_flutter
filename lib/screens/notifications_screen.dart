@@ -51,22 +51,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
         );
       } else {
-        final type = row['type']?.toString();
-        final isOffer = type == 'new_offer' ||
-            type == 'offer_accepted' || type == 'offer_rejected';
-        final isOrder = type == 'new_order' || type == 'order_accepted' ||
-            type == 'order_rejected' || type == 'order_updated';
-        final initialTab = isOffer ? 1 : (isOrder ? 2 : 0);
-        final offerId = (data['offer_id'] ?? data['product_offer_id'])?.toString();
-        final orderId = (data['order_id'] ?? data['product_order_id'])?.toString();
         await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => MessagesInboxScreen(
-              initialTab: initialTab,
-              selectedOfferId: isOffer ? offerId : null,
-              selectedOrderId: isOrder ? orderId : null,
-            ),
-          ),
+          MaterialPageRoute(builder: (_) => const MessagesInboxScreen()),
         );
       }
     } catch (error) {
