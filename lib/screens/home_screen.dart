@@ -281,6 +281,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           overflow: TextOverflow.ellipsis,
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                 fontWeight: FontWeight.w700,
+                                color: Theme.of(context).colorScheme.error,
                               ),
                         ),
                       ),
@@ -296,7 +297,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             icon: Stack(
                               clipBehavior: Clip.none,
                               children: [
-                                const Icon(Icons.notifications_none_rounded),
+                                Icon(
+                                  Icons.notifications_none_rounded,
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
                                 if (unreadCount > 0)
                                   PositionedDirectional(
                                     top: -3,
