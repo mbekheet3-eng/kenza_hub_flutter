@@ -6,6 +6,9 @@ import '../services/marketplace_service.dart';
 import 'search_screen.dart';
 import 'store_directory_screen.dart';
 
+const double _discoverIconBoxSize = 88;
+const double _discoverIconImageSize = 80;
+
 Color _categoryBackgroundForSlug(String slug) {
   switch (slug) {
     case 'clothes':
@@ -256,7 +259,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             crossAxisCount: 2,
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
-                            childAspectRatio: 0.95,
+                            childAspectRatio: 1.05,
                           ),
                         ),
                       ),
@@ -302,7 +305,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             crossAxisCount: 2,
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
-                            childAspectRatio: 0.95,
+                            childAspectRatio: 1.05,
                           ),
                         ),
                       ),
@@ -339,8 +342,8 @@ class _DiscoverCategoryCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 108,
-                height: 108,
+                width: _discoverIconBoxSize,
+                height: _discoverIconBoxSize,
                 decoration: BoxDecoration(
                   color: _categoryBackgroundForSlug(category.slug),
                   borderRadius: BorderRadius.circular(20),
@@ -348,8 +351,8 @@ class _DiscoverCategoryCard extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Image.asset(
                   imageAsset,
-                  width: 88,
-                  height: 88,
+                  width: _discoverIconImageSize,
+                  height: _discoverIconImageSize,
                   fit: BoxFit.contain,
                 ),
               ),
@@ -392,11 +395,16 @@ class _DiscoverStoreCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ClipRect(
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  heightFactor: 0.5,
-                  child: Image.asset(imageAsset, width: 76, fit: BoxFit.contain),
+              SizedBox(
+                width: _discoverIconBoxSize,
+                height: _discoverIconBoxSize,
+                child: Center(
+                  child: Image.asset(
+                    imageAsset,
+                    width: _discoverIconImageSize,
+                    height: _discoverIconImageSize,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
