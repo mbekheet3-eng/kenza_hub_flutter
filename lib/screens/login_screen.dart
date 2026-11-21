@@ -117,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            FilledButton(
+            FilledButton.icon(
               onPressed: _busy
                   ? null
                   : () => _run(
@@ -126,7 +126,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           password: _password.text,
                         ),
                       ),
-              child: _busy
+              icon: const Icon(Icons.email_outlined),
+              label: _busy
                   ? const CircularProgressIndicator()
                   : Text(strings.login),
             ),
