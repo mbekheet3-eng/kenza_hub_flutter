@@ -22,7 +22,7 @@ class PoliciesScreen extends StatelessWidget {
           const SizedBox(height: 16),
           _documentTile(
             context,
-            icon: Icons.gavel_outlined,
+            iconAsset: 'assets/document.png',
             title: s.termsAndConditions,
             subtitle: s.termsOfService,
             onTap: () => Navigator.of(context).push(
@@ -31,7 +31,7 @@ class PoliciesScreen extends StatelessWidget {
           ),
           _documentTile(
             context,
-            icon: Icons.privacy_tip_outlined,
+            iconAsset: 'assets/protection.png',
             title: s.privacyPolicy,
             subtitle: s.privacySecurity,
             onTap: () => Navigator.of(context).push(
@@ -47,7 +47,7 @@ class PoliciesScreen extends StatelessWidget {
 
   Widget _documentTile(
     BuildContext context, {
-    required IconData icon,
+    required String iconAsset,
     required String title,
     required String subtitle,
     required VoidCallback onTap,
@@ -55,7 +55,7 @@ class PoliciesScreen extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
       child: ListTile(
-        leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
+        leading: Image.asset(iconAsset, width: 28, height: 28),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
         subtitle: Text(subtitle),
         trailing: const Icon(Icons.chevron_right),
