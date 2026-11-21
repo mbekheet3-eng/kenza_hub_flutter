@@ -128,11 +128,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     child: Text(AppStrings.of(context)!.startConversationHint),
                   );
                 }
+                // Keep the newest message at the bottom and open the view there.
+                final displayRows = rows.reversed.toList(growable: false);
                 return ListView.builder(
+                  reverse: true,
                   padding: const EdgeInsets.all(16),
-                  itemCount: rows.length,
+                  itemCount: displayRows.length,
                   itemBuilder: (context, index) {
-                    final row = rows[index];
+                    final row = displayRows[index];
                     final mine = row['sender_id'] == myId;
                     return Align(
                       alignment: mine
