@@ -31,6 +31,7 @@ class KenzaAssetIcon extends StatelessWidget {
     final data = await rootBundle.load(asset);
     final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
     final frame = await codec.getNextFrame();
+    codec.dispose();
     final image = frame.image;
     final pixels = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
 
