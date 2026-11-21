@@ -19,7 +19,6 @@ class KenzaAssetIcon extends StatelessWidget {
 
   /// Kept for source compatibility with existing call sites.
   /// Artwork is now normalized from its alpha bounds, so this value is unused.
-  @Deprecated('Artwork is normalized automatically from its visible alpha bounds.')
   final double scale;
 
   /// Kept for source compatibility. Cropped artwork is always contained.
