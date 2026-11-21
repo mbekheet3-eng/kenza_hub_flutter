@@ -3,7 +3,6 @@ import '../l10n/app_strings.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'conversation_screen.dart';
-import '../services/notification_service.dart';
 
 class MessagesInboxScreen extends StatefulWidget {
   const MessagesInboxScreen({super.key});
@@ -19,16 +18,13 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
   late Future<List<Map<String, dynamic>>> _conversations;
   late Future<List<Map<String, dynamic>>> _offers;
   late Future<List<Map<String, dynamic>>> _orders;
-  final _notificationService = NotificationService();
-  late Stream<List<Map<String, dynamic>>> _notifications;
 
   String get _userId => _client.auth.currentUser!.id;
 
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 4, vsync: this);
-    _notifications = _notificationService.watchNotifications();
+    _tabs = TabController(length: 3, vsync: this);
     _reload();
   }
 
@@ -56,127 +52,8 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
   Future<void> _refresh() async {
     setState(() {
       _reload();
-      _notifications = _notificationService.watchNotifications();
     });
     await Future.wait([_conversations, _offers, _orders]);
-  }
-
-  String _notificationTitle(Map<String, dynamic> row) {
-    final strings = AppStrings.of(context)!;
-    switch (row['type']?.toString()) {
-      case 'new_message':
-        return strings.notificationNewMessageTitle;
-      case 'new_offer':
-        return strings.notificationNewOfferTitle;
-      case 'offer_accepted':
-        return strings.notificationOfferAcceptedTitle;
-      case 'offer_rejected':
-        return strings.notificationOfferRejectedTitle;
-      case 'new_order':
-        return strings.notificationNewOrderTitle;
-      case 'order_accepted':
-        return strings.notificationOrderAcceptedTitle;
-      case 'order_rejected':
-        return strings.notificationOrderRejectedTitle;
-      case 'order_updated':
-        return strings.notificationOrderUpdatedTitle;
-      default:
-        return row['title']?.toString() ?? strings.newNotification;
-    }
-  }
-
-  Future<void> _markAllNotificationsRead() async {
-    try {
-      await _notificationService.markAllAsRead();
-    } catch (_) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppStrings.of(context)!.notificationsUpdateError)),
-      );
-    }
-  }
-
-  Future<void> _openNotification(Map<String, dynamic> row) async {
-    try {
-      if (row['is_read'] != true) {
-        await _notificationService.markAsRead(row['id'] as String);
-      }
-      if (!mounted) return;
-      final rawData = row['data'];
-      final data = rawData is Map
-          ? Map<String, dynamic>.from(rawData)
-          : <String, dynamic>{};
-      final conversationId = data['conversation_id']?.toString();
-      if (conversationId != null && conversationId.isNotEmpty) {
-        await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => ConversationScreen(conversationId: conversationId),
-          ),
-        );
-        await _refresh();
-      } else {
-        final type = row['type']?.toString() ?? '';
-        _tabs.animateTo(type.contains('offer') ? 1 : type.contains('order') ? 2 : 0);
-      }
-    } catch (_) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppStrings.of(context)!.notificationOpenError)),
-      );
-    }
-  }
-
-  Widget _notificationList() {
-    return StreamBuilder<List<Map<String, dynamic>>>(
-      stream: _notifications,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Center(child: Text(AppStrings.of(context)!.notificationsLoadError));
-        }
-        if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final rows = snapshot.data ?? [];
-        if (rows.isEmpty) return _empty(AppStrings.of(context)!.emptyNotifications);
-        return RefreshIndicator(
-          onRefresh: _refresh,
-          child: ListView.separated(
-            physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: rows.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final row = rows[index];
-              final unread = row['is_read'] != true;
-              return ListTile(
-                onTap: () => _openNotification(row),
-                leading: CircleAvatar(
-                  child: Icon(row['type'] == 'new_message'
-                      ? Icons.chat_bubble_outline
-                      : row['type'].toString().contains('offer')
-                          ? Icons.local_offer_outlined
-                          : row['type'].toString().contains('order')
-                              ? Icons.shopping_bag_outlined
-                              : Icons.notifications_none_rounded),
-                ),
-                title: Text(
-                  _notificationTitle(row),
-                  style: TextStyle(fontWeight: unread ? FontWeight.w800 : FontWeight.w500),
-                ),
-                subtitle: Text(
-                  '${row['body'] ?? ''}\n${_date(row['created_at'])}',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                isThreeLine: true,
-                trailing: unread
-                    ? Icon(Icons.circle, size: 9, color: Theme.of(context).colorScheme.error)
-                    : const Icon(Icons.chevron_right),
-              );
-            },
-          ),
-        );
-      },
-    );
   }
 
   String _productTitle(Map<String, dynamic> row) {
@@ -331,20 +208,37 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text(AppStrings.of(context)!.messagesOrdersTitle),
-        actions: [
-          TextButton(
-            onPressed: _markAllNotificationsRead,
-            child: Text(AppStrings.of(context)!.readAll),
-          ),
-        ],
         bottom: TabBar(
           controller: _tabs,
           isScrollable: true,
           tabs: [
-            Tab(text: AppStrings.of(context)!.messagesTab),
-            Tab(text: AppStrings.of(context)!.offersTab),
-            Tab(text: AppStrings.of(context)!.purchaseOrdersTab),
-            Tab(text: AppStrings.of(context)!.notificationsTitle),
+            Tab(
+              icon: Image.asset(
+                'assets/icons/1795220040859-removebg-preview.png',
+                width: 28,
+                height: 28,
+                fit: BoxFit.contain,
+              ),
+              text: AppStrings.of(context)!.messagesTab,
+            ),
+            Tab(
+              icon: Image.asset(
+                'assets/icons/1795220047615-removebg-preview.png',
+                width: 28,
+                height: 28,
+                fit: BoxFit.contain,
+              ),
+              text: AppStrings.of(context)!.offersTab,
+            ),
+            Tab(
+              icon: Image.asset(
+                'assets/icons/1795220032715-removebg-preview.png',
+                width: 28,
+                height: 28,
+                fit: BoxFit.contain,
+              ),
+              text: AppStrings.of(context)!.purchaseOrdersTab,
+            ),
           ],
         ),
       ),
@@ -354,7 +248,6 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
           _tab(_conversations, _conversationList),
           _tab(_offers, (rows) => _transactionList(rows, isOffer: true)),
           _tab(_orders, (rows) => _transactionList(rows, isOffer: false)),
-          _notificationList(),
         ],
       ),
     );
