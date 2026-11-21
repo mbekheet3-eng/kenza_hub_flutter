@@ -297,9 +297,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             icon: Stack(
                               clipBehavior: Clip.none,
                               children: [
-                                Icon(
-                                  Icons.notifications_none_rounded,
-                                  color: Theme.of(context).colorScheme.error,
+                                Image.asset(
+                                  'assets/notification.png',
+                                  width: 28,
+                                  height: 28,
+                                  fit: BoxFit.contain,
                                 ),
                                 if (unreadCount > 0)
                                   PositionedDirectional(
@@ -348,11 +350,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     decoration: InputDecoration(
                       hintText: AppStrings.of(context)!.searchProductHint,
-                      prefixIcon: const Icon(Icons.search),
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Image.asset('assets/brows.png', width: 22, height: 22),
+                      ),
                       suffixIcon: IconButton(
                         tooltip: AppStrings.of(context)!.imageSearch,
                         onPressed: _showImageSearchOptions,
-                        icon: const Icon(Icons.camera_alt_outlined),
+                        icon: Image.asset('assets/camera.png', width: 24, height: 24),
                       ),
                     ),
                   ),
