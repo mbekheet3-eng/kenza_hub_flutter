@@ -802,7 +802,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                         ),
                         OutlinedButton.icon(
                           onPressed: _saving || _currentImageCount >= MarketplaceService.maxImages ? null : _pickCamera,
-                          icon: Image.asset('assets/camera.png', width: 22, height: 22),
+                          icon: Image.asset('assets/icons/camera.png', width: 22, height: 22),
                           label: Text(AppStrings.of(context)!.camera),
                         ),
                       ],
