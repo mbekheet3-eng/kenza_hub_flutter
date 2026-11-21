@@ -201,7 +201,6 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         final messages = (row['messages'] as List?)?.cast<Map<String, dynamic>>() ?? [];
         messages.sort((a, b) => (b['created_at'] ?? '').toString().compareTo((a['created_at'] ?? '').toString()));
         final preview = messages.isEmpty ? AppStrings.of(context)!.startConversationShort : (messages.first['body']?.toString() ?? AppStrings.of(context)!.messagePreviewFallback);
-        final isBuyer = row['buyer_id'] == _userId;
         return ListTile(
           leading: CircleAvatar(child: KenzaAssetIcon('assets/message.png', size: 24, scale: 1.3)),
           title: Text(_productTitle(row), maxLines: 1, overflow: TextOverflow.ellipsis),
