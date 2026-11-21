@@ -139,6 +139,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         children: destinations,
       ),
       bottomNavigationBar: NavigationBar(
+        height: 92,
         backgroundColor: Theme.of(context).colorScheme.surface,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
@@ -149,13 +150,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         labelTextStyle: WidgetStateProperty.resolveWith<TextStyle?>((states) {
           final isSelected = states.contains(WidgetState.selected);
           return TextStyle(
-            fontSize: 10,
+            fontSize: 12,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
           );
         }),
         destinations: [
           NavigationDestination(
-            icon: Image.asset('assets/icons/home_icone.png', width: 26, height: 26),
+            icon: Image.asset('assets/icons/home_icone.png', width: 36, height: 36),
             selectedIcon: Image.asset('assets/icons/home_icone.png', width: 26, height: 26),
             label: strings.mainHome,
           ),
@@ -165,7 +166,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             label: strings.discoverTitle,
           ),
           NavigationDestination(
-            icon: Image.asset('assets/icons/Add_icon.png', width: 28, height: 28),
+            icon: Image.asset('assets/icons/Add_icon.png', width: 38, height: 38),
             selectedIcon: Image.asset('assets/icons/Add_icon.png', width: 28, height: 28),
             label: strings.addProduct,
           ),
