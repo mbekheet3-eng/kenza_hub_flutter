@@ -36,18 +36,72 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
   }
 
   void _reload() {
-    _conversations = _client.from('conversations')
+    _conversations = _loadConversations();
+    _offers = _loadOffers();
+    _orders = _loadOrders();
+  }
+
+  Future<List<Map<String, dynamic>>> _attachOtherMemberNames(
+    List<dynamic> rawRows,
+  ) async {
+    final rows = rawRows.cast<Map<String, dynamic>>();
+    final otherMemberIds = rows.map((row) {
+      return row['buyer_id'] == _userId
+          ? row['seller_id'] as String
+          : row['buyer_id'] as String;
+    }).toSet().toList();
+
+    if (otherMemberIds.isEmpty) return [];
+
+    final profiles = await _client
+        .from('member_public_profiles')
+        .select('id,first_name')
+        .inFilter('id', otherMemberIds);
+    final names = {
+      for (final profile in profiles)
+        profile['id'] as String: profile['first_name'] as String?,
+    };
+
+    return rows.map((row) {
+      final otherId = row['buyer_id'] == _userId
+          ? row['seller_id'] as String
+          : row['buyer_id'] as String;
+      return {
+        ...row,
+        '_other_member_name': names[otherId],
+      };
+    }).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> _loadConversations() async {
+    final rows = await _client.from('conversations')
         .select('id,product_id,buyer_id,seller_id,created_at,products(title),messages(body,created_at)')
         .or('buyer_id.eq.$_userId,seller_id.eq.$_userId')
         .order('created_at', ascending: false);
-    _offers = _client.from('product_offers')
+    return _attachOtherMemberNames(rows);
+  }
+
+  Future<List<Map<String, dynamic>>> _loadOffers() async {
+    final rows = await _client.from('product_offers')
         .select('id,product_id,buyer_id,seller_id,offered_price,currency,status,message,created_at,products(title)')
         .or('buyer_id.eq.$_userId,seller_id.eq.$_userId')
         .order('created_at', ascending: false);
-    _orders = _client.from('product_orders')
+    return _attachOtherMemberNames(rows);
+  }
+
+  Future<List<Map<String, dynamic>>> _loadOrders() async {
+    final rows = await _client.from('product_orders')
         .select('id,product_id,buyer_id,seller_id,agreed_price,currency,status,created_at,products(title)')
         .or('buyer_id.eq.$_userId,seller_id.eq.$_userId')
         .order('created_at', ascending: false);
+    return _attachOtherMemberNames(rows);
+  }
+
+  String _otherMemberName(Map<String, dynamic> row) {
+    final name = row['_other_member_name'] as String?;
+    return name?.trim().isNotEmpty == true
+        ? name!.trim()
+        : AppStrings.of(context)!.memberFallback;
   }
 
   Future<void> _refresh() async {
@@ -151,7 +205,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         return ListTile(
           leading: CircleAvatar(child: KenzaAssetIcon('assets/message.png', size: 24, scale: 1.3)),
           title: Text(_productTitle(row), maxLines: 1, overflow: TextOverflow.ellipsis),
-          subtitle: Text('${isBuyer ? AppStrings.of(context)!.sellerRole : AppStrings.of(context)!.buyerRole} • $preview', maxLines: 1, overflow: TextOverflow.ellipsis),
+          subtitle: Text('${_otherMemberName(row)} • $preview', maxLines: 1, overflow: TextOverflow.ellipsis),
           trailing: Text(_date(row['created_at']), style: Theme.of(context).textTheme.bodySmall),
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => ConversationScreen(conversationId: row['id'] as String)),
@@ -184,7 +238,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
           title: Text(_productTitle(row), maxLines: 1, overflow: TextOverflow.ellipsis),
           subtitle: Text(
             '${isOffer ? AppStrings.of(context)!.offerPriceLabel : AppStrings.of(context)!.purchaseOrderLabel}: $price $currency\n'
-            '${isSeller ? AppStrings.of(context)!.fromBuyerLabel : AppStrings.of(context)!.submittedToSellerLabel} • ${_status(row['status'])} • ${_date(row['created_at'])}',
+            '${_otherMemberName(row)} • ${_status(row['status'])} • ${_date(row['created_at'])}',
           ),
           trailing: isSeller && pending
               ? PopupMenuButton<String>(
