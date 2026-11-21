@@ -7,6 +7,7 @@ import '../l10n/app_strings.dart';
 import 'categories_screen.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
+import '../widgets/kenza_asset_icon.dart';
 import 'messages_inbox_screen.dart';
 import 'product_form_screen.dart';
 import 'profile_screen.dart';
@@ -156,28 +157,28 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         }),
         destinations: [
           NavigationDestination(
-            icon: Image.asset('assets/icons/home_icone.png', width: 36, height: 36),
-            selectedIcon: Image.asset('assets/icons/home_icone.png', width: 36, height: 36),
+            icon: KenzaAssetIcon('assets/icons/home_icone.png', size: 36, scale: 1.75),
+            selectedIcon: KenzaAssetIcon('assets/icons/home_icone.png', size: 36, scale: 1.75),
             label: strings.mainHome,
           ),
           NavigationDestination(
-            icon: Image.asset('assets/icons/discover_icon.png', width: 36, height: 36),
-            selectedIcon: Image.asset('assets/icons/discover_icon.png', width: 36, height: 36),
+            icon: KenzaAssetIcon('assets/icons/discover_icon.png', size: 36, scale: 1.75),
+            selectedIcon: KenzaAssetIcon('assets/icons/discover_icon.png', size: 36, scale: 1.75),
             label: strings.discoverTitle,
           ),
           NavigationDestination(
-            icon: Image.asset('assets/icons/Add_icon.png', width: 38, height: 38),
-            selectedIcon: Image.asset('assets/icons/Add_icon.png', width: 38, height: 38),
+            icon: KenzaAssetIcon('assets/icons/Add_icon.png', size: 38, scale: 1.65),
+            selectedIcon: KenzaAssetIcon('assets/icons/Add_icon.png', size: 38, scale: 1.65),
             label: strings.addProduct,
           ),
           NavigationDestination(
-            icon: Image.asset('assets/icons/message_icon.png', width: 36, height: 36),
-            selectedIcon: Image.asset('assets/icons/message_icon.png', width: 36, height: 36),
+            icon: KenzaAssetIcon('assets/icons/message_icon.png', size: 36, scale: 1.75),
+            selectedIcon: KenzaAssetIcon('assets/icons/message_icon.png', size: 36, scale: 1.75),
             label: strings.messages,
           ),
           NavigationDestination(
-            icon: Image.asset('assets/icons/profile_icon.png', width: 36, height: 36),
-            selectedIcon: Image.asset('assets/icons/profile_icon.png', width: 36, height: 36),
+            icon: KenzaAssetIcon('assets/icons/profile_icon.png', size: 36, scale: 1.75),
+            selectedIcon: KenzaAssetIcon('assets/icons/profile_icon.png', size: 36, scale: 1.75),
             label: strings.accountTab,
           ),
         ],
