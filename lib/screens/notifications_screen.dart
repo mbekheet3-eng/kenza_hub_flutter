@@ -73,7 +73,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       'new_order' || 'order_accepted' || 'order_rejected' => 'assets/orders.png',
       _ => 'assets/notification.png',
     };
-    return Image.asset(asset, width: 24, height: 24, fit: BoxFit.contain);
+    return KenzaAssetIcon(asset, size: 24, scale: 1.3);
   }
 
   String _notificationTitle(Map<String, dynamic> row) {
