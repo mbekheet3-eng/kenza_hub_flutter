@@ -91,7 +91,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.favorite_border_rounded, size: 56),
+                            Image.asset('assets/favorite.png', width: 56, height: 56),
                             const SizedBox(height: 12),
                             Text(AppStrings.of(context)!.emptyFavorites),
                             const SizedBox(height: 6),
