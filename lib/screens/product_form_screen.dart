@@ -779,7 +779,18 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isEditing ? AppStrings.of(context)!.editProductTitle : AppStrings.of(context)!.addProductTitle)),
+      appBar: AppBar(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('assets/add_product.png', width: 26, height: 26),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(_isEditing ? AppStrings.of(context)!.editProductTitle : AppStrings.of(context)!.addProductTitle),
+            ),
+          ],
+        ),
+      ),
       body: _loading && _categories.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : Form(
