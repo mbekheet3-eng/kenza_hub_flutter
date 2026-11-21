@@ -63,22 +63,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  IconData _icon(String? type) {
-    switch (type) {
-      case 'new_message':
-        return Icons.chat_bubble_outline_rounded;
-      case 'new_offer':
-      case 'offer_accepted':
-      case 'offer_rejected':
-        return Icons.local_offer_outlined;
-      case 'new_order':
-      case 'order_accepted':
-      case 'order_rejected':
-      case 'order_updated':
-        return Icons.shopping_bag_outlined;
-      default:
-        return Icons.notifications_none_rounded;
-    }
+  Widget _icon(String? type) {
+    final asset = switch (type) {
+      'new_message' => 'assets/message.png',
+      'new_offer' || 'offer_accepted' || 'offer_rejected' =>
+        'assets/icons/1795220047615-removebg-preview.png',
+      'order_updated' => 'assets/delivery.png',
+      'new_order' || 'order_accepted' || 'order_rejected' => 'assets/orders.png',
+      _ => 'assets/notification.png',
+    };
+    return Image.asset(asset, width: 24, height: 24, fit: BoxFit.contain);
   }
 
   String _notificationTitle(Map<String, dynamic> row) {
@@ -167,7 +161,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   backgroundColor: unread
                       ? Theme.of(context).colorScheme.primaryContainer
                       : Theme.of(context).colorScheme.surfaceContainerHighest,
-                  child: Icon(_icon(row['type']?.toString())),
+                  child: _icon(row['type']?.toString()),
                 ),
                 title: Text(
                   _notificationTitle(row),
