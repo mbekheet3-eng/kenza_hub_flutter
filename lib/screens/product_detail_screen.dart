@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import '../widgets/kenza_asset_icon.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -337,12 +338,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   height: 16,
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 )
-                              : Image.asset('assets/favorite.png', width: 22, height: 22),
+                              : KenzaAssetIcon('assets/favorite.png', size: 22, scale: 1.3),
                           label: Text(_isFavorite ? _l10n.removeFavoriteTooltip : _l10n.addFavoriteTooltip),
                         ),
                         OutlinedButton.icon(
                           onPressed: () => _shareProduct(product),
-                          icon: Image.asset('assets/share.png', width: 22, height: 22),
+                          icon: KenzaAssetIcon('assets/share.png', size: 22, scale: 1.3),
                           label: Text(_l10n.shareProduct),
                         ),
                       ],
@@ -417,7 +418,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         width: double.infinity,
                         child: FilledButton.icon(
                           onPressed: () => _buy(product),
-                          icon: Image.asset('assets/cart.png', width: 22, height: 22),
+                          icon: KenzaAssetIcon('assets/cart.png', size: 22, scale: 1.3),
                           label: Text(_l10n.buyNowLabel),
                         ),
                       ),
@@ -435,7 +436,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           Expanded(
                             child: OutlinedButton.icon(
                               onPressed: () => _contactSeller(product),
-                              icon: Image.asset('assets/message.png', width: 22, height: 22),
+                              icon: KenzaAssetIcon('assets/message.png', size: 22, scale: 1.3),
                               label: Text(_l10n.contactSellerLabel),
                             ),
                           ),
