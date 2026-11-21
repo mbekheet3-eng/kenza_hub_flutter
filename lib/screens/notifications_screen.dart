@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import '../widgets/kenza_asset_icon.dart';
 import '../l10n/app_strings.dart';
 
 import '../services/notification_service.dart';
