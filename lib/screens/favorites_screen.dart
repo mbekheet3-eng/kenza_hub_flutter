@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import '../widgets/kenza_asset_icon.dart';
 import '../l10n/app_strings.dart';
 import '../models/product.dart';
 import '../services/favorites_service.dart';
@@ -91,7 +92,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Image.asset('assets/favorite.png', width: 56, height: 56),
+                            KenzaAssetIcon('assets/favorite.png', size: 56, scale: 1.15),
                             const SizedBox(height: 12),
                             Text(AppStrings.of(context)!.emptyFavorites),
                             const SizedBox(height: 6),
