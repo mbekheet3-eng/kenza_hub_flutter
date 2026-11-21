@@ -149,7 +149,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         final preview = messages.isEmpty ? AppStrings.of(context)!.startConversationShort : (messages.first['body']?.toString() ?? AppStrings.of(context)!.messagePreviewFallback);
         final isBuyer = row['buyer_id'] == _userId;
         return ListTile(
-          leading: CircleAvatar(child: KenzaAssetIcon('assets/message.png', size: 22, scale: 1.3)),
+          leading: CircleAvatar(child: KenzaAssetIcon('assets/message.png', size: 24, scale: 1.3)),
           title: Text(_productTitle(row), maxLines: 1, overflow: TextOverflow.ellipsis),
           subtitle: Text('${isBuyer ? AppStrings.of(context)!.sellerRole : AppStrings.of(context)!.buyerRole} • $preview', maxLines: 1, overflow: TextOverflow.ellipsis),
           trailing: Text(_date(row['created_at']), style: Theme.of(context).textTheme.bodySmall),
