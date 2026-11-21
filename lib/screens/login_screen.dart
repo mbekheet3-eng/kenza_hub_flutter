@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../l10n/app_strings.dart';
 import '../services/auth_service.dart';
@@ -128,6 +129,53 @@ class _LoginScreenState extends State<LoginScreen> {
               child: _busy
                   ? const CircularProgressIndicator()
                   : Text(strings.login),
+            ),
+            const SizedBox(height: 18),
+            Row(
+              children: [
+                const Expanded(child: Divider()),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text(strings.orContinueWith),
+                ),
+                const Expanded(child: Divider()),
+              ],
+            ),
+            const SizedBox(height: 14),
+            OutlinedButton.icon(
+              onPressed: _busy ? null : () => _run(_auth.signInWithGoogle),
+              icon: const FaIcon(
+                FontAwesomeIcons.google,
+                size: 18,
+                color: Color(0xFF4285F4),
+              ),
+              label: Text(strings.continueWithGoogle),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+                foregroundColor: const Color(0xFF0F172A),
+                side: const BorderSide(color: Color(0xFFCBD5E1)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            OutlinedButton.icon(
+              onPressed: _busy ? null : () => _run(_auth.signInWithApple),
+              icon: const FaIcon(
+                FontAwesomeIcons.apple,
+                size: 20,
+                color: Colors.black,
+              ),
+              label: Text(strings.continueWithApple),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+                foregroundColor: const Color(0xFF0F172A),
+                side: const BorderSide(color: Color(0xFFCBD5E1)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
             ),
             const SizedBox(height: 24),
             TextButton(
