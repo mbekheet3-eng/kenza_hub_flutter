@@ -17,8 +17,8 @@ class KenzaAssetIcon extends StatelessWidget {
   final String asset;
   final double size;
 
-  /// Kept for source compatibility with existing call sites.
-  /// Artwork is now normalized from its alpha bounds, so this value is unused.
+  /// Fine-tunes the visible artwork after transparent margins are removed.
+  /// Values used by internal icons add a subtle 8–11% visual increase.
   final double scale;
 
   /// Kept for source compatibility. Cropped artwork is always contained.
@@ -85,7 +85,7 @@ class KenzaAssetIcon extends StatelessWidget {
             return const SizedBox.shrink();
           }
           return CustomPaint(
-            painter: _VisibleIconPainter(visible),
+            painter: _VisibleIconPainter(visible, scale),
             size: Size.square(size),
           );
         },
@@ -102,15 +102,19 @@ class _VisibleIcon {
 }
 
 class _VisibleIconPainter extends CustomPainter {
-  const _VisibleIconPainter(this.icon);
+  const _VisibleIconPainter(this.icon, this.scale);
 
   final _VisibleIcon icon;
+  final double scale;
 
   @override
   void paint(ui.Canvas canvas, ui.Size size) {
     const inset = 0.05;
-    final maxWidth = size.width * (1 - inset * 2);
-    final maxHeight = size.height * (1 - inset * 2);
+    // Existing internal icon call sites use 1.25–1.30. Convert that to a
+    // restrained 8–11% increase rather than applying the raw scale value.
+    final artworkScale = (1 + ((scale - 1) * 0.35)).clamp(1.0, 1.12);
+    final maxWidth = size.width * (1 - inset * 2) * artworkScale;
+    final maxHeight = size.height * (1 - inset * 2) * artworkScale;
     final aspect = icon.source.width / icon.source.height;
 
     late double width;
@@ -141,5 +145,6 @@ class _VisibleIconPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _VisibleIconPainter oldDelegate) =>
       oldDelegate.icon.image != icon.image ||
-      oldDelegate.icon.source != icon.source;
+      oldDelegate.icon.source != icon.source ||
+      oldDelegate.scale != scale;
 }
