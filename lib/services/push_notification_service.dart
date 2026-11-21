@@ -38,6 +38,7 @@ class PushNotificationService {
   StreamSubscription<RemoteMessage>? _openedSubscription;
   StreamSubscription<RemoteMessage>? _foregroundSubscription;
   bool _initialized = false;
+  bool _localNotificationsReady = false;
 
   Future<void> initialize() async {
     if (_initialized || defaultTargetPlatform != TargetPlatform.android) return;
@@ -45,16 +46,22 @@ class PushNotificationService {
 
     _initialized = true;
 
-    await _localNotifications.initialize(
-      const InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-      ),
-      onDidReceiveNotificationResponse: (_) => _openNotifications(),
-    );
-    await _localNotifications
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(_channel);
+    try {
+      await _localNotifications.initialize(
+        const InitializationSettings(
+          android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        ),
+        onDidReceiveNotificationResponse: (_) => _openNotifications(),
+      );
+      await _localNotifications
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(_channel);
+      _localNotificationsReady = true;
+    } catch (error, stackTrace) {
+      debugPrint('Could not initialize Kenza local notifications: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
 
     _authSubscription = _client.auth.onAuthStateChange.listen((state) {
       if (state.session != null) {
@@ -75,6 +82,21 @@ class PushNotificationService {
 
     if (_client.auth.currentUser != null) {
       await _requestPermissionAndRegister();
+    }
+
+    if (_localNotificationsReady) {
+      try {
+        final launchDetails =
+            await _localNotifications.getNotificationAppLaunchDetails();
+        if (launchDetails?.didNotificationLaunchApp ?? false) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _openNotifications();
+          });
+          return;
+        }
+      } catch (error) {
+        debugPrint('Could not inspect local notification launch details: $error');
+      }
     }
 
     final initialMessage =
@@ -167,22 +189,41 @@ class PushNotificationService {
     final notificationId =
         message.messageId?.hashCode ?? DateTime.now().millisecondsSinceEpoch;
 
-    await _localNotifications.show(
-      notificationId,
-      notificationTitle,
-      notificationBody,
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'kenza_notifications',
-          'Kenza notifications',
-          channelDescription:
-              'Messages, offers and purchase updates from Kenza Hub',
-          importance: Importance.max,
-          priority: Priority.high,
-          playSound: true,
+    if (!_localNotificationsReady) {
+      _showForegroundFallback(notificationTitle, notificationBody);
+      return;
+    }
+
+    try {
+      await _localNotifications.show(
+        notificationId,
+        notificationTitle,
+        notificationBody,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'kenza_notifications',
+            'Kenza notifications',
+            channelDescription:
+                'Messages, offers and purchase updates from Kenza Hub',
+            importance: Importance.max,
+            priority: Priority.high,
+            playSound: true,
+          ),
         ),
-      ),
-      payload: message.data['notification_id']?.toString(),
+        payload: message.data['notification_id']?.toString(),
+      );
+    } catch (error, stackTrace) {
+      debugPrint('Could not display foreground notification: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      _showForegroundFallback(notificationTitle, notificationBody);
+    }
+  }
+
+  void _showForegroundFallback(String title, String body) {
+    final context = rootNavigatorKey.currentContext;
+    if (context == null) return;
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+      SnackBar(content: Text('$title — $body')),
     );
   }
 
