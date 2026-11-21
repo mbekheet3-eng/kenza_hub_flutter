@@ -167,7 +167,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             label: strings.discoverTitle,
           ),
           NavigationDestination(
-            icon: KenzaAssetIcon('assets/icons/Add_icon.png', size: 38, scale: 1.65),
+            icon: KenzaAssetIcon('assets/icons/Add_icon.png', size: 36, scale: 1.75),
             selectedIcon: KenzaAssetIcon('assets/icons/Add_icon.png', size: 38, scale: 1.65),
             label: strings.addProduct,
           ),
