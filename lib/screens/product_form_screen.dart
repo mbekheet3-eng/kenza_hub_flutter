@@ -797,12 +797,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       children: [
                         OutlinedButton.icon(
                           onPressed: _saving || _currentImageCount >= MarketplaceService.maxImages ? null : _pickGallery,
-                          icon: const Icon(Icons.photo_library_outlined),
+                          icon: Image.asset('assets/gallery.png', width: 22, height: 22),
                           label: Text(AppStrings.of(context)!.gallery),
                         ),
                         OutlinedButton.icon(
                           onPressed: _saving || _currentImageCount >= MarketplaceService.maxImages ? null : _pickCamera,
-                          icon: const Icon(Icons.camera_alt_outlined),
+                          icon: Image.asset('assets/camera.png', width: 22, height: 22),
                           label: Text(AppStrings.of(context)!.camera),
                         ),
                       ],
