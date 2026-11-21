@@ -148,7 +148,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         final preview = messages.isEmpty ? AppStrings.of(context)!.startConversationShort : (messages.first['body']?.toString() ?? AppStrings.of(context)!.messagePreviewFallback);
         final isBuyer = row['buyer_id'] == _userId;
         return ListTile(
-          leading: const CircleAvatar(child: Icon(Icons.chat_bubble_outline)),
+          leading: CircleAvatar(child: Image.asset('assets/message.png', width: 22, height: 22)),
           title: Text(_productTitle(row), maxLines: 1, overflow: TextOverflow.ellipsis),
           subtitle: Text('${isBuyer ? AppStrings.of(context)!.sellerRole : AppStrings.of(context)!.buyerRole} • $preview', maxLines: 1, overflow: TextOverflow.ellipsis),
           trailing: Text(_date(row['created_at']), style: Theme.of(context).textTheme.bodySmall),
@@ -175,7 +175,11 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         final currency = row['currency'] ?? 'EGP';
         return ListTile(
           isThreeLine: true,
-          leading: CircleAvatar(child: Icon(isOffer ? Icons.local_offer_outlined : Icons.shopping_bag_outlined)),
+          leading: CircleAvatar(
+            child: isOffer
+                ? Image.asset('assets/icons/1795220047615-removebg-preview.png', width: 24, height: 24)
+                : Image.asset('assets/orders.png', width: 24, height: 24),
+          ),
           title: Text(_productTitle(row), maxLines: 1, overflow: TextOverflow.ellipsis),
           subtitle: Text(
             '${isOffer ? AppStrings.of(context)!.offerPriceLabel : AppStrings.of(context)!.purchaseOrderLabel}: $price $currency\n'
