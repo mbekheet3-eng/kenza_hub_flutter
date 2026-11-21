@@ -1,4 +1,5 @@
 import 'dart:io';
+import '../widgets/kenza_asset_icon.dart';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:image_picker/image_picker.dart';
@@ -783,7 +784,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset('assets/add_product.png', width: 26, height: 26),
+            KenzaAssetIcon('assets/add_product.png', size: 26, scale: 1.3),
             const SizedBox(width: 8),
             Flexible(
               child: Text(_isEditing ? AppStrings.of(context)!.editProductTitle : AppStrings.of(context)!.addProductTitle),
@@ -808,12 +809,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       children: [
                         OutlinedButton.icon(
                           onPressed: _saving || _currentImageCount >= MarketplaceService.maxImages ? null : _pickGallery,
-                          icon: Image.asset('assets/gallery.png', width: 22, height: 22),
+                          icon: KenzaAssetIcon('assets/gallery.png', size: 22, scale: 1.3),
                           label: Text(AppStrings.of(context)!.gallery),
                         ),
                         OutlinedButton.icon(
                           onPressed: _saving || _currentImageCount >= MarketplaceService.maxImages ? null : _pickCamera,
-                          icon: Image.asset('assets/icons/camera.png', width: 22, height: 22),
+                          icon: KenzaAssetIcon('assets/icons/camera.png', size: 22, scale: 1.3),
                           label: Text(AppStrings.of(context)!.camera),
                         ),
                       ],
