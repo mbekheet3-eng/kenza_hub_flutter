@@ -3,9 +3,8 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:material_ui/material_ui.dart';
-
-import '../l10n/app_strings.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../app.dart';
@@ -23,7 +22,17 @@ class PushNotificationService {
 
   static final PushNotificationService instance = PushNotificationService._();
 
+  static const AndroidNotificationChannel _channel = AndroidNotificationChannel(
+    'kenza_notifications',
+    'Kenza notifications',
+    description: 'Messages, offers and purchase updates from Kenza Hub',
+    importance: Importance.max,
+  );
+
   final SupabaseClient _client = Supabase.instance.client;
+  final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
+
   StreamSubscription<AuthState>? _authSubscription;
   StreamSubscription<String>? _tokenSubscription;
   StreamSubscription<RemoteMessage>? _openedSubscription;
@@ -35,6 +44,18 @@ class PushNotificationService {
     if (Firebase.apps.isEmpty) return;
 
     _initialized = true;
+
+    await _localNotifications.initialize(
+      const InitializationSettings(
+        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      ),
+      onDidReceiveNotificationResponse: (_) => _openNotifications(),
+    );
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(_channel);
+
     _authSubscription = _client.auth.onAuthStateChange.listen((state) {
       if (state.session != null) {
         unawaited(_requestPermissionAndRegister());
@@ -67,8 +88,7 @@ class PushNotificationService {
 
   Future<void> _requestPermissionAndRegister() async {
     try {
-      final settings =
-          await FirebaseMessaging.instance.requestPermission(
+      final settings = await FirebaseMessaging.instance.requestPermission(
         alert: true,
         badge: true,
         sound: true,
@@ -90,22 +110,17 @@ class PushNotificationService {
   }
 
   Future<void> _saveToken(String token) async {
-    final userId = _client.auth.currentUser?.id;
-    if (userId == null || token.isEmpty) return;
+    if (_client.auth.currentUser == null || token.isEmpty) return;
 
-    final now = DateTime.now().toUtc().toIso8601String();
     try {
-      await _client.from('device_tokens').upsert(
-        {
-          'user_id': userId,
-          'token': token,
-          'platform': 'android',
-          'is_active': true,
-          'updated_at': now,
-          'last_seen_at': now,
+      await _client.rpc(
+        'register_device_token',
+        params: {
+          'p_token': token,
+          'p_platform': 'android',
         },
-        onConflict: 'token',
       );
+      debugPrint('Kenza Hub FCM device token registered.');
     } catch (error, stackTrace) {
       debugPrint('Could not save the FCM device token in Supabase: $error');
       debugPrintStack(stackTrace: stackTrace);
@@ -117,21 +132,16 @@ class PushNotificationService {
       return;
     }
 
-    final userId = _client.auth.currentUser?.id;
-    if (userId == null) return;
+    if (_client.auth.currentUser == null) return;
 
     try {
       final token = await FirebaseMessaging.instance.getToken();
       if (token == null || token.isEmpty) return;
 
-      await _client
-          .from('device_tokens')
-          .update({
-            'is_active': false,
-            'updated_at': DateTime.now().toUtc().toIso8601String(),
-          })
-          .eq('user_id', userId)
-          .eq('token', token);
+      await _client.rpc(
+        'deactivate_device_token',
+        params: {'p_token': token},
+      );
     } catch (error, stackTrace) {
       // Do not block sign-out if FCM is temporarily unavailable.
       debugPrint('Could not deactivate the FCM token: $error');
@@ -146,25 +156,33 @@ class PushNotificationService {
     await _foregroundSubscription?.cancel();
   }
 
-  void _showForegroundMessage(RemoteMessage message) {
-    final context = rootNavigatorKey.currentContext;
-    if (context == null) return;
+  Future<void> _showForegroundMessage(RemoteMessage message) async {
+    final title = message.notification?.title?.trim();
+    final body = message.notification?.body?.trim();
+    final notificationTitle =
+        title == null || title.isEmpty ? 'كنزة هب' : title;
+    final notificationBody =
+        body == null || body.isEmpty ? 'لديك إشعار جديد' : body;
 
-    final title = message.notification?.title;
-    final body = message.notification?.body;
-    final content = [title, body]
-        .whereType<String>()
-        .where((value) => value.trim().isNotEmpty)
-        .join(' — ');
+    final notificationId =
+        message.messageId?.hashCode ?? DateTime.now().millisecondsSinceEpoch;
 
-    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-      SnackBar(
-        content: Text(content.isEmpty ? AppStrings.of(context)!.newNotification : content),
-        action: SnackBarAction(
-          label: AppStrings.of(context)!.viewNotification,
-          onPressed: _openNotifications,
+    await _localNotifications.show(
+      notificationId,
+      notificationTitle,
+      notificationBody,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'kenza_notifications',
+          'Kenza notifications',
+          channelDescription:
+              'Messages, offers and purchase updates from Kenza Hub',
+          importance: Importance.max,
+          priority: Priority.high,
+          playSound: true,
         ),
       ),
+      payload: message.data['notification_id']?.toString(),
     );
   }
 
