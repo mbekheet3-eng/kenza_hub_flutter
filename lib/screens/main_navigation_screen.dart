@@ -155,28 +155,28 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         }),
         destinations: [
           NavigationDestination(
-            icon: const Icon(Icons.home_outlined),
-            selectedIcon: const Icon(Icons.home_rounded),
+            icon: Image.asset('assets/icons/home_icone.png', width: 26, height: 26),
+            selectedIcon: Image.asset('assets/icons/home_icone.png', width: 26, height: 26),
             label: strings.mainHome,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.explore_outlined),
-            selectedIcon: const Icon(Icons.explore_rounded),
+            icon: Image.asset('assets/icons/discover_icon.png', width: 26, height: 26),
+            selectedIcon: Image.asset('assets/icons/discover_icon.png', width: 26, height: 26),
             label: strings.discoverTitle,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.add_rounded, size: 28),
-            selectedIcon: const Icon(Icons.add_rounded, size: 28),
+            icon: Image.asset('assets/icons/Add_icon.png', width: 28, height: 28),
+            selectedIcon: Image.asset('assets/icons/Add_icon.png', width: 28, height: 28),
             label: strings.addProduct,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.chat_bubble_outline_rounded),
-            selectedIcon: const Icon(Icons.chat_bubble_rounded),
+            icon: Image.asset('assets/icons/message_icon.png', width: 26, height: 26),
+            selectedIcon: Image.asset('assets/icons/message_icon.png', width: 26, height: 26),
             label: strings.messages,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.person_outline_rounded),
-            selectedIcon: const Icon(Icons.person_rounded),
+            icon: Image.asset('assets/icons/profile_icon.png', width: 26, height: 26),
+            selectedIcon: Image.asset('assets/icons/profile_icon.png', width: 26, height: 26),
             label: strings.accountTab,
           ),
         ],
