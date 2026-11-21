@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import '../widgets/kenza_asset_icon.dart';
 
 import '../l10n/app_strings.dart';
 import 'privacy_policy_screen.dart';
@@ -55,7 +56,7 @@ class PoliciesScreen extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
       child: ListTile(
-        leading: Image.asset(iconAsset, width: 28, height: 28),
+        leading: KenzaAssetIcon(iconAsset, size: 28, scale: 1.25),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
         subtitle: Text(subtitle),
         trailing: const Icon(Icons.chevron_right),
