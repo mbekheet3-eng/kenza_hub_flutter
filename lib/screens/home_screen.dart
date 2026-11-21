@@ -298,12 +298,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             icon: Stack(
                               clipBehavior: Clip.none,
                               children: [
-                                Image.asset(
-                                  'assets/notification.png',
-                                  width: 28,
-                                  height: 28,
-                                  fit: BoxFit.contain,
-                                ),
+                                KenzaAssetIcon('assets/notification.png', size: 28, scale: 1.3),
                                 if (unreadCount > 0)
                                   PositionedDirectional(
                                     top: -3,
