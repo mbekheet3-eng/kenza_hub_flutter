@@ -820,5 +820,6 @@
   "submitProSellerRequest": "Submit upgrade request",
   "proSellerRequestSent": "Your upgrade request was sent to the administration",
   "proSellerRequestFailed": "Could not submit the upgrade request",
-  "noPendingProSellerRequests": "There are no pending upgrade requests"
+  "noPendingProSellerRequests": "There are no pending upgrade requests",
+  "orContinueWith": "Or continue with"
 }
