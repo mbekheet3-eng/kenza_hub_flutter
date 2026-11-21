@@ -21,7 +21,7 @@ class AboutKenzaScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.storefront_rounded, color: Colors.white, size: 42),
+                Image.asset('assets/store.png', width: 48, height: 48, fit: BoxFit.contain),
                 const SizedBox(height: 18),
                 Text(s.brandName, style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
