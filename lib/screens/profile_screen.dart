@@ -154,7 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: () => Navigator.pop(sheetContext, 'photo'),
-                  icon: KenzaAssetIcon('assets/gallery.png', size: 22, scale: 1.25),
+                  icon: KenzaAssetIcon('assets/icons/camera.png', size: 22, scale: 1.25),
                   label: Text(AppStrings.of(sheetContext)!.choosePhotoFromDevice),
                 ),
               ),
