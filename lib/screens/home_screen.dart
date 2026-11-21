@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../widgets/kenza_asset_icon.dart';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:image_picker/image_picker.dart';
@@ -352,12 +353,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       hintText: AppStrings.of(context)!.searchProductHint,
                       prefixIcon: Padding(
                         padding: const EdgeInsets.all(12),
-                        child: Image.asset('assets/brows.png', width: 22, height: 22),
+                        child: KenzaAssetIcon('assets/brows.png', size: 22, scale: 1.3),
                       ),
                       suffixIcon: IconButton(
                         tooltip: AppStrings.of(context)!.imageSearch,
                         onPressed: _showImageSearchOptions,
-                        icon: Image.asset('assets/icons/camera.png', width: 24, height: 24),
+                        icon: KenzaAssetIcon('assets/icons/camera.png', size: 24, scale: 1.3),
                       ),
                     ),
                   ),
