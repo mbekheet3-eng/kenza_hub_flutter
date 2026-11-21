@@ -157,27 +157,27 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         destinations: [
           NavigationDestination(
             icon: Image.asset('assets/icons/home_icone.png', width: 36, height: 36),
-            selectedIcon: Image.asset('assets/icons/home_icone.png', width: 26, height: 26),
+            selectedIcon: Image.asset('assets/icons/home_icone.png', width: 36, height: 36),
             label: strings.mainHome,
           ),
           NavigationDestination(
-            icon: Image.asset('assets/icons/discover_icon.png', width: 26, height: 26),
-            selectedIcon: Image.asset('assets/icons/discover_icon.png', width: 26, height: 26),
+            icon: Image.asset('assets/icons/discover_icon.png', width: 36, height: 36),
+            selectedIcon: Image.asset('assets/icons/discover_icon.png', width: 36, height: 36),
             label: strings.discoverTitle,
           ),
           NavigationDestination(
             icon: Image.asset('assets/icons/Add_icon.png', width: 38, height: 38),
-            selectedIcon: Image.asset('assets/icons/Add_icon.png', width: 28, height: 28),
+            selectedIcon: Image.asset('assets/icons/Add_icon.png', width: 38, height: 38),
             label: strings.addProduct,
           ),
           NavigationDestination(
-            icon: Image.asset('assets/icons/message_icon.png', width: 26, height: 26),
-            selectedIcon: Image.asset('assets/icons/message_icon.png', width: 26, height: 26),
+            icon: Image.asset('assets/icons/message_icon.png', width: 36, height: 36),
+            selectedIcon: Image.asset('assets/icons/message_icon.png', width: 36, height: 36),
             label: strings.messages,
           ),
           NavigationDestination(
-            icon: Image.asset('assets/icons/profile_icon.png', width: 26, height: 26),
-            selectedIcon: Image.asset('assets/icons/profile_icon.png', width: 26, height: 26),
+            icon: Image.asset('assets/icons/profile_icon.png', width: 36, height: 36),
+            selectedIcon: Image.asset('assets/icons/profile_icon.png', width: 36, height: 36),
             label: strings.accountTab,
           ),
         ],
