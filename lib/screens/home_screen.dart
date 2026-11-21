@@ -357,7 +357,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       suffixIcon: IconButton(
                         tooltip: AppStrings.of(context)!.imageSearch,
                         onPressed: _showImageSearchOptions,
-                        icon: Image.asset('assets/camera.png', width: 24, height: 24),
+                        icon: Image.asset('assets/icons/camera.png', width: 24, height: 24),
                       ),
                     ),
                   ),
