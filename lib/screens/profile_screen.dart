@@ -391,7 +391,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 height: 18,
                                 child: CircularProgressIndicator(strokeWidth: 2),
                               )
-                            : const Icon(Icons.camera_alt_outlined),
+                            : KenzaAssetIcon('assets/icons/camera.png', size: 24, scale: 1.25),
                         label: Text(AppStrings.of(context)!.changeProfilePhoto),
                       ),
                       const SizedBox(height: 12),
