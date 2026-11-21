@@ -820,5 +820,6 @@
   "submitProSellerRequest": "إرسال طلب الترقية",
   "proSellerRequestSent": "تم إرسال طلب الترقية للإدارة",
   "proSellerRequestFailed": "تعذر إرسال طلب الترقية",
-  "noPendingProSellerRequests": "لا توجد طلبات ترقية معلقة حاليًا"
+  "noPendingProSellerRequests": "لا توجد طلبات ترقية معلقة حاليًا",
+  "orContinueWith": "أو المتابعة باستخدام"
 }
