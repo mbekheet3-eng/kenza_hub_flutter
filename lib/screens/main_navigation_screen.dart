@@ -150,8 +150,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         labelTextStyle: WidgetStateProperty.resolveWith<TextStyle?>((states) {
           final isSelected = states.contains(WidgetState.selected);
+          final languageCode = Localizations.localeOf(context).languageCode;
+          final labelSize = languageCode == 'ar' ? 12.0 : 10.5;
           return TextStyle(
-            fontSize: 12,
+            fontSize: labelSize,
+            height: 1.0,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
           );
         }),
