@@ -11,6 +11,7 @@ import '../services/auth_service.dart';
 import '../services/account_access_service.dart';
 import '../services/marketplace_service.dart';
 import '../widgets/member_avatar.dart';
+import '../widgets/kenza_asset_icon.dart';
 import '../widgets/product_card.dart';
 import 'product_detail_screen.dart';
 import 'about_kenza_screen.dart';
@@ -153,7 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: () => Navigator.pop(sheetContext, 'photo'),
-                  icon: Image.asset('assets/gallery.png', width: 22, height: 22),
+                  icon: KenzaAssetIcon('assets/gallery.png', size: 22, scale: 1.25),
                   label: Text(AppStrings.of(sheetContext)!.choosePhotoFromDevice),
                 ),
               ),
@@ -298,10 +299,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           IconButton(
             onPressed: _signOut,
             tooltip: AppStrings.of(context)!.logout,
-            icon: Transform.scale(
-              scaleX: -1,
-              child: const Icon(Icons.logout),
-            ),
+            icon: const Icon(Icons.logout, matchTextDirection: true),
           ),
         ],
       ),
@@ -407,7 +405,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ? 'Français'
                                   : 'English';
                           return ListTile(
-                            leading: Image.asset('assets/language.png', width: 28, height: 28),
+                            leading: KenzaAssetIcon('assets/language.png', size: 28, scale: 1.25),
                             title: Text(strings.languageSettingsTitle),
                             subtitle: Text('$languageName · ${strings.languageSettingsSubtitle}'),
                             trailing: const Icon(Icons.chevron_right),
@@ -461,7 +459,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                       ),
                       ListTile(
-                        leading: Image.asset('assets/message.png', width: 28, height: 28),
+                        leading: KenzaAssetIcon('assets/message.png', size: 28, scale: 1.25),
                         title: Text(AppStrings.of(context)!.messagesOffersOrdersTitle),
                         subtitle: Text(
                           '${AppStrings.of(context)!.messagesOffersOrdersSubtitle} · '
@@ -473,7 +471,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       ListTile(
-                        leading: Image.asset('assets/seller.png', width: 28, height: 28),
+                        leading: KenzaAssetIcon('assets/seller.png', size: 28, scale: 1.25),
                         title: Text(AppStrings.of(context)!.sellerPublicProfile),
                         subtitle: Text(AppStrings.of(context)!.sellerLocationPrivacy),
                         trailing: const Icon(Icons.chevron_right),
@@ -484,7 +482,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       ListTile(
-                        leading: Image.asset('assets/favorite.png', width: 28, height: 28),
+                        leading: KenzaAssetIcon('assets/favorite.png', size: 28, scale: 1.25),
                         title: Text(AppStrings.of(context)!.favoritesTitle),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => Navigator.of(context).push(
@@ -493,16 +491,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const Divider(height: 28),
                       ExpansionTile(
-                        leading: Image.asset('assets/profile.png', width: 28, height: 28),
+                        leading: KenzaAssetIcon('assets/profile.png', size: 28, scale: 1.25),
                         title: Text(AppStrings.of(context)!.accountTab),
                         initiallyExpanded: false,
                         children: [
                         ListTile(
-                          leading: Image.asset(
-                            _accountRole == 'pro_seller' ? 'assets/store.png' : 'assets/profile.png',
-                            width: 28,
-                            height: 28,
-                          ),
+                          leading: KenzaAssetIcon(_accountRole == 'pro_seller' ? 'assets/store.png' : 'assets/profile.png', size: 28, scale: 1.25),
                           title: Text(_accountRole == 'pro_seller'
                               ? AppStrings.of(context)!.accountTypeProSeller
                               : AppStrings.of(context)!.accountTypeBuyer),
@@ -533,7 +527,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         if (_isKenzaAdmin)
                           ListTile(
-                            leading: Image.asset('assets/admin.png', width: 28, height: 28),
+                            leading: KenzaAssetIcon('assets/admin.png', size: 28, scale: 1.25),
                             title: Text(AppStrings.of(context)!.adminProSellerRequests),
                             trailing: const Icon(Icons.chevron_right),
                             onTap: () => Navigator.of(context).push(
@@ -542,7 +536,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         if (_isKenzaAdmin)
                           ListTile(
-                            leading: Image.asset('assets/admin.png', width: 28, height: 28),
+                            leading: KenzaAssetIcon('assets/admin.png', size: 28, scale: 1.25),
                             title: Text(AppStrings.of(context)!.reviewGenderRequests),
                             trailing: const Icon(Icons.chevron_right),
                             onTap: () => Navigator.of(context).push(
@@ -551,7 +545,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         if (_accountRole == 'pro_seller' && _store != null)
                           ListTile(
-                            leading: Image.asset('assets/store.png', width: 28, height: 28),
+                            leading: KenzaAssetIcon('assets/store.png', size: 28, scale: 1.25),
                             title: Text(Localizations.localeOf(context).languageCode == 'ar'
                                 ? 'إدارة متجري'
                                 : Localizations.localeOf(context).languageCode == 'fr'
@@ -567,7 +561,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             },
                           ),
                         ListTile(
-                          leading: Image.asset('assets/profile.png', width: 28, height: 28),
+                          leading: KenzaAssetIcon('assets/profile.png', size: 28, scale: 1.25),
                           title: Text(AppStrings.of(context)!.registeredGender),
                           subtitle: Text(AppStrings.of(context)!.genderChangeAdminOnly),
                           trailing: const Icon(Icons.chevron_right),
@@ -576,7 +570,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ).then((_) => _load()),
                         ),
                         ListTile(
-                          leading: Image.asset('assets/lock.png', width: 28, height: 28),
+                          leading: KenzaAssetIcon('assets/lock.png', size: 28, scale: 1.25),
                           title: Text(AppStrings.of(context)!.changePassword),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () => Navigator.of(context).push(
@@ -584,7 +578,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                         ListTile(
-                          leading: Image.asset('assets/info.png', width: 28, height: 28),
+                          leading: KenzaAssetIcon('assets/info.png', size: 28, scale: 1.25),
                           title: Text(AppStrings.of(context)!.aboutKenzaTitle),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () => Navigator.of(context).push(
@@ -592,7 +586,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                         ListTile(
-                          leading: Image.asset('assets/document.png', width: 28, height: 28),
+                          leading: KenzaAssetIcon('assets/document.png', size: 28, scale: 1.25),
                           title: Text(AppStrings.of(context)!.policiesAndTerms),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () => Navigator.of(context).push(
@@ -604,7 +598,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const Divider(height: 28),
                       ListTile(
-                        leading: Image.asset('assets/products.png', width: 28, height: 28),
+                        leading: KenzaAssetIcon('assets/products.png', size: 28, scale: 1.25),
                         title: Text('${AppStrings.of(context)!.myProductsTitle} (${_products.length})'),
                         subtitle: Text(AppStrings.of(context)!.myProductsSubtitle),
                         trailing: const Icon(Icons.chevron_right),
