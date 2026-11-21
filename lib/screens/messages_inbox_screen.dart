@@ -218,30 +218,15 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
           isScrollable: true,
           tabs: [
             Tab(
-              icon: Image.asset(
-                'assets/icons/1795220040859-removebg-preview.png',
-                width: 28,
-                height: 28,
-                fit: BoxFit.contain,
-              ),
+              icon: KenzaAssetIcon('assets/icons/1795220040859-removebg-preview.png', size: 28, scale: 1.3),
               text: AppStrings.of(context)!.messagesTab,
             ),
             Tab(
-              icon: Image.asset(
-                'assets/icons/1795220047615-removebg-preview.png',
-                width: 28,
-                height: 28,
-                fit: BoxFit.contain,
-              ),
+              icon: KenzaAssetIcon('assets/icons/1795220047615-removebg-preview.png', size: 28, scale: 1.3),
               text: AppStrings.of(context)!.offersTab,
             ),
             Tab(
-              icon: Image.asset(
-                'assets/icons/1795220032715-removebg-preview.png',
-                width: 28,
-                height: 28,
-                fit: BoxFit.contain,
-              ),
+              icon: KenzaAssetIcon('assets/icons/1795220032715-removebg-preview.png', size: 28, scale: 1.3),
               text: AppStrings.of(context)!.purchaseOrdersTab,
             ),
           ],
