@@ -10,6 +10,7 @@ import '../models/product.dart';
 import '../services/auth_service.dart';
 import '../services/account_access_service.dart';
 import '../services/marketplace_service.dart';
+import '../services/push_notification_service.dart';
 import '../widgets/member_avatar.dart';
 import '../widgets/kenza_asset_icon.dart';
 import '../widgets/product_card.dart';
@@ -285,6 +286,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _signOut() async {
+    await PushNotificationService.instance.deactivateCurrentDevice();
     await _auth.signOut();
     if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
   }
