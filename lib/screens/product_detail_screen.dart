@@ -337,12 +337,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   height: 16,
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 )
-                              : Icon(_isFavorite ? Icons.favorite : Icons.favorite_border),
+                              : Image.asset('assets/favorite.png', width: 22, height: 22),
                           label: Text(_isFavorite ? _l10n.removeFavoriteTooltip : _l10n.addFavoriteTooltip),
                         ),
                         OutlinedButton.icon(
                           onPressed: () => _shareProduct(product),
-                          icon: const Icon(Icons.share_outlined),
+                          icon: Image.asset('assets/share.png', width: 22, height: 22),
                           label: Text(_l10n.shareProduct),
                         ),
                       ],
@@ -417,7 +417,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         width: double.infinity,
                         child: FilledButton.icon(
                           onPressed: () => _buy(product),
-                          icon: const Icon(Icons.shopping_bag_outlined),
+                          icon: Image.asset('assets/cart.png', width: 22, height: 22),
                           label: Text(_l10n.buyNowLabel),
                         ),
                       ),
@@ -435,7 +435,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           Expanded(
                             child: OutlinedButton.icon(
                               onPressed: () => _contactSeller(product),
-                              icon: const Icon(Icons.chat_bubble_outline),
+                              icon: Image.asset('assets/message.png', width: 22, height: 22),
                               label: Text(_l10n.contactSellerLabel),
                             ),
                           ),
