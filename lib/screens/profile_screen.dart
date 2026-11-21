@@ -153,7 +153,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: () => Navigator.pop(sheetContext, 'photo'),
-                  icon: const Icon(Icons.photo_library_outlined),
+                  icon: Image.asset('assets/gallery.png', width: 22, height: 22),
                   label: Text(AppStrings.of(sheetContext)!.choosePhotoFromDevice),
                 ),
               ),
@@ -407,7 +407,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ? 'Français'
                                   : 'English';
                           return ListTile(
-                            leading: const Icon(Icons.language_rounded),
+                            leading: Image.asset('assets/language.png', width: 28, height: 28),
                             title: Text(strings.languageSettingsTitle),
                             subtitle: Text('$languageName · ${strings.languageSettingsSubtitle}'),
                             trailing: const Icon(Icons.chevron_right),
@@ -461,7 +461,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                       ),
                       ListTile(
-                        leading: const Icon(Icons.forum_outlined),
+                        leading: Image.asset('assets/message.png', width: 28, height: 28),
                         title: Text(AppStrings.of(context)!.messagesOffersOrdersTitle),
                         subtitle: Text(
                           '${AppStrings.of(context)!.messagesOffersOrdersSubtitle} · '
@@ -473,7 +473,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       ListTile(
-                        leading: const Icon(Icons.storefront_outlined),
+                        leading: Image.asset('assets/seller.png', width: 28, height: 28),
                         title: Text(AppStrings.of(context)!.sellerPublicProfile),
                         subtitle: Text(AppStrings.of(context)!.sellerLocationPrivacy),
                         trailing: const Icon(Icons.chevron_right),
@@ -484,7 +484,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       ListTile(
-                        leading: const Icon(Icons.favorite_border_rounded),
+                        leading: Image.asset('assets/favorite.png', width: 28, height: 28),
                         title: Text(AppStrings.of(context)!.favoritesTitle),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => Navigator.of(context).push(
@@ -493,14 +493,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const Divider(height: 28),
                       ExpansionTile(
-                        leading: const Icon(Icons.manage_accounts_outlined),
+                        leading: Image.asset('assets/profile.png', width: 28, height: 28),
                         title: Text(AppStrings.of(context)!.accountTab),
                         initiallyExpanded: false,
                         children: [
                         ListTile(
-                          leading: Icon(_accountRole == 'pro_seller'
-                              ? Icons.storefront_rounded
-                              : Icons.person_outline_rounded),
+                          leading: Image.asset(
+                            _accountRole == 'pro_seller' ? 'assets/store.png' : 'assets/profile.png',
+                            width: 28,
+                            height: 28,
+                          ),
                           title: Text(_accountRole == 'pro_seller'
                               ? AppStrings.of(context)!.accountTypeProSeller
                               : AppStrings.of(context)!.accountTypeBuyer),
@@ -531,7 +533,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         if (_isKenzaAdmin)
                           ListTile(
-                            leading: const Icon(Icons.admin_panel_settings_outlined),
+                            leading: Image.asset('assets/admin.png', width: 28, height: 28),
                             title: Text(AppStrings.of(context)!.adminProSellerRequests),
                             trailing: const Icon(Icons.chevron_right),
                             onTap: () => Navigator.of(context).push(
@@ -540,7 +542,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         if (_isKenzaAdmin)
                           ListTile(
-                            leading: const Icon(Icons.admin_panel_settings_outlined),
+                            leading: Image.asset('assets/admin.png', width: 28, height: 28),
                             title: Text(AppStrings.of(context)!.reviewGenderRequests),
                             trailing: const Icon(Icons.chevron_right),
                             onTap: () => Navigator.of(context).push(
@@ -549,7 +551,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         if (_accountRole == 'pro_seller' && _store != null)
                           ListTile(
-                            leading: const Icon(Icons.store_mall_directory_outlined),
+                            leading: Image.asset('assets/store.png', width: 28, height: 28),
                             title: Text(Localizations.localeOf(context).languageCode == 'ar'
                                 ? 'إدارة متجري'
                                 : Localizations.localeOf(context).languageCode == 'fr'
@@ -565,7 +567,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             },
                           ),
                         ListTile(
-                          leading: const Icon(Icons.manage_accounts_outlined),
+                          leading: Image.asset('assets/profile.png', width: 28, height: 28),
                           title: Text(AppStrings.of(context)!.registeredGender),
                           subtitle: Text(AppStrings.of(context)!.genderChangeAdminOnly),
                           trailing: const Icon(Icons.chevron_right),
@@ -574,7 +576,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ).then((_) => _load()),
                         ),
                         ListTile(
-                          leading: const Icon(Icons.lock_reset_outlined),
+                          leading: Image.asset('assets/lock.png', width: 28, height: 28),
                           title: Text(AppStrings.of(context)!.changePassword),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () => Navigator.of(context).push(
@@ -582,7 +584,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                         ListTile(
-                          leading: const Icon(Icons.info_outline),
+                          leading: Image.asset('assets/info.png', width: 28, height: 28),
                           title: Text(AppStrings.of(context)!.aboutKenzaTitle),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () => Navigator.of(context).push(
@@ -590,7 +592,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                         ListTile(
-                          leading: const Icon(Icons.policy_outlined),
+                          leading: Image.asset('assets/document.png', width: 28, height: 28),
                           title: Text(AppStrings.of(context)!.policiesAndTerms),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () => Navigator.of(context).push(
@@ -602,7 +604,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const Divider(height: 28),
                       ListTile(
-                        leading: const Icon(Icons.inventory_2_outlined),
+                        leading: Image.asset('assets/products.png', width: 28, height: 28),
                         title: Text('${AppStrings.of(context)!.myProductsTitle} (${_products.length})'),
                         subtitle: Text(AppStrings.of(context)!.myProductsSubtitle),
                         trailing: const Icon(Icons.chevron_right),
