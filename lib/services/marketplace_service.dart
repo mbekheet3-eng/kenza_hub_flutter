@@ -752,6 +752,7 @@ class MarketplaceService {
     final uploadedPaths = <String>[];
     final insertedPaths = <String>[];
     var productUpdateAttempted = false;
+    var sortOrderUpdateAttempted = false;
 
     try {
       var nextSortOrder = currentImageRows.isEmpty
@@ -841,6 +842,7 @@ class MarketplaceService {
           final oldSortOrder = originalSortOrders[path];
           if (oldSortOrder == index) continue;
 
+          sortOrderUpdateAttempted = true;
           await _client
               .from('product_images')
               .update({'sort_order': index})
@@ -886,16 +888,18 @@ class MarketplaceService {
         }
       }
 
-      // Restore original order in case only some sort-order updates succeeded.
-      for (final entry in originalSortOrders.entries) {
-        try {
-          await _client
-              .from('product_images')
-              .update({'sort_order': entry.value})
-              .eq('product_id', productId)
-              .eq('storage_path', entry.key);
-        } catch (_) {
-          // Preserve the original error; old image rows/files are retained.
+      // Restore original order only if this edit actually started changing it.
+      if (sortOrderUpdateAttempted) {
+        for (final entry in originalSortOrders.entries) {
+          try {
+            await _client
+                .from('product_images')
+                .update({'sort_order': entry.value})
+                .eq('product_id', productId)
+                .eq('storage_path', entry.key);
+          } catch (_) {
+            // Preserve the original error; old image rows/files are retained.
+          }
         }
       }
 
