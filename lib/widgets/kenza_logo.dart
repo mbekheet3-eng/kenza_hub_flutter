@@ -19,13 +19,20 @@ class KenzaLogo extends StatelessWidget {
       width: width,
       height: height,
       fit: fit,
-      errorBuilder: (context, error, stackTrace) => SizedBox(
+      errorBuilder: (context, error, stackTrace) => Image.asset(
+        'assets/logos/logo.png',
         width: width,
         height: height,
-        child: const Icon(
-          Icons.storefront_rounded,
-          size: 72,
-          color: Color(0xFF17366F),
+        fit: fit,
+        errorBuilder: (context, fallbackError, fallbackStackTrace) =>
+            SizedBox(
+          width: width,
+          height: height,
+          child: const Icon(
+            Icons.storefront_rounded,
+            size: 72,
+            color: Color(0xFF17366F),
+          ),
         ),
       ),
     );
