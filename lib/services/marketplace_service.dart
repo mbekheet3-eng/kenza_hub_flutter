@@ -205,6 +205,7 @@ class MarketplaceService {
     final safeOffset = offset < 0 ? 0 : offset;
     final rows = await request
         .order('created_at', ascending: false)
+        .order('id', ascending: true)
         .range(safeOffset, safeOffset + safeLimit - 1);
     return Future.wait(rows.map(_mapProduct));
   }
