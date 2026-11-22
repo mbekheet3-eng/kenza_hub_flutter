@@ -706,9 +706,12 @@ class MarketplaceService {
     final user = _client.auth.currentUser;
     if (user == null) throw Exception(strings.loginRequired);
 
+    // Keep a snapshot so an incomplete edit can restore the previous listing data.
     final previous = await _client
         .from('products')
-        .select('title,description,category_id,status')
+        .select(
+          'title,description,category_id,status,price,audience,custom_category_name',
+        )
         .eq('id', productId)
         .eq('owner_id', user.id)
         .maybeSingle();
@@ -742,8 +745,14 @@ class MarketplaceService {
         images.isNotEmpty ||
         removedPaths.isNotEmpty;
 
+    final originalSortOrders = <String, int>{
+      for (final row in currentImageRows)
+        row['storage_path'] as String: (row['sort_order'] as num).toInt(),
+    };
     final uploadedPaths = <String>[];
     final insertedPaths = <String>[];
+    var productUpdateAttempted = false;
+
     try {
       var nextSortOrder = currentImageRows.isEmpty
           ? 0
@@ -785,9 +794,12 @@ class MarketplaceService {
       }
 
       if (imageRows.isNotEmpty) {
+        // Track paths before the request so cleanup also covers an ambiguous
+        // network failure where the server may have committed the insert.
         await _client.from('product_images').insert(imageRows);
       }
 
+      productUpdateAttempted = true;
       final rows = await _client
           .from('products')
           .update({
@@ -810,19 +822,8 @@ class MarketplaceService {
         throw Exception(strings.productNotFoundOrNoEditPermission);
       }
 
-      if (removedPaths.isNotEmpty) {
-        await _client
-            .from('product_images')
-            .delete()
-            .eq('product_id', productId)
-            .inFilter('storage_path', removedPaths.toList());
-        try {
-          await _client.storage.from(bucket).remove(removedPaths.toList());
-        } catch (_) {
-          // The database no longer references these files; orphan cleanup is best-effort.
-        }
-      }
-
+      // Apply the new primary-photo order before deleting any old image rows.
+      // If any reorder fails, the old rows and files are still available.
       final orderedPaths = <String>[
         ...currentImageRows
             .map((row) => row['storage_path'] as String)
@@ -830,18 +831,74 @@ class MarketplaceService {
         ...insertedPaths,
       ];
       if (orderedPaths.isNotEmpty) {
-        final safePrimaryIndex = primaryImageIndex.clamp(0, orderedPaths.length - 1).toInt();
+        final safePrimaryIndex =
+            primaryImageIndex.clamp(0, orderedPaths.length - 1).toInt();
         final primaryPath = orderedPaths.removeAt(safePrimaryIndex);
         orderedPaths.insert(0, primaryPath);
+
         for (var index = 0; index < orderedPaths.length; index++) {
+          final path = orderedPaths[index];
+          final oldSortOrder = originalSortOrders[path];
+          if (oldSortOrder == index) continue;
+
           await _client
               .from('product_images')
               .update({'sort_order': index})
               .eq('product_id', productId)
-              .eq('storage_path', orderedPaths[index]);
+              .eq('storage_path', path);
+        }
+      }
+
+      // Destructive database changes happen only after uploads, product update,
+      // and ordering have all succeeded. Storage deletion is deferred until
+      // after this method's recoverable database work has completed.
+      if (removedPaths.isNotEmpty) {
+        final deletedRows = await _client
+            .from('product_images')
+            .delete()
+            .eq('product_id', productId)
+            .inFilter('storage_path', removedPaths.toList())
+            .select('storage_path');
+        if (deletedRows.length != removedPaths.length) {
+          throw Exception(strings.productNotFoundOrNoEditPermission);
         }
       }
     } catch (_) {
+      // Restore editable product fields if the update may have reached the
+      // server. Keep moderation status unchanged: image mutations correctly
+      // leave a previously published listing in draft pending a fresh review.
+      if (productUpdateAttempted) {
+        try {
+          await _client
+              .from('products')
+              .update({
+                'title': previous['title'],
+                'description': previous['description'],
+                'price': previous['price'],
+                'category_id': previous['category_id'],
+                'custom_category_name': previous['custom_category_name'],
+                'audience': previous['audience'],
+              })
+              .eq('id', productId)
+              .eq('owner_id', user.id);
+        } catch (_) {
+          // Preserve the original error; the owner can retry after inspection.
+        }
+      }
+
+      // Restore original order in case only some sort-order updates succeeded.
+      for (final entry in originalSortOrders.entries) {
+        try {
+          await _client
+              .from('product_images')
+              .update({'sort_order': entry.value})
+              .eq('product_id', productId)
+              .eq('storage_path', entry.key);
+        } catch (_) {
+          // Preserve the original error; old image rows/files are retained.
+        }
+      }
+
       if (insertedPaths.isNotEmpty) {
         try {
           await _client
@@ -850,17 +907,28 @@ class MarketplaceService {
               .eq('product_id', productId)
               .inFilter('storage_path', insertedPaths);
         } catch (_) {
-          // Preserve the original failure; storage cleanup can be retried.
+          // Preserve the original failure; orphan cleanup can be retried.
         }
       }
       if (uploadedPaths.isNotEmpty) {
         try {
           await _client.storage.from(bucket).remove(uploadedPaths);
         } catch (_) {
-          // Preserve the original failure; storage cleanup can be retried.
+          // Preserve the original failure; orphan cleanup can be retried.
         }
       }
       rethrow;
+    }
+
+    // Old files are removed only after their database references have been
+    // deleted successfully. A storage cleanup failure leaves harmless orphans,
+    // never broken references in the product gallery.
+    if (removedPaths.isNotEmpty) {
+      try {
+        await _client.storage.from(bucket).remove(removedPaths.toList());
+      } catch (_) {
+        // Best-effort cleanup; do not report a failed edit after it committed.
+      }
     }
 
     if (needsImageReview) {
