@@ -163,6 +163,7 @@ class MarketplaceService {
     String? categoryId,
     String? query,
     int limit = 40,
+    int offset = 0,
   }) async {
     var request = _client
         .from('products')
@@ -200,7 +201,11 @@ class MarketplaceService {
       request = request.ilike('title', '%$normalizedQuery%');
     }
 
-    final rows = await request.order('created_at', ascending: false).limit(limit);
+    final safeLimit = limit.clamp(1, 100).toInt();
+    final safeOffset = offset < 0 ? 0 : offset;
+    final rows = await request
+        .order('created_at', ascending: false)
+        .range(safeOffset, safeOffset + safeLimit - 1);
     return Future.wait(rows.map(_mapProduct));
   }
 
