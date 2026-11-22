@@ -147,7 +147,10 @@ class MarketplaceService {
         .select('id,parent_id,name_ar,name_en,name_fr,slug,sort_order')
         .eq('is_active', true)
         .order('sort_order');
-    return rows.map((row) => Category.fromMap(row)).toList();
+    return rows
+        .where((row) => !((row['slug'] as String?) ?? '').endsWith('-other'))
+        .map((row) => Category.fromMap(row))
+        .toList();
   }
 
   Set<String> _categoryScopeIds(
