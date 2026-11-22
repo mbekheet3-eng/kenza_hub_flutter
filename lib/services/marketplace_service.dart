@@ -40,6 +40,13 @@ class _ProductImageReviewException implements Exception {
   String toString() => message;
 }
 
+class _CachedSignedImageUrl {
+  const _CachedSignedImageUrl(this.url, this.expiresAt);
+
+  final String url;
+  final DateTime expiresAt;
+}
+
 class MarketplaceService {
   MarketplaceService({SupabaseClient? client})
       : _client = client ?? Supabase.instance.client;
@@ -207,7 +214,7 @@ class MarketplaceService {
         .order('created_at', ascending: false)
         .order('id', ascending: true)
         .range(safeOffset, safeOffset + safeLimit - 1);
-    return Future.wait(rows.map(_mapProduct));
+    return _mapProducts(rows);
   }
 
   Future<MarketplaceSearchPage> searchProducts({
@@ -328,7 +335,7 @@ class MarketplaceService {
         .eq('owner_id', user.id)
         .order('created_at', ascending: false);
 
-    return Future.wait(rows.map(_mapProduct));
+    return _mapProducts(rows);
   }
 
   Future<List<Map<String, dynamic>>> getActiveStoresByType(String storeType) async {
@@ -370,7 +377,7 @@ class MarketplaceService {
         .order('created_at', ascending: false)
         .limit(limit);
 
-    return Future.wait(rows.map(_mapProduct));
+    return _mapProducts(rows);
   }
 
   Future<int> getPublishedProductCountBySeller(String sellerId) async {
@@ -395,7 +402,7 @@ class MarketplaceService {
         .eq('status', 'published')
         .order('created_at', ascending: false);
 
-    return Future.wait(rows.map(_mapProduct));
+    return _mapProducts(rows);
   }
 
   Future<Product> getProduct(String productId) async {
@@ -406,37 +413,120 @@ class MarketplaceService {
         )
         .eq('id', productId)
         .single();
-    return _mapProduct(row, includeAllImages: true);
+    return (await _mapProducts([row], includeAllImages: true)).single;
   }
 
-  Future<Product> _mapProduct(
-    Map<String, dynamic> row, {
-    bool includeAllImages = false,
-  }) async {
-    final imageRows = (row['product_images'] as List<dynamic>? ?? [])
-        .cast<Map<String, dynamic>>()
-      ..sort(
-        (a, b) => (a['sort_order'] as int).compareTo(b['sort_order'] as int),
+  static const int _signedImageUrlLifetimeSeconds = 3600;
+  static const Duration _signedImageUrlSafetyWindow = Duration(minutes: 5);
+  static const int _maxCachedSignedImageUrls = 500;
+  static final Map<String, _CachedSignedImageUrl> _signedImageUrlCache = {};
+
+  Future<Map<String, String>> _getSignedImageUrls(List<String> paths) async {
+    final uniquePaths = paths.toSet().toList();
+    if (uniquePaths.isEmpty) return {};
+
+    // Signed URLs are bearer links. Scope the in-memory cache to the signed-in
+    // user so one account never reuses another account's cached image links.
+    final userScope = _client.auth.currentUser?.id ?? 'anonymous';
+    final now = DateTime.now();
+    final urlsByPath = <String, String>{};
+    final pathsToSign = <String>[];
+
+    for (final path in uniquePaths) {
+      final cacheKey = '$userScope::$path';
+      final cached = _signedImageUrlCache[cacheKey];
+      if (cached != null &&
+          cached.expiresAt.isAfter(now.add(_signedImageUrlSafetyWindow))) {
+        urlsByPath[path] = cached.url;
+      } else {
+        if (cached != null) _signedImageUrlCache.remove(cacheKey);
+        pathsToSign.add(path);
+      }
+    }
+
+    if (pathsToSign.isNotEmpty) {
+      final results = await _client.storage
+          .from(bucket)
+          .createSignedUrlsResult(pathsToSign, _signedImageUrlLifetimeSeconds);
+      final expiresAt = DateTime.now().add(
+        Duration(seconds: _signedImageUrlLifetimeSeconds) -
+            _signedImageUrlSafetyWindow,
       );
 
-    // Listing cards use only the primary image. Full galleries are fetched
-    // when the product detail/editor screen requests the complete product.
-    final visibleImageRows = includeAllImages || imageRows.isEmpty
-        ? imageRows
-        : imageRows.take(1).toList();
-    final paths = visibleImageRows
-        .map((image) => image['storage_path'] as String)
-        .toList();
+      for (final result in results) {
+        if (result is SignedUrlSuccess) {
+          urlsByPath[result.path] = result.signedUrl;
+          _signedImageUrlCache['$userScope::${result.path}'] =
+              _CachedSignedImageUrl(result.signedUrl, expiresAt);
+        } else if (result is SignedUrlFailure) {
+          throw StateError(
+            'Unable to create a signed URL for product image: ${result.path}',
+          );
+        }
+      }
 
-    final signedUrls = await Future.wait(
-      paths.map((path) => _client.storage.from(bucket).createSignedUrl(path, 3600)),
-    );
+      for (final path in pathsToSign) {
+        if (!urlsByPath.containsKey(path)) {
+          throw StateError('No signed URL returned for product image: $path');
+        }
+      }
+    }
 
-    return Product.fromMap(
-      row,
-      signedImageUrls: signedUrls,
-      paths: paths,
+    _pruneSignedImageUrlCache(DateTime.now());
+    return urlsByPath;
+  }
+
+  static void _pruneSignedImageUrlCache(DateTime now) {
+    _signedImageUrlCache.removeWhere(
+      (_, cached) => !cached.expiresAt.isAfter(now),
     );
+    if (_signedImageUrlCache.length <= _maxCachedSignedImageUrls) return;
+
+    final oldestFirst = _signedImageUrlCache.entries.toList()
+      ..sort((a, b) => a.value.expiresAt.compareTo(b.value.expiresAt));
+    final overflow = _signedImageUrlCache.length - _maxCachedSignedImageUrls;
+    for (final entry in oldestFirst.take(overflow)) {
+      _signedImageUrlCache.remove(entry.key);
+    }
+  }
+
+  Future<List<Product>> _mapProducts(
+    List<Map<String, dynamic>> rows, {
+    bool includeAllImages = false,
+  }) async {
+    final pathsByProduct = <List<String>>[];
+    final allPaths = <String>[];
+
+    for (final row in rows) {
+      final imageRows = (row['product_images'] as List<dynamic>? ?? [])
+          .cast<Map<String, dynamic>>()
+        ..sort(
+          (a, b) => (a['sort_order'] as int).compareTo(b['sort_order'] as int),
+        );
+
+      // Listing cards use only the primary image. Full galleries are fetched
+      // when the product detail/editor screen requests the complete product.
+      final visibleImageRows = includeAllImages || imageRows.isEmpty
+          ? imageRows
+          : imageRows.take(1).toList();
+      final paths = visibleImageRows
+          .map((image) => image['storage_path'] as String)
+          .toList();
+      pathsByProduct.add(paths);
+      allPaths.addAll(paths);
+    }
+
+    // Sign all uncached images in one Storage request for this product batch,
+    // instead of firing one request per product card.
+    final urlsByPath = await _getSignedImageUrls(allPaths);
+    return List<Product>.generate(rows.length, (index) {
+      final paths = pathsByProduct[index];
+      return Product.fromMap(
+        rows[index],
+        signedImageUrls: paths.map((path) => urlsByPath[path]!).toList(),
+        paths: paths,
+      );
+    });
   }
 
   Future<File> downloadImageForEditing(String storagePath) async {
