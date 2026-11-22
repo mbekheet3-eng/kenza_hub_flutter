@@ -31,17 +31,25 @@ class _HomeScreenState extends State<HomeScreen> {
   late Stream<List<Map<String, dynamic>>> _notificationStream;
   late final StreamSubscription<AuthState> _authSubscription;
   final _search = TextEditingController();
+  static const int _pageSize = 20;
+  final ScrollController _scrollController = ScrollController();
   List<Category> _categories = [];
   List<Product> _products = [];
   Set<String> _favoriteIds = {};
   String? _categoryId;
   bool _loading = true;
+  bool _loadingMore = false;
+  bool _hasMore = true;
+  int _nextOffset = 0;
+  int _loadGeneration = 0;
   String? _error;
+  String? _loadMoreError;
 
   @override
   void initState() {
     super.initState();
     _notificationStream = _currentNotificationStream();
+    _scrollController.addListener(_onScroll);
     _authSubscription = Supabase.instance.client.auth.onAuthStateChange.listen((state) {
       if (!mounted) return;
       setState(() {
@@ -84,20 +92,30 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _authSubscription.cancel();
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
     _search.dispose();
     super.dispose();
   }
 
   Future<void> _load() async {
+    final generation = ++_loadGeneration;
     setState(() {
       _loading = true;
+      _loadingMore = false;
+      _hasMore = true;
+      _nextOffset = 0;
       _error = null;
+      _loadMoreError = null;
     });
     try {
       final categories = await _service.getCategories();
       final products = await _service.getPublishedProducts(
         categoryId: _categoryId,
         query: _search.text,
+        limit: _pageSize,
+        offset: 0,
       );
       var favoriteIds = <String>{};
       if (Supabase.instance.client.auth.currentUser != null) {
@@ -107,16 +125,64 @@ class _HomeScreenState extends State<HomeScreen> {
           // Product discovery should remain available if favorites cannot load.
         }
       }
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
       setState(() {
         _categories = categories;
         _products = products;
         _favoriteIds = favoriteIds;
+        _nextOffset = products.length;
+        _hasMore = products.length == _pageSize;
       });
     } catch (error) {
-      if (mounted) setState(() => _error = error.toString());
+      if (mounted && generation == _loadGeneration) {
+        setState(() => _error = error.toString());
+      }
     } finally {
-      if (mounted) setState(() => _loading = false);
+      if (mounted && generation == _loadGeneration) {
+        setState(() => _loading = false);
+        WidgetsBinding.instance.addPostFrameCallback((_) => _maybeLoadMore());
+      }
+    }
+  }
+
+  void _onScroll() => _maybeLoadMore();
+
+  void _maybeLoadMore() {
+    if (!mounted || !_scrollController.hasClients || _loading || _loadingMore || !_hasMore) {
+      return;
+    }
+    if (_scrollController.position.extentAfter < 600) {
+      _loadMore();
+    }
+  }
+
+  Future<void> _loadMore() async {
+    if (_loading || _loadingMore || !_hasMore || _error != null) return;
+    setState(() {
+      _loadingMore = true;
+      _loadMoreError = null;
+    });
+    try {
+      final products = await _service.getPublishedProducts(
+        categoryId: _categoryId,
+        query: _search.text,
+        limit: _pageSize,
+        offset: _nextOffset,
+      );
+      if (!mounted) return;
+      setState(() {
+        final existingIds = _products.map((product) => product.id).toSet();
+        _products = [
+          ..._products,
+          ...products.where((product) => existingIds.add(product.id)),
+        ];
+        _nextOffset += products.length;
+        _hasMore = products.length == _pageSize;
+      });
+    } catch (error) {
+      if (mounted) setState(() => _loadMoreError = error.toString());
+    } finally {
+      if (mounted) setState(() => _loadingMore = false);
     }
   }
 
@@ -268,6 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: RefreshIndicator(
           onRefresh: _load,
           child: CustomScrollView(
+            controller: _scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               SliverToBoxAdapter(
@@ -456,6 +523,27 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
                       childAspectRatio: 0.68,
+                    ),
+                  ),
+                ),
+              if (!_loading && _error == null && _products.isNotEmpty &&
+                  (_loadingMore || _loadMoreError != null))
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Center(
+                      child: _loadingMore
+                          ? const CircularProgressIndicator()
+                          : Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(AppStrings.of(context)!.homeProductsLoadError),
+                                TextButton(
+                                  onPressed: _loadMore,
+                                  child: Text(AppStrings.of(context)!.retryAction),
+                                ),
+                              ],
+                            ),
                     ),
                   ),
                 ),
