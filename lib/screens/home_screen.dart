@@ -158,6 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadMore() async {
     if (_loading || _loadingMore || !_hasMore || _error != null) return;
+    final generation = _loadGeneration;
     setState(() {
       _loadingMore = true;
       _loadMoreError = null;
@@ -169,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
         limit: _pageSize,
         offset: _nextOffset,
       );
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
       setState(() {
         final existingIds = _products.map((product) => product.id).toSet();
         _products = [
@@ -180,9 +181,13 @@ class _HomeScreenState extends State<HomeScreen> {
         _hasMore = products.length == _pageSize;
       });
     } catch (error) {
-      if (mounted) setState(() => _loadMoreError = error.toString());
+      if (mounted && generation == _loadGeneration) {
+        setState(() => _loadMoreError = error.toString());
+      }
     } finally {
-      if (mounted) setState(() => _loadingMore = false);
+      if (mounted && generation == _loadGeneration) {
+        setState(() => _loadingMore = false);
+      }
     }
   }
 
