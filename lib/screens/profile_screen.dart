@@ -348,9 +348,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            MemberAvatar(
-                              avatarUrl: _profile?['avatar_url'] as String?,
-                              radius: 48,
+                            Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                MemberAvatar(
+                                  avatarUrl: _profile?['avatar_url'] as String?,
+                                  radius: 48,
+                                ),
+                                PositionedDirectional(
+                                  end: -3,
+                                  bottom: -3,
+                                  child: Material(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    shape: const CircleBorder(),
+                                    elevation: 2,
+                                    child: IconButton(
+                                      onPressed: _savingAvatar ? null : _showAvatarOptions,
+                                      tooltip: AppStrings.of(context)!.changeProfilePhoto,
+                                      constraints: const BoxConstraints.tightFor(
+                                        width: 36,
+                                        height: 36,
+                                      ),
+                                      padding: EdgeInsets.zero,
+                                      icon: _savingAvatar
+                                          ? const SizedBox(
+                                              width: 16,
+                                              height: 16,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : const Icon(
+                                              Icons.camera_alt_outlined,
+                                              size: 19,
+                                              color: Colors.white,
+                                            ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                             const SizedBox(width: 16),
                             Expanded(
@@ -382,17 +419,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ],
                         ),
-                      ),
-                      OutlinedButton.icon(
-                        onPressed: _savingAvatar ? null : _showAvatarOptions,
-                        icon: _savingAvatar
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : KenzaAssetIcon('assets/icons/camera.png', size: 24, scale: 1.25),
-                        label: Text(AppStrings.of(context)!.changeProfilePhoto),
                       ),
                       const SizedBox(height: 12),
                       Text(
