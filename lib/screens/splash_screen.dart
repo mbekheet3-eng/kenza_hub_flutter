@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:material_ui/material_ui.dart';
 import 'auth_gate.dart';
-import '../widgets/kenza_logo.dart';
 
 class KenzaSplashScreen extends StatefulWidget {
   const KenzaSplashScreen({super.key});
@@ -12,11 +11,24 @@ class KenzaSplashScreen extends StatefulWidget {
 }
 
 class _KenzaSplashScreenState extends State<KenzaSplashScreen> {
+  static const _splashImages = [
+    'assets/images/kenza_splash_screen.png',
+    'assets/images/kenza_splash_2.jpg',
+  ];
+
   Timer? _timer;
+  Timer? _imageTimer;
+  int _splashImageIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    _imageTimer = Timer.periodic(const Duration(milliseconds: 700), (_) {
+      if (!mounted) return;
+      setState(() {
+        _splashImageIndex = (_splashImageIndex + 1) % _splashImages.length;
+      });
+    });
     _timer = Timer(const Duration(milliseconds: 1400), () {
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
@@ -33,6 +45,7 @@ class _KenzaSplashScreenState extends State<KenzaSplashScreen> {
   @override
   void dispose() {
     _timer?.cancel();
+    _imageTimer?.cancel();
     super.dispose();
   }
 
@@ -43,16 +56,20 @@ class _KenzaSplashScreenState extends State<KenzaSplashScreen> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final logoSize = math.min(
-              constraints.maxWidth * 0.88,
-              constraints.maxHeight * 0.78,
+            final imageWidth = math.min(
+              constraints.maxWidth * 0.94,
+              constraints.maxHeight * 0.84,
             );
             return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  KenzaLogo(width: logoSize, height: logoSize),
-                ],
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                child: Image.asset(
+                  _splashImages[_splashImageIndex],
+                  key: ValueKey(_splashImageIndex),
+                  width: imageWidth,
+                  height: constraints.maxHeight * 0.84,
+                  fit: BoxFit.contain,
+                ),
               ),
             );
           },
