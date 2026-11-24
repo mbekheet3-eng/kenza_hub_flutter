@@ -15,30 +15,25 @@ class KenzaLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Image.asset(
+      // This asset is byte-for-byte the same image used by Android's
+      // mipmap/ic_launcher.png, packaged as a Flutter asset for the welcome UI.
       'assets/logos/kenza_mark.png',
       width: width,
       height: height,
       fit: fit,
-      errorBuilder: (context, error, stackTrace) => Image.asset(
-        'assets/logos/logo.png',
+      errorBuilder: (context, error, stackTrace) => SizedBox(
         width: width,
         height: height,
-        fit: fit,
-        errorBuilder: (context, fallbackError, fallbackStackTrace) =>
-            SizedBox(
-          width: width,
-          height: height,
-          child: const FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              'kenza',
-              style: TextStyle(
-                fontFamily: 'cursive',
-                fontSize: 34,
-                fontStyle: FontStyle.italic,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFFC62828),
-              ),
+        child: const FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            'kenza',
+            style: TextStyle(
+              fontFamily: 'cursive',
+              fontSize: 34,
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFFC62828),
             ),
           ),
         ),
