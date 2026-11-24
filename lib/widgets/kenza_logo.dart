@@ -28,10 +28,18 @@ class KenzaLogo extends StatelessWidget {
             SizedBox(
           width: width,
           height: height,
-          child: const Icon(
-            Icons.storefront_rounded,
-            size: 72,
-            color: Color(0xFF17366F),
+          child: const FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              'kenza',
+              style: TextStyle(
+                fontFamily: 'cursive',
+                fontSize: 34,
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFFC62828),
+              ),
+            ),
           ),
         ),
       ),
