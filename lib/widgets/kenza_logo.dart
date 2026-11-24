@@ -16,7 +16,7 @@ class KenzaLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Image.asset(
       // This asset is byte-for-byte the same image used by Android's
-      // mipmap/ic_launcher.png, packaged as a Flutter asset for the welcome UI.
+      // mipmap/ic_launcher.jpg, packaged as a Flutter asset for the welcome UI.
       'assets/logos/kenza_mark.jpg',
       width: width,
       height: height,
