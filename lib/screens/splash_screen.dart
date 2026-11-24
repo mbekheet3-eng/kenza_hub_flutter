@@ -53,26 +53,18 @@ class _KenzaSplashScreenState extends State<KenzaSplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final imageWidth = math.min(
-              constraints.maxWidth * 0.94,
-              constraints.maxHeight * 0.84,
-            );
-            return Center(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 250),
-                child: Image.asset(
-                  _splashImages[_splashImageIndex],
-                  key: ValueKey(_splashImageIndex),
-                  width: imageWidth,
-                  height: constraints.maxHeight * 0.84,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            );
-          },
+      body: LayoutBuilder(
+        builder: (context, constraints) => SizedBox.expand(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 250),
+            child: Image.asset(
+              _splashImages[_splashImageIndex],
+              key: ValueKey(_splashImageIndex),
+              width: constraints.maxWidth,
+              height: constraints.maxHeight,
+              fit: BoxFit.cover,
+            ),
+          ),
         ),
       ),
     );
