@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 import 'package:material_ui/material_ui.dart';
 import 'auth_gate.dart';
 
