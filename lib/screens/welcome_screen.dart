@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter/services.dart';
 
 import '../config/app_locale.dart';
 import '../l10n/app_strings.dart';
@@ -172,8 +173,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     final imageWidth = (screenWidth * 0.40).clamp(145.0, 175.0).toDouble();
     final imageHeight = imageWidth * 1.22;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.white,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) => SingleChildScrollView(
@@ -382,6 +389,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               ),
             ),
           ),
+        ),
         ),
       ),
     );
