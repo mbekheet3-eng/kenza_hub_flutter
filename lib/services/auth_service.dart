@@ -49,7 +49,7 @@ class AuthService {
       email: email.trim(),
       password: password,
       emailRedirectTo: _authRedirectUrl,
-      data: {'display_name': displayName.trim(), 'gender': gender},
+      data: {\n        'display_name': displayName.trim(),\n        'gender': gender,\n        'signup_confirmation_pending': true,\n      },
     );
   }
 
@@ -84,7 +84,7 @@ class AuthService {
     );
   }
 
-  Future<void> updatePassword(String password) async {
+  Future<void> dismissEmailConfirmationNotice() async {\n    await _client.auth.updateUser(\n      UserAttributes(data: {'signup_confirmation_pending': false}),\n    );\n  }\n\n  Future<void> updatePassword(String password) async {
     await _client.auth.updateUser(UserAttributes(password: password));
   }
 
