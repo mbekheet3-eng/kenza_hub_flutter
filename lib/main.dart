@@ -8,6 +8,7 @@ import 'app.dart';
 import 'config/app_locale.dart';
 import 'l10n/app_strings.dart';
 import 'l10n/kenza_localizations.dart';
+import 'services/auth_service.dart';
 import 'services/push_notification_service.dart';
 
 Future<void> main() async {
@@ -39,6 +40,10 @@ Future<void> main() async {
     url: supabaseUrl,
     publishableKey: supabasePublishableKey,
   );
+
+  // Listen before showing the splash screen so password-recovery deep links
+  // are not missed while the splash screen is visible.
+  AuthService.initializeRecoveryListener();
 
   await PushNotificationService.instance.initialize();
   await AppLocale.initialize();
