@@ -3,29 +3,54 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../l10n/app_strings.dart';
 import '../services/auth_service.dart';
+import 'email_confirmation_success_screen.dart';
 import 'gender_onboarding_screen.dart';
 import 'main_navigation_screen.dart';
 import 'password_recovery_screen.dart';
 import 'welcome_screen.dart';
 
-class AuthGate extends StatelessWidget {
+class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
 
   @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  final AuthService _auth = AuthService();
+  bool _clearingConfirmationNotice = false;
+
+  Future<void> _continueAfterEmailConfirmation() async {
+    if (_clearingConfirmationNotice) return;
+    setState(() => _clearingConfirmationNotice = true);
+    try {
+      await _auth.dismissEmailConfirmationNotice();
+    } finally {
+      if (mounted) setState(() => _clearingConfirmationNotice = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final auth = AuthService();
     return StreamBuilder<AuthState>(
-      stream: auth.authChanges,
+      stream: _auth.authChanges,
       builder: (context, snapshot) {
         if (AuthService.isPasswordRecoveryPending ||
             snapshot.data?.event == AuthChangeEvent.passwordRecovery) {
           return const PasswordRecoveryScreen();
         }
 
-        final userId = auth.currentUser?.id;
-        if (userId == null) return const WelcomeScreen();
+        final user = _auth.currentUser;
+        if (user == null) return const WelcomeScreen();
 
-        return _MemberGenderGate(key: ValueKey(userId), userId: userId);
+        if (user.userMetadata?['signup_confirmation_pending'] == true) {
+          return EmailConfirmationSuccessScreen(
+            onContinue: _continueAfterEmailConfirmation,
+            busy: _clearingConfirmationNotice,
+          );
+        }
+
+        return _MemberGenderGate(key: ValueKey(user.id), userId: user.id);
       },
     );
   }
