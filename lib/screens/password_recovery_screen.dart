@@ -34,6 +34,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
     setState(() => _busy = true);
     try {
       await _auth.updatePassword(_password.text);
+      AuthService.clearPasswordRecovery();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppStrings.of(context)!.passwordUpdated)),
