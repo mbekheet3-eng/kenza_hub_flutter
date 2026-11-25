@@ -389,7 +389,7 @@ Deno.serve(async (request: Request) => {
       : "approved";
 
     const result = {
-      model: "gemini-2.5-flash",
+      models_used: [...new Set(imageResults.map((item) => String(item.model ?? "unknown")))],
       image_count: images.length,
       images: imageResults,
     };
