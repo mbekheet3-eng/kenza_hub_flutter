@@ -42,6 +42,10 @@ function safeStrings(value: unknown, max = 8): string[] {
     .slice(0, max);
 }
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const TRANSIENT_HTTP_STATUSES = new Set([408, 429, 500, 502, 503, 504]);
+
 async function analyzeImage(
   apiKey: string,
   bytes: Uint8Array,
@@ -67,79 +71,138 @@ async function analyzeImage(
     "Listing description: " + JSON.stringify(description.slice(0, 1000)),
   ].join("\n");
 
-  const response = await fetch(
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": apiKey,
-      },
-      body: JSON.stringify({
-        contents: [{
-          role: "user",
-          parts: [
-            { text: prompt },
-            { inline_data: { mime_type: mimeType, data: base64Encode(bytes) } },
-          ],
-        }],
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.1,
-        },
-      }),
-      signal: AbortSignal.timeout(45000),
+  const requestBody = JSON.stringify({
+    contents: [{
+      role: "user",
+      parts: [
+        { text: prompt },
+        { inline_data: { mime_type: mimeType, data: base64Encode(bytes) } },
+      ],
+    }],
+    generationConfig: {
+      responseMimeType: "application/json",
+      temperature: 0.1,
     },
-  );
+  });
 
-  if (!response.ok) {
-    const detail = await response.text();
-    console.error("Gemini image review failed:", response.status, detail.slice(0, 400));
-    throw new Error("Gemini review unavailable");
+  const models = ["gemini-2.5-flash", "gemini-3.8-flash"];
+  let lastError = "Gemini review unavailable";
+
+  for (let modelIndex = 0; modelIndex < models.length; modelIndex++) {
+    const model = models[modelIndex];
+    const attempts = modelIndex === 0 ? 2 : 1;
+
+    for (let attempt = 1; attempt <= attempts; attempt++) {
+      try {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": apiKey,
+            },
+            body: requestBody,
+            signal: AbortSignal.timeout(30000),
+          },
+        );
+
+        if (!response.ok) {
+          const detail = await response.text();
+          lastError = `${model} HTTP ${response.status}`;
+          console.error("Gemini image review HTTP error:", {
+            model,
+            status: response.status,
+            attempt,
+            detail: detail.slice(0, 300),
+          });
+
+          if (!TRANSIENT_HTTP_STATUSES.has(response.status)) {
+            throw new Error(`Gemini image review failed with non-retryable HTTP ${response.status}`);
+          }
+          if (attempt < attempts) {
+            await sleep(900);
+            continue;
+          }
+          break;
+        }
+
+        const payload = await response.json();
+        const rawText = payload?.candidates?.[0]?.content?.parts
+          ?.map((part: JsonRecord) => typeof part.text === "string" ? part.text : "")
+          .join("")
+          .trim();
+
+        if (typeof rawText !== "string" || !rawText) {
+          throw new Error("Gemini returned no review result");
+        }
+
+        let parsed: JsonRecord;
+        try {
+          parsed = JSON.parse(rawText) as JsonRecord;
+        } catch {
+          throw new Error("Gemini returned invalid review JSON");
+        }
+
+        const rawDecision = parsed.decision;
+        const decision: Decision =
+          rawDecision === "approve" || rawDecision === "reject" || rawDecision === "review"
+            ? rawDecision
+            : "review";
+        const score = Number(parsed.quality_score);
+        const qualityScore = Number.isFinite(score)
+          ? Math.max(0, Math.min(100, Math.round(score)))
+          : 0;
+
+        // A low-confidence or low-quality response must never become an approval.
+        const finalDecision: Decision =
+          decision === "approve" && qualityScore < 60 ? "review" : decision;
+
+        return {
+          model,
+          decision: finalDecision,
+          quality_score: qualityScore,
+          issues: safeStrings(parsed.issues),
+          reason_ar: typeof parsed.reason_ar === "string"
+            ? parsed.reason_ar.slice(0, 400)
+            : "تعذر التأكد من ملاءمة الصورة تلقائيًا.",
+          visible_item: typeof parsed.visible_item === "string"
+            ? parsed.visible_item.slice(0, 160)
+            : "",
+        };
+      } catch (error) {
+        lastError = error instanceof Error ? error.message : String(error);
+        console.error("Gemini image review attempt failed:", {
+          model,
+          attempt,
+          error: lastError.slice(0, 250),
+        });
+
+        // Do not retry authentication, configuration, request, or response-format errors.
+        if (
+          lastError.includes("non-retryable HTTP") ||
+          lastError.includes("no review result") ||
+          lastError.includes("invalid review JSON")
+        ) {
+          throw error;
+        }
+
+        if (attempt < attempts) {
+          await sleep(900);
+          continue;
+        }
+      }
+    }
+
+    if (modelIndex === 0) {
+      console.warn("Primary Gemini model unavailable; trying fallback model", {
+        primary_model: model,
+        fallback_model: models[1],
+      });
+    }
   }
 
-  const payload = await response.json();
-  const rawText = payload?.candidates?.[0]?.content?.parts
-    ?.map((part: JsonRecord) => typeof part.text === "string" ? part.text : "")
-    .join("")
-    .trim();
-
-  if (typeof rawText !== "string" || !rawText) {
-    throw new Error("Gemini returned no review result");
-  }
-
-  let parsed: JsonRecord;
-  try {
-    parsed = JSON.parse(rawText) as JsonRecord;
-  } catch {
-    throw new Error("Gemini returned invalid review JSON");
-  }
-
-  const rawDecision = parsed.decision;
-  const decision: Decision =
-    rawDecision === "approve" || rawDecision === "reject" || rawDecision === "review"
-      ? rawDecision
-      : "review";
-  const score = Number(parsed.quality_score);
-  const qualityScore = Number.isFinite(score)
-    ? Math.max(0, Math.min(100, Math.round(score)))
-    : 0;
-
-  // A low-confidence or low-quality response must never become an approval.
-  const finalDecision: Decision =
-    decision === "approve" && qualityScore < 60 ? "review" : decision;
-
-  return {
-    decision: finalDecision,
-    quality_score: qualityScore,
-    issues: safeStrings(parsed.issues),
-    reason_ar: typeof parsed.reason_ar === "string"
-      ? parsed.reason_ar.slice(0, 400)
-      : "تعذر التأكد من ملاءمة الصورة تلقائيًا.",
-    visible_item: typeof parsed.visible_item === "string"
-      ? parsed.visible_item.slice(0, 160)
-      : "",
-  };
+  throw new Error(`All Gemini image-review attempts failed: ${lastError}`);
 }
 
 Deno.serve(async (request: Request) => {
