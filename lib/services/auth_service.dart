@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../config/app_locale.dart';
@@ -9,6 +11,25 @@ class AuthService {
   final SupabaseClient _client = Supabase.instance.client;
 
   static const _authRedirectUrl = 'com.kenza.hub://login-callback/';
+  static StreamSubscription<AuthState>? _recoverySubscription;
+  static bool _passwordRecoveryPending = false;
+
+  static bool get isPasswordRecoveryPending => _passwordRecoveryPending;
+
+  /// Capture recovery links as soon as Supabase is initialized. This prevents
+  /// the splash screen delay from swallowing the one-time passwordRecovery event.
+  static void initializeRecoveryListener() {
+    _recoverySubscription ??=
+        Supabase.instance.client.auth.onAuthStateChange.listen((state) {
+      if (state.event == AuthChangeEvent.passwordRecovery) {
+        _passwordRecoveryPending = true;
+      }
+    });
+  }
+
+  static void clearPasswordRecovery() {
+    _passwordRecoveryPending = false;
+  }
 
   User? get currentUser => _client.auth.currentUser;
 
