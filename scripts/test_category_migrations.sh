@@ -45,8 +45,38 @@ do
   } | psql -v ON_ERROR_STOP=1
 done
 
+# Validate the proposed Miscellaneous seed against the disposable database twice.
+# The second run proves the slug-based upserts are idempotent.
+psql -v ON_ERROR_STOP=1 -f docs/proposed_miscellaneous_categories.sql
+psql -v ON_ERROR_STOP=1 -f docs/proposed_miscellaneous_categories.sql
+
 psql -v ON_ERROR_STOP=1 <<'SQL'
-do $$
+do $
+begin
+  if not exists (
+    select 1 from public.categories
+    where parent_id is null and slug = 'miscellaneous'
+      and name_ar = 'متفرقات' and name_en = 'Miscellaneous'
+      and name_fr = 'Divers'
+  ) then
+    raise exception 'Miscellaneous root category or translations are missing';
+  end if;
+
+  if (select count(*) from public.categories
+      where slug in (
+        'miscellaneous-books',
+        'miscellaneous-office-equipment',
+        'miscellaneous-tools-equipment',
+        'miscellaneous-other'
+      ) and parent_id = (select id from public.categories where slug = 'miscellaneous')) <> 4 then
+    raise exception 'Miscellaneous child categories are incomplete';
+  end if;
+end;
+$;
+SQL
+
+psql -v ON_ERROR_STOP=1 <<'SQL'
+do $
 begin
   if exists (
     select 1 from public.categories
