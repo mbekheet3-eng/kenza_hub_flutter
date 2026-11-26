@@ -92,7 +92,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
 
   Future<List<Map<String, dynamic>>> _loadOrders() async {
     final rows = await _client.from('product_orders')
-        .select('id,product_id,buyer_id,seller_id,agreed_price,currency,status,created_at,products(title)')
+        .select('id,product_id,buyer_id,seller_id,agreed_price,currency,status,created_at,expires_at,products(title)')
         .or('buyer_id.eq.$_userId,seller_id.eq.$_userId')
         .order('created_at', ascending: false);
     return _attachOtherMemberNames(rows);
