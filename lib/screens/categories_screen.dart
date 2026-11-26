@@ -19,6 +19,8 @@ Color _categoryBackgroundForSlug(String slug) {
       return const Color(0xFFE8F5E9);
     case 'home-supplies':
       return const Color(0xFFFFF1D6);
+    case 'miscellaneous':
+      return const Color(0xFFEDE7F6);
     default:
       return const Color(0xFFF1EAFE);
   }
@@ -34,6 +36,8 @@ String _categoryImageForSlug(String slug) {
       return 'assets/icons/children_supplies.png';
     case 'home-supplies':
       return 'assets/icons/home_supplies.png';
+    case 'miscellaneous':
+      return '';
     default:
       return 'assets/icons/clothing.png';
   }
@@ -52,6 +56,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     'shoes',
     'children-supplies',
     'home-supplies',
+    'miscellaneous',
   ];
 
   final _service = MarketplaceService();
@@ -334,12 +339,14 @@ class _DiscoverCategoryCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 alignment: Alignment.center,
-                child: Image.asset(
-                  imageAsset,
-                  width: _discoverIconImageSize,
-                  height: _discoverIconImageSize,
-                  fit: BoxFit.contain,
-                ),
+                child: imageAsset.isEmpty
+                    ? const Icon(Icons.widgets_rounded, size: 64)
+                    : Image.asset(
+                        imageAsset,
+                        width: _discoverIconImageSize,
+                        height: _discoverIconImageSize,
+                        fit: BoxFit.contain,
+                      ),
               ),
               const SizedBox(height: 9),
               Text(
