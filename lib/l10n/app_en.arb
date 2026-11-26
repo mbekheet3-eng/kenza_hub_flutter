@@ -835,5 +835,6 @@
   "confirmCompleteOrderTitle": "Confirm product receipt",
   "confirmCompleteOrderBody": "Have you received the product? The purchase request will be marked as completed.",
   "orderCancelledToast": "Purchase request cancelled.",
-  "orderCompletedToast": "Receipt confirmed. Purchase request completed."
+  "orderCompletedToast": "Receipt confirmed. Purchase request completed.",
+  "notificationOrderCompletedTitle": "Product received"
 }
