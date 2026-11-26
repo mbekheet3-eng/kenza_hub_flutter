@@ -11,6 +11,9 @@ on:
       - 'pubspec.yaml'
       - 'pubspec.lock'
       - 'supabase/migrations/**'
+      - 'supabase/functions/**'
+      - 'docs/proposed_miscellaneous_categories.sql'
+      - 'scripts/test_category_migrations.sh'
       - 'supabase/SCHEMA.md'
       - '.github/workflows/flutter-analyze.yml'
   workflow_dispatch:
@@ -19,6 +22,20 @@ permissions:
   contents: read
 
 jobs:
+  edge-function-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the pushed branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Test Gemini model fallback behavior
+        run: deno test supabase/functions/tests/review-product-images-test.ts
+
   analyze:
     runs-on: ubuntu-latest
     steps:
