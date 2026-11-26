@@ -582,6 +582,8 @@
   "actionTooltipLabel": "Action",
   "offersTab": "Offers",
   "purchaseOrdersTab": "Purchase orders",
+  "sentPurchaseOrdersTab": "Requests sent",
+  "receivedPurchaseOrdersTab": "Requests received",
   "messagesTab": "Messages",
   "favoriteAddedToast": "Product added to favorites",
   "priceRangeTitle": "Price range in EGP",
