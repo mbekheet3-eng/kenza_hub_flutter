@@ -37,13 +37,12 @@ class MarketplaceTransactionService {
       throw Exception(strings.pendingPurchaseRequestExists);
     }
     try {
+      // The database trigger derives buyer, seller, price, currency and
+      // expiry from the authenticated session and the current published product.
+      // Keep the client-supplied price only as an early UI validation.
+      if (price <= 0) throw Exception(strings.priceMustBePositive);
       await _client.from('product_orders').insert({
         'product_id': productId,
-        'buyer_id': userId,
-        'seller_id': sellerId,
-        'agreed_price': price,
-        'currency': 'EGP',
-        'status': 'pending',
       });
     } on PostgrestException catch (error) {
       if (error.code == '23505') {
@@ -63,13 +62,10 @@ class MarketplaceTransactionService {
     final strings = await AppStrings.delegate.load(AppLocale.notifier.value);
     if (userId == sellerId) throw Exception(strings.cannotOfferOwnProduct);
     if (offeredPrice <= 0) throw Exception(strings.priceMustBePositive);
+    // The database derives buyer, seller, currency and initial status.
     await _client.from('product_offers').insert({
       'product_id': productId,
-      'buyer_id': userId,
-      'seller_id': sellerId,
       'offered_price': offeredPrice,
-      'currency': 'EGP',
-      'status': 'pending',
       if (message != null && message.trim().isNotEmpty) 'message': message.trim(),
     });
   }
