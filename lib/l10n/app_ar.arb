@@ -827,5 +827,13 @@
   "pendingPurchaseRequestExists": "لديك بالفعل طلب شراء معلق لهذا المنتج. انتظر رد البائع أو انتهاء صلاحية الطلب قبل إرسال طلب جديد.",
   "statusExpired": "منتهي الصلاحية",
   "notificationOrderReminderTitle": "تذكير بطلب شراء معلق",
-  "notificationOrderExpiredTitle": "انتهت صلاحية طلب الشراء"
+  "notificationOrderExpiredTitle": "انتهت صلاحية طلب الشراء",
+  "cancelOrderLabel": "إلغاء الطلب",
+  "completeOrderLabel": "تأكيد الاستلام",
+  "confirmCancelOrderTitle": "تأكيد إلغاء الطلب",
+  "confirmCancelOrderBody": "هل أنت متأكد من إلغاء طلب الشراء؟",
+  "confirmCompleteOrderTitle": "تأكيد استلام المنتج",
+  "confirmCompleteOrderBody": "هل استلمت المنتج بالفعل؟ بعد التأكيد سيتم إغلاق طلب الشراء.",
+  "orderCancelledToast": "تم إلغاء طلب الشراء",
+  "orderCompletedToast": "تم تأكيد استلام المنتج وإتمام الطلب"
 }
