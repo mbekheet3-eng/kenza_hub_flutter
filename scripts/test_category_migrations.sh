@@ -47,8 +47,8 @@ done
 
 # Validate the proposed Miscellaneous seed against the disposable database twice.
 # The second run proves the slug-based upserts are idempotent.
-psql -v ON_ERROR_STOP=1 -f docs/proposed_miscellaneous_categories.sql
-psql -v ON_ERROR_STOP=1 -f docs/proposed_miscellaneous_categories.sql
+psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261127000000_add_miscellaneous_category.sql
+psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261127000000_add_miscellaneous_category.sql
 
 psql -v ON_ERROR_STOP=1 <<'SQL'
 do $
