@@ -31,7 +31,7 @@ class MarketplaceTransactionService {
         .select('id')
         .eq('product_id', productId)
         .eq('buyer_id', userId)
-        .eq('status', 'pending')
+        .inFilter('status', ['pending', 'accepted'])
         .maybeSingle();
     if (existingPending != null) {
       throw Exception(strings.pendingPurchaseRequestExists);
