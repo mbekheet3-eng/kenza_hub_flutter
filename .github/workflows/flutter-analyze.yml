@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - phase-1/implementation
+      - phase-1/prelaunch-critical-fixes
     paths:
       - 'lib/**'
       - 'test/**'
