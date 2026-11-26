@@ -132,6 +132,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
       case 'rejected': return AppStrings.of(context)!.statusRejected;
       case 'cancelled': return AppStrings.of(context)!.statusCancelled;
       case 'completed': return AppStrings.of(context)!.statusCompleted;
+      case 'expired': return AppStrings.of(context)!.statusExpired;
       default: return value?.toString() ?? '';
     }
   }
