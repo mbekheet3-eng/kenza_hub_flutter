@@ -836,5 +836,11 @@
   "confirmCompleteOrderBody": "Avez-vous bien reçu le produit ? La demande d’achat sera marquée comme terminée.",
   "orderCancelledToast": "Demande d’achat annulée.",
   "orderCompletedToast": "Réception confirmée. Demande d’achat terminée.",
-  "notificationOrderCompletedTitle": "Produit reçu"
+  "notificationOrderCompletedTitle": "Produit reçu",
+  "statusDelivered": "Livré",
+  "markDeliveredLabel": "Marquer comme livré",
+  "confirmMarkDeliveredTitle": "Confirmer la livraison",
+  "confirmMarkDeliveredBody": "Avez-vous remis le produit à l’acheteur ? L’acheteur sera invité à confirmer la réception.",
+  "orderDeliveredToast": "Livraison enregistrée ; l’acheteur a été averti.",
+  "notificationOrderDeliveredTitle": "Le vendeur a confirmé la livraison"
 }
