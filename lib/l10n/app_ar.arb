@@ -836,5 +836,11 @@
   "confirmCompleteOrderBody": "هل استلمت المنتج بالفعل؟ بعد التأكيد سيتم إغلاق طلب الشراء.",
   "orderCancelledToast": "تم إلغاء طلب الشراء",
   "orderCompletedToast": "تم تأكيد استلام المنتج وإتمام الطلب",
-  "notificationOrderCompletedTitle": "تم استلام المنتج"
+  "notificationOrderCompletedTitle": "تم استلام المنتج",
+  "statusDelivered": "تم التسليم",
+  "markDeliveredLabel": "تأكيد التسليم",
+  "confirmMarkDeliveredTitle": "تأكيد تسليم المنتج",
+  "confirmMarkDeliveredBody": "هل سلّمت المنتج للمشتري بالفعل؟ بعد التأكيد سيُطلب من المشتري تأكيد الاستلام.",
+  "orderDeliveredToast": "تم تسجيل التسليم وإخطار المشتري",
+  "notificationOrderDeliveredTitle": "البائع أكد تسليم المنتج"
 }
