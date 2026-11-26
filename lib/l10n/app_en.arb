@@ -836,5 +836,11 @@
   "confirmCompleteOrderBody": "Have you received the product? The purchase request will be marked as completed.",
   "orderCancelledToast": "Purchase request cancelled.",
   "orderCompletedToast": "Receipt confirmed. Purchase request completed.",
-  "notificationOrderCompletedTitle": "Product received"
+  "notificationOrderCompletedTitle": "Product received",
+  "statusDelivered": "Delivered",
+  "markDeliveredLabel": "Mark as delivered",
+  "confirmMarkDeliveredTitle": "Confirm delivery",
+  "confirmMarkDeliveredBody": "Have you handed the product to the buyer? The buyer will be asked to confirm receipt.",
+  "orderDeliveredToast": "Delivery recorded; the buyer has been notified.",
+  "notificationOrderDeliveredTitle": "Seller marked the product delivered"
 }
