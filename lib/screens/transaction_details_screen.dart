@@ -1,5 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../l10n/app_strings.dart';
+
 class TransactionDetailsScreen extends StatelessWidget {
   const TransactionDetailsScreen({
     super.key,
@@ -12,14 +14,25 @@ class TransactionDetailsScreen extends StatelessWidget {
   final bool isOffer;
   final String currentUserId;
 
-  String _status(String value, bool isArabic) {
+  String _status(BuildContext context, String value) {
+    final strings = AppStrings.of(context)!;
     switch (value) {
-      case 'pending': return isArabic ? 'قيد الانتظار' : 'Pending';
-      case 'accepted': return isArabic ? 'مقبول' : 'Accepted';
-      case 'rejected': return isArabic ? 'مرفوض' : 'Rejected';
-      case 'cancelled': return isArabic ? 'ملغي' : 'Cancelled';
-      case 'completed': return isArabic ? 'مكتمل' : 'Completed';
-      default: return value;
+      case 'pending':
+        return strings.statusPending;
+      case 'accepted':
+        return strings.statusAccepted;
+      case 'rejected':
+        return strings.statusRejected;
+      case 'cancelled':
+        return strings.statusCancelled;
+      case 'delivered':
+        return strings.statusDelivered;
+      case 'completed':
+        return strings.statusCompleted;
+      case 'expired':
+        return strings.statusExpired;
+      default:
+        return value;
     }
   }
 
@@ -61,7 +74,7 @@ class TransactionDetailsScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 24),
           _detailRow(context, isArabic ? 'السعر' : 'Price', '$price $currency'),
-          _detailRow(context, isArabic ? 'الحالة' : 'Status', _status(status, isArabic)),
+          _detailRow(context, isArabic ? 'الحالة' : 'Status', _status(context, status)),
           _detailRow(context, isArabic ? 'دورك' : 'Your role', isBuyer
               ? (isArabic ? 'المشتري' : 'Buyer')
               : (isArabic ? 'البائع' : 'Seller')),
