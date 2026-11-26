@@ -835,5 +835,6 @@
   "confirmCompleteOrderTitle": "تأكيد استلام المنتج",
   "confirmCompleteOrderBody": "هل استلمت المنتج بالفعل؟ بعد التأكيد سيتم إغلاق طلب الشراء.",
   "orderCancelledToast": "تم إلغاء طلب الشراء",
-  "orderCompletedToast": "تم تأكيد استلام المنتج وإتمام الطلب"
+  "orderCompletedToast": "تم تأكيد استلام المنتج وإتمام الطلب",
+  "notificationOrderCompletedTitle": "تم استلام المنتج"
 }
