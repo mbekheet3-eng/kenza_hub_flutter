@@ -26,7 +26,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 3, vsync: this);
+    _tabs = TabController(length: 4, vsync: this);
     _reload();
   }
 
@@ -252,15 +252,22 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
     );
   }
 
-  Widget _transactionList(List<Map<String, dynamic>> rows, {required bool isOffer}) {
-    if (rows.isEmpty) return _empty(isOffer ? AppStrings.of(context)!.noOffers : AppStrings.of(context)!.noPurchaseOrders);
+  Widget _transactionList(
+    List<Map<String, dynamic>> rows, {
+    required bool isOffer,
+    bool? sellerSide,
+  }) {
+    final visibleRows = sellerSide == null
+        ? rows
+        : rows.where((row) => (row['seller_id'] == _userId) == sellerSide).toList();
+    if (visibleRows.isEmpty) return _empty(isOffer ? AppStrings.of(context)!.noOffers : AppStrings.of(context)!.noPurchaseOrders);
     final table = isOffer ? 'product_offers' : 'product_orders';
     return ListView.separated(
       physics: const AlwaysScrollableScrollPhysics(),
-      itemCount: rows.length,
+      itemCount: visibleRows.length,
       separatorBuilder: (_, __) => const Divider(height: 1),
       itemBuilder: (context, index) {
-        final row = rows[index];
+        final row = visibleRows[index];
         final isSeller = row['seller_id'] == _userId;
         final pending = row['status'] == 'pending';
         final price = row[isOffer ? 'offered_price' : 'agreed_price'];
@@ -323,7 +330,11 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
             ),
             Tab(
               icon: KenzaAssetIcon('assets/icons/1795220032715-removebg-preview.png', size: 28, scale: 1.3),
-              text: AppStrings.of(context)!.purchaseOrdersTab,
+              text: AppStrings.of(context)!.submittedToSellerLabel,
+            ),
+            Tab(
+              icon: KenzaAssetIcon('assets/icons/1795220032715-removebg-preview.png', size: 28, scale: 1.3),
+              text: AppStrings.of(context)!.fromBuyerLabel,
             ),
           ],
         ),
@@ -333,7 +344,8 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         children: [
           _tab(_conversations, _conversationList),
           _tab(_offers, (rows) => _transactionList(rows, isOffer: true)),
-          _tab(_orders, (rows) => _transactionList(rows, isOffer: false)),
+          _tab(_orders, (rows) => _transactionList(rows, isOffer: false, sellerSide: false)),
+          _tab(_orders, (rows) => _transactionList(rows, isOffer: false, sellerSide: true)),
         ],
       ),
     );
