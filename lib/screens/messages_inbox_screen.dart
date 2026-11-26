@@ -4,6 +4,7 @@ import '../l10n/app_strings.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'conversation_screen.dart';
+import '../services/marketplace_transaction_service.dart';
 
 class MessagesInboxScreen extends StatefulWidget {
   const MessagesInboxScreen({super.key});
@@ -155,6 +156,43 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
     }
   }
 
+  Future<void> _contactSellerForAcceptedOrder(Map<String, dynamic> row) async {
+    try {
+      final service = MarketplaceTransactionService();
+      final conversationId = await service.getOrCreateConversation(
+        productId: row['product_id'] as String,
+        sellerId: row['seller_id'] as String,
+      );
+      final title = _productTitle(row);
+      final price = row['agreed_price'];
+      final currency = row['currency'] ?? 'EGP';
+      final language = Localizations.localeOf(context).languageCode;
+      final message = switch (language) {
+        'fr' => 'Bonjour, je souhaite finaliser l’achat de « $title » au prix de $price $currency.',
+        'en' => 'Hello, I would like to complete the purchase of "$title" at $price $currency.',
+        _ => 'مرحبًا، أرغب في استكمال طلب شراء "$title" بسعر $price $currency.',
+      };
+
+      final existingMessages = await service.getMessages(conversationId);
+      final alreadySent = existingMessages.any((item) => item['body'] == message);
+      if (!alreadySent) {
+        await service.sendMessage(conversationId, message);
+      }
+      if (!mounted) return;
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ConversationScreen(conversationId: conversationId),
+        ),
+      );
+      if (mounted) await _refresh();
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.of(context)!.conversationOpenFailed)),
+      );
+    }
+  }
+
   Widget _empty(String message) => ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
@@ -248,7 +286,12 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
                     PopupMenuItem(value: 'rejected', child: Text(AppStrings.of(context)!.rejectLabel)),
                   ],
                 )
-              : null,
+              : (!isOffer && !isSeller && row['status'] == 'accepted'
+                  ? TextButton(
+                      onPressed: () => _contactSellerForAcceptedOrder(row),
+                      child: Text(AppStrings.of(context)!.contactSellerLabel),
+                    )
+                  : null),
         );
       },
     );
