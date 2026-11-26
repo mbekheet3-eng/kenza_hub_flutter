@@ -824,7 +824,7 @@
   "proSellerRequestFailed": "تعذر إرسال طلب الترقية",
   "noPendingProSellerRequests": "لا توجد طلبات ترقية معلقة حاليًا",
   "orContinueWith": "أو المتابعة باستخدام",
-  "pendingPurchaseRequestExists": "لديك بالفعل طلب شراء معلق لهذا المنتج. انتظر رد البائع أو انتهاء صلاحية الطلب قبل إرسال طلب جديد.",
+  "pendingPurchaseRequestExists": "لديك بالفعل طلب شراء قائم لهذا المنتج. أكمل الطلب الحالي أو انتظر إغلاقه قبل إرسال طلب جديد.",
   "statusExpired": "منتهي الصلاحية",
   "notificationOrderReminderTitle": "تذكير بطلب شراء معلق",
   "notificationOrderExpiredTitle": "انتهت صلاحية طلب الشراء",
