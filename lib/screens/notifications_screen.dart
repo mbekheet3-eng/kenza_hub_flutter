@@ -70,7 +70,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       'new_offer' || 'offer_accepted' || 'offer_rejected' =>
         'assets/icons/1795220047615-removebg-preview.png',
       'order_updated' || 'order_reminder' || 'order_expired' => 'assets/delivery.png',
-      'new_order' || 'order_accepted' || 'order_rejected' || 'order_completed' => 'assets/orders.png',
+      'new_order' || 'order_accepted' || 'order_rejected' || 'order_delivered' || 'order_completed' => 'assets/orders.png',
       _ => 'assets/notification.png',
     };
     return KenzaAssetIcon(asset, size: 24, scale: 1.3);
@@ -93,6 +93,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return strings.notificationOrderAcceptedTitle;
       case 'order_rejected':
         return strings.notificationOrderRejectedTitle;
+      case 'order_delivered':
+        return strings.notificationOrderDeliveredTitle;
       case 'order_completed':
         return strings.notificationOrderCompletedTitle;
       case 'order_updated':
