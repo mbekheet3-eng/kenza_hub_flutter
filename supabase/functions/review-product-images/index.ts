@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { shouldFallbackToNextModel } from "../_shared/gemini_model_fallback.ts";
 
 type JsonRecord = Record<string, unknown>;
 type Decision = "approve" | "reject" | "review";
@@ -118,6 +119,13 @@ async function analyzeImage(
           });
 
           if (!TRANSIENT_HTTP_STATUSES.has(response.status)) {
+            if (shouldFallbackToNextModel(response.status, modelIndex, models.length)) {
+              console.warn("Primary Gemini model returned 404; trying fallback model", {
+                primary_model: model,
+                fallback_model: models[modelIndex + 1],
+              });
+              break;
+            }
             throw new Error(`Gemini image review failed with non-retryable HTTP ${response.status}`);
           }
           if (attempt < attempts) {
