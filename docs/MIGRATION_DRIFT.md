@@ -4,13 +4,18 @@
 **Project:** `mxdcfewkajwvtwtjoeia` (`kenza-hub-marketplace`)  
 **Branch:** `phase-1/prelaunch-critical-fixes`
 
-## Result
+## Verified counts
 
-The live Supabase database has 52 recorded migrations. This branch contains 38 migration files.
+- Live Supabase migration ledger: **52 records**.
+- SQL migration files on this branch: **38 files**.
+- Exact version-and-name matches: **33**.
+- Live records without a matching SQL file in this branch: **15**.
+- Same migration name but different version identifier: **4**.
+- Repository migration file with no matching live ledger record: **1**.
 
-The live database is operating with its recorded schema; this finding is a source-control/reproducibility gap, not evidence that the live database is broken.
+These are source-control and reproducibility differences. They are **not evidence that 15 migrations or database data disappeared from the live database**.
 
-### Migrations missing from this repository by migration name
+## Live migration records without matching SQL files in this repository
 
 - `20261109220347_marketplace_orders_offers_messaging`
 - `20261109220351_tighten_order_offer_status_permissions`
@@ -28,7 +33,9 @@ The live database is operating with its recorded schema; this finding is a sourc
 - `20261120234313_fix_product_message_read_rls_for_seller`
 - `20261120234758_fix_product_message_insert_rls_for_seller`
 
-### Same migration name, different version in the repository
+A GitHub commit-history lookup for each of these exact migration paths returned an empty history. Therefore, the original SQL files have **not** been recovered from this repository's commit history.
+
+## Same migration name, different version in the repository
 
 | Live database version | Repository version | Migration |
 |---|---|---|
@@ -37,9 +44,17 @@ The live database is operating with its recorded schema; this finding is a sourc
 | `20261111112248` | `20261111111800` | `add_product_image_moderation` |
 | `20261113195342` | `20261113195000` | `seed_arabic_jacket_search_synonyms` |
 
+The SQL content currently in the repository is not proven byte-for-byte identical to the SQL originally applied under the live versions. Do not simply rename these files and assume that the migration history has been reconciled.
+
+## Repository file without a matching live ledger record
+
+- `20261114170000_ignore_sort_order_for_image_moderation_reset.sql`
+
+This file must be inspected against the live schema and the migration that actually introduced the behavior before deciding whether it is obsolete, already represented by another migration, or needs a new reconciliation record. Do not delete it just to make the counts match.
+
 ## Recovered and tracked in this branch
 
-The existing live pending-order expiry migration is now represented by:
+The existing live pending-order expiry migration is represented by:
 
 - `20261126010548_pending_product_order_expiry_and_deduplication.sql`
 
@@ -54,8 +69,16 @@ The following new security/notification migrations were applied to the live proj
 - `20261126163651_add_seller_delivery_confirmation_step.sql`
 - `20261126163748_block_duplicate_requests_until_buyer_receipt.sql`
 
-## Safety rule
+## Reconciliation decision
 
-**Do not run `supabase db reset`, rebuild the production database, or use this branch to provision a fresh production-like database until the 15 missing migrations and 4 version discrepancies are reconciled.**
+1. Preserve the live production database and its migration ledger as the authority for what is currently deployed.
+2. Do not fabricate historical migration files or claim that reconstructed SQL is the original SQL.
+3. Export a complete schema-only snapshot from the live project, including tables, columns, constraints, indexes, RLS policies, views, functions, triggers, grants, Storage buckets/policies, extensions, and publication membership.
+4. Recover original SQL only from a trusted external source if one is found (for example, a developer machine backup or exported SQL history). Label any reconstructed migration as reconstructed.
+5. For a clean-install path, create and test a clearly named baseline from the verified live schema on a disposable database. Keep historical ledger reconciliation separate from the baseline so the history is not falsified.
+6. Resolve the four version mismatches and the one repository-only file only after comparing their actual SQL effects with the live schema.
+7. Verify a fresh disposable database against the live schema contract before treating the repository as reproducible.
 
-The missing SQL must be recovered from a trusted source or reconstructed against the live schema and reviewed. Do not replace it with guessed SQL. The existing production database should not be reset as part of this reconciliation.
+## Safety
+
+**Do not run `supabase db reset`, rebuild the production database, or apply reconstructed migrations to production as part of this work.** No production schema or data changes were made during this audit.
