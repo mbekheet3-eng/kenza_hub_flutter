@@ -835,5 +835,6 @@
   "confirmCompleteOrderTitle": "Confirmer la réception du produit",
   "confirmCompleteOrderBody": "Avez-vous bien reçu le produit ? La demande d’achat sera marquée comme terminée.",
   "orderCancelledToast": "Demande d’achat annulée.",
-  "orderCompletedToast": "Réception confirmée. Demande d’achat terminée."
+  "orderCompletedToast": "Réception confirmée. Demande d’achat terminée.",
+  "notificationOrderCompletedTitle": "Produit reçu"
 }
