@@ -6,7 +6,7 @@
 
 ## Result
 
-The live Supabase database has 49 recorded migrations. This branch contains 35 migration files.
+The live Supabase database has 50 recorded migrations. This branch contains 36 migration files.
 
 The live database is operating with its recorded schema; this finding is a source-control/reproducibility gap, not evidence that the live database is broken.
 
@@ -50,6 +50,7 @@ The following new security/notification migrations were applied to the live proj
 - `20261126163026_fix_order_trigger_rls_visibility.sql`
 - `20261126163251_notify_seller_on_order_completion.sql`
 - `20261126163328_allow_order_completed_notifications.sql`
+- `20261126163559_allow_multiple_accepted_orders_per_listing.sql`
 
 ## Safety rule
 
