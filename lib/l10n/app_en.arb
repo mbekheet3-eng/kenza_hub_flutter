@@ -824,7 +824,7 @@
   "proSellerRequestFailed": "Could not submit the upgrade request",
   "noPendingProSellerRequests": "There are no pending upgrade requests",
   "orContinueWith": "Or continue with",
-  "pendingPurchaseRequestExists": "You already have a pending purchase request for this product. Wait for the seller's response or for it to expire before sending another request.",
+  "pendingPurchaseRequestExists": "You already have an active purchase request for this product. Complete or close it before sending another.",
   "statusExpired": "Expired",
   "notificationOrderReminderTitle": "Pending purchase request reminder",
   "notificationOrderExpiredTitle": "Purchase request expired",
