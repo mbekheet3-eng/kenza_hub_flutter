@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:material_ui/material_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -143,6 +144,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context)!;
     final signedIn = Supabase.instance.client.auth.currentUser != null;
+    // Keep the bottom navigation usable with Android's large-font settings.
+    // At larger scales, show only the selected label to avoid five labels
+    // competing for the narrow width of each destination.
+    final textScaler = MediaQuery.textScalerOf(context);
+    final textScale = textScaler.scale(1.0);
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final labelSize = languageCode == 'ar' ? 12.0 : 10.5;
+    final scaledLabelSize = textScaler.scale(labelSize);
+    final iconSize = textScale >= 1.2 ? 28.0 : 36.0;
+    final navigationBarHeight = math.max(
+      92.0,
+      iconSize + (scaledLabelSize * 1.3) + 36.0,
+    ).toDouble();
     final destinations = <Widget>[
       _tabNavigator(0, const HomeScreen()),
       _tabNavigator(1, const CategoriesScreen()),
@@ -163,18 +177,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         children: destinations,
       ),
       bottomNavigationBar: NavigationBar(
-        height: 92,
+        height: navigationBarHeight,
         backgroundColor: Theme.of(context).colorScheme.surface,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         indicatorColor: Colors.transparent,
         selectedIndex: _selectedIndex,
         onDestinationSelected: _selectDestination,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        labelBehavior: textScale >= 1.3
+            ? NavigationDestinationLabelBehavior.onlyShowSelected
+            : NavigationDestinationLabelBehavior.alwaysShow,
         labelTextStyle: WidgetStateProperty.resolveWith<TextStyle?>((states) {
           final isSelected = states.contains(WidgetState.selected);
-          final languageCode = Localizations.localeOf(context).languageCode;
-          final labelSize = languageCode == 'ar' ? 12.0 : 10.5;
           return TextStyle(
             fontSize: labelSize,
             height: 1.0,
@@ -183,28 +197,28 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         }),
         destinations: [
           NavigationDestination(
-            icon: KenzaAssetIcon('assets/icons/home_icone.png', size: 36, scale: 1.0),
-            selectedIcon: KenzaAssetIcon('assets/icons/home_icone.png', size: 36, scale: 1.0),
+            icon: KenzaAssetIcon('assets/icons/home_icone.png', size: iconSize, scale: 1.0),
+            selectedIcon: KenzaAssetIcon('assets/icons/home_icone.png', size: iconSize, scale: 1.0),
             label: strings.mainHome,
           ),
           NavigationDestination(
-            icon: KenzaAssetIcon('assets/icons/discover_icon.png', size: 36, scale: 1.0),
-            selectedIcon: KenzaAssetIcon('assets/icons/discover_icon.png', size: 36, scale: 1.0),
+            icon: KenzaAssetIcon('assets/icons/discover_icon.png', size: iconSize, scale: 1.0),
+            selectedIcon: KenzaAssetIcon('assets/icons/discover_icon.png', size: iconSize, scale: 1.0),
             label: strings.discoverTitle,
           ),
           NavigationDestination(
-            icon: KenzaAssetIcon('assets/icons/Add_icon.png', size: 36, scale: 1.0),
-            selectedIcon: KenzaAssetIcon('assets/icons/Add_icon.png', size: 38, scale: 1.0),
+            icon: KenzaAssetIcon('assets/icons/Add_icon.png', size: iconSize, scale: 1.0),
+            selectedIcon: KenzaAssetIcon('assets/icons/Add_icon.png', size: iconSize, scale: 1.0),
             label: strings.addProduct,
           ),
           NavigationDestination(
-            icon: KenzaAssetIcon('assets/icons/message_icon.png', size: 36, scale: 1.0),
-            selectedIcon: KenzaAssetIcon('assets/icons/message_icon.png', size: 36, scale: 1.0),
+            icon: KenzaAssetIcon('assets/icons/message_icon.png', size: iconSize, scale: 1.0),
+            selectedIcon: KenzaAssetIcon('assets/icons/message_icon.png', size: iconSize, scale: 1.0),
             label: strings.messages,
           ),
           NavigationDestination(
-            icon: KenzaAssetIcon('assets/icons/profile_icon.png', size: 36, scale: 1.0),
-            selectedIcon: KenzaAssetIcon('assets/icons/profile_icon.png', size: 36, scale: 1.0),
+            icon: KenzaAssetIcon('assets/icons/profile_icon.png', size: iconSize, scale: 1.0),
+            selectedIcon: KenzaAssetIcon('assets/icons/profile_icon.png', size: iconSize, scale: 1.0),
             label: strings.accountTab,
           ),
         ],
