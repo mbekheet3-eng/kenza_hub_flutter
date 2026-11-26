@@ -143,16 +143,66 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
     required String status,
   }) async {
     try {
-      await _client.from(table).update({'status': status}).eq('id', id);
+      final updated = await _client
+          .from(table)
+          .update({'status': status})
+          .eq('id', id)
+          .select('id')
+          .maybeSingle();
+      if (updated == null) throw StateError('The status was not changed');
       if (!mounted) return;
+      final strings = AppStrings.of(context)!;
+      final message = switch (status) {
+        'accepted' => strings.acceptedToast,
+        'rejected' => strings.rejectedToast,
+        'cancelled' => strings.orderCancelledToast,
+        'completed' => strings.orderCompletedToast,
+        _ => strings.statusUpdateFailed,
+      };
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(status == 'accepted' ? AppStrings.of(context)!.acceptedToast : AppStrings.of(context)!.rejectedToast)),
+        SnackBar(content: Text(message)),
       );
       await _refresh();
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppStrings.of(context)!.statusUpdateFailed)),
+      );
+    }
+  }
+
+  Future<void> _confirmOrderStatusChange({
+    required String id,
+    required String status,
+  }) async {
+    final strings = AppStrings.of(context)!;
+    final completing = status == 'completed';
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(completing
+            ? strings.confirmCompleteOrderTitle
+            : strings.confirmCancelOrderTitle),
+        content: Text(completing
+            ? strings.confirmCompleteOrderBody
+            : strings.confirmCancelOrderBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(strings.backLabel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(strings.confirmAction),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await _updateStatus(
+        table: 'product_orders',
+        id: id,
+        status: status,
       );
     }
   }
@@ -288,18 +338,49 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
           trailing: isSeller && pending
               ? PopupMenuButton<String>(
                   tooltip: AppStrings.of(context)!.actionTooltipLabel,
-                  onSelected: (value) => _updateStatus(table: table, id: row['id'] as String, status: value),
+                  onSelected: (value) => _updateStatus(
+                    table: table,
+                    id: row['id'] as String,
+                    status: value,
+                  ),
                   itemBuilder: (_) => [
-                    PopupMenuItem(value: 'accepted', child: Text(AppStrings.of(context)!.acceptLabel)),
-                    PopupMenuItem(value: 'rejected', child: Text(AppStrings.of(context)!.rejectLabel)),
+                    PopupMenuItem(
+                      value: 'accepted',
+                      child: Text(AppStrings.of(context)!.acceptLabel),
+                    ),
+                    PopupMenuItem(
+                      value: 'rejected',
+                      child: Text(AppStrings.of(context)!.rejectLabel),
+                    ),
                   ],
                 )
-              : (!isOffer && !isSeller && row['status'] == 'accepted'
+              : (!isOffer && !isSeller && pending
                   ? TextButton(
-                      onPressed: () => _contactSellerForAcceptedOrder(row),
-                      child: Text(AppStrings.of(context)!.contactSellerLabel),
+                      onPressed: () => _confirmOrderStatusChange(
+                        id: row['id'] as String,
+                        status: 'cancelled',
+                      ),
+                      child: Text(AppStrings.of(context)!.cancelOrderLabel),
                     )
-                  : null),
+                  : (!isOffer && !isSeller && row['status'] == 'accepted'
+                      ? Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              onPressed: () => _contactSellerForAcceptedOrder(row),
+                              child: Text(AppStrings.of(context)!.contactSellerLabel),
+                            ),
+                            TextButton(
+                              onPressed: () => _confirmOrderStatusChange(
+                                id: row['id'] as String,
+                                status: 'completed',
+                              ),
+                              child: Text(AppStrings.of(context)!.completeOrderLabel),
+                            ),
+                          ],
+                        )
+                      : null)),
         );
       },
     );
