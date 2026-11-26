@@ -29,6 +29,12 @@ The following checks were executed against the `kenza-hub-marketplace` project i
 
 The database webhook and `send-push-notification` Edge Function are configured and return HTTP 200. However, recent webhook responses for the tested recipients reported zero active Android devices for those specific users, so end-to-end push delivery has not yet been proven on physical devices.
 
-## Build/test limitation
+## Automated build/test result
 
-The current execution environment does not have the Flutter or Dart SDK installed. Therefore `flutter gen-l10n`, `flutter analyze`, `flutter test`, and APK generation have not been run. Run those checks before distributing this branch as a tester APK.
+GitHub Actions run `45860737349` on this branch completed these checks successfully:
+
+- `flutter analyze --no-fatal-infos`
+- `flutter test`
+- Disposable PostgreSQL category-migration validation
+
+No APK was generated as part of this run. Build and install a tester APK separately after the manual two-device push checks.
