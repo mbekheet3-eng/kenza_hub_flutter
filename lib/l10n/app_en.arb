@@ -827,5 +827,13 @@
   "pendingPurchaseRequestExists": "You already have a pending purchase request for this product. Wait for the seller's response or for it to expire before sending another request.",
   "statusExpired": "Expired",
   "notificationOrderReminderTitle": "Pending purchase request reminder",
-  "notificationOrderExpiredTitle": "Purchase request expired"
+  "notificationOrderExpiredTitle": "Purchase request expired",
+  "cancelOrderLabel": "Cancel request",
+  "completeOrderLabel": "Confirm receipt",
+  "confirmCancelOrderTitle": "Cancel purchase request?",
+  "confirmCancelOrderBody": "Are you sure you want to cancel this purchase request?",
+  "confirmCompleteOrderTitle": "Confirm product receipt",
+  "confirmCompleteOrderBody": "Have you received the product? The purchase request will be marked as completed.",
+  "orderCancelledToast": "Purchase request cancelled.",
+  "orderCompletedToast": "Receipt confirmed. Purchase request completed."
 }
