@@ -26,14 +26,31 @@ class MarketplaceTransactionService {
     final userId = await _requireUserId();
     final strings = await AppStrings.delegate.load(AppLocale.notifier.value);
     if (userId == sellerId) throw Exception(strings.ownProductCannotBuy);
-    await _client.from('product_orders').insert({
+    final existingPending = await _client
+        .from('product_orders')
+        .select('id')
+        .eq('product_id', productId)
+        .eq('buyer_id', userId)
+        .eq('status', 'pending')
+        .maybeSingle();
+    if (existingPending != null) {
+      throw Exception(strings.pendingPurchaseRequestExists);
+    }
+    try {
+      await _client.from('product_orders').insert({
       'product_id': productId,
       'buyer_id': userId,
       'seller_id': sellerId,
       'agreed_price': price,
       'currency': 'EGP',
       'status': 'pending',
-    });
+      });
+    } on PostgrestException catch (error) {
+      if (error.code == '23505') {
+        throw Exception(strings.pendingPurchaseRequestExists);
+      }
+      rethrow;
+    }
   }
 
   Future<void> createOffer({
