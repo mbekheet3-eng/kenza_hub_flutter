@@ -827,5 +827,13 @@
   "pendingPurchaseRequestExists": "Vous avez déjà une demande d’achat en attente pour ce produit. Attendez la réponse du vendeur ou son expiration avant d’en envoyer une autre.",
   "statusExpired": "Expirée",
   "notificationOrderReminderTitle": "Rappel : demande d’achat en attente",
-  "notificationOrderExpiredTitle": "Demande d’achat expirée"
+  "notificationOrderExpiredTitle": "Demande d’achat expirée",
+  "cancelOrderLabel": "Annuler la demande",
+  "completeOrderLabel": "Confirmer la réception",
+  "confirmCancelOrderTitle": "Annuler la demande d’achat ?",
+  "confirmCancelOrderBody": "Voulez-vous vraiment annuler cette demande d’achat ?",
+  "confirmCompleteOrderTitle": "Confirmer la réception du produit",
+  "confirmCompleteOrderBody": "Avez-vous bien reçu le produit ? La demande d’achat sera marquée comme terminée.",
+  "orderCancelledToast": "Demande d’achat annulée.",
+  "orderCompletedToast": "Réception confirmée. Demande d’achat terminée."
 }
