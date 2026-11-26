@@ -330,11 +330,11 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
             ),
             Tab(
               icon: KenzaAssetIcon('assets/icons/1795220032715-removebg-preview.png', size: 28, scale: 1.3),
-              text: AppStrings.of(context)!.submittedToSellerLabel,
+              text: AppStrings.of(context)!.sentPurchaseOrdersTab,
             ),
             Tab(
               icon: KenzaAssetIcon('assets/icons/1795220032715-removebg-preview.png', size: 28, scale: 1.3),
-              text: AppStrings.of(context)!.fromBuyerLabel,
+              text: AppStrings.of(context)!.receivedPurchaseOrdersTab,
             ),
           ],
         ),
