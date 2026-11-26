@@ -25,6 +25,9 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
+  int _returnIndex = 0;
+  bool _openingSell = false;
+  bool _sellRouteOpen = false;
   late final StreamSubscription<AuthState> _authSubscription;
   late final List<GlobalKey<NavigatorState>> _navigatorKeys;
 
@@ -77,20 +80,35 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Future<void> _openSell() async {
-    if (!await _ensureSignedIn() || !mounted) return;
+    // Keep the existing form route alive when the user switches tabs and
+    // taps Add Product again. Pushing another route here caused overlapping
+    // route futures to reset the selected tab out of order.
+    if (_sellRouteOpen) {
+      if (mounted) setState(() => _selectedIndex = 2);
+      return;
+    }
 
-    final previousIndex = _selectedIndex;
-    final navigator = _navigatorKeys[2].currentState;
-    if (navigator == null) return;
+    // Avoid opening multiple sign-in sheets/routes from rapid repeated taps.
+    if (_openingSell) return;
+    _openingSell = true;
 
-    setState(() => _selectedIndex = 2);
-    navigator.popUntil((route) => route.isFirst);
-    await navigator.push<void>(
-      MaterialPageRoute<void>(builder: (_) => const ProductFormScreen()),
-    );
+    try {
+      if (!await _ensureSignedIn() || !mounted) return;
 
-    if (mounted) {
-      setState(() => _selectedIndex = previousIndex == 2 ? 0 : previousIndex);
+      final navigator = _navigatorKeys[2].currentState;
+      if (navigator == null) return;
+
+      _sellRouteOpen = true;
+      setState(() => _selectedIndex = 2);
+      await navigator.push<void>(
+        MaterialPageRoute<void>(builder: (_) => const ProductFormScreen()),
+      );
+    } finally {
+      _openingSell = false;
+      _sellRouteOpen = false;
+      if (mounted) {
+        setState(() => _selectedIndex = _returnIndex);
+      }
     }
   }
 
@@ -104,7 +122,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       if (!await _ensureSignedIn() || !mounted) return;
     }
 
-    if (mounted) setState(() => _selectedIndex = index);
+    if (mounted) {
+      setState(() {
+        _returnIndex = index;
+        _selectedIndex = index;
+      });
+    }
   }
 
   Widget _tabNavigator(int index, Widget initialPage) {
