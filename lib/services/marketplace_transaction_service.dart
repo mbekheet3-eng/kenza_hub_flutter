@@ -38,12 +38,12 @@ class MarketplaceTransactionService {
     }
     try {
       await _client.from('product_orders').insert({
-      'product_id': productId,
-      'buyer_id': userId,
-      'seller_id': sellerId,
-      'agreed_price': price,
-      'currency': 'EGP',
-      'status': 'pending',
+        'product_id': productId,
+        'buyer_id': userId,
+        'seller_id': sellerId,
+        'agreed_price': price,
+        'currency': 'EGP',
+        'status': 'pending',
       });
     } on PostgrestException catch (error) {
       if (error.code == '23505') {
