@@ -1,6 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { shouldFallbackToNextModel } from "../_shared/gemini_model_fallback.ts";
 
 type JsonRecord = Record<string, unknown>;
 type Decision = "approve" | "reject" | "review";
@@ -46,6 +45,10 @@ function safeStrings(value: unknown, max = 8): string[] {
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const TRANSIENT_HTTP_STATUSES = new Set([408, 429, 500, 502, 503, 504]);
+
+function shouldFallbackToNextModel(httpStatus: number, modelIndex: number, modelCount: number): boolean {
+  return httpStatus === 404 && modelIndex < modelCount - 1;
+}
 
 async function analyzeImage(
   apiKey: string,
