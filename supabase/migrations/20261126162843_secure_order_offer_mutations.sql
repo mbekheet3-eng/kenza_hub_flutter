@@ -173,11 +173,6 @@ CREATE TRIGGER trg_validate_product_offer_status_transition
 BEFORE UPDATE OF status ON public.product_offers
 FOR EACH ROW EXECUTE FUNCTION public.validate_product_offer_status_transition();
 
--- The seller can accept only one purchase order for a single-item listing at a time.
-CREATE UNIQUE INDEX IF NOT EXISTS product_orders_one_accepted_per_product
-ON public.product_orders (product_id)
-WHERE status = 'accepted';
-
 -- Keep existing clients compatible while preventing any authenticated user from
 -- changing price, participants, timestamps, or other immutable transaction fields.
 REVOKE UPDATE ON TABLE public.product_orders FROM PUBLIC, anon, authenticated;
