@@ -582,6 +582,8 @@
   "actionTooltipLabel": "إجراء",
   "offersTab": "العروض",
   "purchaseOrdersTab": "طلبات الشراء",
+  "sentPurchaseOrdersTab": "طلبات أرسلتها",
+  "receivedPurchaseOrdersTab": "طلبات وصلتك",
   "messagesTab": "الرسائل",
   "favoriteAddedToast": "تمت إضافة المنتج للمفضلة",
   "priceRangeTitle": "نطاق السعر بالجنيه المصري",
