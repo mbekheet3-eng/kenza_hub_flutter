@@ -823,5 +823,9 @@
   "proSellerRequestSent": "Votre demande a été envoyée à l’administration",
   "proSellerRequestFailed": "Impossible d’envoyer la demande",
   "noPendingProSellerRequests": "Aucune demande de mise à niveau en attente",
-  "orContinueWith": "Ou continuer avec"
+  "orContinueWith": "Ou continuer avec",
+  "pendingPurchaseRequestExists": "Vous avez déjà une demande d’achat en attente pour ce produit. Attendez la réponse du vendeur ou son expiration avant d’en envoyer une autre.",
+  "statusExpired": "Expirée",
+  "notificationOrderReminderTitle": "Rappel : demande d’achat en attente",
+  "notificationOrderExpiredTitle": "Demande d’achat expirée"
 }
