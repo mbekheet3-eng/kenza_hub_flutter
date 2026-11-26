@@ -69,7 +69,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       'new_message' => 'assets/message.png',
       'new_offer' || 'offer_accepted' || 'offer_rejected' =>
         'assets/icons/1795220047615-removebg-preview.png',
-      'order_updated' => 'assets/delivery.png',
+      'order_updated' || 'order_reminder' || 'order_expired' => 'assets/delivery.png',
       'new_order' || 'order_accepted' || 'order_rejected' => 'assets/orders.png',
       _ => 'assets/notification.png',
     };
@@ -95,6 +95,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return strings.notificationOrderRejectedTitle;
       case 'order_updated':
         return strings.notificationOrderUpdatedTitle;
+      case 'order_reminder':
+        return strings.notificationOrderReminderTitle;
+      case 'order_expired':
+        return strings.notificationOrderExpiredTitle;
       default:
         return row['title']?.toString() ?? strings.newNotification;
     }
