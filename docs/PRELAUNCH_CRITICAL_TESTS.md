@@ -10,8 +10,8 @@ The following checks were executed against the `kenza-hub-marketplace` project i
 - Inserted a purchase request with a deliberately incorrect client price/currency/status; the database stored the published product price, product currency, authenticated buyer, actual seller, and `pending` status.
 - Verified authenticated users cannot update `agreed_price`, `buyer_id`, `seller_id`, or currency; only the `status` column remains updateable.
 - Verified a buyer cannot accept their own purchase request.
-- Verified seller acceptance and buyer completion of a purchase request.
-- Verified the buyer can cancel a pending request.
+- Verified seller acceptance, seller delivery confirmation, and buyer completion of a purchase request.
+- Verified the buyer can cancel a pending request and cannot complete an order before the seller marks it delivered.
 - Verified an active pending/accepted request blocks a duplicate request for the same buyer and product.
 - Verified an offer's buyer, seller, currency, and initial status are derived by the database.
 - Verified completion creates an `order_completed` notification for the seller.
