@@ -209,7 +209,7 @@ Deno.serve(async (request: Request) => {
         }, status);
       }
 
-      await sleep(500);
+      await new Promise((resolve) => setTimeout(resolve, 500));
       model = "gemini-3.5-flash-lite";
       response = await requestModel(model);
     }
