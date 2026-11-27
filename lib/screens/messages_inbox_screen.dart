@@ -126,6 +126,15 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
     return '${date.day}/${date.month}/${date.year}';
   }
 
+  String _dateTime(dynamic value) {
+    if (value is! String) return '';
+    final date = DateTime.tryParse(value)?.toLocal();
+    if (date == null) return '';
+    final hour = date.hour.toString().padLeft(2, '0');
+    final minute = date.minute.toString().padLeft(2, '0');
+    return '${date.day}/${date.month}/${date.year} $hour:$minute';
+  }
+
   String _status(dynamic value) {
     switch (value) {
       case 'pending': return AppStrings.of(context)!.statusPending;
@@ -443,10 +452,10 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
           '\n$displayColor${variantColor != null && variantSize != null ? ' / ' : ''}${variantSize ?? ''} • ${language == 'ar' ? 'العدد' : language == 'fr' ? 'Quantité' : 'Qty'}: $quantity';
         final holdDeadline = row['hold_expires_at'];
         final holdSummary = !isOffer && row['status'] == 'accepted' && holdDeadline is String
-            ? '\n${language == 'ar' ? 'الحجز حتى' : language == 'fr' ? 'Réservé jusqu’au' : 'Reserved until'}: ${_date(holdDeadline)}'
+            ? '\n${language == 'ar' ? 'الحجز حتى' : language == 'fr' ? 'Réservé jusqu’au' : 'Reserved until'}: ${_dateTime(holdDeadline)}'
             : '';
         final postponementSummary = !isOffer && row['postponement_requested_until'] is String
-            ? '\n${language == 'ar' ? 'طلب التأجيل حتى' : language == 'fr' ? 'Demande jusqu’au' : 'Requested until'}: ${_date(row['postponement_requested_until'])}'
+            ? '\n${language == 'ar' ? 'طلب التأجيل حتى' : language == 'fr' ? 'Demande jusqu’au' : 'Requested until'}: ${_dateTime(row['postponement_requested_until'])}'
             : '';
         Widget? trailing;
         if (isSeller && pending) {
