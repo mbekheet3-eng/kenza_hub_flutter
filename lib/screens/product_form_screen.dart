@@ -752,11 +752,25 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     return labels[value]![index];
   }
 
-  List<String> _suggestedSizes() => [
-    'XS','S','M','L','XL','XXL','XXXL',
-    '35','36','37','38','39','40','41','42','43','44','45',
-    '0-3 months','3-6 months','6-12 months','1-2 years','2-3 years','3-4 years','4-5 years','5-6 years','6-7 years','7-8 years',
-  ];
+  List<String> _suggestedSizes() {
+    final slug = _selectionPath.isEmpty ? '' : _selectionPath.last.slug;
+    if (slug.startsWith('shoes-kids')) {
+      return List.generate(16, (index) => '${20 + index}');
+    }
+    if (slug.startsWith('shoes')) {
+      return List.generate(11, (index) => '${35 + index}');
+    }
+    if (slug.startsWith('clothes-kids')) {
+      return [
+        '0-3 months','3-6 months','6-12 months','1-2 years',
+        '2-3 years','3-4 years','4-5 years','5-6 years','6-7 years','7-8 years',
+      ];
+    }
+    if (slug.startsWith('clothes')) {
+      return ['XS','S','M','L','XL','XXL','XXXL'];
+    }
+    return ['One size','Free size'];
+  }
 
   Widget _buildVariantEditor() {
     if (!_isProSeller) return const SizedBox.shrink();
