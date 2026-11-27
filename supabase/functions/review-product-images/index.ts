@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { shouldFallbackToNextModel } from "../_shared/gemini_model_fallback.ts";
 
 type JsonRecord = Record<string, unknown>;
 type Decision = "approve" | "reject" | "review";
@@ -100,9 +101,6 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const TRANSIENT_HTTP_STATUSES = new Set([408, 429, 500, 502, 503, 504]);
 
-function shouldFallbackToNextModel(httpStatus: number, modelIndex: number, modelCount: number): boolean {
-  return httpStatus === 404 && modelIndex < modelCount - 1;
-}
 
 async function analyzeImage(
   apiKey: string,
@@ -146,7 +144,7 @@ async function analyzeImage(
     },
   });
 
-  const models = ["gemini-3.8-flash", "gemini-3.5-flash-lite"];
+  const models = ["gemini-4-hydrogen", "gemini-3.8-flash", "gemini-3.5-flash-lite"];
   let lastError = "Gemini review unavailable";
 
   for (let modelIndex = 0; modelIndex < models.length; modelIndex++) {
@@ -188,7 +186,7 @@ async function analyzeImage(
           });
 
           if (!TRANSIENT_HTTP_STATUSES.has(response.status)) {
-            if (shouldFallbackToNextModel(response.status, modelIndex, models.length)) {
+            if (shouldFallbackToNextModel(response.status, modelIndex, models.length, detail)) {
               console.warn("Primary Gemini model returned 404; trying fallback model", {
                 primary_model: model,
                 fallback_model: models[modelIndex + 1],
