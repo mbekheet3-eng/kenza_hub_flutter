@@ -313,7 +313,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           }
           final selectedQuantity = selectedVariant == null
               ? 1
-              : _selectedQuantity.clamp(1, selectedVariant.quantity > 0 ? selectedVariant.quantity : 1);
+              : _selectedQuantity.clamp(1, selectedVariant.quantity > 0 ? selectedVariant.quantity : 1).toInt();
 
           return ListView(
             padding: const EdgeInsets.only(bottom: 24),
