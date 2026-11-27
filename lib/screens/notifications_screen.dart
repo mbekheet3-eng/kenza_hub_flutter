@@ -3,8 +3,7 @@ import '../widgets/kenza_asset_icon.dart';
 import '../l10n/app_strings.dart';
 
 import '../services/notification_service.dart';
-import 'conversation_screen.dart';
-import 'messages_inbox_screen.dart';
+import 'main_navigation_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -45,17 +44,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ? Map<String, dynamic>.from(rawData)
           : <String, dynamic>{};
       final conversationId = data['conversation_id']?.toString();
-      if (conversationId != null && conversationId.isNotEmpty) {
-        await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => ConversationScreen(conversationId: conversationId),
-          ),
-        );
-      } else {
-        await Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const MessagesInboxScreen()),
-        );
-      }
+      // Close the app-level notifications route, then let the shell route
+      // the user through the existing Messages tab navigator.
+      Navigator.of(context, rootNavigator: true).pop();
+      await MainNavigationScreen.openMessagesFromNotification(
+        conversationId: conversationId,
+      );
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
