@@ -441,6 +441,13 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         final displayColor = ProductVariant(color: variantColor, size: variantSize, quantity: quantity).colorLabel(language);
         final variantSummary = variantColor == null && variantSize == null ? '' :
           '\n$displayColor${variantColor != null && variantSize != null ? ' / ' : ''}${variantSize ?? ''} • ${language == 'ar' ? 'العدد' : language == 'fr' ? 'Quantité' : 'Qty'}: $quantity';
+        final holdDeadline = row['hold_expires_at'];
+        final holdSummary = !isOffer && row['status'] == 'accepted' && holdDeadline is String
+            ? '\n${language == 'ar' ? 'الحجز حتى' : language == 'fr' ? 'Réservé jusqu’au' : 'Reserved until'}: ${_date(holdDeadline)}'
+            : '';
+        final postponementSummary = !isOffer && row['postponement_requested_until'] is String
+            ? '\n${language == 'ar' ? 'طلب التأجيل حتى' : language == 'fr' ? 'Demande jusqu’au' : 'Requested until'}: ${_date(row['postponement_requested_until'])}'
+            : '';
         Widget? trailing;
         if (isSeller && pending) {
           trailing = PopupMenuButton<String>(
@@ -520,7 +527,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
           title: Text(_productTitle(row), maxLines: 1, overflow: TextOverflow.ellipsis),
           subtitle: Text(
             '${isOffer ? AppStrings.of(context)!.offerPriceLabel : AppStrings.of(context)!.purchaseOrderLabel}: $price $currency\n'
-            '${_otherMemberName(row)} • ${_status(row['status'])} • ${_date(row['created_at'])}$variantSummary',
+            '${_otherMemberName(row)} • ${_status(row['status'])} • ${_date(row['created_at'])}$variantSummary$holdSummary$postponementSummary',
           ),
           trailing: trailing,
         );
