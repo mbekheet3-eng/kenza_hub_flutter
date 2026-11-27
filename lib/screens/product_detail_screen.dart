@@ -305,7 +305,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           for (final variant in product.variants) {
             if (variant.id == _selectedVariantId) { selectedVariant = variant; break; }
           }
-          selectedVariant ??= product.variants.isEmpty ? null : product.variants.first;
+          if (selectedVariant == null) {
+            for (final variant in product.variants) {
+              if (variant.quantity > 0) { selectedVariant = variant; break; }
+            }
+            selectedVariant ??= product.variants.isEmpty ? null : product.variants.first;
+          }
+          final selectedQuantity = selectedVariant == null
+              ? 1
+              : _selectedQuantity.clamp(1, selectedVariant.quantity > 0 ? selectedVariant.quantity : 1);
 
           return ListView(
             padding: const EdgeInsets.only(bottom: 24),
@@ -356,14 +364,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             Text(Localizations.localeOf(context).languageCode == 'ar' ? 'الكمية' : Localizations.localeOf(context).languageCode == 'fr' ? 'Quantité' : 'Quantity'),
                             const Spacer(),
                             IconButton(
-                              onPressed: selectedVariant == null || _selectedQuantity <= 1
-                                  ? null : () => setState(() => _selectedQuantity--),
+                              onPressed: selectedVariant == null || selectedQuantity <= 1
+                                  ? null : () => setState(() => _selectedQuantity = selectedQuantity - 1),
                               icon: const Icon(Icons.remove_circle_outline),
                             ),
-                            Text('$_selectedQuantity', style: Theme.of(context).textTheme.titleMedium),
+                            Text('$selectedQuantity', style: Theme.of(context).textTheme.titleMedium),
                             IconButton(
-                              onPressed: selectedVariant == null || _selectedQuantity >= selectedVariant.quantity
-                                  ? null : () => setState(() => _selectedQuantity++),
+                              onPressed: selectedVariant == null || selectedQuantity >= selectedVariant.quantity
+                                  ? null : () => setState(() => _selectedQuantity = selectedQuantity + 1),
                               icon: const Icon(Icons.add_circle_outline),
                             ),
                           ],
@@ -372,7 +380,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         Text('${Localizations.localeOf(context).languageCode == 'ar' ? 'المتاح' : Localizations.localeOf(context).languageCode == 'fr' ? 'Disponible' : 'Available'}: ${selectedVariant?.quantity ?? 0}'),
                         const SizedBox(height: 6),
                         Text(
-                          '${Localizations.localeOf(context).languageCode == 'ar' ? 'الإجمالي' : Localizations.localeOf(context).languageCode == 'fr' ? 'Total' : 'Total'}: ${(product.price * _selectedQuantity.clamp(1, selectedVariant?.quantity ?? 1)).toStringAsFixed(2)} ${_l10n.currency}',
+                          '${Localizations.localeOf(context).languageCode == 'ar' ? 'الإجمالي' : Localizations.localeOf(context).languageCode == 'fr' ? 'Total' : 'Total'}: ${(product.price * selectedQuantity).toStringAsFixed(2)} ${_l10n.currency}',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                         ),
                       ],
