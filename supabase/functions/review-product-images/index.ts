@@ -89,7 +89,7 @@ async function analyzeImage(
     },
   });
 
-  const models = ["gemini-2.5-flash", "gemini-3.8-flash"];
+  const models = ["gemini-3.8-flash", "gemini-3.5-flash-lite"];
   let lastError = "Gemini review unavailable";
 
   for (let modelIndex = 0; modelIndex < models.length; modelIndex++) {
