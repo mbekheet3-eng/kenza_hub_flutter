@@ -476,7 +476,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: FilledButton.icon(
-                          onPressed: product.hasVariants && (selectedVariant == null || selectedVariant.quantity == 0) ? null : () => _buy(product, variantId: selectedVariant?.id, quantity: product.hasVariants ? _selectedQuantity.clamp(1, selectedVariant!.quantity) : 1),
+                          onPressed: product.hasVariants && (selectedVariant == null || selectedVariant.quantity == 0) ? null : () => _buy(product, variantId: selectedVariant?.id, quantity: product.hasVariants ? selectedQuantity : 1),
                           icon: KenzaAssetIcon('assets/cart.png', size: 22, scale: 1.3),
                           label: Text(_l10n.buyNowLabel),
                         ),
