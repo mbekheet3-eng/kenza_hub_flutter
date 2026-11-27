@@ -10,6 +10,7 @@ import 'home_screen.dart';
 import 'login_screen.dart';
 import '../widgets/kenza_asset_icon.dart';
 import 'messages_inbox_screen.dart';
+import 'conversation_screen.dart';
 import 'product_form_screen.dart';
 import 'profile_screen.dart';
 
@@ -25,6 +26,13 @@ class MainNavigationScreen extends StatefulWidget {
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
+  static Future<void> Function(String?)? _notificationMessageHandler;
+
+  /// Routes notification taps through the existing Messages tab navigator.
+  static Future<void> openMessagesFromNotification({String? conversationId}) async {
+    await _notificationMessageHandler?.call(conversationId);
+  }
+
   int _selectedIndex = 0;
   int _returnIndex = 0;
   bool _openingSell = false;
@@ -35,6 +43,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   void initState() {
     super.initState();
+    _notificationMessageHandler = _openMessagesFromNotification;
     _navigatorKeys = List.generate(5, (_) => GlobalKey<NavigatorState>());
     _authSubscription =
         Supabase.instance.client.auth.onAuthStateChange.listen((state) {
@@ -56,6 +65,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   void dispose() {
+    if (identical(_notificationMessageHandler, _openMessagesFromNotification)) {
+      _notificationMessageHandler = null;
+    }
     _authSubscription.cancel();
     super.dispose();
   }
@@ -81,12 +93,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   }
 
   Future<void> _openSell() async {
-    // Keep the existing form route alive when the user switches tabs and
-    // taps Add Product again. Pushing another route here caused overlapping
-    // route futures to reset the selected tab out of order.
-    if (_sellRouteOpen) {
+    // Reuse the current form only while it is still on the Sell tab's stack.
+    // A stale flag must never prevent the user from reopening Add Product.
+    final sellNavigator = _navigatorKeys[2].currentState;
+    if (_sellRouteOpen && sellNavigator?.canPop() == true) {
       if (mounted) setState(() => _selectedIndex = 2);
       return;
+    }
+    if (_sellRouteOpen && sellNavigator?.canPop() != true) {
+      _sellRouteOpen = false;
     }
 
     // Avoid opening multiple sign-in sheets/routes from rapid repeated taps.
@@ -111,6 +126,29 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         setState(() => _selectedIndex = _returnIndex);
       }
     }
+  }
+
+  Future<void> _openMessagesFromNotification(String? conversationId) async {
+    if (!await _ensureSignedIn() || !mounted) return;
+
+    setState(() {
+      _returnIndex = 3;
+      _selectedIndex = 3;
+    });
+
+    final navigator = _navigatorKeys[3].currentState;
+    if (navigator == null) return;
+
+    // Keep the inbox as the root of the Messages tab and open the selected
+    // conversation inside that tab, not on the app-level navigator.
+    navigator.popUntil((route) => route.isFirst);
+    if (conversationId == null || conversationId.isEmpty) return;
+
+    await navigator.push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => ConversationScreen(conversationId: conversationId),
+      ),
+    );
   }
 
   Future<void> _selectDestination(int index) async {
