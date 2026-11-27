@@ -1,5 +1,5 @@
 import 'package:material_ui/material_ui.dart';
-import '../widgets/kenza_asset_icon.dart';
+import '../widgets/kenza_logo.dart';
 import '../l10n/app_strings.dart';
 
 class AboutKenzaScreen extends StatelessWidget {
@@ -22,7 +22,16 @@ class AboutKenzaScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                KenzaAssetIcon('assets/store.png', size: 48, scale: 1.15),
+                Container(
+                  width: 68,
+                  height: 68,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const KenzaLogo(width: 56, height: 56),
+                ),
                 const SizedBox(height: 18),
                 Text(s.brandName, style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
