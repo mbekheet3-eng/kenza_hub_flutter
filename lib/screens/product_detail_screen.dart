@@ -343,8 +343,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         DropdownButtonFormField<String>(
                           initialValue: selectedVariant?.id,
                           decoration: InputDecoration(labelText: Localizations.localeOf(context).languageCode == 'ar' ? 'اللون / المقاس' : Localizations.localeOf(context).languageCode == 'fr' ? 'Couleur / taille' : 'Color / size'),
-                          items: product.variants.map((v) => DropdownMenuItem(
+                          items: product.variants.map((v) => DropdownMenuItem<String>(
                             value: v.id,
+                            enabled: v.quantity > 0,
                             child: Text('${v.color == null ? '—' : v.colorLabel(Localizations.localeOf(context).languageCode)} / ${v.size ?? '—'}  •  ${Localizations.localeOf(context).languageCode == 'ar' ? 'متاح' : Localizations.localeOf(context).languageCode == 'fr' ? 'Disponible' : 'Available'} ${v.quantity}'),
                           )).toList(),
                           onChanged: (id) => setState(() { _selectedVariantId = id; _selectedQuantity = 1; }),
@@ -369,6 +370,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                         const SizedBox(height: 6),
                         Text('${Localizations.localeOf(context).languageCode == 'ar' ? 'المتاح' : Localizations.localeOf(context).languageCode == 'fr' ? 'Disponible' : 'Available'}: ${selectedVariant?.quantity ?? 0}'),
+                        const SizedBox(height: 6),
+                        Text(
+                          '${Localizations.localeOf(context).languageCode == 'ar' ? 'الإجمالي' : Localizations.localeOf(context).languageCode == 'fr' ? 'Total' : 'Total'}: ${(product.price * _selectedQuantity.clamp(1, selectedVariant?.quantity ?? 1)).toStringAsFixed(2)} ${_l10n.currency}',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                        ),
                       ],
                     ],
                     const SizedBox(height: 12),
