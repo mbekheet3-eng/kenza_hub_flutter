@@ -23,7 +23,7 @@
 - The insert trigger validates that the variant belongs to the product, that the requested quantity is available, derives buyer/seller/price/currency, and calculates total price server-side.
 - On acceptance, the status-transition trigger decrements inventory with a conditional atomic update. If stock is insufficient, acceptance fails with `out_of_stock`.
 - The single-unit unique index applies only when `variant_id IS NULL`; multiple accepted orders for a variant listing are allowed only while the corresponding stock remains.
-- Variant deletion is restricted when any order references it. A product cannot turn off variants while order history references variant rows.
+- Variant deletion is restricted when any order references it. A product cannot switch between single-unit and variant mode while any order history references it.
 
 ## Flutter changes
 
@@ -39,6 +39,7 @@
 
 - Supabase migration ledger contains the variant schema, order snapshot, guard fix and RLS/index optimization migrations.
 - RLS transaction test: active Pro Seller can enable variants and insert a variant row.
+- Negative permission test: a non-Pro account was blocked by the database trigger when attempting to create a product with variants; the transaction left no test product behind.
 - Rollback-only order test: product price 120 × quantity 2 produced order total 240; order snapshot stored black / M; accepting the order reduced stock from 3 to 1.
 - Supabase security advisor did not report an RLS issue on `product_variants`; the existing `product_moderation` no-policy finding is intentional and pre-existing.
 - Performance advisor no longer reports the variant/product-order foreign key as unindexed.
