@@ -338,27 +338,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     if (product.hasVariants) ...[
                       const SizedBox(height: 14),
                       if (product.variants.isEmpty || product.availableQuantity == 0)
-                        Text('نفد المخزون', style: TextStyle(color: Theme.of(context).colorScheme.error, fontWeight: FontWeight.bold))
+                        Text(Localizations.localeOf(context).languageCode == 'ar' ? 'نفد المخزون' : Localizations.localeOf(context).languageCode == 'fr' ? 'Épuisé' : 'Out of stock', style: TextStyle(color: Theme.of(context).colorScheme.error, fontWeight: FontWeight.bold))
                       else ...[
                         DropdownButtonFormField<String>(
                           initialValue: selectedVariant?.id,
-                          decoration: const InputDecoration(labelText: 'اللون / المقاس'),
+                          decoration: InputDecoration(labelText: Localizations.localeOf(context).languageCode == 'ar' ? 'اللون / المقاس' : Localizations.localeOf(context).languageCode == 'fr' ? 'Couleur / taille' : 'Color / size'),
                           items: product.variants.map((v) => DropdownMenuItem(
                             value: v.id,
-                            child: Text('${v.color ?? '—'} / ${v.size ?? '—'}  •  متاح ${v.quantity}'),
+                            child: Text('${v.color ?? '—'} / ${v.size ?? '—'}  •  ${Localizations.localeOf(context).languageCode == 'ar' ? 'متاح' : Localizations.localeOf(context).languageCode == 'fr' ? 'Disponible' : 'Available'} ${v.quantity}'),
                           )).toList(),
                           onChanged: (id) => setState(() { _selectedVariantId = id; _selectedQuantity = 1; }),
                         ),
                         const SizedBox(height: 10),
                         DropdownButtonFormField<int>(
                           initialValue: selectedVariant == null ? null : _selectedQuantity.clamp(1, selectedVariant.quantity),
-                          decoration: const InputDecoration(labelText: 'الكمية'),
+                          decoration: InputDecoration(labelText: Localizations.localeOf(context).languageCode == 'ar' ? 'الكمية' : Localizations.localeOf(context).languageCode == 'fr' ? 'Quantité' : 'Quantity'),
                           items: List.generate(selectedVariant?.quantity ?? 0, (i) => i + 1)
                             .map((q) => DropdownMenuItem(value: q, child: Text('$q'))).toList(),
                           onChanged: selectedVariant == null ? null : (q) => setState(() => _selectedQuantity = q ?? 1),
                         ),
                         const SizedBox(height: 6),
-                        Text('المتاح: ${selectedVariant?.quantity ?? 0}'),
+                        Text('${Localizations.localeOf(context).languageCode == 'ar' ? 'المتاح' : Localizations.localeOf(context).languageCode == 'fr' ? 'Disponible' : 'Available'}: ${selectedVariant?.quantity ?? 0}'),
                       ],
                     ],
                     const SizedBox(height: 12),
