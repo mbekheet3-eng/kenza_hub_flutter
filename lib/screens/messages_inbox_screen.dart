@@ -93,7 +93,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
 
   Future<List<Map<String, dynamic>>> _loadOrders() async {
     final rows = await _client.from('product_orders')
-        .select('id,product_id,buyer_id,seller_id,agreed_price,currency,status,created_at,expires_at,quantity,variant_id,variant_color,variant_size,products(title)')
+        .select('id,product_id,buyer_id,seller_id,agreed_price,currency,status,created_at,expires_at,hold_expires_at,postponement_requested_at,postponement_requested_until,postponement_extension_count,quantity,variant_id,variant_color,variant_size,products(title)')
         .or('buyer_id.eq.$_userId,seller_id.eq.$_userId')
         .order('created_at', ascending: false);
     return _attachOtherMemberNames(rows);
@@ -214,6 +214,107 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         id: id,
         status: status,
       );
+    }
+  }
+
+
+  Future<void> _requestPostponement(Map<String, dynamic> row) async {
+    final language = Localizations.localeOf(context).languageCode;
+    final hold = DateTime.tryParse(row['hold_expires_at']?.toString() ?? '');
+    if (hold == null) return;
+    final hours = await showDialog<int>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(language == 'ar' ? 'طلب تأجيل' : language == 'fr' ? 'Demander un délai' : 'Request more time'),
+        content: Text(language == 'ar' ? 'اختر مدة التمديد المطلوبة بعد موعد الحجز الحالي.' : language == 'fr' ? 'Choisissez la durée supplémentaire.' : 'Choose the additional time after the current reservation deadline.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, null), child: Text(AppStrings.of(context)!.backLabel)),
+          for (final h in [24, 48, 72])
+            TextButton(onPressed: () => Navigator.pop(dialogContext, h), child: Text('$h')),
+        ],
+      ),
+    );
+    if (hours == null) return;
+    try {
+      await MarketplaceTransactionService().requestOrderPostponement(orderId: row['id'] as String, requestedUntil: hold.add(Duration(hours: hours)));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(language == 'ar' ? 'تم إرسال طلب التأجيل للبائع' : language == 'fr' ? 'Demande envoyée au vendeur' : 'Postponement request sent to seller')));
+      await _refresh();
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppStrings.of(context)!.statusUpdateFailed)));
+    }
+  }
+
+  Future<void> _respondPostponement(String orderId, bool approve) async {
+    try {
+      await MarketplaceTransactionService().respondOrderPostponement(orderId: orderId, approve: approve);
+      if (!mounted) return;
+      final language = Localizations.localeOf(context).languageCode;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(approve
+        ? (language == 'ar' ? 'وافقت على التأجيل' : language == 'fr' ? 'Prolongation acceptée' : 'Postponement approved')
+        : (language == 'ar' ? 'رفضت التأجيل' : language == 'fr' ? 'Prolongation refusée' : 'Postponement declined'))));
+      await _refresh();
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppStrings.of(context)!.statusUpdateFailed)));
+    }
+  }
+
+  Future<void> _cancelAccepted(Map<String, dynamic> row, {required bool sellerSide}) async {
+    final language = Localizations.localeOf(context).languageCode;
+    String reason = 'buyer_request';
+    String? note;
+    if (sellerSide) {
+      final selected = await showDialog<String>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(language == 'ar' ? 'سبب إلغاء الطلب' : language == 'fr' ? 'Motif d’annulation' : 'Cancellation reason'),
+          content: Column(mainAxisSize: MainAxisSize.min, children: [
+            ListTile(title: Text(language == 'ar' ? 'المنتج تالف' : language == 'fr' ? 'Article endommagé' : 'Item damaged'), onTap: () => Navigator.pop(dialogContext, 'item_damaged')),
+            ListTile(title: Text(language == 'ar' ? 'المنتج غير موجود' : language == 'fr' ? 'Article introuvable' : 'Item missing'), onTap: () => Navigator.pop(dialogContext, 'item_missing')),
+            ListTile(title: Text(language == 'ar' ? 'خطأ في المخزون' : language == 'fr' ? 'Erreur de stock' : 'Stock error'), onTap: () => Navigator.pop(dialogContext, 'stock_error')),
+          ]),
+        ),
+      );
+      if (selected == null) return;
+      reason = selected;
+      final controller = TextEditingController();
+      note = await showDialog<String>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(language == 'ar' ? 'وضح السبب' : language == 'fr' ? 'Précisez le motif' : 'Explain the reason'),
+          content: TextField(controller: controller, minLines: 2, maxLines: 4),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text(AppStrings.of(context)!.backLabel)),
+            TextButton(onPressed: () => Navigator.pop(dialogContext, controller.text.trim()), child: Text(AppStrings.of(context)!.confirmAction)),
+          ],
+        ),
+      );
+      controller.dispose();
+      if (note == null || note!.trim().length < 8) return;
+    } else {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(language == 'ar' ? 'إلغاء الطلب المقبول؟' : language == 'fr' ? 'Annuler la commande acceptée ?' : 'Cancel accepted order?'),
+          content: Text(language == 'ar' ? 'سيتم إلغاء الحجز وإعادة إتاحة المنتج.' : language == 'fr' ? 'La réservation sera annulée et l’article remis en disponibilité.' : 'The reservation will be cancelled and the item made available again.'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(AppStrings.of(context)!.backLabel)),
+            TextButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(AppStrings.of(context)!.confirmAction)),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+    }
+    try {
+      await MarketplaceTransactionService().cancelAcceptedOrder(orderId: row['id'] as String, reason: reason, note: note);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(language == 'ar' ? 'تم إلغاء الطلب وإعادة المخزون' : language == 'fr' ? 'Commande annulée et stock restauré' : 'Order cancelled and stock restored')));
+      await _refresh();
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppStrings.of(context)!.statusUpdateFailed)));
     }
   }
 
@@ -361,13 +462,15 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
             ],
           );
         } else if (!isOffer && isSeller && row['status'] == 'accepted') {
-          trailing = TextButton(
-            onPressed: () => _confirmOrderStatusChange(
-              id: row['id'] as String,
-              status: 'delivered',
-            ),
-            child: Text(AppStrings.of(context)!.markDeliveredLabel),
-          );
+          final hasPostponement = row['postponement_requested_at'] != null;
+          trailing = Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.end, children: [
+            if (hasPostponement) ...[
+              TextButton(onPressed: () => _respondPostponement(row['id'] as String, true), child: Text(language == 'ar' ? 'موافقة على التأجيل' : language == 'fr' ? 'Accepter' : 'Approve delay')),
+              TextButton(onPressed: () => _respondPostponement(row['id'] as String, false), child: Text(language == 'ar' ? 'رفض التأجيل' : language == 'fr' ? 'Refuser' : 'Decline delay')),
+            ],
+            TextButton(onPressed: () => _confirmOrderStatusChange(id: row['id'] as String, status: 'delivered'), child: Text(AppStrings.of(context)!.markDeliveredLabel)),
+            TextButton(onPressed: () => _cancelAccepted(row, sellerSide: true), child: Text(language == 'ar' ? 'إلغاء لسبب حقيقي' : language == 'fr' ? 'Annuler (motif valable)' : 'Cancel for valid reason')),
+          ]);
         } else if (!isOffer && !isSeller && pending) {
           trailing = TextButton(
             onPressed: () => _confirmOrderStatusChange(
@@ -377,10 +480,16 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
             child: Text(AppStrings.of(context)!.cancelOrderLabel),
           );
         } else if (!isOffer && !isSeller && row['status'] == 'accepted') {
-          trailing = TextButton(
-            onPressed: () => _contactSellerForAcceptedOrder(row),
-            child: Text(AppStrings.of(context)!.contactSellerLabel),
-          );
+          final hasPostponement = row['postponement_requested_at'] != null;
+          final extended = ((row['postponement_extension_count'] as num?)?.toInt() ?? 0) >= 1;
+          trailing = Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.end, children: [
+            TextButton(onPressed: () => _contactSellerForAcceptedOrder(row), child: Text(AppStrings.of(context)!.contactSellerLabel)),
+            if (!extended && !hasPostponement)
+              TextButton(onPressed: () => _requestPostponement(row), child: Text(language == 'ar' ? 'طلب تأجيل' : language == 'fr' ? 'Demander un délai' : 'Request delay')),
+            if (hasPostponement)
+              Text(language == 'ar' ? 'طلب التأجيل قيد المراجعة' : language == 'fr' ? 'Demande en attente' : 'Delay request pending'),
+            TextButton(onPressed: () => _cancelAccepted(row, sellerSide: false), child: Text(AppStrings.of(context)!.cancelOrderLabel)),
+          ]);
         } else if (!isOffer && !isSeller && row['status'] == 'delivered') {
           trailing = Column(
             mainAxisSize: MainAxisSize.min,
