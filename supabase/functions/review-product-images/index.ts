@@ -3,6 +3,60 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 type JsonRecord = Record<string, unknown>;
 type Decision = "approve" | "reject" | "review";
+type UsageClient = {
+  rpc: (name: string, args: Record<string, unknown>) => Promise<{ data: any; error: any }>;
+};
+class AiQuotaError extends Error {
+  payload: Record<string, unknown>;
+  constructor(payload: Record<string, unknown>) {
+    super(String(payload.reason ?? "AI quota limit reached"));
+    this.payload = payload;
+  }
+}
+async function beginAiUsage(
+  client: UsageClient, service: string, requestId: string, attemptNo: number, model: string,
+): Promise<void> {
+  const { data, error } = await client.rpc("consume_ai_usage_attempt", {
+    p_service_key: service, p_request_id: requestId, p_attempt_no: attemptNo, p_model: model,
+  });
+  if (error) {
+    console.error("AI quota check failed", error.message ?? error);
+    throw new Error("Could not verify AI usage quota");
+  }
+  if (!data?.allowed) throw new AiQuotaError(data ?? { reason: "quota_check_failed" });
+}
+async function finishAiUsage(
+  client: UsageClient, service: string, requestId: string, attemptNo: number,
+  response: Response | null,
+): Promise<void> {
+  let inputTokens: number | null = null;
+  let outputTokens: number | null = null;
+  if (response) {
+    try {
+      const payload = await response.clone().json();
+      inputTokens = Number.isFinite(Number(payload?.usageMetadata?.promptTokenCount))
+        ? Number(payload.usageMetadata.promptTokenCount) : null;
+      outputTokens = Number.isFinite(Number(payload?.usageMetadata?.candidatesTokenCount))
+        ? Number(payload.usageMetadata.candidatesTokenCount) : null;
+    } catch { /* Provider errors may not contain JSON usage metadata. */ }
+  }
+  const { error } = await client.rpc("finish_ai_usage_attempt", {
+    p_service_key: service, p_request_id: requestId, p_attempt_no: attemptNo,
+    p_http_status: response?.status ?? null, p_succeeded: response?.ok ?? false,
+    p_input_tokens: inputTokens, p_output_tokens: outputTokens,
+  });
+  if (error) console.error("Could not finalize AI usage event", error.message ?? error);
+}
+function quotaErrorResponse(error: AiQuotaError) {
+  const daily = error.payload.reason === "daily_quota_exceeded";
+  return {
+    error_code: daily ? "daily_quota_exceeded" : "rate_limited",
+    message_ar: daily
+      ? "وصلت للحد اليومي لاستخدام هذه الخدمة. حاول مرة أخرى غدًا."
+      : "استخدمت الخدمة بسرعة. انتظر دقيقة ثم حاول مرة أخرى.",
+    ...error.payload,
+  };
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -56,6 +110,9 @@ async function analyzeImage(
   mimeType: string,
   title: string,
   description: string,
+  usageClient: UsageClient,
+  requestId: string,
+  attemptCounter: { value: number },
 ): Promise<JsonRecord> {
   const prompt = [
     "You are a strict but fair image-quality and marketplace-safety reviewer for a general consumer-to-consumer marketplace in Egypt.",
@@ -98,7 +155,11 @@ async function analyzeImage(
 
     for (let attempt = 1; attempt <= attempts; attempt++) {
       try {
-        const response = await fetch(
+        const attemptNo = ++attemptCounter.value;
+        await beginAiUsage(usageClient, "image_review", requestId, attemptNo, model);
+        let response: Response;
+        try {
+          response = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
           {
             method: "POST",
@@ -109,7 +170,12 @@ async function analyzeImage(
             body: requestBody,
             signal: AbortSignal.timeout(30000),
           },
-        );
+          );
+        } catch (fetchError) {
+          await finishAiUsage(usageClient, "image_review", requestId, attemptNo, null);
+          throw fetchError;
+        }
+        await finishAiUsage(usageClient, "image_review", requestId, attemptNo, response);
 
         if (!response.ok) {
           const detail = await response.text();
@@ -182,6 +248,7 @@ async function analyzeImage(
             : "",
         };
       } catch (error) {
+        if (error instanceof AiQuotaError) throw error;
         lastError = error instanceof Error ? error.message : String(error);
         console.error("Gemini image review attempt failed:", {
           model,
@@ -343,6 +410,9 @@ Deno.serve(async (request: Request) => {
     }, 503);
   }
 
+  const usageRequestId = crypto.randomUUID();
+  const usageAttemptCounter = { value: 0 };
+
   try {
     const imageResults: JsonRecord[] = [];
 
@@ -384,6 +454,9 @@ Deno.serve(async (request: Request) => {
         mimeType,
         String(product.title ?? ""),
         String(product.description ?? ""),
+        userClient,
+        usageRequestId,
+        usageAttemptCounter,
       );
       imageResults.push({
         sort_order: image.sort_order,
@@ -453,6 +526,14 @@ Deno.serve(async (request: Request) => {
       image_count: images.length,
     });
   } catch (error) {
+    if (error instanceof AiQuotaError) {
+      try {
+        await persistResult("review_required", { reason: "ai_usage_limit_reached", ...error.payload });
+      } catch (persistError) {
+        console.error("Could not persist quota-limited moderation state:", persistError);
+      }
+      return json({ status: "quota_exceeded", ...quotaErrorResponse(error) }, 429);
+    }
     console.error("Product image moderation failed:", error);
     try {
       await persistResult("review_required", {
