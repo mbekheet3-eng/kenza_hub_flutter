@@ -167,9 +167,11 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
       await _refresh();
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppStrings.of(context)!.statusUpdateFailed)),
-      );
+      final language = Localizations.localeOf(context).languageCode;
+      final message = error.toString().contains('out_of_stock')
+          ? (language == 'ar' ? 'الكمية المطلوبة لم تعد متاحة. حدّث المخزون أو ارفض الطلب.' : language == 'fr' ? 'Stock insuffisant. Actualisez le stock ou refusez la demande.' : 'Requested stock is no longer available. Update stock or reject the request.')
+          : AppStrings.of(context)!.statusUpdateFailed;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
