@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 45
     steps:
-      - name: Check out implementation branch
+      - name: Check out current prelaunch branch
         uses: actions/checkout@v4
         with:
-          ref: phase-1/implementation
+          ref: phase-1/prelaunch-critical-fixes
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -41,7 +41,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          base64 --decode assets/logos/kenza_mark.png.base64 > /tmp/kenza_logo_source.png
+          cp assets/logos/kenza_icon_1024.png /tmp/kenza_logo_source.png
           python3 -m pip install --user Pillow
           python3 - <<'PY'
           from pathlib import Path
