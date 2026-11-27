@@ -142,42 +142,37 @@ Deno.serve(async (req: Request) => {
       }
     };
 
-    // Use a different, lighter multimodal model as fallback to avoid correlated overload.
-    let geminiResponse = await requestModel("gemini-3.8-flash");
-    if (!geminiResponse?.ok) {
-      const firstStatus = geminiResponse?.status ?? 0;
-      const firstDetails = geminiResponse ? await geminiResponse.text() : "network error or timeout";
-      console.error("Primary Gemini model failed", firstStatus, firstDetails.slice(0, 200));
+    // Fast-first cascade: Hydrogen, then two independently available Flash fallbacks.
+    const models = ["gemini-4-hydrogen", "gemini-3.8-flash", "gemini-3.5-flash-lite"];
+    let geminiResponse: Response | null = null;
+    let lastStatus = 0;
+    let lastDetails = "network error or timeout";
 
-      if ([400, 401, 403].includes(firstStatus)) {
-        return json({
-          error_code: "analysis_configuration_error",
-          error: "Image analysis could not be completed. Please try again later.",
-        }, 503);
-      }
+    for (let modelIndex = 0; modelIndex < models.length; modelIndex++) {
+      const model = models[modelIndex];
+      geminiResponse = await requestModel(model);
+      if (geminiResponse?.ok) break;
 
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      geminiResponse = await requestModel("gemini-3.5-flash-lite");
+      lastStatus = geminiResponse?.status ?? 0;
+      lastDetails = geminiResponse ? await geminiResponse.text() : "network error or timeout";
+      console.error("Gemini image search model failed", model, lastStatus, lastDetails.slice(0, 200));
 
-      // Retry the independent fallback once only for temporary failures.
-      if (!geminiResponse?.ok && (
-        !geminiResponse || [408, 429, 500, 502, 503, 504].includes(geminiResponse.status)
-      )) {
-        const fallbackDetails = geminiResponse ? await geminiResponse.text() : "network error or timeout";
-        console.error("Gemini Flash-Lite fallback failed; retrying once", geminiResponse?.status ?? 0, fallbackDetails.slice(0, 200));
-        await new Promise((resolve) => setTimeout(resolve, 700));
-        geminiResponse = await requestModel("gemini-3.5-flash-lite");
-      }
+      const modelSpecific403 = lastStatus === 403 &&
+        /MODEL_NOT_AVAILABLE|model.{0,30}(not available|not found|unavailable)/i.test(lastDetails);
+      const canFallback = ![400, 401].includes(lastStatus) &&
+        (lastStatus !== 403 || modelSpecific403) &&
+        (lastStatus === 0 || [403, 404, 408, 429, 500, 502, 503, 504].includes(lastStatus));
+
+      if (!canFallback || modelIndex === models.length - 1) break;
+      await new Promise((resolve) => setTimeout(resolve, 350));
     }
 
     if (!geminiResponse?.ok) {
-      const status = geminiResponse?.status ?? 0;
-      const details = geminiResponse ? await geminiResponse.text() : "network error or timeout";
-      console.error("Gemini image analysis unavailable", status, details.slice(0, 300));
+      console.error("All Gemini image search models unavailable", lastStatus, lastDetails.slice(0, 300));
       return json({
-        error_code: "temporary_unavailable",
+        error_code: lastStatus === 429 ? "rate_limited" : "temporary_unavailable",
         error: "Image search is temporarily busy. Please try again in a moment.",
-      }, 503);
+      }, lastStatus === 429 ? 429 : 503);
     }
 
     const geminiData = await geminiResponse.json();
