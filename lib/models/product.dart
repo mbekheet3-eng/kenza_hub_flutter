@@ -4,6 +4,21 @@ class ProductVariant {
   final String? color;
   final String? size;
   final int quantity;
+
+  String colorLabel(String languageCode) {
+    const labels = {
+      'black': ['أسود', 'Black', 'Noir'], 'white': ['أبيض', 'White', 'Blanc'],
+      'blue': ['أزرق', 'Blue', 'Bleu'], 'red': ['أحمر', 'Red', 'Rouge'],
+      'green': ['أخضر', 'Green', 'Vert'], 'yellow': ['أصفر', 'Yellow', 'Jaune'],
+      'pink': ['وردي', 'Pink', 'Rose'], 'brown': ['بني', 'Brown', 'Marron'],
+      'gray': ['رمادي', 'Gray', 'Gris'], 'beige': ['بيج', 'Beige', 'Beige'],
+    };
+    final values = labels[color?.toLowerCase()];
+    if (values == null) return color ?? '';
+    final index = languageCode == 'ar' ? 0 : languageCode == 'fr' ? 2 : 1;
+    return values[index];
+  }
+
   factory ProductVariant.fromMap(Map<String, dynamic> map) => ProductVariant(
     id: map['id'] as String?, color: map['color'] as String?,
     size: map['size'] as String?, quantity: (map['quantity'] as num).toInt(),
