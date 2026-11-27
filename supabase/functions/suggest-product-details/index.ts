@@ -255,37 +255,48 @@ Deno.serve(async (request: Request) => {
       }
     };
 
-    // Prefer Gemini 3.8; fall back to Gemini 3.5 Flash-Lite on provider/network failures.
-    let model = "gemini-3.8-flash";
-    let response = await requestModel(model);
-    if (!response?.ok) {
-      const firstStatus = response?.status ?? 0;
-      const firstDetails = response ? await response.text() : "network error or timeout";
-      console.error("Primary Gemini product suggestion model failed:", firstStatus, firstDetails.slice(0, 300));
+    // Try the fast Gemini 4 model first, then independent supported fallbacks.
+    // Neon is kept as an optional stronger fallback for the richer listing/pricing task.
+    const models = [
+      "gemini-4-hydrogen",
+      "gemini-4-neon",
+      "gemini-3.8-flash",
+      "gemini-3.5-flash-lite",
+    ];
+    let model = models[0];
+    let response: Response | null = null;
+    let lastStatus = 0;
+    let lastDetail = "network error or timeout";
 
-      if ([400, 401, 403].includes(firstStatus)) {
-        const status = firstStatus === 429 ? 429 : 503;
-        return json({
-          error: "AI suggestions are temporarily unavailable. Please try again.",
-          error_code: "provider_unavailable",
-        }, status);
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      model = "gemini-3.5-flash-lite";
+    for (let modelIndex = 0; modelIndex < models.length; modelIndex++) {
+      model = models[modelIndex];
       response = await requestModel(model);
+      if (response?.ok) break;
+
+      lastStatus = response?.status ?? 0;
+      lastDetail = response ? await response.text() : "network error or timeout";
+      console.error("Gemini product suggestion model failed:", {
+        model, status: lastStatus, detail: lastDetail.slice(0, 300),
+      });
+
+      const modelSpecific403 = lastStatus === 403 &&
+        /MODEL_NOT_AVAILABLE|model.{0,30}(not available|not found|unavailable)/i.test(lastDetail);
+      const canFallback = ![400, 401].includes(lastStatus) &&
+        (lastStatus !== 403 || modelSpecific403) &&
+        (lastStatus === 0 || [403, 404, 408, 429, 500, 502, 503, 504].includes(lastStatus));
+
+      if (!canFallback || modelIndex === models.length - 1) break;
+      await new Promise((resolve) => setTimeout(resolve, 350));
     }
 
     if (!response?.ok) {
-      const status = response?.status ?? 0;
-      const detail = response ? await response.text() : "network error or timeout";
-      console.error("Gemini product suggestion fallback failed:", status, detail.slice(0, 300));
+      console.error("All Gemini product suggestion models failed:", lastStatus, lastDetail.slice(0, 300));
       return json({
-        error: status === 429
+        error: lastStatus === 429
           ? "AI suggestion limit reached. Please try again later."
           : "AI suggestions are temporarily unavailable. Please try again.",
-        error_code: status === 429 ? "rate_limited" : "provider_unavailable",
-      }, status === 429 ? 429 : 503);
+        error_code: lastStatus === 429 ? "rate_limited" : "provider_unavailable",
+      }, lastStatus === 429 ? 429 : 503);
     }
 
     const payload = await response.json();
