@@ -58,6 +58,35 @@ class MarketplaceService {
   Future<List<Category>>? _categoriesCache;
   static const String bucket = 'product-images';
   static const int maxImageBytes = 10 * 1024 * 1024;
+  Future<bool> isActiveProSeller() async {
+    final user = _client.auth.currentUser;
+    if (user == null) return false;
+    final row = await _client.from('account_roles').select('id')
+      .eq('user_id', user.id).eq('role', 'pro_seller')
+      .eq('is_active', true).maybeSingle();
+    return row != null;
+  }
+
+  Future<void> _syncProductVariants(String productId, List<ProductVariant> variants) async {
+    final current = await _client.from('product_variants').select('id').eq('product_id', productId);
+    final currentIds = current.map((r) => r['id'] as String).toSet();
+    final retained = variants.where((v) => v.id != null).map((v) => v.id!).toSet();
+    for (final v in variants) {
+      if (v.id == null) {
+        await _client.from('product_variants').insert(v.toInsertMap(productId));
+      } else {
+        await _client.from('product_variants').update({
+          'color': v.color, 'size': v.size, 'quantity': v.quantity,
+        }).eq('id', v.id!).eq('product_id', productId);
+      }
+    }
+    final removed = currentIds.difference(retained);
+    if (removed.isNotEmpty) {
+      await _client.from('product_variants').delete()
+        .eq('product_id', productId).inFilter('id', removed.toList());
+    }
+  }
+
   static const int maxImages = 8;
 
   Future<String?> getMyGender() async {
@@ -179,7 +208,7 @@ class MarketplaceService {
     var request = _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,status,created_at,product_images(id,storage_path,sort_order)',
+          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,status,has_variants,created_at,product_images(id,storage_path,sort_order),product_variants(id,color,size,quantity)',
         )
         .eq('status', 'published');
 
@@ -334,7 +363,7 @@ class MarketplaceService {
     final rows = await _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,status,created_at,product_images(id,storage_path,sort_order)',
+          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,status,has_variants,created_at,product_images(id,storage_path,sort_order),product_variants(id,color,size,quantity)',
         )
         .eq('owner_id', user.id)
         .order('created_at', ascending: false);
@@ -374,7 +403,7 @@ class MarketplaceService {
     final rows = await _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
+          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,has_variants,created_at,product_images(id,storage_path,sort_order),product_variants(id,color,size,quantity)',
         )
         .eq('owner_id', sellerId)
         .eq('status', 'published')
@@ -400,7 +429,7 @@ class MarketplaceService {
     final rows = await _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
+          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,has_variants,created_at,product_images(id,storage_path,sort_order),product_variants(id,color,size,quantity)',
         )
         .inFilter('id', productIds)
         .eq('status', 'published')
@@ -413,7 +442,7 @@ class MarketplaceService {
     final row = await _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,created_at,product_images(id,storage_path,sort_order)',
+          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,has_variants,created_at,product_images(id,storage_path,sort_order),product_variants(id,color,size,quantity)',
         )
         .eq('id', productId)
         .single();
@@ -554,12 +583,17 @@ class MarketplaceService {
     required String audience,
     String? customCategoryName,
     int primaryImageIndex = 0,
+    bool hasVariants = false,
+    List<ProductVariant> variants = const [],
   }) async {
     final strings = await _localizedStrings();
     final user = _client.auth.currentUser;
     if (user == null) throw Exception(strings.loginRequired);
     if (images.isEmpty || images.length > maxImages) {
       throw Exception(strings.selectAtLeastOnePhoto);
+    }
+    if (hasVariants && (!await isActiveProSeller() || variants.isEmpty || variants.any((v) => v.quantity < 0 || ((v.color ?? '').trim().isEmpty && (v.size ?? '').trim().isEmpty)))) {
+      throw Exception('Only active Pro Sellers can publish variants; add a valid stock row.');
     }
     if (title.trim().isEmpty || price <= 0) {
       throw Exception(strings.productTitleAndPriceRequired);
@@ -577,6 +611,7 @@ class MarketplaceService {
           'currency': 'EGP',
           'status': 'draft',
           'audience': audience,
+          'has_variants': hasVariants,
         })
         .select('id')
         .single();
@@ -586,6 +621,7 @@ class MarketplaceService {
     var preserveDraft = false;
 
     try {
+      if (hasVariants) await _syncProductVariants(productId, variants);
       final imageRows = <Map<String, dynamic>>[];
 
       for (var index = 0; index < images.length; index++) {
@@ -705,6 +741,8 @@ class MarketplaceService {
     List<File> images = const [],
     List<String> removedImagePaths = const [],
     int primaryImageIndex = 0,
+    bool hasVariants = false,
+    List<ProductVariant> variants = const [],
   }) async {
     final strings = await _localizedStrings();
     final user = _client.auth.currentUser;
@@ -714,7 +752,7 @@ class MarketplaceService {
     final previous = await _client
         .from('products')
         .select(
-          'title,description,category_id,status,price,audience,custom_category_name',
+          'title,description,category_id,status,price,audience,custom_category_name,has_variants',
         )
         .eq('id', productId)
         .eq('owner_id', user.id)
@@ -722,6 +760,10 @@ class MarketplaceService {
 
     if (previous == null) {
       throw Exception(strings.productNotFoundOrNoEditPermission);
+    }
+
+    if (hasVariants && (!await isActiveProSeller() || variants.isEmpty || variants.any((v) => v.quantity < 0 || ((v.color ?? '').trim().isEmpty && (v.size ?? '').trim().isEmpty)))) {
+      throw Exception('Only active Pro Sellers can manage variants; add a valid stock row.');
     }
 
     final currentImageRows = await _client
@@ -816,6 +858,7 @@ class MarketplaceService {
                 ? null
                 : customCategoryName?.trim(),
             'audience': audience,
+            'has_variants': hasVariants,
             // Hide changed content until the image review approves it.
             if (needsImageReview) 'status': 'draft',
           })
@@ -826,6 +869,7 @@ class MarketplaceService {
       if (rows.isEmpty) {
         throw Exception(strings.productNotFoundOrNoEditPermission);
       }
+      await _syncProductVariants(productId, hasVariants ? variants : const []);
 
       // Apply the new primary-photo order before deleting any old image rows.
       // If any reorder fails, the old rows and files are still available.
