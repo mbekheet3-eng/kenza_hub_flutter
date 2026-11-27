@@ -1,0 +1,3 @@
+-- Pro Seller inventory variants: color + size + available quantity.
+-- Existing individual/used listings remain single-unit products.
+-- Applied to Supabase project mxdcfewkajwvtwtjoeia as migration 20261127120748.
