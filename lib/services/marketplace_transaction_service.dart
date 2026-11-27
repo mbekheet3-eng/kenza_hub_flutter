@@ -22,6 +22,8 @@ class MarketplaceTransactionService {
     required String productId,
     required String sellerId,
     required double price,
+    String? variantId,
+    int quantity = 1,
   }) async {
     final userId = await _requireUserId();
     final strings = await AppStrings.delegate.load(AppLocale.notifier.value);
@@ -43,6 +45,8 @@ class MarketplaceTransactionService {
       if (price <= 0) throw Exception(strings.priceMustBePositive);
       await _client.from('product_orders').insert({
         'product_id': productId,
+        if (variantId != null) 'variant_id': variantId,
+        'quantity': quantity,
       });
     } on PostgrestException catch (error) {
       if (error.code == '23505') {
