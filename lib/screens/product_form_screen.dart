@@ -740,6 +740,24 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     return lang == 'ar' ? ar : lang == 'fr' ? fr : en;
   }
 
+  String _variantColorLabel(String value) {
+    const labels = {
+      'black': ['أسود', 'Black', 'Noir'], 'white': ['أبيض', 'White', 'Blanc'],
+      'blue': ['أزرق', 'Blue', 'Bleu'], 'red': ['أحمر', 'Red', 'Rouge'],
+      'green': ['أخضر', 'Green', 'Vert'], 'yellow': ['أصفر', 'Yellow', 'Jaune'],
+      'pink': ['وردي', 'Pink', 'Rose'], 'brown': ['بني', 'Brown', 'Marron'],
+      'gray': ['رمادي', 'Gray', 'Gris'], 'beige': ['بيج', 'Beige', 'Beige'],
+    };
+    final index = Localizations.localeOf(context).languageCode == 'ar' ? 0 : Localizations.localeOf(context).languageCode == 'fr' ? 2 : 1;
+    return labels[value]![index];
+  }
+
+  List<String> _suggestedSizes() => [
+    'XS','S','M','L','XL','XXL','XXXL',
+    '35','36','37','38','39','40','41','42','43','44','45',
+    '0-3 months','3-6 months','6-12 months','1-2 years','2-3 years','3-4 years','4-5 years','5-6 years','6-7 years','7-8 years',
+  ];
+
   Widget _buildVariantEditor() {
     if (!_isProSeller) return const SizedBox.shrink();
     return Card(
@@ -767,12 +785,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   Row(children: [
                     Expanded(child: TextFormField(
                       controller: row.color,
-                      decoration: InputDecoration(labelText: _variantText('اللون','Color','Couleur'), hintText: _variantText('أسود','Black','Noir')),
+                      decoration: InputDecoration(labelText: _variantText('اللون','Color','Couleur'), hintText: _variantText('أسود','Black','Noir'), suffixIcon: PopupMenuButton<String>(icon: const Icon(Icons.palette_outlined), onSelected: (value) => setState(() => row.color.text = value), itemBuilder: (_) => ['black','white','blue','red','green','yellow','pink','brown','gray','beige'].map((value) => PopupMenuItem(value: value, child: Text(_variantColorLabel(value)))).toList())),
                     )),
                     const SizedBox(width: 8),
                     Expanded(child: TextFormField(
                       controller: row.size,
-                      decoration: InputDecoration(labelText: _variantText('المقاس','Size','Taille'), hintText: _variantText('مثال: L أو 42 أو 6 سنوات','e.g. L, 42, age 6','ex. L, 42, 6 ans')),
+                      decoration: InputDecoration(labelText: _variantText('المقاس','Size','Taille'), hintText: _variantText('مثال: L أو 42 أو 6 سنوات','e.g. L, 42, age 6','ex. L, 42, 6 ans'), suffixIcon: PopupMenuButton<String>(icon: const Icon(Icons.straighten), onSelected: (value) => setState(() => row.size.text = value), itemBuilder: (_) => _suggestedSizes().map((value) => PopupMenuItem(value: value, child: Text(value))).toList())),
                     )),
                     IconButton(
                       tooltip: _variantText('حذف','Remove','Supprimer'),
