@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../l10n/app_strings.dart';
+import '../widgets/kenza_page_brand_header.dart';
 
 class TermsScreen extends StatelessWidget {
   const TermsScreen({super.key});
@@ -26,6 +27,7 @@ class TermsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          const KenzaPageBrandHeader(),
           Text(
             s.policiesIntro,
             style: const TextStyle(height: 1.8, color: Color(0xFF475569)),
