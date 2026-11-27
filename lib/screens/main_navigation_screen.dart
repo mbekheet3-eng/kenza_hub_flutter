@@ -65,9 +65,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   void dispose() {
-    if (identical(_notificationMessageHandler, _openMessagesFromNotification)) {
-      _notificationMessageHandler = null;
-    }
+    _notificationMessageHandler = null;
     _authSubscription.cancel();
     super.dispose();
   }
@@ -96,13 +94,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     // Reuse the current form only while it is still on the Sell tab's stack.
     // A stale flag must never prevent the user from reopening Add Product.
     final sellNavigator = _navigatorKeys[2].currentState;
-    if (_sellRouteOpen && sellNavigator?.canPop() == true) {
+    if (sellNavigator?.canPop() == true) {
+      _sellRouteOpen = true;
       if (mounted) setState(() => _selectedIndex = 2);
       return;
     }
-    if (_sellRouteOpen && sellNavigator?.canPop() != true) {
-      _sellRouteOpen = false;
-    }
+    _sellRouteOpen = false;
 
     // Avoid opening multiple sign-in sheets/routes from rapid repeated taps.
     if (_openingSell) return;
