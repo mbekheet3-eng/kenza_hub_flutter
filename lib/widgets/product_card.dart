@@ -20,6 +20,13 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context)!;
+    // Decode grid thumbnails near their rendered physical size instead of
+    // keeping the full-resolution upload in memory for every visible card.
+    final imageDecodeSize =
+        (MediaQuery.sizeOf(context).width *
+                MediaQuery.devicePixelRatioOf(context) /
+                2)
+            .round();
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -41,6 +48,8 @@ class ProductCard extends StatelessWidget {
                       : Image.network(
                           product.primaryImage!,
                           fit: BoxFit.cover,
+                          cacheWidth: imageDecodeSize,
+                          cacheHeight: imageDecodeSize,
                           errorBuilder: (_, __, ___) => const ColoredBox(
                             color: Color(0xFFEDEDF4),
                             child: Icon(Icons.broken_image_outlined, size: 42),
