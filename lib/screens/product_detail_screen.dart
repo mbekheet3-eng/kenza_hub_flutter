@@ -345,7 +345,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           decoration: InputDecoration(labelText: Localizations.localeOf(context).languageCode == 'ar' ? 'اللون / المقاس' : Localizations.localeOf(context).languageCode == 'fr' ? 'Couleur / taille' : 'Color / size'),
                           items: product.variants.map((v) => DropdownMenuItem(
                             value: v.id,
-                            child: Text('${v.color ?? '—'} / ${v.size ?? '—'}  •  ${Localizations.localeOf(context).languageCode == 'ar' ? 'متاح' : Localizations.localeOf(context).languageCode == 'fr' ? 'Disponible' : 'Available'} ${v.quantity}'),
+                            child: Text('${v.color == null ? '—' : v.colorLabel(Localizations.localeOf(context).languageCode)} / ${v.size ?? '—'}  •  ${Localizations.localeOf(context).languageCode == 'ar' ? 'متاح' : Localizations.localeOf(context).languageCode == 'fr' ? 'Disponible' : 'Available'} ${v.quantity}'),
                           )).toList(),
                           onChanged: (id) => setState(() { _selectedVariantId = id; _selectedQuantity = 1; }),
                         ),
