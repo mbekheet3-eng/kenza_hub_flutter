@@ -105,7 +105,7 @@ class ProductCard extends StatelessWidget {
                   border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text('${v.color ?? ''}${v.color != null && v.size != null ? ' / ' : ''}${v.size ?? ''}', style: const TextStyle(fontSize: 10)),
+                child: Text('${v.colorLabel(language)}${v.color != null && v.size != null ? ' / ' : ''}${v.size ?? ''}', style: const TextStyle(fontSize: 10)),
               )).toList(),
             ),
             Text(
