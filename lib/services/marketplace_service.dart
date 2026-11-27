@@ -592,7 +592,7 @@ class MarketplaceService {
     if (images.isEmpty || images.length > maxImages) {
       throw Exception(strings.selectAtLeastOnePhoto);
     }
-    if (hasVariants && (!await isActiveProSeller() || variants.isEmpty || variants.any((v) => v.quantity < 0 || ((v.color ?? '').trim().isEmpty && (v.size ?? '').trim().isEmpty)))) {
+    if (hasVariants && (!await isActiveProSeller() || variants.isEmpty || variants.any((v) => v.quantity < 0 || ((v.color ?? '').trim().isEmpty && (v.size ?? '').trim().isEmpty)) || variants.map((v) => '${(v.color ?? '').trim().toLowerCase()}::${(v.size ?? '').trim().toLowerCase()}').toSet().length != variants.length)) {
       throw Exception('Only active Pro Sellers can publish variants; add a valid stock row.');
     }
     if (title.trim().isEmpty || price <= 0) {
@@ -762,7 +762,7 @@ class MarketplaceService {
       throw Exception(strings.productNotFoundOrNoEditPermission);
     }
 
-    if (hasVariants && (!await isActiveProSeller() || variants.isEmpty || variants.any((v) => v.quantity < 0 || ((v.color ?? '').trim().isEmpty && (v.size ?? '').trim().isEmpty)))) {
+    if (hasVariants && (!await isActiveProSeller() || variants.isEmpty || variants.any((v) => v.quantity < 0 || ((v.color ?? '').trim().isEmpty && (v.size ?? '').trim().isEmpty)) || variants.map((v) => '${(v.color ?? '').trim().toLowerCase()}::${(v.size ?? '').trim().toLowerCase()}').toSet().length != variants.length)) {
       throw Exception('Only active Pro Sellers can manage variants; add a valid stock row.');
     }
 
