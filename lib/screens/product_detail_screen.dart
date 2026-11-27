@@ -182,9 +182,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       }
     } catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${_l10n.orderSendFailed}: $error')),
-        );
+        final language = Localizations.localeOf(context).languageCode;
+        final message = error.toString().contains('out_of_stock')
+            ? (language == 'ar' ? 'الكمية المختارة لم تعد متاحة. اختر كمية أو مقاسًا آخر.' : language == 'fr' ? 'La quantité choisie n’est plus disponible. Choisissez une autre option.' : 'The selected quantity is no longer available. Choose another option.')
+            : '${_l10n.orderSendFailed}: $error';
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
       }
     }
   }
