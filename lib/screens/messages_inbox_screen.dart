@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import '../widgets/kenza_asset_icon.dart';
 import '../l10n/app_strings.dart';
+import '../models/product.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'conversation_screen.dart';
@@ -335,8 +336,10 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         final variantColor = row['variant_color'] as String?;
         final variantSize = row['variant_size'] as String?;
         final quantity = (row['quantity'] as num?)?.toInt() ?? 1;
+        final language = Localizations.localeOf(context).languageCode;
+        final displayColor = ProductVariant(color: variantColor, size: variantSize, quantity: quantity).colorLabel(language);
         final variantSummary = variantColor == null && variantSize == null ? '' :
-          '\n${variantColor ?? ''}${variantColor != null && variantSize != null ? ' / ' : ''}${variantSize ?? ''} • العدد: $quantity';
+          '\n$displayColor${variantColor != null && variantSize != null ? ' / ' : ''}${variantSize ?? ''} • ${language == 'ar' ? 'العدد' : language == 'fr' ? 'Quantité' : 'Qty'}: $quantity';
         Widget? trailing;
         if (isSeller && pending) {
           trailing = PopupMenuButton<String>(
