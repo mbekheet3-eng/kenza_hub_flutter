@@ -40,7 +40,7 @@ class _KenzaSplashScreenState extends State<KenzaSplashScreen> {
       backgroundColor: Colors.white,
       body: SizedBox.expand(
         child: Image.asset(
-          'assets/images/kenza_splash_2.jpg',
+          'assets/logos/kenza_splash_2.png',
           width: double.infinity,
           height: double.infinity,
           fit: BoxFit.cover,
