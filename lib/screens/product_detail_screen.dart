@@ -350,12 +350,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           onChanged: (id) => setState(() { _selectedVariantId = id; _selectedQuantity = 1; }),
                         ),
                         const SizedBox(height: 10),
-                        DropdownButtonFormField<int>(
-                          initialValue: selectedVariant == null ? null : _selectedQuantity.clamp(1, selectedVariant.quantity),
-                          decoration: InputDecoration(labelText: Localizations.localeOf(context).languageCode == 'ar' ? 'الكمية' : Localizations.localeOf(context).languageCode == 'fr' ? 'Quantité' : 'Quantity'),
-                          items: List.generate(selectedVariant?.quantity ?? 0, (i) => i + 1)
-                            .map((q) => DropdownMenuItem(value: q, child: Text('$q'))).toList(),
-                          onChanged: selectedVariant == null ? null : (q) => setState(() => _selectedQuantity = q ?? 1),
+                        Row(
+                          children: [
+                            Text(Localizations.localeOf(context).languageCode == 'ar' ? 'الكمية' : Localizations.localeOf(context).languageCode == 'fr' ? 'Quantité' : 'Quantity'),
+                            const Spacer(),
+                            IconButton(
+                              onPressed: selectedVariant == null || _selectedQuantity <= 1
+                                  ? null : () => setState(() => _selectedQuantity--),
+                              icon: const Icon(Icons.remove_circle_outline),
+                            ),
+                            Text('$_selectedQuantity', style: Theme.of(context).textTheme.titleMedium),
+                            IconButton(
+                              onPressed: selectedVariant == null || _selectedQuantity >= selectedVariant.quantity
+                                  ? null : () => setState(() => _selectedQuantity++),
+                              icon: const Icon(Icons.add_circle_outline),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 6),
                         Text('${Localizations.localeOf(context).languageCode == 'ar' ? 'المتاح' : Localizations.localeOf(context).languageCode == 'fr' ? 'Disponible' : 'Available'}: ${selectedVariant?.quantity ?? 0}'),
