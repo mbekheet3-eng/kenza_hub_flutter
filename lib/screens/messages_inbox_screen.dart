@@ -301,7 +301,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         ),
       );
       controller.dispose();
-      if (note == null || note!.trim().length < 8) return;
+      if (note == null || note.trim().length < 8) return;
     } else {
       final confirmed = await showDialog<bool>(
         context: context,
