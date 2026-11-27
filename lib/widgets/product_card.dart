@@ -93,6 +93,25 @@ class ProductCard extends StatelessWidget {
               height: 1.25,
             ),
           ),
+          if (product.hasVariants) ...[
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 4,
+              runSpacing: 2,
+              children: product.variants.map((v) => Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text('${v.color ?? ''}${v.color != null && v.size != null ? ' / ' : ''}${v.size ?? ''}', style: const TextStyle(fontSize: 10)),
+              )).toList(),
+            ),
+            Text(
+              product.availableQuantity == 0 ? 'نفد المخزون' : 'المتاح: ${product.availableQuantity}',
+              style: TextStyle(fontSize: 11, color: product.availableQuantity == 0 ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.secondary),
+            ),
+          ],
           const SizedBox(height: 4),
           Text(
             '${product.price.toStringAsFixed(0)} ${strings.currency}',
