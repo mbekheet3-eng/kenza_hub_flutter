@@ -13,9 +13,14 @@ The following checks were executed against the `kenza-hub-marketplace` project i
 - Verified seller acceptance, seller delivery confirmation, and buyer completion of a purchase request.
 - Verified the buyer can cancel a pending request and cannot complete an order before the seller marks it delivered.
 - Verified an active pending/accepted request blocks a duplicate request for the same buyer and product.
+- Added and verified the live partial unique index `product_orders_one_successful_order_per_product`: only one order per product can be in `accepted`, `delivered`, or `completed`; multiple pending requests remain allowed. The index is concurrency-safe and prevents a second buyer from accepting the same single-unit listing.
 - Verified an offer's buyer, seller, currency, and initial status are derived by the database.
 - Verified completion creates an `order_completed` notification for the seller.
 - Verified the pending-order cron job is active and has successful executions.
+
+## Additional critical concurrency check still required
+
+- On two separate buyer sessions, create pending requests for the same single-unit product. Accept both as close together as possible. Exactly one acceptance must succeed; the other must fail with unique-constraint error `product_orders_one_successful_order_per_product`. Confirm the product cannot reach a second accepted order after delivery or completion either.
 
 ## Manual device checks still required
 
