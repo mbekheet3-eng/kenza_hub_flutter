@@ -162,38 +162,68 @@ Deno.serve(async (request: Request) => {
   }
 
   try {
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": geminiApiKey,
+    const requestBody = JSON.stringify({
+      contents: [{ role: "user", parts }],
+      generationConfig: {
+        responseMimeType: "application/json",
+        maxOutputTokens: 800,
+        thinkingConfig: {
+          thinkingLevel: "minimal",
         },
-        body: JSON.stringify({
-          contents: [{ role: "user", parts }],
-          generationConfig: {
-            responseMimeType: "application/json",
-            maxOutputTokens: 800,
-            thinkingConfig: {
-              thinkingLevel: "minimal",
-            },
-          },
-        }),
-        signal: AbortSignal.timeout(60000),
       },
-    );
+    });
 
-    if (!response.ok) {
-      const detail = await response.text();
-      console.error("Gemini product suggestion HTTP error:", response.status, detail.slice(0, 300));
-      const status = response.status === 429 ? 429 : 503;
+    const requestModel = async (model: string): Promise<Response | null> => {
+      try {
+        return await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": geminiApiKey,
+            },
+            body: requestBody,
+            signal: AbortSignal.timeout(60000),
+          },
+        );
+      } catch (error) {
+        console.error("Gemini product suggestion request failed:", model, error instanceof Error ? error.name : "UnknownError");
+        return null;
+      }
+    };
+
+    // Prefer Gemini 3.8; fall back to Gemini 3.5 Flash-Lite on provider/network failures.
+    let model = "gemini-3.8-flash";
+    let response = await requestModel(model);
+    if (!response?.ok) {
+      const firstStatus = response?.status ?? 0;
+      const firstDetails = response ? await response.text() : "network error or timeout";
+      console.error("Primary Gemini product suggestion model failed:", firstStatus, firstDetails.slice(0, 300));
+
+      if ([400, 401, 403].includes(firstStatus)) {
+        const status = firstStatus === 429 ? 429 : 503;
+        return json({
+          error: "AI suggestions are temporarily unavailable. Please try again.",
+          error_code: "provider_unavailable",
+        }, status);
+      }
+
+      await sleep(500);
+      model = "gemini-3.5-flash-lite";
+      response = await requestModel(model);
+    }
+
+    if (!response?.ok) {
+      const status = response?.status ?? 0;
+      const detail = response ? await response.text() : "network error or timeout";
+      console.error("Gemini product suggestion fallback failed:", status, detail.slice(0, 300));
       return json({
         error: status === 429
           ? "AI suggestion limit reached. Please try again later."
           : "AI suggestions are temporarily unavailable. Please try again.",
         error_code: status === 429 ? "rate_limited" : "provider_unavailable",
-      }, status);
+      }, status === 429 ? 429 : 503);
     }
 
     const payload = await response.json();
@@ -255,7 +285,7 @@ Deno.serve(async (request: Request) => {
       price_confidence: confidence,
       missing_info: safeList(parsed.missing_info),
       note: cleanText(parsed.note, 300),
-      model: "gemini-3.5-flash-lite",
+      model,
       images_analyzed: images.length,
     });
   } catch (error) {
