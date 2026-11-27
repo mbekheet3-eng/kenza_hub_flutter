@@ -41,6 +41,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   int _primaryImageIndex = 0;
   int _selectedImageIndex = 0;
   bool _loading = false;
+  bool _isProSeller = false;
+  bool _hasVariants = false;
+  final List<_VariantDraft> _variantDrafts = [];
   bool _saving = false;
   bool _aiLoading = false;
   Map<String, dynamic>? _aiSuggestion;
@@ -58,6 +61,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       _description.text = product.description;
       _price.text = product.price.toStringAsFixed(0);
       _audience = product.audience;
+      _hasVariants = product.hasVariants;
+      _variantDrafts.addAll(product.variants.map((v) => _VariantDraft.fromVariant(v)));
       _customCategoryName.text = product.customCategoryName ?? '';
       _existingImagePaths.addAll(product.imagePaths);
       _existingImageUrls.addAll(product.imageUrls);
@@ -71,6 +76,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     _description.dispose();
     _price.dispose();
     _customCategoryName.dispose();
+    for (final row in _variantDrafts) { row.dispose(); }
     super.dispose();
   }
 
@@ -80,9 +86,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       final results = await Future.wait([
         _service.getCategories(),
         _service.getMyGender(),
+        _service.isActiveProSeller(),
       ]);
       final categories = results[0] as List<Category>;
       final gender = results[1] as String?;
+      final isProSeller = results[2] as bool;
       final byId = {for (final category in categories) category.id: category};
       final path = <Category>[];
       var current = byId[widget.product?.categoryId];
@@ -97,6 +105,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           ..clear()
           ..addAll(path.reversed);
         _gender = gender;
+        _isProSeller = isProSeller;
         if (gender == null) _error = AppStrings.of(context)!.genderRequiredToPublish;
         if ((gender == 'female' && _audience == 'men_only') ||
             (gender == 'male' && _audience == 'women_only')) {
@@ -726,6 +735,80 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     );
   }
 
+  String _variantText(String ar, String en, String fr) {
+    final lang = Localizations.localeOf(context).languageCode;
+    return lang == 'ar' ? ar : lang == 'fr' ? fr : en;
+  }
+
+  Widget _buildVariantEditor() {
+    if (!_isProSeller) return const SizedBox.shrink();
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            value: _hasVariants,
+            onChanged: _saving ? null : (value) => setState(() {
+              _hasVariants = value;
+              if (value && _variantDrafts.isEmpty) _variantDrafts.add(_VariantDraft());
+            }),
+            title: Text(_variantText('إدارة الألوان والمقاسات والمخزون','Manage colors, sizes and stock','Gérer couleurs, tailles et stock')),
+            subtitle: Text(_variantText('للتجار Pro Seller فقط. السعر واحد لكل الاختيارات.','For Pro Sellers only. One price for all options.','Réservé aux vendeurs Pro. Un seul prix pour toutes les options.')),
+          ),
+          if (_hasVariants) ...[
+            const Divider(),
+            ..._variantDrafts.asMap().entries.map((entry) {
+              final i = entry.key;
+              final row = entry.value;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Column(children: [
+                  Row(children: [
+                    Expanded(child: TextFormField(
+                      controller: row.color,
+                      decoration: InputDecoration(labelText: _variantText('اللون','Color','Couleur'), hintText: _variantText('أسود','Black','Noir')),
+                    )),
+                    const SizedBox(width: 8),
+                    Expanded(child: TextFormField(
+                      controller: row.size,
+                      decoration: InputDecoration(labelText: _variantText('المقاس','Size','Taille'), hintText: _variantText('مثال: L أو 42 أو 6 سنوات','e.g. L, 42, age 6','ex. L, 42, 6 ans')),
+                    )),
+                    IconButton(
+                      tooltip: _variantText('حذف','Remove','Supprimer'),
+                      onPressed: _saving ? null : () => setState(() {
+                        final removed = _variantDrafts.removeAt(i);
+                        removed.dispose();
+                      }),
+                      icon: const Icon(Icons.delete_outline),
+                    ),
+                  ]),
+                  TextFormField(
+                    controller: row.quantity,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(labelText: _variantText('الكمية المتاحة','Available quantity','Quantité disponible')),
+                    validator: (value) {
+                      final q = int.tryParse((value ?? '').trim());
+                      return q == null || q < 0 ? _variantText('أدخل كمية صحيحة','Enter a valid quantity','Saisissez une quantité valide') : null;
+                    },
+                  ),
+                ]),
+              );
+            }),
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: OutlinedButton.icon(
+                onPressed: _saving ? null : () => setState(() => _variantDrafts.add(_VariantDraft())),
+                icon: const Icon(Icons.add),
+                label: Text(_variantText('إضافة لون أو مقاس','Add color or size','Ajouter couleur ou taille')),
+              ),
+            ),
+          ],
+        ]),
+      ),
+    );
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     final categoryId = _selectedLeafCategoryId;
@@ -744,6 +827,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     });
     try {
       final price = double.parse(_price.text.trim());
+      final variants = _variantDrafts.map((row) => row.toVariant()).toList(growable: false);
+      if (_hasVariants && variants.isEmpty) {
+        throw Exception('أضف تركيبة لون أو مقاس واحدة على الأقل');
+      }
       if (_isEditing) {
         await _service.updateProduct(
           productId: widget.product!.id,
@@ -756,6 +843,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           images: _images,
           removedImagePaths: _removedImagePaths,
           primaryImageIndex: _primaryImageIndex,
+          hasVariants: _hasVariants,
+          variants: _hasVariants ? variants : const [],
         );
       } else {
         await _service.publishProduct(
@@ -889,6 +978,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       return price == null || price <= 0 ? AppStrings.of(context)!.priceMustBePositive : null;
                     },
                   ),
+                  if (_isProSeller) ...[
+                    const SizedBox(height: 16),
+                    _buildVariantEditor(),
+                  ],
                   if (_error != null) ...[
                     const SizedBox(height: 16),
                     Text(_error!, style: const TextStyle(color: Colors.red)),
@@ -916,4 +1009,28 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
             ),
     );
   }
+}
+
+class _VariantDraft {
+  _VariantDraft({String? id, String? color, String? size, int quantity = 1})
+      : id = id,
+        color = TextEditingController(text: color ?? ''),
+        size = TextEditingController(text: size ?? ''),
+        quantity = TextEditingController(text: quantity.toString());
+
+  factory _VariantDraft.fromVariant(ProductVariant variant) => _VariantDraft(
+    id: variant.id, color: variant.color, size: variant.size, quantity: variant.quantity,
+  );
+
+  final String? id;
+  final TextEditingController color, size, quantity;
+
+  ProductVariant toVariant() => ProductVariant(
+    id: id,
+    color: color.text.trim().isEmpty ? null : color.text.trim(),
+    size: size.text.trim().isEmpty ? null : size.text.trim(),
+    quantity: int.tryParse(quantity.text.trim()) ?? 0,
+  );
+
+  void dispose() { color.dispose(); size.dispose(); quantity.dispose(); }
 }
