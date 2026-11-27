@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import '../l10n/app_strings.dart';
+import '../widgets/kenza_page_brand_header.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
@@ -25,6 +26,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          const KenzaPageBrandHeader(),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(16)),
