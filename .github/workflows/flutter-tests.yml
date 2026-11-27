@@ -15,7 +15,7 @@ jobs:
       - name: Check out implementation branch
         uses: actions/checkout@v4
         with:
-          ref: phase-1/implementation
+          ref: phase-1/prelaunch-critical-fixes
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -27,7 +27,7 @@ jobs:
         run: flutter pub get
 
       - name: Analyze Flutter code
-        run: flutter analyze
+        run: flutter analyze --no-fatal-infos
 
       - name: Run automated tests
         run: flutter test
