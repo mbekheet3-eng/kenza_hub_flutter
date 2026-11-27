@@ -20,6 +20,7 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context)!;
+    final language = Localizations.localeOf(context).languageCode;
     // Decode grid thumbnails near their rendered physical size instead of
     // keeping the full-resolution upload in memory for every visible card.
     final imageDecodeSize =
@@ -108,7 +109,9 @@ class ProductCard extends StatelessWidget {
               )).toList(),
             ),
             Text(
-              product.availableQuantity == 0 ? 'نفد المخزون' : 'المتاح: ${product.availableQuantity}',
+              product.availableQuantity == 0
+                  ? (language == 'ar' ? 'نفد المخزون' : language == 'fr' ? 'Épuisé' : 'Out of stock')
+                  : '${language == 'ar' ? 'المتاح' : language == 'fr' ? 'Disponible' : 'Available'}: ${product.availableQuantity}',
               style: TextStyle(fontSize: 11, color: product.availableQuantity == 0 ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.secondary),
             ),
           ],
