@@ -81,7 +81,7 @@ begin
     raise exception 'Requested deadline must extend the current hold by no more than 7 days' using errcode='23514';
   end if;
   update public.product_orders set postponement_requested_at=now(),postponement_requested_until=p_requested_until where id=p_order_id;
-  perform public.create_user_notification(v_order.seller_id,'order_postponement_requested','طلب تأجيل طلب الشراء',
+  perform public.create_user_notification(v_order.seller_id,'order_updated','طلب تأجيل طلب الشراء',
     'طلب المشتري تمديد مهلة الحجز. يرجى مراجعة الطلب.',jsonb_build_object('order_id',p_order_id),
     'order:'||p_order_id::text||':postponement-request');
 end;
@@ -104,7 +104,7 @@ begin
       postponement_requested_at=null,postponement_requested_until=null
   where id=p_order_id;
   perform public.create_user_notification(v_order.buyer_id,
-    case when p_approve then 'order_postponement_approved' else 'order_postponement_declined' end,
+    case when p_approve then 'order_updated' else 'order_updated' end,
     case when p_approve then 'تمت الموافقة على التأجيل' else 'لم يوافق البائع على التأجيل' end,
     case when p_approve then 'وافق البائع على تمديد مهلة الحجز.' else 'رفض البائع تمديد مهلة الحجز. ما زالت المهلة الأصلية سارية.' end,
     jsonb_build_object('order_id',p_order_id),
@@ -133,7 +133,7 @@ begin
   end if;
   update public.product_orders set status='cancelled',cancellation_reason=p_reason,cancellation_note=nullif(btrim(p_note),'') where id=p_order_id;
   if not v_is_buyer then
-    perform public.create_user_notification(v_order.buyer_id,'seller_cancelled_order','ألغى البائع طلب الشراء',
+    perform public.create_user_notification(v_order.buyer_id,'order_updated','ألغى البائع طلب الشراء',
       'ألغى البائع الطلب لسبب متعلق بتوفر المنتج أو حالته.',jsonb_build_object('order_id',p_order_id,'reason',p_reason),
       'order:'||p_order_id::text||':seller-cancelled');
   end if;
@@ -191,10 +191,10 @@ begin
         jsonb_build_object('order_id',NEW.id,'product_id',NEW.product_id),'order:'||NEW.id::text||':rejected');
     elsif NEW.status='expired' then
       if OLD.status='accepted' then
-        perform public.create_user_notification(NEW.buyer_id,'order_hold_expired','انتهت مهلة حجز المنتج',
+        perform public.create_user_notification(NEW.buyer_id,'order_expired','انتهت مهلة حجز المنتج',
           'انتهت مهلة الحجز البالغة 24 ساعة وتم إتاحة المنتج من جديد.',
           jsonb_build_object('order_id',NEW.id,'product_id',NEW.product_id),'order:'||NEW.id::text||':hold-expired:buyer');
-        perform public.create_user_notification(NEW.seller_id,'order_hold_expired','انتهت مهلة حجز المنتج',
+        perform public.create_user_notification(NEW.seller_id,'order_expired','انتهت مهلة حجز المنتج',
           'انتهت مهلة الحجز وتمت إعادة إتاحة المخزون.',
           jsonb_build_object('order_id',NEW.id,'product_id',NEW.product_id),'order:'||NEW.id::text||':hold-expired:seller');
       else
@@ -207,7 +207,7 @@ begin
       end if;
     elsif NEW.status='cancelled' then
       if auth.uid()=NEW.seller_id then
-        perform public.create_user_notification(NEW.buyer_id,'seller_cancelled_order','ألغى البائع طلب الشراء',
+        perform public.create_user_notification(NEW.buyer_id,'order_updated','ألغى البائع طلب الشراء',
           'ألغى البائع الطلب لسبب متعلق بتوفر المنتج أو حالته.',
           jsonb_build_object('order_id',NEW.id,'product_id',NEW.product_id,'reason',NEW.cancellation_reason),
           'order:'||NEW.id::text||':seller-cancelled');
