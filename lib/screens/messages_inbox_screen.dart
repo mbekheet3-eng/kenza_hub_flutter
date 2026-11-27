@@ -92,7 +92,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
 
   Future<List<Map<String, dynamic>>> _loadOrders() async {
     final rows = await _client.from('product_orders')
-        .select('id,product_id,buyer_id,seller_id,agreed_price,currency,status,created_at,expires_at,quantity,variant_id,product_variants(color,size),products(title)')
+        .select('id,product_id,buyer_id,seller_id,agreed_price,currency,status,created_at,expires_at,quantity,variant_id,variant_color,variant_size,products(title)')
         .or('buyer_id.eq.$_userId,seller_id.eq.$_userId')
         .order('created_at', ascending: false);
     return _attachOtherMemberNames(rows);
@@ -330,10 +330,11 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         final pending = row['status'] == 'pending';
         final price = row[isOffer ? 'offered_price' : 'agreed_price'];
         final currency = row['currency'] ?? 'EGP';
-        final variant = row['product_variants'] as Map<String, dynamic>?;
+        final variantColor = row['variant_color'] as String?;
+        final variantSize = row['variant_size'] as String?;
         final quantity = (row['quantity'] as num?)?.toInt() ?? 1;
-        final variantSummary = variant == null ? '' :
-          '\n${variant['color'] ?? ''}${variant['color'] != null && variant['size'] != null ? ' / ' : ''}${variant['size'] ?? ''} • العدد: $quantity';
+        final variantSummary = variantColor == null && variantSize == null ? '' :
+          '\n${variantColor ?? ''}${variantColor != null && variantSize != null ? ' / ' : ''}${variantSize ?? ''} • العدد: $quantity';
         Widget? trailing;
         if (isSeller && pending) {
           trailing = PopupMenuButton<String>(
