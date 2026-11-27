@@ -2,6 +2,60 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 type JsonRecord = Record<string, unknown>;
+type UsageClient = {
+  rpc: (name: string, args: Record<string, unknown>) => Promise<{ data: any; error: any }>;
+};
+class AiQuotaError extends Error {
+  payload: Record<string, unknown>;
+  constructor(payload: Record<string, unknown>) {
+    super(String(payload.reason ?? "AI quota limit reached"));
+    this.payload = payload;
+  }
+}
+async function beginAiUsage(
+  client: UsageClient, service: string, requestId: string, attemptNo: number, model: string,
+): Promise<void> {
+  const { data, error } = await client.rpc("consume_ai_usage_attempt", {
+    p_service_key: service, p_request_id: requestId, p_attempt_no: attemptNo, p_model: model,
+  });
+  if (error) {
+    console.error("AI quota check failed", error.message ?? error);
+    throw new Error("Could not verify AI usage quota");
+  }
+  if (!data?.allowed) throw new AiQuotaError(data ?? { reason: "quota_check_failed" });
+}
+async function finishAiUsage(
+  client: UsageClient, service: string, requestId: string, attemptNo: number,
+  response: Response | null,
+): Promise<void> {
+  let inputTokens: number | null = null;
+  let outputTokens: number | null = null;
+  if (response) {
+    try {
+      const payload = await response.clone().json();
+      inputTokens = Number.isFinite(Number(payload?.usageMetadata?.promptTokenCount))
+        ? Number(payload.usageMetadata.promptTokenCount) : null;
+      outputTokens = Number.isFinite(Number(payload?.usageMetadata?.candidatesTokenCount))
+        ? Number(payload.usageMetadata.candidatesTokenCount) : null;
+    } catch { /* Provider errors may not contain JSON usage metadata. */ }
+  }
+  const { error } = await client.rpc("finish_ai_usage_attempt", {
+    p_service_key: service, p_request_id: requestId, p_attempt_no: attemptNo,
+    p_http_status: response?.status ?? null, p_succeeded: response?.ok ?? false,
+    p_input_tokens: inputTokens, p_output_tokens: outputTokens,
+  });
+  if (error) console.error("Could not finalize AI usage event", error.message ?? error);
+}
+function quotaErrorResponse(error: AiQuotaError) {
+  const daily = error.payload.reason === "daily_quota_exceeded";
+  return {
+    error_code: daily ? "daily_quota_exceeded" : "rate_limited",
+    message_ar: daily
+      ? "وصلت للحد اليومي لاستخدام هذه الخدمة. حاول مرة أخرى غدًا."
+      : "استخدمت الخدمة بسرعة. انتظر دقيقة ثم حاول مرة أخرى.",
+    ...error.payload,
+  };
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -161,6 +215,9 @@ Deno.serve(async (request: Request) => {
     parts.push({ inline_data: { mime_type: image.mimeType, data: image.data } });
   }
 
+  const usageRequestId = crypto.randomUUID();
+  const usageAttemptCounter = { value: 0 };
+
   try {
     const requestBody = JSON.stringify({
       contents: [{ role: "user", parts }],
@@ -174,8 +231,10 @@ Deno.serve(async (request: Request) => {
     });
 
     const requestModel = async (model: string): Promise<Response | null> => {
+      const attemptNo = ++usageAttemptCounter.value;
+      await beginAiUsage(userClient, "product_suggestions", usageRequestId, attemptNo, model);
       try {
-        return await fetch(
+        const response = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
           {
             method: "POST",
@@ -187,7 +246,10 @@ Deno.serve(async (request: Request) => {
             signal: AbortSignal.timeout(60000),
           },
         );
+        await finishAiUsage(userClient, "product_suggestions", usageRequestId, attemptNo, response);
+        return response;
       } catch (error) {
+        await finishAiUsage(userClient, "product_suggestions", usageRequestId, attemptNo, null);
         console.error("Gemini product suggestion request failed:", model, error instanceof Error ? error.name : "UnknownError");
         return null;
       }
@@ -289,6 +351,7 @@ Deno.serve(async (request: Request) => {
       images_analyzed: images.length,
     });
   } catch (error) {
+    if (error instanceof AiQuotaError) return json(quotaErrorResponse(error), 429);
     console.error("Product suggestion request failed:", error instanceof Error ? error.name : "UnknownError");
     return json({ error: "AI suggestions are temporarily unavailable. Please try again." }, 503);
   }
