@@ -34,6 +34,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   late Future<List<Category>> _categories;
   bool _isFavorite = false;
   bool _favoriteLoading = false;
+  String? _selectedVariantId;
+  int _selectedQuantity = 1;
   final Map<String, Future<Map<String, dynamic>?>> _publicMemberProfiles = {};
 
   AppStrings get _l10n => AppStrings.of(context)!;
@@ -150,7 +152,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return mounted && Supabase.instance.client.auth.currentUser != null;
   }
 
-  Future<void> _buy(Product product) async {
+  Future<void> _buy(Product product, {String? variantId, int quantity = 1}) async {
     if (!await _ensureLogin()) return;
     if (!mounted) return;
     final confirmed = await showDialog<bool>(
@@ -170,6 +172,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         productId: product.id,
         sellerId: product.ownerId,
         price: product.price,
+        variantId: variantId,
+        quantity: quantity,
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -297,6 +301,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
           final product = snapshot.data!;
           final isOwner = userId != null && userId == product.ownerId;
+          ProductVariant? selectedVariant;
+          for (final variant in product.variants) {
+            if (variant.id == _selectedVariantId) { selectedVariant = variant; break; }
+          }
+          selectedVariant ??= product.variants.isEmpty ? null : product.variants.first;
 
           return ListView(
             padding: const EdgeInsets.only(bottom: 24),
@@ -326,6 +335,32 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                     ),
+                    if (product.hasVariants) ...[
+                      const SizedBox(height: 14),
+                      if (product.variants.isEmpty || product.availableQuantity == 0)
+                        Text('نفد المخزون', style: TextStyle(color: Theme.of(context).colorScheme.error, fontWeight: FontWeight.bold))
+                      else ...[
+                        DropdownButtonFormField<String>(
+                          initialValue: selectedVariant?.id,
+                          decoration: const InputDecoration(labelText: 'اللون / المقاس'),
+                          items: product.variants.map((v) => DropdownMenuItem(
+                            value: v.id,
+                            child: Text('${v.color ?? '—'} / ${v.size ?? '—'}  •  متاح ${v.quantity}'),
+                          )).toList(),
+                          onChanged: (id) => setState(() { _selectedVariantId = id; _selectedQuantity = 1; }),
+                        ),
+                        const SizedBox(height: 10),
+                        DropdownButtonFormField<int>(
+                          initialValue: selectedVariant == null ? null : _selectedQuantity.clamp(1, selectedVariant.quantity),
+                          decoration: const InputDecoration(labelText: 'الكمية'),
+                          items: List.generate(selectedVariant?.quantity ?? 0, (i) => i + 1)
+                            .map((q) => DropdownMenuItem(value: q, child: Text('$q'))).toList(),
+                          onChanged: selectedVariant == null ? null : (q) => setState(() => _selectedQuantity = q ?? 1),
+                        ),
+                        const SizedBox(height: 6),
+                        Text('المتاح: ${selectedVariant?.quantity ?? 0}'),
+                      ],
+                    ],
                     const SizedBox(height: 12),
                     Wrap(
                       spacing: 8,
@@ -417,7 +452,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: FilledButton.icon(
-                          onPressed: () => _buy(product),
+                          onPressed: product.hasVariants && (selectedVariant == null || selectedVariant.quantity == 0) ? null : () => _buy(product, variantId: selectedVariant?.id, quantity: product.hasVariants ? _selectedQuantity.clamp(1, selectedVariant!.quantity) : 1),
                           icon: KenzaAssetIcon('assets/cart.png', size: 22, scale: 1.3),
                           label: Text(_l10n.buyNowLabel),
                         ),
@@ -425,7 +460,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       const SizedBox(height: 10),
                       Row(
                         children: [
-                          Expanded(
+                          if (!product.hasVariants) Expanded(
                             child: OutlinedButton.icon(
                               onPressed: () => _makeOffer(product),
                               icon: const Icon(Icons.local_offer_outlined),
