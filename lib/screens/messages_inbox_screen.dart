@@ -92,7 +92,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
 
   Future<List<Map<String, dynamic>>> _loadOrders() async {
     final rows = await _client.from('product_orders')
-        .select('id,product_id,buyer_id,seller_id,agreed_price,currency,status,created_at,expires_at,products(title)')
+        .select('id,product_id,buyer_id,seller_id,agreed_price,currency,status,created_at,expires_at,quantity,variant_id,product_variants(color,size),products(title)')
         .or('buyer_id.eq.$_userId,seller_id.eq.$_userId')
         .order('created_at', ascending: false);
     return _attachOtherMemberNames(rows);
@@ -330,6 +330,10 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         final pending = row['status'] == 'pending';
         final price = row[isOffer ? 'offered_price' : 'agreed_price'];
         final currency = row['currency'] ?? 'EGP';
+        final variant = row['product_variants'] as Map<String, dynamic>?;
+        final quantity = (row['quantity'] as num?)?.toInt() ?? 1;
+        final variantSummary = variant == null ? '' :
+          '\n${variant['color'] ?? ''}${variant['color'] != null && variant['size'] != null ? ' / ' : ''}${variant['size'] ?? ''} • العدد: $quantity';
         Widget? trailing;
         if (isSeller && pending) {
           trailing = PopupMenuButton<String>(
@@ -401,7 +405,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
           title: Text(_productTitle(row), maxLines: 1, overflow: TextOverflow.ellipsis),
           subtitle: Text(
             '${isOffer ? AppStrings.of(context)!.offerPriceLabel : AppStrings.of(context)!.purchaseOrderLabel}: $price $currency\n'
-            '${_otherMemberName(row)} • ${_status(row['status'])} • ${_date(row['created_at'])}',
+            '${_otherMemberName(row)} • ${_status(row['status'])} • ${_date(row['created_at'])}$variantSummary',
           ),
           trailing: trailing,
         );
