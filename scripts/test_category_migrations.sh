@@ -51,7 +51,7 @@ psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261126220749_add_miscellaneous_
 psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261126220749_add_miscellaneous_category.sql
 
 psql -v ON_ERROR_STOP=1 <<'SQL'
-do $
+do $$
 begin
   if not exists (
     select 1 from public.categories
@@ -76,7 +76,7 @@ $;
 SQL
 
 psql -v ON_ERROR_STOP=1 <<'SQL'
-do $
+do $$
 begin
   if exists (
     select 1 from public.categories
