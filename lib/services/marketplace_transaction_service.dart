@@ -74,6 +74,42 @@ class MarketplaceTransactionService {
     });
   }
 
+
+  Future<void> requestOrderPostponement({
+    required String orderId,
+    required DateTime requestedUntil,
+  }) async {
+    await _requireUserId();
+    await _client.rpc('request_order_postponement', params: {
+      'p_order_id': orderId,
+      'p_requested_until': requestedUntil.toUtc().toIso8601String(),
+    });
+  }
+
+  Future<void> respondOrderPostponement({
+    required String orderId,
+    required bool approve,
+  }) async {
+    await _requireUserId();
+    await _client.rpc('respond_order_postponement', params: {
+      'p_order_id': orderId,
+      'p_approve': approve,
+    });
+  }
+
+  Future<void> cancelAcceptedOrder({
+    required String orderId,
+    required String reason,
+    String? note,
+  }) async {
+    await _requireUserId();
+    await _client.rpc('cancel_accepted_order', params: {
+      'p_order_id': orderId,
+      'p_reason': reason,
+      'p_note': note,
+    });
+  }
+
   Future<String> getOrCreateConversation({
     required String productId,
     required String sellerId,
