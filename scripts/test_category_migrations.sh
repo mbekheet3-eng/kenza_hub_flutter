@@ -72,7 +72,7 @@ begin
     raise exception 'Miscellaneous child categories are incomplete';
   end if;
 end;
-$;
+$$;
 SQL
 
 psql -v ON_ERROR_STOP=1 <<'SQL'
