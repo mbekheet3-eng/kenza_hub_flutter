@@ -37,7 +37,7 @@ String _categoryImageForSlug(String slug) {
     case 'home-supplies':
       return 'assets/icons/home_supplies.png';
     case 'miscellaneous':
-      return '';
+      return 'assets/icons/miscellaneous.jpg';
     default:
       return 'assets/icons/clothing.png';
   }
