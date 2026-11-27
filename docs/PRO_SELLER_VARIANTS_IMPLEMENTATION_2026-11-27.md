@@ -41,6 +41,7 @@
 - RLS transaction test: active Pro Seller can enable variants and insert a variant row.
 - Negative permission test: a non-Pro account was blocked by the database trigger when attempting to create a product with variants; the transaction left no test product behind.
 - Rollback-only order test: product price 120 × quantity 2 produced order total 240; order snapshot stored black / M; accepting the order reduced stock from 3 to 1.
+- Multi-buyer stock test: two different buyers each requested and had one unit accepted from the same variant; both orders were accepted and stock reduced from 3 to 1.
 - Supabase security advisor did not report an RLS issue on `product_variants`; the existing `product_moderation` no-policy finding is intentional and pre-existing.
 - Performance advisor no longer reports the variant/product-order foreign key as unindexed.
 
