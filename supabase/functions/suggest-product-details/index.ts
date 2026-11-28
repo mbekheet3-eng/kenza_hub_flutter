@@ -219,17 +219,6 @@ Deno.serve(async (request: Request) => {
   const usageAttemptCounter = { value: 0 };
 
   try {
-    const requestBody = JSON.stringify({
-      contents: [{ role: "user", parts }],
-      generationConfig: {
-        responseMimeType: "application/json",
-        maxOutputTokens: 800,
-        thinkingConfig: {
-          thinkingLevel: "minimal",
-        },
-      },
-    });
-
     const requestModel = async (model: string): Promise<Response | null> => {
       const attemptNo = ++usageAttemptCounter.value;
       await beginAiUsage(userClient, "product_suggestions", usageRequestId, attemptNo, model);
@@ -242,8 +231,17 @@ Deno.serve(async (request: Request) => {
               "Content-Type": "application/json",
               "x-goog-api-key": geminiApiKey,
             },
-            body: requestBody,
-            signal: AbortSignal.timeout(60000),
+            body: JSON.stringify({
+              contents: [{ role: "user", parts }],
+              generationConfig: {
+                responseMimeType: "application/json",
+                maxOutputTokens: 800,
+                thinkingConfig: {
+                  thinkingLevel: model === "gemini-3.5-flash-lite" ? "minimal" : "low",
+                },
+              },
+            }),
+            signal: AbortSignal.timeout(25000),
           },
         );
         await finishAiUsage(userClient, "product_suggestions", usageRequestId, attemptNo, response);
@@ -255,13 +253,10 @@ Deno.serve(async (request: Request) => {
       }
     };
 
-    // Try the fast Gemini 4 model first, then independent supported fallbacks.
-    // Neon is kept as an optional stronger fallback for the richer listing/pricing task.
+    // Use the lightweight model first, then fall back to the stronger Flash model.
     const models = [
-      "gemini-4-hydrogen",
-      "gemini-4-neon",
-      "gemini-3.8-flash",
       "gemini-3.5-flash-lite",
+      "gemini-3.8-flash",
     ];
     let model = models[0];
     let response: Response | null = null;
@@ -292,9 +287,11 @@ Deno.serve(async (request: Request) => {
     if (!response?.ok) {
       console.error("All Gemini product suggestion models failed:", lastStatus, lastDetail.slice(0, 300));
       return json({
-        error: lastStatus === 429
-          ? "AI suggestion limit reached. Please try again later."
-          : "AI suggestions are temporarily unavailable. Please try again.",
+        error: language === "ar"
+          ? (lastStatus === 429 ? "وصلت خدمة الاقتراحات الذكية للحد المؤقت. حاول لاحقًا." : "خدمة الاقتراحات الذكية غير متاحة مؤقتًا. حاول مرة أخرى بعد قليل.")
+          : language === "fr"
+          ? (lastStatus === 429 ? "Limite temporaire atteinte. Veuillez réessayer plus tard." : "Les suggestions IA sont temporairement indisponibles. Veuillez réessayer.")
+          : (lastStatus === 429 ? "AI suggestion limit reached. Please try again later." : "AI suggestions are temporarily unavailable. Please try again."),
         error_code: lastStatus === 429 ? "rate_limited" : "provider_unavailable",
       }, lastStatus === 429 ? 429 : 503);
     }

@@ -130,7 +130,7 @@ async function analyzeImage(
     "Listing description: " + JSON.stringify(description.slice(0, 1000)),
   ].join("\n");
 
-  const requestBody = JSON.stringify({
+  const buildRequestBody = (model: string) => JSON.stringify({
     contents: [{
       role: "user",
       parts: [
@@ -141,10 +141,14 @@ async function analyzeImage(
     generationConfig: {
       responseMimeType: "application/json",
       temperature: 0.1,
+      maxOutputTokens: 512,
+      thinkingConfig: {
+        thinkingLevel: model === "gemini-3.5-flash-lite" ? "minimal" : "low",
+      },
     },
   });
 
-  const models = ["gemini-4-hydrogen", "gemini-3.8-flash", "gemini-3.5-flash-lite"];
+  const models = ["gemini-3.8-flash", "gemini-3.5-flash-lite"];
   let lastError = "Gemini review unavailable";
 
   for (let modelIndex = 0; modelIndex < models.length; modelIndex++) {
@@ -165,7 +169,7 @@ async function analyzeImage(
               "Content-Type": "application/json",
               "x-goog-api-key": apiKey,
             },
-            body: requestBody,
+            body: buildRequestBody(model),
             signal: AbortSignal.timeout(30000),
           },
           );
@@ -255,11 +259,7 @@ async function analyzeImage(
         });
 
         // Do not retry authentication, configuration, request, or response-format errors.
-        if (
-          lastError.includes("non-retryable HTTP") ||
-          lastError.includes("no review result") ||
-          lastError.includes("invalid review JSON")
-        ) {
+        if (lastError.includes("non-retryable HTTP")) {
           throw error;
         }
 

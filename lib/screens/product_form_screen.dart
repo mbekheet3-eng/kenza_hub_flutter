@@ -237,7 +237,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   Future<void> _pickGallery() async {
     final picked = await _picker.pickMultiImage(
-      imageQuality: 88,
+      imageQuality: 85,
       maxWidth: 1800,
     );
     if (!mounted || picked.isEmpty) return;
@@ -279,7 +279,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     final picked = await _picker.pickImage(
       source: ImageSource.camera,
-      imageQuality: 88,
+      imageQuality: 85,
       maxWidth: 1800,
     );
     if (!mounted || picked == null) return;
