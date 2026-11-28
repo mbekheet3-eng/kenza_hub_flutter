@@ -35,6 +35,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     'assets/images/welcome/welcome_row1_02.png',
     'assets/images/welcome/welcome_row1_03.png',
     'assets/images/welcome/welcome_row1_04.png',
+    'https://apollosports.pk/cdn/shop/files/Gemini_Generated_Image_woo9yzwoo9yzwoo9.jpg?v=1771931312&width=800',
+    'https://abbeyangels.co.uk/uploads/2026/04/essential-sports-equipment-examples-for-every-athlete.webp',
+    'https://thecoachhouse.store/cdn/shop/collections/pet-accessories-bedding-tpys.png?v=1762802681',
+    'https://yiwusrc.com/images/custom/pet-supplies.jpg',
+    'https://www.globus.de/media/globus/themen/sommer/schulanfang/schreibwaren_169.jpg',
+    'https://www.wiky.sk/sub/wiky.sk/shop/content/full_images/127.jpg',
   ];
 
   static const List<String> _row2Images = [
@@ -48,6 +54,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     'assets/images/welcome/welcome_row2_02.png',
     'assets/images/welcome/welcome_row2_03.png',
     'assets/images/welcome/welcome_row2_04.png',
+    'https://cdn.prod.website-files.com/58ff73d27e10d442b71ca39c/5e3b69c2c2c6352e36fdd33f_ulta-beauty.jpg',
+    'https://muslimsheraz.com/cdn/shop/collections/IMG-2084.png?crop=center&height=500&v=1782414415&width=600',
+    'https://www.aircold.sg/cdn/shop/collections/WhatsApp_Image_2026-01-20_at_08.35.17.jpg?v=1768875219&width=1536',
+    'https://dogruhomestore.com/upload/mega-kucuk-ev.png',
+    'https://image.rakuten.co.jp/ideabike/cabinet/tool/h14002a_002.jpg',
+    'https://i.ebayimg.com/images/g/fJIAAeSw9jVo1llL/s-l1200.jpg',
   ];
 
   @override
@@ -124,17 +136,29 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(17),
-                child: Image.asset(
-                  image,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const ColoredBox(
-                    color: Color(0xFFF1F5F9),
-                    child: Center(
-                      child: Icon(Icons.image_not_supported_outlined,
-                          color: Color(0xFF94A3B8)),
-                    ),
-                  ),
-                ),
+                child: image.startsWith('https://')
+                    ? Image.network(
+                        image,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const ColoredBox(
+                          color: Color(0xFFF1F5F9),
+                          child: Center(
+                            child: Icon(Icons.image_not_supported_outlined,
+                                color: Color(0xFF94A3B8)),
+                          ),
+                        ),
+                      )
+                    : Image.asset(
+                        image,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const ColoredBox(
+                          color: Color(0xFFF1F5F9),
+                          child: Center(
+                            child: Icon(Icons.image_not_supported_outlined,
+                                color: Color(0xFF94A3B8)),
+                          ),
+                        ),
+                      ),
               ),
             ),
           ),
