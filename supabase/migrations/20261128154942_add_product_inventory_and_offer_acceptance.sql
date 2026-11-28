@@ -60,6 +60,7 @@ DECLARE
   v_product_status text;
   v_has_variants boolean;
   v_product_quantity integer;
+  v_reserved_by_order_id uuid;
   v_available integer;
   v_variant_color text;
   v_variant_size text;
@@ -106,7 +107,7 @@ BEGIN
   SELECT p.owner_id, p.price, p.currency, p.status, p.has_variants,
          p.quantity, p.reserved_by_order_id
     INTO v_owner_id, v_price, v_currency, v_product_status, v_has_variants,
-         v_product_quantity, NEW.reserved_by_order_id
+         v_product_quantity, v_reserved_by_order_id
   FROM public.products p
   WHERE p.id = NEW.product_id
   FOR UPDATE;
@@ -124,7 +125,7 @@ BEGIN
     RAISE EXCEPTION 'You cannot purchase your own product' USING ERRCODE = '23514';
   END IF;
 
-  IF v_price <= 0 OR v_product_quantity < 1 OR NEW.reserved_by_order_id IS NOT NULL THEN
+  IF v_price <= 0 OR v_product_quantity < 1 OR v_reserved_by_order_id IS NOT NULL THEN
     RAISE EXCEPTION 'out_of_stock' USING ERRCODE = '23514';
   END IF;
 
@@ -221,7 +222,7 @@ BEGIN
         v_expected_price := COALESCE(v_offer.counter_price, v_offer.offered_price);
       END IF;
 
-      IF NOT FOUND OR v_product_status <> 'published' OR v_owner_id <> NEW.seller_id
+      IF v_owner_id IS NULL OR v_product_status <> 'published' OR v_owner_id <> NEW.seller_id
         OR v_expected_price <> NEW.agreed_price OR v_currency <> NEW.currency
         OR v_has_variants <> (NEW.variant_id IS NOT NULL) THEN
         RAISE EXCEPTION 'The product price or availability changed; refresh the listing before accepting'
