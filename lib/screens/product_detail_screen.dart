@@ -426,6 +426,43 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                     ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        if (product.condition != null)
+                          Chip(
+                            visualDensity: VisualDensity.compact,
+                            label: Text(
+                              product.condition == 'new'
+                                  ? (Localizations.localeOf(context).languageCode == 'ar' ? 'جديد' : Localizations.localeOf(context).languageCode == 'fr' ? 'Neuf' : 'New')
+                                  : (Localizations.localeOf(context).languageCode == 'ar' ? 'مستعمل' : Localizations.localeOf(context).languageCode == 'fr' ? 'Occasion' : 'Used'),
+                            ),
+                          ),
+                        if (!product.hasVariants)
+                          Chip(
+                            visualDensity: VisualDensity.compact,
+                            label: Text(
+                              Localizations.localeOf(context).languageCode == 'ar'
+                                  ? 'الكمية المتاحة: ${product.availableQuantity}'
+                                  : Localizations.localeOf(context).languageCode == 'fr'
+                                      ? 'Disponible : ${product.availableQuantity}'
+                                      : 'Available: ${product.availableQuantity}',
+                            ),
+                          ),
+                      ],
+                    ),
+                    if (product.location?.trim().isNotEmpty == true) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(Icons.location_on_outlined, size: 18),
+                          const SizedBox(width: 4),
+                          Expanded(child: Text(product.location!.trim())),
+                        ],
+                      ),
+                    ],
                     if (product.hasVariants) ...[
                       const SizedBox(height: 14),
                       if (product.variants.isEmpty || product.availableQuantity == 0)
