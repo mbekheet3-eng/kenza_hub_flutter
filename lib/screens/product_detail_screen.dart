@@ -32,6 +32,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final _favoritesService = FavoritesService();
   late Future<Product> _product;
   late Future<List<Category>> _categories;
+  late Future<Map<String, dynamic>?> _myRequestState;
   bool _isFavorite = false;
   bool _favoriteLoading = false;
   String? _selectedVariantId;
@@ -52,12 +53,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     super.initState();
     _product = _service.getProduct(widget.productId);
     _categories = _service.getCategories();
+    _myRequestState = _transactionService.getMyProductRequestState(widget.productId);
     _loadFavoriteStatus();
   }
 
   void _reload() => setState(() {
         _product = _service.getProduct(widget.productId);
         _categories = _service.getCategories();
+        _myRequestState = _transactionService.getMyProductRequestState(widget.productId);
       });
 
   Future<void> _loadFavoriteStatus() async {
@@ -335,6 +338,49 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    FutureBuilder<Map<String, dynamic>?>(
+                      future: _myRequestState,
+                      builder: (context, stateSnapshot) {
+                        final state = stateSnapshot.data;
+                        if (state == null) return const SizedBox.shrink();
+                        final language = Localizations.localeOf(context).languageCode;
+                        final isOffer = state['type'] == 'offer';
+                        final status = state['status'] as String? ?? '';
+                        final statusText = switch (status) {
+                          'pending' => _l10n.statusPending,
+                          'accepted' => _l10n.statusAccepted,
+                          'rejected' => _l10n.statusRejected,
+                          'cancelled' => _l10n.statusCancelled,
+                          'completed' => _l10n.statusCompleted,
+                          'delivered' => _l10n.statusDelivered,
+                          'expired' => _l10n.statusExpired,
+                          _ => status,
+                        };
+                        final prefix = language == 'ar'
+                            ? (isOffer ? 'حالة عرضك: ' : 'حالة طلبك: ')
+                            : language == 'fr'
+                                ? (isOffer ? 'Votre offre : ' : 'Votre demande : ')
+                                : (isOffer ? 'Your offer: ' : 'Your request: ');
+                        final color = status == 'accepted' || status == 'completed'
+                            ? Colors.green
+                            : status == 'rejected' || status == 'cancelled' || status == 'expired'
+                                ? Theme.of(context).colorScheme.error
+                                : Theme.of(context).colorScheme.primary;
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Align(
+                            alignment: AlignmentDirectional.centerStart,
+                            child: Chip(
+                              avatar: Icon(Icons.info_outline, size: 17, color: color),
+                              label: Text('$prefix$statusText'),
+                              side: BorderSide(color: color.withValues(alpha: 0.35)),
+                              backgroundColor: color.withValues(alpha: 0.08),
+                              labelStyle: TextStyle(color: color, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                     Text(product.title, style: Theme.of(context).textTheme.headlineSmall),
                     if (product.customCategoryName?.isNotEmpty == true) ...[
                       const SizedBox(height: 6),
@@ -394,7 +440,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Wrap(
                       spacing: 8,
                       children: [
-                        OutlinedButton.icon(
+                        if (!isOwner) OutlinedButton.icon(
                           onPressed: _favoriteLoading ? null : () => _toggleFavorite(product),
                           icon: _favoriteLoading
                               ? const SizedBox(
