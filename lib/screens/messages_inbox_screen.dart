@@ -350,7 +350,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
 
   Future<void> _cancelAccepted(Map<String, dynamic> row, {required bool sellerSide}) async {
     final language = Localizations.localeOf(context).languageCode;
-    final strings = strings;
+    final strings = AppStrings.of(context)!;
     String reason = 'buyer_request';
     String? note;
     if (sellerSide) {
