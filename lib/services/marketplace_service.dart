@@ -208,7 +208,7 @@ class MarketplaceService {
     var request = _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,status,has_variants,created_at,product_images(id,storage_path,sort_order),product_variants(id,color,size,quantity)',
+          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,condition,location,quantity,status,has_variants,created_at,product_images(id,storage_path,sort_order),product_variants(id,color,size,quantity)',
         )
         .eq('status', 'published');
 
@@ -363,7 +363,7 @@ class MarketplaceService {
     final rows = await _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,status,has_variants,created_at,product_images(id,storage_path,sort_order),product_variants(id,color,size,quantity)',
+          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,condition,location,quantity,status,has_variants,created_at,product_images(id,storage_path,sort_order),product_variants(id,color,size,quantity)',
         )
         .eq('owner_id', user.id)
         .order('created_at', ascending: false);
@@ -403,7 +403,7 @@ class MarketplaceService {
     final rows = await _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,has_variants,created_at,product_images(id,storage_path,sort_order),product_variants(id,color,size,quantity)',
+          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,condition,location,quantity,has_variants,created_at,product_images(id,storage_path,sort_order),product_variants(id,color,size,quantity)',
         )
         .eq('owner_id', sellerId)
         .eq('status', 'published')
@@ -429,7 +429,7 @@ class MarketplaceService {
     final rows = await _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,has_variants,created_at,product_images(id,storage_path,sort_order),product_variants(id,color,size,quantity)',
+          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,condition,location,quantity,has_variants,created_at,product_images(id,storage_path,sort_order),product_variants(id,color,size,quantity)',
         )
         .inFilter('id', productIds)
         .eq('status', 'published')
@@ -442,7 +442,7 @@ class MarketplaceService {
     final row = await _client
         .from('products')
         .select(
-          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,has_variants,created_at,product_images(id,storage_path,sort_order),product_variants(id,color,size,quantity)',
+          'id,owner_id,category_id,title,description,custom_category_name,price,currency,audience,condition,location,quantity,has_variants,created_at,product_images(id,storage_path,sort_order),product_variants(id,color,size,quantity)',
         )
         .eq('id', productId)
         .single();
@@ -581,6 +581,9 @@ class MarketplaceService {
     required double price,
     required List<File> images,
     required String audience,
+    required String condition,
+    String? location,
+    int quantity = 1,
     String? customCategoryName,
     int primaryImageIndex = 0,
     bool hasVariants = false,
@@ -595,7 +598,7 @@ class MarketplaceService {
     if (hasVariants && (!await isActiveProSeller() || variants.isEmpty || variants.any((v) => v.quantity < 0 || ((v.color ?? '').trim().isEmpty && (v.size ?? '').trim().isEmpty)) || variants.map((v) => '${(v.color ?? '').trim().toLowerCase()}::${(v.size ?? '').trim().toLowerCase()}').toSet().length != variants.length)) {
       throw Exception('Only active Pro Sellers can publish variants; add a valid stock row.');
     }
-    if (title.trim().isEmpty || price <= 0) {
+    if (title.trim().isEmpty || price <= 0 || !['new', 'used'].contains(condition) || quantity < 1) {
       throw Exception(strings.productTitleAndPriceRequired);
     }
 
@@ -611,6 +614,9 @@ class MarketplaceService {
           'currency': 'EGP',
           'status': 'draft',
           'audience': audience,
+          'condition': condition,
+          'location': location?.trim().isEmpty == true ? null : location?.trim(),
+          'quantity': hasVariants ? 1 : quantity,
           'has_variants': hasVariants,
         })
         .select('id')
@@ -737,6 +743,9 @@ class MarketplaceService {
     required double price,
     required String categoryId,
     required String audience,
+    required String condition,
+    String? location,
+    int quantity = 1,
     String? customCategoryName,
     List<File> images = const [],
     List<String> removedImagePaths = const [],
@@ -752,7 +761,7 @@ class MarketplaceService {
     final previous = await _client
         .from('products')
         .select(
-          'title,description,category_id,status,price,audience,custom_category_name,has_variants',
+          'title,description,category_id,status,price,audience,custom_category_name,has_variants,condition,location,quantity',
         )
         .eq('id', productId)
         .eq('owner_id', user.id)
@@ -858,6 +867,9 @@ class MarketplaceService {
                 ? null
                 : customCategoryName?.trim(),
             'audience': audience,
+            'condition': condition,
+            'location': location?.trim().isEmpty == true ? null : location?.trim(),
+            'quantity': hasVariants ? 1 : quantity,
             'has_variants': hasVariants,
             // Hide changed content until the image review approves it.
             if (needsImageReview) 'status': 'draft',
@@ -928,6 +940,9 @@ class MarketplaceService {
                 'category_id': previous['category_id'],
                 'custom_category_name': previous['custom_category_name'],
                 'audience': previous['audience'],
+                'condition': previous['condition'],
+                'location': previous['location'],
+                'quantity': previous['quantity'],
               })
               .eq('id', productId)
               .eq('owner_id', user.id);
