@@ -100,6 +100,20 @@ class MarketplaceTransactionService {
   }
 
 
+  Future<bool> hasPendingOffer(String productId) async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) return false;
+    final offer = await _client
+        .from('product_offers')
+        .select('id')
+        .eq('product_id', productId)
+        .eq('buyer_id', userId)
+        .eq('status', 'pending')
+        .maybeSingle();
+    return offer != null;
+  }
+
+
   Future<Map<String, dynamic>?> getMyProductRequestState(String productId) async {
     final userId = _client.auth.currentUser?.id;
     if (userId == null) return null;
