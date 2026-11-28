@@ -161,6 +161,7 @@ Deno.serve(async (request: Request) => {
     parts.push({ inline_data: { mime_type: image.mimeType, data: image.data } });
   }
 
+  try {
   const unavailableMessage = language === "ar"
     ? "خدمة الاقتراحات الذكية مشغولة حاليًا. حاول مرة أخرى بعد قليل."
     : language === "fr"
