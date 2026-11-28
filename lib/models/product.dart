@@ -35,15 +35,19 @@ class Product {
     this.status = 'published', required this.createdAt,
     required this.imagePaths, required this.imageUrls,
     this.hasVariants = false, this.variants = const [],
+    this.condition, this.location, this.quantity = 1,
   });
   final String id, ownerId, categoryId, title, description, currency, audience, status;
   final double price;
   final String? customCategoryName;
+  final String? condition;
+  final String? location;
+  final int quantity;
   final DateTime createdAt;
   final List<String> imagePaths, imageUrls;
   final bool hasVariants;
   final List<ProductVariant> variants;
-  int get availableQuantity => hasVariants ? variants.fold(0, (sum, v) => sum + v.quantity) : 1;
+  int get availableQuantity => hasVariants ? variants.fold(0, (sum, v) => sum + v.quantity) : quantity;
   String? get primaryImage => imageUrls.isEmpty ? null : imageUrls.first;
   factory Product.fromMap(Map<String, dynamic> map, {
     required List<String> signedImageUrls, required List<String> paths,
@@ -59,6 +63,9 @@ class Product {
     createdAt: DateTime.parse(map['created_at'] as String),
     imagePaths: paths, imageUrls: signedImageUrls,
     hasVariants: map['has_variants'] == true,
+    condition: map['condition'] as String?,
+    location: map['location'] as String?,
+    quantity: (map['quantity'] as num?)?.toInt() ?? 1,
     variants: ((map['product_variants'] as List<dynamic>?) ?? const [])
       .map((row) => ProductVariant.fromMap(Map<String,dynamic>.from(row as Map))).toList(growable:false),
   );
