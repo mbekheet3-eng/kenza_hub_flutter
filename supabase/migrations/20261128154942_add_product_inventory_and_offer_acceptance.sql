@@ -328,6 +328,62 @@ CREATE TRIGGER trg_guard_reserved_product_metadata
 BEFORE UPDATE OF condition, location, quantity ON public.products
 FOR EACH ROW EXECUTE FUNCTION public.guard_reserved_product_metadata();
 
+-- Notify the other participant, including when a buyer accepts a counteroffer.
+CREATE OR REPLACE FUNCTION public.notify_offer_activity()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $function$
+DECLARE
+  v_type text;
+  v_title text;
+  v_body text;
+  v_recipient uuid;
+BEGIN
+  IF TG_OP = 'INSERT' THEN
+    v_type := 'new_offer';
+    v_title := 'عرض سعر جديد';
+    v_body := 'وصلك عرض سعر جديد على أحد منتجاتك';
+    v_recipient := NEW.seller_id;
+  ELSIF NEW.status IS DISTINCT FROM OLD.status THEN
+    IF NEW.status = 'accepted' THEN
+      v_type := 'offer_accepted';
+      IF auth.uid() = NEW.buyer_id AND NEW.counter_price IS NOT NULL THEN
+        v_title := 'تم قبول العرض المضاد';
+        v_body := 'وافق المشتري على العرض المضاد الذي قدمته';
+        v_recipient := NEW.seller_id;
+      ELSE
+        v_title := 'تم قبول العرض';
+        v_body := 'تم قبول عرض السعر الذي قدمته';
+        v_recipient := NEW.buyer_id;
+      END IF;
+    ELSIF NEW.status = 'rejected' THEN
+      v_type := 'offer_rejected';
+      v_title := 'تم رفض العرض';
+      v_body := 'لم يتم قبول عرض سعر المنتج';
+      v_recipient := NEW.buyer_id;
+    ELSE
+      RETURN NEW;
+    END IF;
+  ELSE
+    RETURN NEW;
+  END IF;
+
+  PERFORM public.create_user_notification(
+    v_recipient,
+    v_type,
+    v_title,
+    v_body,
+    jsonb_build_object('offer_id', NEW.id, 'product_id', NEW.product_id),
+    'offer:' || NEW.id::text || ':' || COALESCE(NEW.status, 'created') || ':' || TG_OP
+  );
+  RETURN NEW;
+END;
+$function$;
+
+REVOKE ALL ON FUNCTION public.notify_offer_activity() FROM PUBLIC, anon, authenticated;
+
 CREATE OR REPLACE FUNCTION public.counter_product_offer(
   p_offer_id uuid,
   p_counter_price numeric,
