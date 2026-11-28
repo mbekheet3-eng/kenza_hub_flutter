@@ -7,8 +7,23 @@ Project: `mxdcfewkajwvtwtjoeia`
 - `profiles`: one private row per Auth user; only the owner can read or update it. The full saved name and email remain private.
 - `member_public_profiles`: a restricted public projection containing only the first name and avatar URL; it never contains email or the full name.
 - `categories`: active categories are readable by guests and members. Every row must provide non-empty `name_ar`, `name_en`, and `name_fr`; the app selects the matching label using the member's chosen language. `id` and `slug` remain language-independent and stable.
-- `products`: `owner_id`, `category_id`, `title`, `description`, `custom_category_name` (optional seller-entered type when selecting an `*-other` leaf, max 80 characters), `price`, `currency`, `status`, `created_at`.
+- `products`: `owner_id`, `category_id`, `title`, `description`, `custom_category_name` (optional seller-entered type when selecting an `*-other` leaf, max 80 characters), `price`, `currency`, `status`, `condition` (`new` or `used`), optional coarse `location` (city/area only, max 80 characters), available `quantity` for non-variant listings, and `created_at`.
 - `product_images`: `product_id`, `storage_path`, `alt_text`, `sort_order`, `created_at`.
+
+## Product condition, location, and stock
+
+- New listings must specify condition as `new` or `used`. The database keeps the field nullable for legacy listings until their owners edit them; the app requires a selection when saving.
+- Product location is optional and limited to a seller-entered governorate, city, or area. Never store a street address or precise home location in this field.
+- Non-variant listings use `products.quantity` (minimum 1, default 1). Pro Seller variant listings continue to use `product_variants.quantity`; the product-level quantity is not used for variant stock.
+- Accepting an order decrements the matching stock in the same database transaction. Cancelling or expiring an accepted order restores that stock exactly once. A non-variant listing is archived when its available quantity reaches zero and is republished if the held order is cancelled or expires.
+- While a single-unit listing is held by an accepted order, its condition, location, and quantity cannot be edited.
+
+## Offers and counteroffers
+
+- Sellers can accept or reject a pending offer, or submit a counteroffer. Buyers can accept or decline a seller counteroffer.
+- Accepting an offer creates and accepts the corresponding `product_orders` row in one database transaction. `product_orders.source_offer_id` links the resulting order to the offer, and the agreed price is the accepted offer/counteroffer price.
+- Offers on listings with color/size variants are not accepted through this flow because the offer form does not identify a specific variant; buyers should use the regular purchase flow to select a variant.
+- The offer acceptance and counteroffer RPCs validate the authenticated participant and current listing availability server-side. They do not require client-side writes to protected transaction fields.
 
 ## Product publication workflow
 
