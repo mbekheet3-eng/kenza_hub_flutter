@@ -100,6 +100,26 @@ class MarketplaceTransactionService {
   }
 
 
+  Future<void> acceptOffer(String offerId) async {
+    await _requireUserId();
+    await _client.rpc('accept_product_offer', params: {
+      'p_offer_id': offerId,
+    });
+  }
+
+  Future<void> counterOffer({
+    required String offerId,
+    required double counterPrice,
+    String? message,
+  }) async {
+    await _requireUserId();
+    await _client.rpc('counter_product_offer', params: {
+      'p_offer_id': offerId,
+      'p_counter_price': counterPrice,
+      'p_counter_message': message?.trim().isEmpty == true ? null : message?.trim(),
+    });
+  }
+
   Future<bool> hasPendingOffer(String productId) async {
     final userId = _client.auth.currentUser?.id;
     if (userId == null) return false;
