@@ -192,11 +192,7 @@ async function analyzeImage(
         });
 
         // Do not retry authentication, configuration, request, or response-format errors.
-        if (
-          lastError.includes("non-retryable HTTP") ||
-          lastError.includes("no review result") ||
-          lastError.includes("invalid review JSON")
-        ) {
+        if (lastError.includes("non-retryable HTTP")) {
           throw error;
         }
 
