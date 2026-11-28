@@ -175,6 +175,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
       final message = switch (status) {
         'accepted' => strings.acceptedToast,
         'rejected' => strings.rejectedToast,
+        'withdrawn' => Localizations.localeOf(context).languageCode == 'ar' ? 'تم سحب العرض' : Localizations.localeOf(context).languageCode == 'fr' ? 'Offre retirée' : 'Offer withdrawn',
         'delivered' => strings.orderDeliveredToast,
         'cancelled' => strings.orderCancelledToast,
         'completed' => strings.orderCompletedToast,
