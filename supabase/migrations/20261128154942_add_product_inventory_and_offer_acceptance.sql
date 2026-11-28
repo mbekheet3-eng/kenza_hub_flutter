@@ -301,6 +301,34 @@ CREATE TRIGGER trg_validate_product_order_status_transition
 BEFORE UPDATE OF status ON public.product_orders
 FOR EACH ROW EXECUTE FUNCTION public.validate_product_order_status_transition();
 
+-- Prevent sellers from changing condition, location, or stock while a
+-- single-unit accepted order still holds the listing.
+CREATE OR REPLACE FUNCTION public.guard_reserved_product_metadata()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = ''
+AS $function$
+BEGIN
+  IF OLD.reserved_by_order_id IS NOT NULL
+     AND NEW.reserved_by_order_id = OLD.reserved_by_order_id
+     AND (
+       NEW.condition IS DISTINCT FROM OLD.condition
+       OR NEW.location IS DISTINCT FROM OLD.location
+       OR NEW.quantity IS DISTINCT FROM OLD.quantity
+     ) THEN
+    RAISE EXCEPTION 'This listing is reserved by an accepted order and cannot be edited until the reservation ends'
+      USING ERRCODE = '23514';
+  END IF;
+  RETURN NEW;
+END;
+$function$;
+
+DROP TRIGGER IF EXISTS trg_guard_reserved_product_metadata ON public.products;
+CREATE TRIGGER trg_guard_reserved_product_metadata
+BEFORE UPDATE OF condition, location, quantity ON public.products
+FOR EACH ROW EXECUTE FUNCTION public.guard_reserved_product_metadata();
+
 CREATE OR REPLACE FUNCTION public.counter_product_offer(
   p_offer_id uuid,
   p_counter_price numeric,
@@ -415,6 +443,7 @@ BEGIN
 END;
 $function$;
 
+REVOKE ALL ON FUNCTION public.validate_product_order_status_transition() FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.counter_product_offer(uuid, numeric, text) FROM PUBLIC, anon;
 REVOKE ALL ON FUNCTION public.accept_product_offer(uuid) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.counter_product_offer(uuid, numeric, text) TO authenticated;
