@@ -158,6 +158,38 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Future<void> _buy(Product product, {String? variantId, int quantity = 1}) async {
     if (!await _ensureLogin()) return;
     if (!mounted) return;
+
+    // Check the buyer's pending offer before showing purchase confirmation.
+    try {
+      final hasPendingOffer =
+          await _transactionService.hasPendingOffer(product.id);
+      if (!mounted) return;
+      if (hasPendingOffer) {
+        final language = Localizations.localeOf(context).languageCode;
+        final message = language == 'ar'
+            ? 'عندك عرض قائم على المنتج ده. تابع حالة العرض قبل إرسال طلب شراء جديد.'
+            : language == 'fr'
+                ? 'Vous avez déjà une offre en attente pour ce produit. Consultez son statut avant de passer une commande.'
+                : 'You already have a pending offer for this product. Check its status before placing an order.';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+        return;
+      }
+    } catch (_) {
+      if (!mounted) return;
+      final language = Localizations.localeOf(context).languageCode;
+      final message = language == 'ar'
+          ? 'تعذر التحقق من حالة العرض. حاول مرة أخرى قبل الشراء.'
+          : language == 'fr'
+              ? 'Impossible de vérifier le statut de votre offre. Réessayez avant d’acheter.'
+              : 'Could not verify your offer status. Please try again before purchasing.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+      return;
+    }
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
