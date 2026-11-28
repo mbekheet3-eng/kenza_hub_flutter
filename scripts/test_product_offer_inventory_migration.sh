@@ -149,6 +149,13 @@ BEGIN
       actual_quantity, actual_status;
   END IF;
 
+  BEGIN
+    UPDATE public.products SET condition = 'new' WHERE id = product_original;
+    RAISE EXCEPTION 'Reserved listing metadata update unexpectedly succeeded';
+  EXCEPTION WHEN check_violation THEN
+    NULL;
+  END;
+
   PERFORM set_config('request.jwt.claim.sub', buyer_two::text, true);
   INSERT INTO public.product_orders(product_id, quantity)
   VALUES (product_direct, 3)
@@ -170,6 +177,21 @@ BEGIN
       actual_quantity, actual_status;
   END IF;
 END $$;
+
+DO $
+BEGIN
+  IF has_function_privilege('anon', 'public.accept_product_offer(uuid)', 'EXECUTE')
+     OR has_function_privilege('anon', 'public.counter_product_offer(uuid,numeric,text)', 'EXECUTE') THEN
+    RAISE EXCEPTION 'Anonymous role must not execute offer mutation RPCs';
+  END IF;
+  IF NOT has_function_privilege('authenticated', 'public.accept_product_offer(uuid)', 'EXECUTE')
+     OR NOT has_function_privilege('authenticated', 'public.counter_product_offer(uuid,numeric,text)', 'EXECUTE') THEN
+    RAISE EXCEPTION 'Authenticated role must execute offer mutation RPCs';
+  END IF;
+  IF has_function_privilege('authenticated', 'public.validate_product_order_status_transition()', 'EXECUTE') THEN
+    RAISE EXCEPTION 'Authenticated role must not directly execute the order trigger function';
+  END IF;
+END $;
 
 SELECT 'product inventory and offer migration tests passed' AS result;
 SQL
