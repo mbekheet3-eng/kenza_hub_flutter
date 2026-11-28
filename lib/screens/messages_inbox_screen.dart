@@ -225,7 +225,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(AppStrings.of(context)!.backLabel),
+            child: Text(AppStrings.of(context)!.cancelLabel),
           ),
           FilledButton(
             onPressed: () {
