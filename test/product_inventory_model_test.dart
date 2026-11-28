@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kenza_hub_flutter/models/product.dart';
+import 'package:kenza_hub_marketplace/models/product.dart';
 
 void main() {
   group('Product inventory fields', () {
