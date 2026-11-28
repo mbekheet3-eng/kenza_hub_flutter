@@ -67,11 +67,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     super.initState();
     _row1Controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 27500),
+      duration: const Duration(milliseconds: 44000),
     )..repeat();
     _row2Controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 25),
+      duration: const Duration(seconds: 40),
     )..repeat();
   }
 
