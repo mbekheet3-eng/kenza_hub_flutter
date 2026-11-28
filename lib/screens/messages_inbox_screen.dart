@@ -272,6 +272,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
 
   Future<void> _cancelAccepted(Map<String, dynamic> row, {required bool sellerSide}) async {
     final language = Localizations.localeOf(context).languageCode;
+    final strings = strings;
     String reason = 'buyer_request';
     String? note;
     if (sellerSide) {
@@ -295,8 +296,8 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
           title: Text(language == 'ar' ? 'وضح السبب' : language == 'fr' ? 'Précisez le motif' : 'Explain the reason'),
           content: TextField(controller: controller, minLines: 2, maxLines: 4),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text(AppStrings.of(context)!.backLabel)),
-            TextButton(onPressed: () => Navigator.pop(dialogContext, controller.text.trim()), child: Text(AppStrings.of(context)!.confirmAction)),
+            TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text(strings.backLabel)),
+            TextButton(onPressed: () => Navigator.pop(dialogContext, controller.text.trim()), child: Text(strings.confirmAction)),
           ],
         ),
       );
@@ -309,8 +310,8 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
           title: Text(language == 'ar' ? 'إلغاء الطلب المقبول؟' : language == 'fr' ? 'Annuler la commande acceptée ?' : 'Cancel accepted order?'),
           content: Text(language == 'ar' ? 'سيتم إلغاء الحجز وإعادة إتاحة المنتج.' : language == 'fr' ? 'La réservation sera annulée et l’article remis en disponibilité.' : 'The reservation will be cancelled and the item made available again.'),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(AppStrings.of(context)!.backLabel)),
-            TextButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(AppStrings.of(context)!.confirmAction)),
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(strings.backLabel)),
+            TextButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(strings.confirmAction)),
           ],
         ),
       );
@@ -323,7 +324,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
       await _refresh();
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppStrings.of(context)!.statusUpdateFailed)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(strings.statusUpdateFailed)));
     }
   }
 
