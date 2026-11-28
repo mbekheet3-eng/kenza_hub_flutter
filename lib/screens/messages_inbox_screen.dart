@@ -85,7 +85,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
 
   Future<List<Map<String, dynamic>>> _loadOffers() async {
     final rows = await _client.from('product_offers')
-        .select('id,product_id,buyer_id,seller_id,offered_price,currency,status,message,created_at,products(title)')
+        .select('id,product_id,buyer_id,seller_id,offered_price,counter_price,counter_message,countered_at,currency,status,message,created_at,products(title)')
         .or('buyer_id.eq.$_userId,seller_id.eq.$_userId')
         .order('created_at', ascending: false);
     return _attachOtherMemberNames(rows);
@@ -154,6 +154,15 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
     required String status,
   }) async {
     try {
+      if (table == 'product_offers' && status == 'accepted') {
+        await MarketplaceTransactionService().acceptOffer(id);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppStrings.of(context)!.acceptedToast)),
+        );
+        await _refresh();
+        return;
+      }
       final updated = await _client
           .from(table)
           .update({'status': status})
@@ -182,6 +191,75 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
           ? (language == 'ar' ? 'الكمية المطلوبة لم تعد متاحة. حدّث المخزون أو ارفض الطلب.' : language == 'fr' ? 'Stock insuffisant. Actualisez le stock ou refusez la demande.' : 'Requested stock is no longer available. Update stock or reject the request.')
           : AppStrings.of(context)!.statusUpdateFailed;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
+  Future<void> _counterOffer(Map<String, dynamic> row) async {
+    final language = Localizations.localeOf(context).languageCode;
+    final priceController = TextEditingController();
+    final messageController = TextEditingController();
+    final result = await showDialog<Map<String, String>>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(language == 'ar' ? 'إرسال عرض مضاد' : language == 'fr' ? 'Faire une contre-offre' : 'Make a counteroffer'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: priceController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                labelText: language == 'ar' ? 'السعر المقترح' : language == 'fr' ? 'Prix proposé' : 'Counter price',
+              ),
+            ),
+            TextField(
+              controller: messageController,
+              maxLines: 2,
+              decoration: InputDecoration(
+                labelText: language == 'ar' ? 'رسالة (اختياري)' : language == 'fr' ? 'Message (facultatif)' : 'Message (optional)',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(AppStrings.of(context)!.backLabel),
+          ),
+          FilledButton(
+            onPressed: () {
+              final price = double.tryParse(priceController.text.trim());
+              if (price != null && price > 0) {
+                Navigator.pop(dialogContext, {
+                  'price': price.toString(),
+                  'message': messageController.text.trim(),
+                });
+              }
+            },
+            child: Text(language == 'ar' ? 'إرسال' : language == 'fr' ? 'Envoyer' : 'Send'),
+          ),
+        ],
+      ),
+    );
+    priceController.dispose();
+    messageController.dispose();
+    if (result == null) return;
+    try {
+      await MarketplaceTransactionService().counterOffer(
+        offerId: row['id'] as String,
+        counterPrice: double.parse(result['price']!),
+        message: result['message'],
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(language == 'ar' ? 'تم إرسال العرض المضاد' : language == 'fr' ? 'Contre-offre envoyée' : 'Counteroffer sent')),
+      );
+      await _refresh();
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.of(context)!.statusUpdateFailed)),
+      );
     }
   }
 
@@ -462,11 +540,13 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
         if (isSeller && pending) {
           trailing = PopupMenuButton<String>(
             tooltip: AppStrings.of(context)!.actionTooltipLabel,
-            onSelected: (value) => _updateStatus(
-              table: table,
-              id: row['id'] as String,
-              status: value,
-            ),
+            onSelected: (value) {
+              if (value == 'counter') {
+                _counterOffer(row);
+              } else {
+                _updateStatus(table: table, id: row['id'] as String, status: value);
+              }
+            },
             itemBuilder: (_) => [
               PopupMenuItem(
                 value: 'accepted',
@@ -475,6 +555,34 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
               PopupMenuItem(
                 value: 'rejected',
                 child: Text(AppStrings.of(context)!.rejectLabel),
+              ),
+              if (isOffer)
+                PopupMenuItem(
+                  value: 'counter',
+                  child: Text(language == 'ar' ? 'عرض مضاد' : language == 'fr' ? 'Contre-offre' : 'Counteroffer'),
+                ),
+            ],
+          );
+        } else if (isOffer && !isSeller && pending && row['counter_price'] != null) {
+          trailing = Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () => _updateStatus(
+                  table: 'product_offers',
+                  id: row['id'] as String,
+                  status: 'accepted',
+                ),
+                child: Text(language == 'ar' ? 'قبول العرض المضاد' : language == 'fr' ? 'Accepter la contre-offre' : 'Accept counteroffer'),
+              ),
+              TextButton(
+                onPressed: () => _updateStatus(
+                  table: 'product_offers',
+                  id: row['id'] as String,
+                  status: 'withdrawn',
+                ),
+                child: Text(language == 'ar' ? 'رفض العرض المضاد' : language == 'fr' ? 'Refuser la contre-offre' : 'Decline counteroffer'),
               ),
             ],
           );
@@ -547,6 +655,10 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               Text('${isOffer ? AppStrings.of(context)!.offerPriceLabel : AppStrings.of(context)!.purchaseOrderLabel}: $price $currency'),
+              if (isOffer && row['counter_price'] != null)
+                Text('${language == 'ar' ? 'عرض البائع المضاد' : language == 'fr' ? 'Contre-offre du vendeur' : 'Seller counteroffer'}: ${row['counter_price']} $currency'),
+              if (isOffer && row['counter_message'] is String && (row['counter_message'] as String).isNotEmpty)
+                Text(row['counter_message'] as String),
               const SizedBox(height: 4),
               Align(
                 alignment: AlignmentDirectional.centerStart,
