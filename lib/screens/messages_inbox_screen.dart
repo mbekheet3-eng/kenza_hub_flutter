@@ -526,6 +526,13 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
           );
         }
 
+        final status = row['status']?.toString() ?? '';
+        final statusColor = switch (status) {
+          'accepted' || 'completed' || 'delivered' => Colors.green,
+          'rejected' || 'cancelled' || 'expired' => Theme.of(context).colorScheme.error,
+          _ => Theme.of(context).colorScheme.primary,
+        };
+
         return ListTile(
           isThreeLine: true,
           leading: CircleAvatar(
@@ -534,9 +541,25 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
                 : KenzaAssetIcon('assets/orders.png', size: 24, scale: 1.3),
           ),
           title: Text(_productTitle(row), maxLines: 1, overflow: TextOverflow.ellipsis),
-          subtitle: Text(
-            '${isOffer ? AppStrings.of(context)!.offerPriceLabel : AppStrings.of(context)!.purchaseOrderLabel}: $price $currency\n'
-            '${_otherMemberName(row)} • ${_status(row['status'])} • ${_date(row['created_at'])}$variantSummary$holdSummary$postponementSummary',
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('${isOffer ? AppStrings.of(context)!.offerPriceLabel : AppStrings.of(context)!.purchaseOrderLabel}: $price $currency'),
+              const SizedBox(height: 4),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: Chip(
+                  visualDensity: VisualDensity.compact,
+                  label: Text(_status(status)),
+                  side: BorderSide(color: statusColor.withValues(alpha: 0.35)),
+                  backgroundColor: statusColor.withValues(alpha: 0.08),
+                  labelStyle: TextStyle(color: statusColor, fontWeight: FontWeight.w600),
+                  padding: EdgeInsets.zero,
+                ),
+              ),
+              Text('${_otherMemberName(row)} • ${_date(row['created_at'])}$variantSummary$holdSummary$postponementSummary'),
+            ],
           ),
           trailing: trailing,
         );
@@ -555,6 +578,7 @@ class _MessagesInboxScreenState extends State<MessagesInboxScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(AppStrings.of(context)!.messagesOrdersTitle),
         bottom: TabBar(
           controller: _tabs,
