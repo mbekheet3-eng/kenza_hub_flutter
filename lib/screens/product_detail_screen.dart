@@ -194,7 +194,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Future<void> _makeOffer(Product product) async {
     if (!await _ensureLogin()) return;
     if (!mounted) return;
-    final priceController = TextEditingController(text: product.price.toStringAsFixed(2));
+    final priceController = TextEditingController();
     final noteController = TextEditingController();
     final formKey = GlobalKey<FormState>();
     final result = await showDialog<bool>(
@@ -209,7 +209,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               TextFormField(
                 controller: priceController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(labelText: _l10n.proposedPriceLabel),
+                decoration: InputDecoration(
+                  labelText: _l10n.proposedPriceLabel,
+                  hintText: product.price.toStringAsFixed(0),
+                ),
                 validator: (value) {
                   final price = double.tryParse((value ?? '').trim());
                   return price == null || price <= 0 ? _l10n.invalidPrice : null;
