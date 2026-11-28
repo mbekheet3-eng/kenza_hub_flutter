@@ -29,6 +29,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   final _title = TextEditingController();
   final _description = TextEditingController();
   final _price = TextEditingController();
+  final _location = TextEditingController();
+  final _quantity = TextEditingController(text: '1');
+  String? _condition;
   final _customCategoryName = TextEditingController();
   List<Category> _categories = [];
   final List<Category> _selectionPath = [];
@@ -60,6 +63,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       _title.text = product.title;
       _description.text = product.description;
       _price.text = product.price.toStringAsFixed(0);
+      _location.text = product.location ?? '';
+      _quantity.text = product.quantity.toString();
+      _condition = product.condition;
       _audience = product.audience;
       _hasVariants = product.hasVariants;
       _variantDrafts.addAll(product.variants.map((v) => _VariantDraft.fromVariant(v)));
@@ -75,6 +81,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     _title.dispose();
     _description.dispose();
     _price.dispose();
+    _location.dispose();
+    _quantity.dispose();
     _customCategoryName.dispose();
     for (final row in _variantDrafts) { row.dispose(); }
     super.dispose();
@@ -864,6 +872,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     });
     try {
       final price = double.parse(_price.text.trim());
+      final condition = _condition;
+      if (condition == null || !['new', 'used'].contains(condition)) {
+        throw Exception(_formText('اختر حالة المنتج: جديد أو مستعمل', 'Choose whether the item is new or used', 'Choisissez si l’article est neuf ou d’occasion'));
+      }
+      final quantity = _hasVariants ? 1 : int.parse(_quantity.text.trim());
       final variants = _variantDrafts.map((row) => row.toVariant()).toList(growable: false);
       if (_hasVariants && variants.isEmpty) {
         throw Exception('أضف تركيبة لون أو مقاس واحدة على الأقل');
@@ -876,6 +889,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           price: price,
           categoryId: categoryId,
           audience: _audience,
+          condition: condition,
+          location: _location.text,
+          quantity: quantity,
           customCategoryName: _isOtherCategory ? _customCategoryName.text.trim() : null,
           images: _images,
           removedImagePaths: _removedImagePaths,
@@ -891,6 +907,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           price: price,
           images: _images,
           audience: _audience,
+          condition: condition,
+          location: _location.text,
+          quantity: quantity,
           customCategoryName: _isOtherCategory ? _customCategoryName.text.trim() : null,
           primaryImageIndex: _primaryImageIndex,
           hasVariants: _hasVariants,
@@ -1030,6 +1049,57 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       return price == null || price <= 0 ? AppStrings.of(context)!.priceMustBePositive : null;
                     },
                   ),
+                  const SizedBox(height: 14),
+                  DropdownButtonFormField<String>(
+                    initialValue: _condition,
+                    decoration: InputDecoration(
+                      labelText: _formText('حالة المنتج', 'Product condition', 'État du produit'),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: 'new',
+                        child: Text(_formText('جديد', 'New', 'Neuf')),
+                      ),
+                      DropdownMenuItem(
+                        value: 'used',
+                        child: Text(_formText('مستعمل', 'Used', 'Occasion')),
+                      ),
+                    ],
+                    validator: (value) => value == null
+                        ? _formText('اختر حالة المنتج', 'Select the product condition', 'Sélectionnez l’état du produit')
+                        : null,
+                    onChanged: _saving ? null : (value) => setState(() => _condition = value),
+                  ),
+                  const SizedBox(height: 14),
+                  TextFormField(
+                    controller: _location,
+                    maxLength: 80,
+                    decoration: InputDecoration(
+                      labelText: _formText('الموقع (اختياري)', 'Location (optional)', 'Lieu (facultatif)'),
+                      hintText: _formText(
+                        'المحافظة أو المدينة أو المنطقة فقط، بدون عنوان تفصيلي',
+                        'Governorate, city or area only — no street address',
+                        'Gouvernorat, ville ou quartier uniquement — sans adresse précise',
+                      ),
+                    ),
+                  ),
+                  if (!_hasVariants) ...[
+                    const SizedBox(height: 14),
+                    TextFormField(
+                      controller: _quantity,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: _formText('الكمية المتاحة', 'Available quantity', 'Quantité disponible'),
+                      ),
+                      validator: (value) {
+                        if (_hasVariants) return null;
+                        final quantity = int.tryParse((value ?? '').trim());
+                        return quantity == null || quantity < 1
+                            ? _formText('أدخل كمية صحيحة لا تقل عن 1', 'Enter a quantity of at least 1', 'Saisissez une quantité d’au moins 1')
+                            : null;
+                      },
+                    ),
+                  ],
                   if (_isProSeller) ...[
                     const SizedBox(height: 16),
                     _buildVariantEditor(),
