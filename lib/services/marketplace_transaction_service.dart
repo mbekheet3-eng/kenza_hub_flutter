@@ -100,6 +100,39 @@ class MarketplaceTransactionService {
   }
 
 
+  Future<Map<String, dynamic>?> getMyProductRequestState(String productId) async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) return null;
+
+    final offer = await _client
+        .from('product_offers')
+        .select('status,created_at')
+        .eq('product_id', productId)
+        .eq('buyer_id', userId)
+        .order('created_at', ascending: false)
+        .limit(1)
+        .maybeSingle();
+    final order = await _client
+        .from('product_orders')
+        .select('status,created_at')
+        .eq('product_id', productId)
+        .eq('buyer_id', userId)
+        .order('created_at', ascending: false)
+        .limit(1)
+        .maybeSingle();
+
+    if (offer == null && order == null) return null;
+    if (offer == null) return {'type': 'order', 'status': order!['status']};
+    if (order == null) return {'type': 'offer', 'status': offer['status']};
+
+    final offerDate = DateTime.tryParse(offer['created_at'] as String? ?? '');
+    final orderDate = DateTime.tryParse(order['created_at'] as String? ?? '');
+    if (offerDate != null && orderDate != null && orderDate.isAfter(offerDate)) {
+      return {'type': 'order', 'status': order['status']};
+    }
+    return {'type': 'offer', 'status': offer['status']};
+  }
+
   Future<void> requestOrderPostponement({
     required String orderId,
     required DateTime requestedUntil,
