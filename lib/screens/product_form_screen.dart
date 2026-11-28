@@ -841,6 +841,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     );
   }
 
+  String _formText(String ar, String en, String fr) {
+    final language = Localizations.localeOf(context).languageCode;
+    return language == 'ar' ? ar : language == 'fr' ? fr : en;
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     final categoryId = _selectedLeafCategoryId;
@@ -997,7 +1002,20 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     controller: _description,
                     maxLines: 4,
                     maxLength: 1000,
-                    decoration: InputDecoration(labelText: AppStrings.of(context)!.productDescriptionOptional),
+                    decoration: InputDecoration(
+                      labelText: _formText('وصف المنتج (20 حرفًا على الأقل)', 'Product description (at least 20 characters)', 'Description du produit (20 caractères minimum)'),
+                    ),
+                    validator: (value) {
+                      final description = (value ?? '').trim();
+                      if (description.length < 20) {
+                        return _formText(
+                          'اكتب وصفًا لا يقل عن 20 حرفًا',
+                          'Enter a description of at least 20 characters',
+                          'Saisissez une description d’au moins 20 caractères',
+                        );
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 14),
                   TextFormField(
