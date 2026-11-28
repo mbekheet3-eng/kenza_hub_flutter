@@ -14,6 +14,7 @@ on:
       - 'supabase/functions/**'
       - 'docs/proposed_miscellaneous_categories.sql'
       - 'scripts/test_category_migrations.sh'
+      - 'scripts/test_product_offer_inventory_migration.sh'
       - 'supabase/SCHEMA.md'
       - '.github/workflows/flutter-analyze.yml'
   workflow_dispatch:
@@ -88,3 +89,5 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
       - name: Validate category migrations on disposable PostgreSQL
         run: bash scripts/test_category_migrations.sh
+      - name: Validate product inventory and offer migrations on disposable PostgreSQL
+        run: bash scripts/test_product_offer_inventory_migration.sh
