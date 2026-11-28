@@ -178,7 +178,7 @@ BEGIN
   END IF;
 END $$;
 
-DO $
+DO $check$
 BEGIN
   IF has_function_privilege('anon', 'public.accept_product_offer(uuid)', 'EXECUTE')
      OR has_function_privilege('anon', 'public.counter_product_offer(uuid,numeric,text)', 'EXECUTE') THEN
@@ -191,7 +191,7 @@ BEGIN
   IF has_function_privilege('authenticated', 'public.validate_product_order_status_transition()', 'EXECUTE') THEN
     RAISE EXCEPTION 'Authenticated role must not directly execute the order trigger function';
   END IF;
-END $;
+END $check$;
 
 SELECT 'product inventory and offer migration tests passed' AS result;
 SQL
