@@ -260,15 +260,39 @@ Deno.serve(async (request: Request) => {
     ];
     let model = models[0];
     let response: Response | null = null;
+    let parsed: JsonRecord | null = null;
+    let modelUsed = "";
     let lastStatus = 0;
     let lastDetail = "network error or timeout";
 
     for (let modelIndex = 0; modelIndex < models.length; modelIndex++) {
       model = models[modelIndex];
       response = await requestModel(model);
+      if (response?.ok) {
+        try {
+          const payload = await response.json();
+          const rawText = payload?.candidates?.[0]?.content?.parts
+            ?.map((part: JsonRecord) => typeof part.text === "string" ? part.text : "")
+            .join("")
+            .trim();
+          if (typeof rawText !== "string" || !rawText) {
+            throw new Error("Gemini returned no suggestion");
+          }
+          parsed = JSON.parse(rawText) as JsonRecord;
+          modelUsed = model;
+          break;
+        } catch (error) {
+          lastStatus = 502;
+          lastDetail = error instanceof Error ? error.message : "Invalid Gemini response";
+          console.error("Gemini product suggestion response was invalid:", model, lastDetail.slice(0, 250));
+          response = null;
+        }
+      }
+
+      if (parsed) break;
       if (response?.ok) break;
 
-      lastStatus = response?.status ?? 0;
+      lastStatus = response?.status ?? lastStatus;
       lastDetail = response ? await response.text() : "network error or timeout";
       console.error("Gemini product suggestion model failed:", {
         model, status: lastStatus, detail: lastDetail.slice(0, 300),
@@ -284,7 +308,7 @@ Deno.serve(async (request: Request) => {
       await new Promise((resolve) => setTimeout(resolve, 350));
     }
 
-    if (!response?.ok) {
+    if (!parsed) {
       console.error("All Gemini product suggestion models failed:", lastStatus, lastDetail.slice(0, 300));
       return json({
         error: language === "ar"
@@ -294,24 +318,6 @@ Deno.serve(async (request: Request) => {
           : (lastStatus === 429 ? "AI suggestion limit reached. Please try again later." : "AI suggestions are temporarily unavailable. Please try again."),
         error_code: lastStatus === 429 ? "rate_limited" : "provider_unavailable",
       }, lastStatus === 429 ? 429 : 503);
-    }
-
-    const payload = await response.json();
-    const rawText = payload?.candidates?.[0]?.content?.parts
-      ?.map((part: JsonRecord) => typeof part.text === "string" ? part.text : "")
-      .join("")
-      .trim();
-
-    if (typeof rawText !== "string" || !rawText) {
-      return json({ error: "Gemini returned no suggestion" }, 503);
-    }
-
-    let parsed: JsonRecord;
-    try {
-      parsed = JSON.parse(rawText) as JsonRecord;
-    } catch {
-      console.error("Gemini returned invalid product suggestion JSON");
-      return json({ error: "Could not read AI suggestions. Please try again." }, 503);
     }
 
     const byId = new Map(categories.map((item) => [item.id, item]));
@@ -355,7 +361,7 @@ Deno.serve(async (request: Request) => {
       price_confidence: confidence,
       missing_info: safeList(parsed.missing_info),
       note: cleanText(parsed.note, 300),
-      model,
+      model: modelUsed,
       images_analyzed: images.length,
     });
   } catch (error) {
