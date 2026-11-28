@@ -20,7 +20,9 @@ ALTER TABLE public.products
 ALTER TABLE public.products
   DROP CONSTRAINT IF EXISTS products_quantity_positive;
 ALTER TABLE public.products
-  ADD CONSTRAINT products_quantity_positive CHECK (quantity > 0);
+  DROP CONSTRAINT IF EXISTS products_quantity_nonnegative;
+ALTER TABLE public.products
+  ADD CONSTRAINT products_quantity_nonnegative CHECK (quantity >= 0);
 
 ALTER TABLE public.product_offers
   ADD COLUMN IF NOT EXISTS counter_price numeric,
