@@ -161,58 +161,112 @@ Deno.serve(async (request: Request) => {
     parts.push({ inline_data: { mime_type: image.mimeType, data: image.data } });
   }
 
-  try {
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": geminiApiKey,
-        },
-        body: JSON.stringify({
-          contents: [{ role: "user", parts }],
-          generationConfig: {
-            responseMimeType: "application/json",
-            maxOutputTokens: 800,
-            thinkingConfig: {
-              thinkingLevel: "minimal",
-            },
-          },
-        }),
-        signal: AbortSignal.timeout(60000),
-      },
-    );
+  const unavailableMessage = language === "ar"
+    ? "خدمة الاقتراحات الذكية مشغولة حاليًا. حاول مرة أخرى بعد قليل."
+    : language === "fr"
+    ? "Les suggestions IA sont temporairement indisponibles. Veuillez réessayer dans un instant."
+    : "AI suggestions are temporarily unavailable. Please try again in a moment.";
+  const configurationMessage = language === "ar"
+    ? "تعذر الاتصال بخدمة الاقتراحات الذكية. حاول مرة أخرى لاحقًا."
+    : language === "fr"
+    ? "Le service de suggestions IA est indisponible. Veuillez réessayer plus tard."
+    : "The AI suggestion service is unavailable. Please try again later.";
 
-    if (!response.ok) {
-      const detail = await response.text();
-      console.error("Gemini product suggestion HTTP error:", response.status, detail.slice(0, 300));
-      const status = response.status === 429 ? 429 : 503;
-      return json({
-        error: status === 429
-          ? "AI suggestion limit reached. Please try again later."
-          : "AI suggestions are temporarily unavailable. Please try again.",
-        error_code: status === 429 ? "rate_limited" : "provider_unavailable",
-      }, status);
-    }
+  const models = ["gemini-3.5-flash-lite", "gemini-3.8-flash"];
+  const retryableStatuses = new Set([404, 408, 429, 500, 502, 503, 504]);
+  let parsed: JsonRecord | null = null;
+  let modelUsed = "";
+  let lastStatus = 0;
+  let lastFailure = "Gemini request failed";
 
-    const payload = await response.json();
-    const rawText = payload?.candidates?.[0]?.content?.parts
-      ?.map((part: JsonRecord) => typeof part.text === "string" ? part.text : "")
-      .join("")
-      .trim();
-
-    if (typeof rawText !== "string" || !rawText) {
-      return json({ error: "Gemini returned no suggestion" }, 503);
-    }
-
-    let parsed: JsonRecord;
+  for (let modelIndex = 0; modelIndex < models.length; modelIndex++) {
+    const model = models[modelIndex];
     try {
-      parsed = JSON.parse(rawText) as JsonRecord;
-    } catch {
-      console.error("Gemini returned invalid product suggestion JSON");
-      return json({ error: "Could not read AI suggestions. Please try again." }, 503);
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": geminiApiKey,
+          },
+          body: JSON.stringify({
+            contents: [{ role: "user", parts }],
+            generationConfig: {
+              responseMimeType: "application/json",
+              maxOutputTokens: 800,
+              thinkingConfig: {
+                thinkingLevel: model === "gemini-3.5-flash-lite" ? "minimal" : "low",
+              },
+            },
+          }),
+          signal: AbortSignal.timeout(25000),
+        },
+      );
+
+      if (!response.ok) {
+        lastStatus = response.status;
+        const detail = await response.text();
+        lastFailure = `${model} HTTP ${response.status}`;
+        console.error("Gemini product suggestion HTTP error:", {
+          model,
+          status: response.status,
+          detail: detail.slice(0, 300),
+        });
+
+        if ([400, 401, 403].includes(response.status)) {
+          return json({
+            error: configurationMessage,
+            error_code: "provider_configuration_error",
+          }, 503);
+        }
+        if (retryableStatuses.has(response.status) && modelIndex < models.length - 1) {
+          await new Promise((resolve) => setTimeout(resolve, 400));
+          continue;
+        }
+        break;
+      }
+
+      const payload = await response.json();
+      const rawText = payload?.candidates?.[0]?.content?.parts
+        ?.map((part: JsonRecord) => typeof part.text === "string" ? part.text : "")
+        .join("")
+        .trim();
+
+      if (typeof rawText !== "string" || !rawText) {
+        lastFailure = `${model} returned no suggestion`;
+        console.error("Gemini product suggestion returned no text:", model);
+        continue;
+      }
+
+      try {
+        parsed = JSON.parse(rawText) as JsonRecord;
+        modelUsed = model;
+        break;
+      } catch {
+        lastFailure = `${model} returned invalid JSON`;
+        console.error("Gemini returned invalid product suggestion JSON:", model);
+      }
+    } catch (error) {
+      lastFailure = error instanceof Error ? error.message : String(error);
+      console.error("Gemini product suggestion attempt failed:", {
+        model,
+        error: lastFailure.slice(0, 250),
+      });
+      if (modelIndex < models.length - 1) {
+        await new Promise((resolve) => setTimeout(resolve, 400));
+      }
     }
+  }
+
+  if (!parsed) {
+    console.error("All Gemini product suggestion models failed:", lastFailure);
+    const status = lastStatus === 429 ? 429 : 503;
+    return json({
+      error: unavailableMessage,
+      error_code: status === 429 ? "rate_limited" : "provider_unavailable",
+    }, status);
+  }
 
     const byId = new Map(categories.map((item) => [item.id, item]));
     const parentIds = new Set(categories.map((item) => item.parent_id).filter(Boolean));
@@ -255,7 +309,7 @@ Deno.serve(async (request: Request) => {
       price_confidence: confidence,
       missing_info: safeList(parsed.missing_info),
       note: cleanText(parsed.note, 300),
-      model: "gemini-3.5-flash-lite",
+      model: modelUsed,
       images_analyzed: images.length,
     });
   } catch (error) {

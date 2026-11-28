@@ -187,10 +187,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     final strings = AppStrings.of(context)!;
     final cropped = await ImageCropper().cropImage(
       sourcePath: source.path,
-      maxWidth: 2000,
-      maxHeight: 2000,
+      maxWidth: 1600,
+      maxHeight: 1600,
       compressFormat: ImageCompressFormat.jpg,
-      compressQuality: 92,
+      compressQuality: 85,
       uiSettings: [
         AndroidUiSettings(
           toolbarTitle: strings.cropImageTitle,
@@ -228,8 +228,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   Future<void> _pickGallery() async {
     final picked = await _picker.pickMultiImage(
-      imageQuality: 95,
-      maxWidth: 2400,
+      imageQuality: 85,
+      maxWidth: 1800,
     );
     if (!mounted || picked.isEmpty) return;
 
@@ -270,8 +270,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     final picked = await _picker.pickImage(
       source: ImageSource.camera,
-      imageQuality: 95,
-      maxWidth: 2400,
+      imageQuality: 85,
+      maxWidth: 1800,
     );
     if (!mounted || picked == null) return;
 

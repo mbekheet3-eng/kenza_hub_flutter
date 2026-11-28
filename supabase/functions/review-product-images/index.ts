@@ -75,21 +75,7 @@ async function analyzeImage(
     "Listing description: " + JSON.stringify(description.slice(0, 1000)),
   ].join("\n");
 
-  const requestBody = JSON.stringify({
-    contents: [{
-      role: "user",
-      parts: [
-        { text: prompt },
-        { inline_data: { mime_type: mimeType, data: base64Encode(bytes) } },
-      ],
-    }],
-    generationConfig: {
-      responseMimeType: "application/json",
-      temperature: 0.1,
-    },
-  });
-
-  const models = ["gemini-2.5-flash", "gemini-3.8-flash"];
+  const models = ["gemini-3.8-flash", "gemini-3.5-flash-lite"];
   let lastError = "Gemini review unavailable";
 
   for (let modelIndex = 0; modelIndex < models.length; modelIndex++) {
@@ -106,7 +92,23 @@ async function analyzeImage(
               "Content-Type": "application/json",
               "x-goog-api-key": apiKey,
             },
-            body: requestBody,
+            body: JSON.stringify({
+            contents: [{
+              role: "user",
+              parts: [
+                { text: prompt },
+                { inline_data: { mime_type: mimeType, data: base64Encode(bytes) } },
+              ],
+            }],
+            generationConfig: {
+              responseMimeType: "application/json",
+              temperature: 0.1,
+              maxOutputTokens: 512,
+              thinkingConfig: {
+                thinkingLevel: model === "gemini-3.5-flash-lite" ? "minimal" : "low",
+              },
+            },
+          }),
             signal: AbortSignal.timeout(30000),
           },
         );
