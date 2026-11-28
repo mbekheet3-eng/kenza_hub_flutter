@@ -311,8 +311,7 @@ SET search_path = ''
 AS $function$
 BEGIN
   IF OLD.reserved_by_order_id IS NOT NULL
-     AND NEW.reserved_by_order_id = OLD.reserved_by_order_id
-     AND (
+     AND (NEW.reserved_by_order_id IS DISTINCT FROM OLD.reserved_by_order_id OR
        NEW.condition IS DISTINCT FROM OLD.condition
        OR NEW.location IS DISTINCT FROM OLD.location
        OR NEW.quantity IS DISTINCT FROM OLD.quantity
