@@ -28,6 +28,22 @@ class MarketplaceTransactionService {
     final userId = await _requireUserId();
     final strings = await AppStrings.delegate.load(AppLocale.notifier.value);
     if (userId == sellerId) throw Exception(strings.ownProductCannotBuy);
+    final activeOffer = await _client
+        .from('product_offers')
+        .select('id')
+        .eq('product_id', productId)
+        .eq('buyer_id', userId)
+        .eq('status', 'pending')
+        .maybeSingle();
+    if (activeOffer != null) {
+      final language = AppLocale.notifier.value.languageCode;
+      final message = language == 'ar'
+          ? 'عندك عرض قائم على المنتج ده. تابع حالة العرض من صفحة الرسائل قبل إرسال طلب شراء جديد.'
+          : language == 'fr'
+              ? 'Vous avez déjà une offre en attente pour ce produit. Consultez son statut dans les messages avant de passer une commande.'
+              : 'You already have a pending offer for this product. Check its status in Messages before sending a purchase request.';
+      throw Exception(message);
+    }
     final existingPending = await _client
         .from('product_orders')
         .select('id')
@@ -51,6 +67,15 @@ class MarketplaceTransactionService {
     } on PostgrestException catch (error) {
       if (error.code == '23505') {
         throw Exception(strings.pendingPurchaseRequestExists);
+      }
+      if (error.code == '23514') {
+        final language = AppLocale.notifier.value.languageCode;
+        final message = language == 'ar'
+            ? 'لا يمكن إرسال طلب الشراء حاليًا. قد يكون المنتج غير متاح أو توجد حالة شراء قائمة. حدّث الصفحة وحاول مرة أخرى.'
+            : language == 'fr'
+                ? 'Impossible d’envoyer la demande pour le moment. Le produit peut être indisponible ou une demande est déjà en cours. Actualisez la page et réessayez.'
+                : 'The purchase request cannot be sent right now. The product may be unavailable or another purchase request may be active. Refresh and try again.';
+        throw Exception(message);
       }
       rethrow;
     }
